@@ -1,0 +1,34 @@
+<app-navbar></app-navbar>
+
+<md-sidenav-container class=fill-client-area>
+  <md-sidenav #sidenav mode="side" opened="true" fxFlex=350px>
+
+    <div fxLayout="column" class=side-nav-content>
+
+
+      <div class=scrolling-content class=fill-client-area>
+
+        <md-nav-list fxFlex>
+          <md-divider></md-divider>
+
+          <div *ngFor="let event of events | async" (click)="eventClicked(event)">
+            <md-list-item>
+              <h2 md-line> {{ event.eventdate |  date }} {{ event.name }} </h2>
+              <p md-line>
+                <span>  {{event.nationality}}  {{event.club}} </span>
+              </p>
+            </md-list-item>
+            <md-divider></md-divider>
+          </div>
+        </md-nav-list>
+
+      </div>
+    </div>
+  </md-sidenav>
+
+  <div fxFlex=450px fxLayout="column" class=.my-content>
+
+       Some content
+
+  </div>
+</md-sidenav-container>

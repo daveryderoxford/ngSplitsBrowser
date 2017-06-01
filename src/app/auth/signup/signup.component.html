@@ -1,0 +1,48 @@
+<app-navbar></app-navbar>
+
+<div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
+
+    <div fxFlex=450px fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
+
+        <h5> Register user </h5>
+
+        <div class=error>{{error}}</div>
+
+        <md-card>
+
+            <form [formGroup]="signupForm" (ngSubmit)="signup()">
+
+                <div fxLayout="column" fxFlex fxLayoutAlign="space-around">
+
+                    <md-input-container>
+                        <input mdInput formControlName="email" type="email" placeholder="Email">
+                        <md-error *ngIf="signupForm.controls.email.errors?.required">Email required</md-error>
+                        <md-error *ngIf="signupForm.controls.email.errors?.email">Invalid email</md-error>
+                    </md-input-container>
+ 
+                    <md-input-container>
+                        <input mdInput formControlName="password" type="password" placeholder="Password">
+                           <md-error>Password required</md-error>
+
+                    </md-input-container>
+
+                    <md-input-container>
+                        <input mdInput formControlName="confirmPassword" type="password" placeholder="Confirm Password">
+                           <md-error>Confirm password required</md-error>
+                           <md-hint *ngIf="signupForm.errors?.passwordMatch" class=error>Passwords do not match</md-hint>
+                    </md-input-container>
+
+                    <div fxLayout="row" fxLayoutAlign="space-between center">
+                        <button [disabled]="signupForm.invalid" md-raised-button color=primary type="submit" aria-label="Signup">Sign up</button>
+                        <a md-button routerLink="/login">Already have user name</a>
+                    </div>
+ 
+                </div>
+
+            </form>
+
+        </md-card>
+
+    </div>
+
+</div>

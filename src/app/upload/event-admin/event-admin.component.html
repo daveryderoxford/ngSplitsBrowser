@@ -1,0 +1,67 @@
+<app-navbar></app-navbar>
+
+<md-sidenav-container class=fill-client-area>
+  <md-sidenav #sidenav mode="side" opened="true" fxFlex=300px>
+
+    <div fxLayout="column" class=side-nav-content>
+
+      <h4 fxFlexAlign="center">Events</h4>
+      <button md-raised-button (click)="addEvent()" fxFlexAlign="start" fxFlexOffset="5">
+         Add event
+       </button>
+
+      <div class=scrolling-content class=fill-client-area>
+
+        <md-nav-list fxFlex>
+          <md-divider></md-divider>
+
+          <div *ngFor="let event of events | async" (click)="eventClicked(event)">
+            <md-list-item>
+              <h2 md-line> {{ event.eventdate | date }} {{ event.name }} </h2>
+              <p md-line>
+                <span>  {{event.nationality}}  {{event.club}} </span>
+              </p>
+            </md-list-item>
+            <md-divider></md-divider>
+          </div>
+        </md-nav-list>
+      </div>
+    </div>
+  </md-sidenav>
+
+  <div fxFlex=450px fxLayout="column" class=.my-content>
+
+  <div *ngIf="selectedEvent || new">
+
+    <md-card>
+
+      <md-card-content>
+          <app-event-edit [oevent]="selectedEvent"></app-event-edit>
+      </md-card-content>
+    </md-card>
+
+    <div *ngIf="!new">
+
+      <md-card>
+        <md-card-title>
+          Upload Splits
+        </md-card-title>
+
+        <md-card-content>
+          <file-button color=primary (onFileSelect)="upload($event)" label="Upload Splits"></file-button>
+        </md-card-content>
+      </md-card>
+
+      <md-card>
+        <md-card-title>
+          Delete Event
+        </md-card-title>
+
+        <md-card-content>
+          <button md-raised-button color=primary type="submit" aria-label="delete">Delete</button>
+        </md-card-content>
+      </md-card>
+    </div>
+    </div>
+  </div>
+</md-sidenav-container>

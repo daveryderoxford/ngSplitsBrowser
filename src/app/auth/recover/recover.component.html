@@ -1,0 +1,34 @@
+<<app-navbar></app-navbar>
+
+    <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
+
+        <div fxFlex=450px fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
+
+            <h5> Recover Your Password</h5>
+
+            <div class=error>{{error}}</div>
+
+            <md-card>
+
+                <form [formGroup]="recoverForm" (ngSubmit)="recover()">
+
+                    <div fxLayout="column" fxFlex fxLayoutAlign="space-around">
+
+                        <md-input-container>
+                            <input mdInput formControlName="email" type="email" placeholder="Email">
+                        </md-input-container>
+                        <div *ngIf="recoverForm.controls.email.dirty" class=error>
+                            <div *ngIf="recoverForm.controls.email.errors?.email">Invalid email</div>
+                        </div>
+                        <BR>
+                        <div fxLayout="row" fxLayoutAlign="space-between center">
+                            <button [disabled]="recoverForm.invalid" md-raised-button color=primary type="submit" aria-label="login">Recover</button>
+                            <a md-button routerLink="/login">Remembered your password?</a>
+
+                        </div>
+                    </div>
+                </form>
+
+            </md-card>
+        </div>
+    </div>

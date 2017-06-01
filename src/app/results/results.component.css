@@ -1,0 +1,10 @@
+
+.fill-client-area {
+  width: 100%;
+  height: 100%;
+}
+
+.scrolling-content {
+  overflow-y: scroll;
+  position: relative;
+}

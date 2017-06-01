@@ -1,0 +1,25 @@
+ 
+<md-toolbar class=bottom-shaddow>
+  Splitsbrowser
+
+  <div fxLayout="row" fxFlex fxLayoutAlign="end center">
+
+    <button md-button routerLink="/results">Results</button>
+    <button md-button routerLink="/admin/event-admin">Manage</button>
+
+    <a *ngIf="!authorised" md-icon-button routerLink="/login">
+         <md-icon class="material-icons md-26">account_box</md-icon>
+    </a>
+    
+    <a *ngIf="authorised" md-icon-button [mdMenuTriggerFor]="appMenu">
+      <md-icon class="material-icons md-26">account_box</md-icon>
+    </a>
+
+  </div>
+
+</md-toolbar> 
+
+<md-menu #appMenu="mdMenu" xPosition="before">
+  <button routerLink="/user" md-menu-item>User settings</button>
+  <button (click)="logout()" md-menu-item>Logout</button>
+</md-menu>

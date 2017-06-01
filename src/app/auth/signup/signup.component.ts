@@ -1,0 +1,59 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
+
+@Component({
+    selector: 'app-signup',
+    templateUrl: './signup.component.html',
+    styleUrls: ['./signup.component.css']
+})
+export class SignupComponent {
+    signupForm: FormGroup;
+    error = '';
+
+    constructor(private router: Router,
+        private formBuilder: FormBuilder,
+        private afAuth: AngularFireAuth) {
+        this.signupForm = this.formBuilder.group({
+            email: ['', [Validators.required, Validators.email]],
+            password: ['', Validators.required],
+            confirmPassword: ['', Validators.required],
+        }, this.passwordMatch);
+
+    }
+
+    passwordMatch(g: FormGroup): any {
+        let ret: any;
+        if (g.get('password').value === g.get('confirmPassword').value) {
+            ret = null;
+        } else {
+            ret = { valid: false };
+        }
+
+        return (ret);
+    }
+
+    async signup() {
+
+        const auth = this.afAuth.auth;
+        const email = this.signupForm.get('email').value;
+        const password = this.signupForm.get('password').value;
+
+        this.error = '';
+
+        try {
+            await auth.createUserWithEmailAndPassword(email, password);
+
+            // User is automatically signed in so get the current user and send verification email
+            await auth.currentUser.sendEmailVerification();
+
+            this.router.navigateByUrl('/user');
+
+        } catch (error) {
+            console.log('SignupComponent: Error creating user code:' + error.code + '  ' + error.message);
+            this.error = error.message;
+        }
+    }
+}

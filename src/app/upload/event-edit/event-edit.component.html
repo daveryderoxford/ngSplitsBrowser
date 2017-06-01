@@ -1,0 +1,51 @@
+<div>
+  <form [formGroup]="f" (ngSubmit)="submit()" novalidate>
+
+    <div fxLayout="column" fxFlex fxLayoutAlign="space-around" fxLayoutGap=10px>
+
+      <md-input-container>
+        <input mdInput formControlName="name" placeholder="Event Name">
+        <md-error>Name required</md-error>
+      </md-input-container>
+
+      <md-input-container>
+        <input mdInput formControlName="eventdate" placeholder="Date" [mdDatepicker]="picker">
+        <button mdSuffix [mdDatepickerToggle]="picker"></button>
+        <md-error>Date required</md-error>
+      </md-input-container>
+      <md-datepicker #picker></md-datepicker>
+
+      <md-input-container>
+        <input type="text" mdInput formControlName="nationality" [mdAutocomplete]="auto" placeholder="Nationality">
+        <md-error>Nationality required</md-error>
+      </md-input-container>
+
+      <md-autocomplete #auto="mdAutocomplete">
+        <md-option *ngFor="let nation of filteredNations | async" [value]="nation.fullname">
+          {{ nation.fullname }}
+        </md-option>
+      </md-autocomplete>
+
+      <md-input-container>
+        <input mdInput formControlName="club" placeholder="Club">
+        <md-error>Club required</md-error>
+      </md-input-container>
+
+      <md-select formControlName="type" placeholder="Type">
+        <md-option *ngFor="let type of types" [value]="type">
+          {{ type }}
+        </md-option>
+      </md-select>
+
+      <md-input-container>
+        <input mdInput formControlName="webpage" placeholder="Web page">
+      </md-input-container>
+
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <button [disabled]="f.invalid" md-raised-button color=primary type="submit" aria-label="login">Save</button>
+      </div>
+
+    </div>
+
+  </form>
+</div>
