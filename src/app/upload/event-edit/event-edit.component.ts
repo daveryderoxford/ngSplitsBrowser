@@ -8,8 +8,8 @@ import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable }
 import { OEvent, EventInfo, EventTypes } from 'app/model/oevent';
 import { Nations, Nation } from 'app/model/nations';
 
-import { AngularFireAuth } from 'angularfire2/auth';
 import { MdSnackBar } from '@angular/material';
+import { EventAdminService } from 'app/upload/event-admin.service';
 
 @Component({
   selector: 'app-event-edit',
@@ -20,6 +20,8 @@ export class EventEditComponent implements OnInit {
   @Input() oevent: OEvent;
   new = true;
   @Output() eventSubmitted = new EventEmitter<EventInfo>();
+  showProgressBar = false;
+
 
   f: FormGroup;
   nations = Nations.getNations();
@@ -30,7 +32,7 @@ export class EventEditComponent implements OnInit {
   constructor(private router: Router,
     private formBuilder: FormBuilder,
     private af: AngularFireDatabase,
-    private afAuth: AngularFireAuth,
+    private eventService: EventAdminService,
     public snackBar: MdSnackBar
   ) {
     this.createForm();
@@ -54,8 +56,8 @@ export class EventEditComponent implements OnInit {
       .map(val => val ? this.filterNations(val) : this.nations.slice());
   }
 
-  private filterNations(val: Nation): Nation[] {
-    const ret = this.nations.filter(nation => new RegExp(`^${val}`, 'gi').test(nation.fullname));
+  private filterNations(name: string): Nation[] {
+    const ret = this.nations.filter(nation => new RegExp(`^${name}`, 'gi').test(nation.fullname));
     return (ret);
   }
 
@@ -63,36 +65,12 @@ export class EventEditComponent implements OnInit {
     // set the form fields then the evnt is changed.
     if (this.oevent === null) {
       this.new = true;
-      this.f.reset();
       this.createForm();
+      this.f.reset();
     } else {
       this.new = false;
       this.f.reset(this.oevent);
     }
-  }
-
-  private async saveNew() {
-    const events: FirebaseListObservable<OEvent[]> = this.af.list('/events/');
-    const event: OEvent = {
-      name: this.f.value.name,
-      eventdate: this.f.value.eventdate.toISOString(),
-      nationality: this.f.value.nationality,
-      club: this.f.value.club,
-      type: this.f.value.type,
-      webpage: this.f.value.webpage,
-      email: '',
-      user: this.afAuth.auth.currentUser.uid
-    };
-    console.log('EventEditComponent:  Adding Event ' + JSON.stringify(event));
-    await events.push(event);
-    console.log('EventEditComponent:  Event added');
-  }
-
-  private async update() {
-    console.log('EventEditComponent: Updating key ' + this.oevent.$key);
-    const events: FirebaseListObservable<OEvent[]> = this.af.list('/events/');
-    await events.update(this.oevent.$key, this.f.value);
-    console.log('EventEditComponent:  Event updated');
   }
 
   cancel() {
@@ -104,13 +82,17 @@ export class EventEditComponent implements OnInit {
   async submit() {
 
     if (this.f.valid) {
+
       try {
+        this.showProgressBar = true;
         if (this.new) {
-          await this.saveNew();
+          await this.eventService.saveNew(this.f.value);
         } else {
-          await this.update();
+          await this.eventService.updateEventInfo(this.oevent.$key, this.f.value);
         }
+        this.showProgressBar = false;
       } catch (err) {
+        this.showProgressBar = false;
         const snackBarRef = this.snackBar.open('Error updating event information');
         console.log('EventEditComponent:  Error updating event information ' + err);
       }

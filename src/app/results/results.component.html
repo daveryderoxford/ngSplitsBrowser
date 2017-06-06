@@ -5,18 +5,18 @@
 
     <div fxLayout="column" class=side-nav-content>
 
-
       <div class=scrolling-content class=fill-client-area>
 
-        <md-nav-list fxFlex>
+        <md-nav-list fxFlex dense>
           <md-divider></md-divider>
 
           <div *ngFor="let event of events | async" (click)="eventClicked(event)">
             <md-list-item>
-              <h2 md-line> {{ event.eventdate |  date }} {{ event.name }} </h2>
-              <p md-line>
-                <span>  {{event.nationality}}  {{event.club}} </span>
-              </p>
+              <span md-line class='list-header'> {{ event.eventdate |  date }}  {{ event.name }} </span>
+              <span md-line>
+                  {{event.nationality}}  {{event.club}}
+              </span>
+
             </md-list-item>
             <md-divider></md-divider>
           </div>

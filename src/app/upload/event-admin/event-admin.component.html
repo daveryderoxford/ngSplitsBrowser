@@ -48,7 +48,7 @@
         </md-card-title>
 
         <md-card-content>
-          <file-button color=primary (onFileSelect)="upload($event)" label="Upload Splits"></file-button>
+          <file-button color=primary (onFileSelect)="uploadSplits($event)" label="Upload Splits"></file-button>
         </md-card-content>
       </md-card>
 
@@ -58,7 +58,7 @@
         </md-card-title>
 
         <md-card-content>
-          <button md-raised-button color=primary type="submit" aria-label="delete">Delete</button>
+          <button md-raised-button color=primary aria-label="delete" (click)="deleteEvent()">Delete</button>
         </md-card-content>
       </md-card>
     </div>

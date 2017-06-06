@@ -16,7 +16,6 @@
 
                     <md-input-container>
                         <input mdInput formControlName="email" type="email" placeholder="Email">
-                        <md-error *ngIf="signupForm.controls.email.errors?.required">Email required</md-error>
                         <md-error *ngIf="signupForm.controls.email.errors?.email">Invalid email</md-error>
                     </md-input-container>
  

@@ -7,9 +7,12 @@ export class EventTypes {
 export interface OEvent extends EventInfo {
      $key?: string;
      user: string;
-     splits?: SplitsData;
-     summary?: EventSummary;
+     splits?: SplitsData | null;
+     summary?: EventSummary | null;
      legacyPassword?: string;
+     date_club_index?: string;
+     club_date_index?: string;
+     user_date_index?: string;
 }
 
 export interface EventInfo {

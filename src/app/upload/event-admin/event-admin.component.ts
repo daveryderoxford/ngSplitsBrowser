@@ -37,11 +37,8 @@ export class EventAdminComponent implements OnInit {
 
   }
 
-  uploadsplits() {
 
-  }
-
-  async upload(files: File[]) {
+  async uploadSplits(files: File[]) {
     const splitsFile = files[0];
     try {
       await this.eventAdmin.uploadSplits(this.selectedEvent, splitsFile);
@@ -53,6 +50,16 @@ export class EventAdminComponent implements OnInit {
   addEvent() {
     this.selectedEvent = null;
     this.new = true;
+  }
+
+  async deleteEvent() {
+    // display confirmation dialog
+    try {
+      await this.eventAdmin.delete(this.selectedEvent.$key);
+      this.selectedEvent = null;
+    } catch (err) {
+      console.log('EventAdminComponnet: Error deleting event' + err );
+    }
   }
 
   eventClicked(event: OEvent) {

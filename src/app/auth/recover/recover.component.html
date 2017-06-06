@@ -1,4 +1,4 @@
-<<app-navbar></app-navbar>
+<app-navbar></app-navbar>
 
     <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
 
@@ -16,10 +16,9 @@
 
                         <md-input-container>
                             <input mdInput formControlName="email" type="email" placeholder="Email">
+                            <md-error *ngIf="loginForm.controls.email.errors?.email">Invalid email</md-error>
                         </md-input-container>
-                        <div *ngIf="recoverForm.controls.email.dirty" class=error>
-                            <div *ngIf="recoverForm.controls.email.errors?.email">Invalid email</div>
-                        </div>
+
                         <BR>
                         <div fxLayout="row" fxLayoutAlign="space-between center">
                             <button [disabled]="recoverForm.invalid" md-raised-button color=primary type="submit" aria-label="login">Recover</button>

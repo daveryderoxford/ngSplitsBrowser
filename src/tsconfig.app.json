@@ -20,5 +20,8 @@
   "exclude": [
     "test.ts",
     "**/*.spec.ts"
+  ],
+  "types": [
+    "d3"
   ]
 }

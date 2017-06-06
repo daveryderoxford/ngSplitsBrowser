@@ -24,7 +24,7 @@ export class ResultsComponent implements OnInit {
 
     const opts = {
       query: {
-        orderByChild: 'eventdate',
+        orderByChild: 'date_club_index',
       }
     };
 

@@ -17,7 +17,6 @@ import { AuthGuard } from 'app/auth/guards/auth-guard';
 import { UploadModule } from './upload/upload.module';
 import { AppComponent } from './app.component';
 
-
 import 'hammerjs';
 
 import { LoginComponent } from './auth/login/login.component';

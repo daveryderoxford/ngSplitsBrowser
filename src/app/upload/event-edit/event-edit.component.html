@@ -3,6 +3,8 @@
 
     <div fxLayout="column" fxFlex fxLayoutAlign="space-around" fxLayoutGap=10px>
 
+       <md-progress-bar *ngIf="showProgressBar" mode="query"> </md-progress-bar>
+
       <md-input-container>
         <input mdInput formControlName="name" placeholder="Event Name">
         <md-error>Name required</md-error>
