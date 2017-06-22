@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@angular/core';
-import { OEvent, EventInfo, EventSummary, CourseSummary } from 'app/model/oevent';
+import { OEvent, EventInfo, EventSummary, CourseSummary, SplitsFileFormat} from 'app/model/oevent';
 // import * as sb from './filereader/splitsbrowser.data';
 
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -79,31 +79,43 @@ export class EventAdminService {
     return str;
   }
 
-  async delete(key: string) {
-    // Delete stored files
-
-
+  async delete(oevent: OEvent) {
+    // Delete results file
+    if (oevent.splits) {
+       await this.firebaseApp.storage().ref().child(oevent.splits.splitsFilename).delete();
+     }
     // Delete record
-    return (await this.af.database.ref('/events/' + key).remove());
+    return (await this.af.database.ref('/events/' + oevent.$key).remove());
   }
 
+/** Loads splits from a file */
+  async loadResults(oevent: OEvent, file: File): Promise<any> {
+      const text = await this.loadTextFile(file);
+      const results = this.parseSplits(text, oevent);
 
-  /** Asymc functiom to read and parse splits and upload splits.
-   * An observable of the upload process is retsuned allowing the client to monitor the upload tha may take some time.   */
-  async uploadSplits(oevent: OEvent, file: File) {
+      return new Promise<any>((resolve) => {
+         resolve(results);
+      });
+  }
+
+  /** Asymc functiom to read and parse splits and upload splits.*/
+    async uploadSplits(oevent: OEvent, file: File, fileFormat: SplitsFileFormat = 'auto') {
 
     const text = await this.loadTextFile(file);
 
     const results = this.parseSplits(text, oevent);
-    const summary = this.populateSummary(results);
+
+    oevent.summary = this.populateSummary(results);
 
     // Save file
     const uid = this.afAuth.auth.currentUser.uid;
     const path = 'results/' + uid + '/' + oevent.$key + '-results';
     await this.uploadToGoogle(text, path);
-
-     // Save Summary
-     await this.af.database.ref('/events/' + oevent.$key).update( { summary: summary} );
+    oevent.splits = {
+      splitsFilename: path,
+      splitsFileFormat: fileFormat
+    }
+    await this.af.database.ref('/events/' + oevent.$key).set(oevent);
 
     console.log('EventAdminService: Splits  uploaded ' + file + '  to' + path);
 

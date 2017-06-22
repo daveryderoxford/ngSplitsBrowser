@@ -19,11 +19,7 @@
       "testTsconfig": "tsconfig.spec.json",
       "prefix": "app",
       "styles": [
-        "styles.css"
-      ],
-      "scripts": [
-        "../lib/splitsbrowser.min.js",
-        "../lib/messages-en_gb.js"
+        "styles.scss"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
@@ -54,7 +50,7 @@
     }
   },
   "defaults": {
-    "styleExt": "css",
+    "styleExt": "scss",
     "component": {}
   }
 }

@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule, Routes } from '@angular/router';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { DialogsModule } from 'app/dialogs/dialogs.module';
 
 import {
     MdCoreModule, MdRippleModule, MdButtonModule, MdCardModule, MdIconModule,
@@ -31,6 +32,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
         MdTooltipModule,
         RouterModule,
         FlexLayoutModule,
+        DialogsModule,
     ],
     declarations: [NavbarComponent],
     exports: [NavbarComponent],

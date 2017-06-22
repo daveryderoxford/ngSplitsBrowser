@@ -28,6 +28,9 @@ import { ResultsComponent } from './results/results.component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { firebaseConfig } from 'app/app.firebase-config';
 import { UserComponent } from 'app/user/user.component';
+import { AboutComponent } from './about/about.component';
+import { GraphComponent } from './results/graph/graph.component';
+import { ResultsSelectionService } from './results/results-selection.service';
 
 export const appRoutes: Routes = [
   { path: '', component: MainComponent },
@@ -35,8 +38,9 @@ export const appRoutes: Routes = [
   { path: 'signup', component: SignupComponent },
   { path: 'recover', component: RecoverComponent },
   { path: 'results', component: ResultsComponent },
-  { path: 'user', component: UserComponent, canActivate: [AuthGuard] }
-
+  { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
+  { path: 'about', component: AboutComponent },
+  { path: 'graph/:id', component: GraphComponent }
 ];
 
 @NgModule({
@@ -48,6 +52,8 @@ export const appRoutes: Routes = [
     MainComponent,
     ResultsComponent,
     UserComponent,
+    AboutComponent,
+    GraphComponent,
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
@@ -63,6 +69,7 @@ export const appRoutes: Routes = [
   ],
   providers: [
     AuthGuard,
+    ResultsSelectionService,
   ],
   bootstrap: [AppComponent]
 })

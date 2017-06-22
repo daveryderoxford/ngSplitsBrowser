@@ -1,41 +1,97 @@
 <app-navbar> </app-navbar>
 
-<div>
-  <div fxLayout="row" fxFlex fxLayoutAlign="space-around center">
 
-    <md-card>
-      <md-card-header>
-        <div md-card-avatar class="example-header-image"></div>
-        <md-card-title>About Splitsbrowser</md-card-title>
-        <md-card-subtitle>Orienteering results analysis</md-card-subtitle>
-      </md-card-header>
+<div fxLayout="column" fxLayoutAlign="start">
 
-      <md-card-content> 
-        <p>
-          Splitsbrowser
-        </p>
-      </md-card-content>
-      <md-card-actions>
-        <button md-button>MORE</button>
-      </md-card-actions>
-    </md-card>
+  <div fxFlex=350px fxLayout="row wrap" fxLayoutAlign="space-around center">
+    <div>
+      <h1>Splitsbrowser</h1>
+      <h3>Orienteering results analysis</h3>
+    </div>
 
-    <md-card>
-      <md-card-header>
-        <div md-card-avatar class="example-header-image"></div>
-        <md-card-title>About Splitsbrowser</md-card-title>
-        <md-card-subtitle>Orienteering results analysis</md-card-subtitle>
-      </md-card-header>
+    <div fxFlex=300px>
+      <md-list>
+        <h3 md-subheader>Recent Results</h3>
+        <div *ngFor="let event of events | async" (click)="eventClicked(event)">
+          <md-list-item>
+            <span md-line class='list-header'> {{ event.eventdate |  date }}  {{ event.name }} </span>
+            <span md-line>
+                  {{event.nationality}}  {{event.club}}
+              </span>
 
-      <md-card-content>
-        <p>
-          Splitsbrowser
-        </p>
-      </md-card-content>
-      <md-card-actions>
-        <button md-button>MORE</button>
-      </md-card-actions>
-    </md-card>
-
+          </md-list-item>
+        </div>
+      </md-list>
+    </div>
   </div>
-</div>
+
+  <div fxFlex='100%' class="gray_background panel_margin">
+
+
+    <div fxLayout="row" fxFlex='100%' fxLayoutGap=30px fxLayoutAlign="space-around" fxLayout.xs="column" fxFlex.xs='100%' fxLayoutAlign.xs="start center"
+      class="gray_background">
+
+      <md-card>
+        <md-card-header>
+          <md-icon md-card-avatar color=primary class="material-icons.md-36">directions_run</md-icon>
+          <md-card-title>Competitors</md-card-title>
+          <md-card-subtitle>Orienteering results analysis</md-card-subtitle>
+        </md-card-header>
+
+        <md-card-content>
+          <p>
+            Splitsbrowser supports viewing of the results of orienteering events. Competitors can maintain a list of events they have
+            attended.
+          </p>
+        </md-card-content>
+        <md-card-actions>
+           <button md-button routerLink="/about">About</button>
+          <button md-button routerLink="/admin">Results</button>
+        </md-card-actions>
+      </md-card>
+
+      <md-card>
+        <md-card-header>
+          <div md-card-avatar class="example-header-image"></div>
+          <md-card-title>Event organisers</md-card-title>
+          <md-card-subtitle>Upload event results for viewing</md-card-subtitle>
+        </md-card-header>
+
+        <md-card-content>
+          <p>
+            Event organisers may upload event results In order to download event a event you will need to register as user
+          </p>
+        </md-card-content>
+        <md-card-actions>
+          <button md-button routerLink="/admin">Add Event</button>
+        </md-card-actions>
+      </md-card>
+
+      <md-card>
+        <md-card-header>
+          <div md-card-avatar class="example-header-image"></div>
+          <md-card-title>Developers</md-card-title>
+          <md-card-subtitle>Enhance Splitsbrowser or </md-card-subtitle>
+        </md-card-header>
+
+        <md-card-content>
+          <p>
+            Splitsbrowser is based on Open Source software. The source code and is avalible on Github.
+          </p>
+        </md-card-content>
+        <md-card-actions>
+          <a md-button href="https://github.com/daveryderoxford/ngSplitsBrowser">GitHub</a>
+        </md-card-actions>
+      </md-card>
+
+    </div>
+  </div>
+
+  <div fxFlex=50px class=footer fxLayout="row" fxLayoutAlign="start center">
+    <a fxFlexOffset=20px class=footer_link href="mailto:support@splitsbrowser.org.uk">Contact</a>
+    <div fxLayout="row" fxLayoutGap=20px fxFlex fxLayoutAlign="end center">
+      <a class=footer_link routerLink="/about">About</a>
+      <a class=footer_link href="https://github.com/daveryderoxford/ngSplitsBrowser">Github</a>
+      <div></div>
+    </div>
+  </div>

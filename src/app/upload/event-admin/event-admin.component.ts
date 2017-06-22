@@ -6,6 +6,7 @@ import { OEvent, EventInfo } from 'app/model/oevent';
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 
+import { DialogsService } from 'app/dialogs/dialogs.service';
 import { EventAdminService } from 'app/upload/event-admin.service';
 
 @Component({
@@ -22,7 +23,8 @@ export class EventAdminComponent implements OnInit {
 
   constructor(private afAuth: AngularFireAuth,
     private eventAdmin: EventAdminService,
-    private db: AngularFireDatabase) { }
+    private db: AngularFireDatabase,
+    private dialogsService: DialogsService) { }
 
   ngOnInit() {
 
@@ -37,14 +39,19 @@ export class EventAdminComponent implements OnInit {
 
   }
 
-
   async uploadSplits(files: File[]) {
-    const splitsFile = files[0];
-    try {
-      await this.eventAdmin.uploadSplits(this.selectedEvent, splitsFile);
-     } catch (err) {
-        console.log('EventAdminComponnet: Error uploading splits' + err );
-     }
+    let confirm = true;
+    if (this.selectedEvent.splits) {
+      confirm = await this.dialogsService.confirm('Confirm Dialog', 'Are you sure you want to overwrite splits?');
+    }
+    if (confirm) {
+      const splitsFile = files[0];
+      try {
+        await this.eventAdmin.uploadSplits(this.selectedEvent, splitsFile);
+      } catch (err) {
+        console.log('EventAdminComponnet: Error uploading splits' + err);
+      }
+    }
   }
 
   addEvent() {
@@ -53,12 +60,14 @@ export class EventAdminComponent implements OnInit {
   }
 
   async deleteEvent() {
-    // display confirmation dialog
-    try {
-      await this.eventAdmin.delete(this.selectedEvent.$key);
-      this.selectedEvent = null;
-    } catch (err) {
-      console.log('EventAdminComponnet: Error deleting event' + err );
+    const confirm = await this.dialogsService.confirm('Confirm Dialog', 'Are you sure you want to delete is event?');
+    if (confirm) {
+      try {
+        await this.eventAdmin.delete(this.selectedEvent);
+        this.selectedEvent = null;
+      } catch (err) {
+        console.log('EventAdminComponnet: Error deleting event' + err);
+      }
     }
   }
 
@@ -68,3 +77,4 @@ export class EventAdminComponent implements OnInit {
   }
 
 }
+

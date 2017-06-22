@@ -1,6 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 
+//  Common colors
+$gray-background: rgb(249,249,249);
+$gray-text: rgb(100,100,100);
+$text-link-color: rgb(20, 20,18000);
+
+
+// Text Styles 
 html, body {
  font-family: 'Roboto';
   font-size: 14px;
@@ -10,16 +17,6 @@ html, body {
   width: 100%;
   margin: 0;
   border: 0;
-}
-
-.gradient {
-    width: 100%;
-    height: 100%;
-    background: red; /* For browsers that do not support gradients */
-    background: -webkit-linear-gradient(red, yellow); /* For Safari 5.1 to 6.0 */
-    background: -o-linear-gradient(red, yellow); /* For Opera 11.1 to 12.0 */
-    background: -moz-linear-gradient(red, yellow); /* For Firefox 3.6 to 15 */
-    background: linear-gradient(red, yellow); /* Standard syntax (must be last) */
 }
 
 h1, h2, h3, h4, h5, h6, p {
@@ -170,5 +167,18 @@ ul, ol {
     padding-bottom: 0px;
 }
 
+.gradient {
+    width: 100%;
+    height: 100%;
+    background: red; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(red, yellow); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(red, yellow); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(red, yellow); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(red, yellow); /* Standard syntax (must be last) */
+}
+
+.gray_background {
+   background: rgb(249,249,249);
+}
 
 

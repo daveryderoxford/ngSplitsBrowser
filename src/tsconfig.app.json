@@ -14,8 +14,7 @@
     "module": "es2015",
     "baseUrl": "",
     "types": [],
-    "allowJs": true,
-    "checkJs": true
+    "allowJs": true
   },
   "exclude": [
     "test.ts",

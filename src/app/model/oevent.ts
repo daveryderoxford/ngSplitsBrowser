@@ -4,6 +4,8 @@ export class EventTypes {
     static types: Array<EventType> = ['IOF' , 'International' , 'National' , 'Regional', 'Local'];
 }
 
+export type SplitsFileFormat = 'auto' | 'IOFv3' |  'IOFv2' | 'SI-CSV' | 'SB-CSV' | 'HTML';
+
 export interface OEvent extends EventInfo {
      $key?: string;
      user: string;
@@ -27,7 +29,7 @@ export interface EventInfo {
 
 export interface SplitsData {
      splitsFilename: string;
-     splitsFileFormat: string;
+     splitsFileFormat: SplitsFileFormat;
 }
 
 export interface EventSummary {
