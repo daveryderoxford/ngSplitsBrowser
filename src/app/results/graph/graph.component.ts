@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewEncapsulation } from '@angular/core';
 import { OEvent } from 'app/model/oevent';
 import { ActivatedRoute, Params } from '@angular/router';
 
@@ -9,15 +9,21 @@ import {SplitsBrowser} from 'app/results/graph/splitsbrowser/splitsbrowser';
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
-  styleUrls: ['./graph.component.scss']
+  styleUrls: ['./graph.component.scss'],
+  // To avoid angular re-writting style names that will be used by D3.
+  encapsulation: ViewEncapsulation.None
 })
 export class GraphComponent implements OnInit {
 
   event: OEvent;
+  private parentNativeElement: any;
 
-  constructor(
-    private route: ActivatedRoute,
-    private rs: ResultsSelectionService) { }
+  constructor( private route: ActivatedRoute,
+               private rs: ResultsSelectionService,
+                element: ElementRef) {
+      this.parentNativeElement = element.nativeElement;
+
+    }
 
   ngOnInit() {
     this.route.params.subscribe((params: Params) => this.rs.setSelectedEventByKey(params['id']));
