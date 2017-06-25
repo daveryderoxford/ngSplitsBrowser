@@ -6,11 +6,18 @@ import { ResultsSelectionService } from 'app/results/results-selection.service';
 
 import {SplitsBrowser} from 'app/results/graph/splitsbrowser/splitsbrowser';
 
+
+interface SplitsBrowserOptions {
+   defaultLanguage?: boolean;
+   containerElement?: string;
+   topBar?: string;
+}
+
 @Component({
   selector: 'app-graph',
   templateUrl: './graph.component.html',
   styleUrls: ['./graph.component.scss'],
-  // To avoid angular re-writting style names that will be used by D3.
+  // To avoid angular re-writting style names that will be used by D3.  These styles will just get appende dto the global styles file
   encapsulation: ViewEncapsulation.None
 })
 export class GraphComponent implements OnInit {
@@ -32,11 +39,9 @@ export class GraphComponent implements OnInit {
 
   async selectedEventUpdated( event: OEvent) {
     if (event) {
-      console.log('GraphComponent: Event Next')
       this.event = event;
-      // Load the results
       const url = await this.rs.getSplitsURL();
-      SplitsBrowser.loadEvent(url);
+      SplitsBrowser.loadEvent(url, {containerElement: 'app-graph'} );
     }
   }
 

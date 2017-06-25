@@ -19,6 +19,7 @@ import { AppComponent } from './app.component';
 
 import 'hammerjs';
 
+// Components
 import { LoginComponent } from './auth/login/login.component';
 import { RecoverComponent } from './auth/recover/recover.component';
 import { SignupComponent } from './auth/signup/signup.component';
@@ -30,7 +31,10 @@ import { firebaseConfig } from 'app/app.firebase-config';
 import { UserComponent } from 'app/user/user.component';
 import { AboutComponent } from './about/about.component';
 import { GraphComponent } from './results/graph/graph.component';
+
+// Services
 import { ResultsSelectionService } from './results/results-selection.service';
+import { UserDataService } from 'app/user/user-data.service';
 
 export const appRoutes: Routes = [
   { path: '', component: MainComponent },
@@ -70,6 +74,7 @@ export const appRoutes: Routes = [
   providers: [
     AuthGuard,
     ResultsSelectionService,
+    UserDataService,
   ],
   bootstrap: [AppComponent]
 })

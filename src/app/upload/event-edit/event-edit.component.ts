@@ -22,9 +22,7 @@ export class EventEditComponent implements OnInit {
   @Output() eventSubmitted = new EventEmitter<EventInfo>();
   showProgressBar = false;
 
-
   f: FormGroup;
-  nations = Nations.getNations();
   types = EventTypes.types;
 
   filteredNations: Observable<Nation[]>;
@@ -50,14 +48,13 @@ export class EventEditComponent implements OnInit {
   }
 
   ngOnInit() {
-
     this.filteredNations = this.f.get('nationality').valueChanges
       .startWith(null)
-      .map(val => val ? this.filterNations(val) : this.nations.slice());
+      .map(val => val ? this.filterNations(val) : Nations.getNations().slice());
   }
 
   private filterNations(name: string): Nation[] {
-    const ret = this.nations.filter(nation => new RegExp(`^${name}`, 'gi').test(nation.fullname));
+    const ret = Nations.getNations().filter(nation => new RegExp(`^${name}`, 'gi').test(nation.fullname));
     return (ret);
   }
 

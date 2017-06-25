@@ -29,7 +29,8 @@
       </md-autocomplete>
 
       <md-input-container>
-        <input mdInput formControlName="club" placeholder="Club">
+        <input mdInput formControlName="club"  minlength=2 maxlength=10 placeholder="Club abrievation">
+         <md-hint align="end">Between 2 and 10 characters</md-hint>
         <md-error>Club required</md-error>
       </md-input-container>
 

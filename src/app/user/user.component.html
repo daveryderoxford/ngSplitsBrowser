@@ -1,5 +1,73 @@
 <app-navbar></app-navbar>
 
-<p>
-  user works!
-</p>
+<div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
+
+  <div fxFlex=450px fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
+
+    <h5> Splitsbrowser Login </h5>
+
+    <div class=error>{{error}}</div>
+
+    <md-card>
+
+      <form [formGroup]="userForm" (ngSubmit)="save()" novalidate>
+
+        <div fxLayout="column" fxFlex fxLayoutAlign="space-around" fxLayoutGap=10px>
+
+          <md-progress-bar *ngIf="showProgressBar" mode="query"> </md-progress-bar>
+
+          <div fxFlexLayout=row>
+            <md-input-container>
+              <input mdInput formControlName="firstName" placeholder="First Name">
+            </md-input-container>
+
+            <md-input-container>
+              <input mdInput formControlName="lastName" placeholder="Last Names">
+            </md-input-container>
+          </div>
+
+          <md-input-container>
+            <input type="text" mdInput formControlName="nationality" [mdAutocomplete]="auto" placeholder="Nationality">
+            <md-error>Nationality required</md-error>
+          </md-input-container>
+
+          <md-autocomplete #auto="mdAutocomplete">
+            <md-option *ngFor="let nation of filteredNations | async" [value]="nation.fullname">
+              {{ nation.fullname }}
+            </md-option>
+          </md-autocomplete>
+
+          <md-input-container>
+            <input mdInput formControlName="yearOfBirth" type="number" placeholder="Year of birth">
+          </md-input-container>
+
+          <md-input-container>
+            <input mdInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
+            <md-hint align="end">Between 2 and 10 characters</md-hint>
+          </md-input-container>
+
+          <md-input-container>
+            <input mdInput formControlName="nationalId" type="number" placeholder="National ID number">
+          </md-input-container>
+
+          <md-input-container>
+            <input mdInput formControlName="ecardSI" type="number" placeholder="Sportident ecard number">
+          </md-input-container>
+
+          <md-input-container>
+            <input mdInput formControlName="ecardEmit" type="number" placeholder="Emit ecard number">
+          </md-input-container>
+
+          <md-checkbox formControlName="autoFind"> Automatically add results </md-checkbox>
+
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <button [disabled]="userForm.invalid" md-raised-button color=primary type="submit" aria-label="login">Save</button>
+          </div>
+        </div>
+
+      </form>
+    </md-card>
+
+  </div>
+
+</div>

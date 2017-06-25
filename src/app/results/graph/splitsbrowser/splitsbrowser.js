@@ -10215,14 +10215,19 @@ SplitsBrowser.Messages = {};
     /**
     * Construct the UI inside the HTML body.
     */
-    Viewer.prototype.buildUi = function () {
+    Viewer.prototype.buildUi = function (options) {
         // DKR Attach the D3 output to a div with ID of SB container
-        var body = d3.select("body");
+        if (options && options.containerElement) {
+            var body = d3.select(options.containerElement);
+        } else {
+           var body = d3.select("body");
+        }
         body.style("overflow", "hidden");
 
       this.container = body.append("div")
-                            .attr("id", "sbContainer");
-    // this.container == d3.select("#️sbContainer");
+                           .attr("id", "sbContainer");
+  //     this.container == d3.select('.sb');
+     //  this.container.append("Hi Dave");
         
         this.topPanel = this.container.append("div");
         
@@ -10370,7 +10375,8 @@ SplitsBrowser.Messages = {};
         // Extra amount subtracted off of the width of the chart in order to
         // prevent wrapping, in units of pixels.
         // 2 to prevent wrapping when zoomed out to 33% in Chrome. 
-        //DKR TODO Temp bdge as chart seems to be wrapping in chrome currently  was 2. Looks like a scrollbar width
+        //DKR TODO Temp bdge as chart seems to be wrapping in chrome currently  was 2. Looks like a scrollbar 
+        // width associated the mets viewport tag in the index. 
         var EXTRA_WRAP_PREVENTION_SPACE = 15;
         
         var containerWidth = $(window).width() - horzMargin;
@@ -10734,7 +10740,7 @@ SplitsBrowser.Messages = {};
             }
             
             var viewer = new Viewer(options);
-            viewer.buildUi();
+            viewer.buildUi(options);
             viewer.setEvent(eventData);
             
             var queryString = document.location.search;
@@ -10795,6 +10801,7 @@ SplitsBrowser.Messages = {};
             return;
         }
         
+        // Load the event data 
         $.ajax({
             url: eventUrl,
             data: "",
