@@ -10328,7 +10328,7 @@ SplitsBrowser.Messages = {};
     * @sb-return {Number} Total horizontal margin.
     */ 
     Viewer.prototype.getHorizontalMargin = function () {
-        var body = $("body");
+        var body = $("app-graph");
         var container = $(this.container.node());
         return (body.outerWidth(true) - body.width()) + (container.outerWidth() - container.width());
     };
@@ -10340,7 +10340,7 @@ SplitsBrowser.Messages = {};
     * @sb-return {Number} Total vertical margin.
     */ 
     Viewer.prototype.getVerticalMargin = function () {
-        var body = $("body");
+        var body = $("app-graph");
         var container = $(this.container.node());
         return (body.outerHeight(true) - body.height()) + (container.outerHeight() - container.height());
     };

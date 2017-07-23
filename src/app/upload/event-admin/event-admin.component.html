@@ -6,7 +6,7 @@
     <div fxLayout="column" class=side-nav-content>
 
       <h4 fxFlexAlign="center">Events</h4>
-      <button md-raised-button (click)="addEvent()" fxFlexAlign="start" fxFlexOffset="5">
+      <button md-raised-button color=primary  (click)="addEvent()" fxFlexAlign="start" fxFlexOffset="5">
          Add event
        </button>
 
@@ -48,7 +48,16 @@
         </md-card-title>
 
         <md-card-content>
-          <file-button color=primary (onFileSelect)="uploadSplits($event)" label="Upload Splits"></file-button>
+          <div fxLayout=row>
+          <file-button color=primary (onFileSelect)="uploadSplits($event)" label="Upload Splits"></file-button>   
+          <span fxFlexAlign=end *ngIf=selectedEvent.summary>  
+             Splits uploaded  {{selectedEvent.summary.courses.length}} courses <BR>
+            <span *ngFor="let course of selectedEvent.summary.courses"> 
+                {{course.name}} &nbsp; &nbsp; 
+            </span>
+          </span>
+          <span *ngIf=!selectedEvent.summary color=red> Splits not yet uploded</span>
+          </div>
         </md-card-content>
       </md-card>
 

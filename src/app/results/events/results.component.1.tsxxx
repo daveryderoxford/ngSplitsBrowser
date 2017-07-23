@@ -1,0 +1,82 @@
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { FirebaseListObservable, AngularFireDatabase } from 'angularfire2/database';
+import { OEvent } from 'app/model/oevent';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { EventAdminService } from 'app/upload/event-admin.service';
+
+import { ChangeEvent } from 'angular2-virtual-scroll';
+
+@Component({
+  selector: 'app-results',
+  templateUrl: './results.component.html',
+  styleUrls: ['./results.component.css']
+})
+export class ResultsComponent implements OnInit {
+
+  selectedEvent: OEvent = null;
+  protected oevents: OEvent[] = [];
+  protected visibleEvents: OEvent[] = [];
+  protected loading: boolean = false;
+
+  new = false;
+
+  constructor(private afAuth: AngularFireAuth,
+    private eventAdmin: EventAdminService,
+    private db: AngularFireDatabase,
+    private router: Router) { }
+
+  async ngOnInit() {
+    console.log('hi dave');
+   this.fetchNextChunk().subscribe( (chunk) => this.chunkAdded(chunk) );
+  }
+
+  oeventClicked(event: OEvent) {
+    this.router.navigate(['/graph', event.$key]);
+  }
+
+  chunkAdded(chunk: OEvent[]) {
+      this.oevents = this.oevents.concat(chunk);
+      console.log('Events:  ' + this.oevents.length);
+      this.oevents.forEach(event => { console.log(event.name) });
+      this.loading = false;
+  }
+
+  protected fetchMore(event: ChangeEvent) {
+    console.log('ho dave');
+
+    if (event.end === this.oevents.length) {
+      this.loading = true;
+      this.fetchNextChunk().subscribe( (chunk) => this.chunkAdded(chunk) );
+    }
+  }
+
+  protected fetchNextChunk(): FirebaseListObservable<OEvent[]> {
+
+    const oevents = this.oevents;
+    let opts: any;
+    const pageSize = 30;
+
+    if (oevents.length > 0) {
+      opts = {
+        query: {
+          orderByChild: 'date_club_index',
+          startAt: oevents[oevents.length - 1].date_club_index,
+          limitToFirst: pageSize
+        }
+      };
+    } else {
+      opts = {
+        query: {
+          orderByChild: 'date_club_index',
+          limitToFirst: pageSize
+        }
+      };
+    };
+    return(this.db.list('/events', opts));
+  }
+
+  protected updateVisibleEvents($event) {
+    this.visibleEvents = $event;
+  }
+}

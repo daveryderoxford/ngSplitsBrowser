@@ -25,12 +25,12 @@ import { RecoverComponent } from './auth/recover/recover.component';
 import { SignupComponent } from './auth/signup/signup.component';
 import { MainComponent } from './main/main.component';
 import { SharedModule } from 'app/app.shared.module';
-import { ResultsComponent } from './results/results.component';
-import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { EventsComponent } from './results/events/events.component';
 import { firebaseConfig } from 'app/app.firebase-config';
 import { UserComponent } from 'app/user/user.component';
 import { AboutComponent } from './about/about.component';
 import { GraphComponent } from './results/graph/graph.component';
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
 // Services
 import { ResultsSelectionService } from './results/results-selection.service';
@@ -41,7 +41,7 @@ export const appRoutes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'recover', component: RecoverComponent },
-  { path: 'results', component: ResultsComponent },
+  { path: 'events', component: EventsComponent },
   { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
   { path: 'about', component: AboutComponent },
   { path: 'graph/:id', component: GraphComponent }
@@ -54,7 +54,7 @@ export const appRoutes: Routes = [
     RecoverComponent,
     SignupComponent,
     MainComponent,
-    ResultsComponent,
+    EventsComponent,
     UserComponent,
     AboutComponent,
     GraphComponent,
@@ -69,7 +69,7 @@ export const appRoutes: Routes = [
     AppMaterialModule,
     UploadModule,
     SharedModule,
-    InfiniteScrollModule,
+    VirtualScrollModule,
   ],
   providers: [
     AuthGuard,

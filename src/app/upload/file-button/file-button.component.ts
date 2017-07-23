@@ -1,11 +1,12 @@
 import { Component, Output, EventEmitter, ViewChild, ElementRef, Input } from '@angular/core';
 
 @Component({
+  // tslint:disable-next-line:component-selector
   'selector': 'file-button',
   'template': `
         <span>
         <input [accept]="accept" [multiple]="multiple" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
-        <button type="button" md-raised-button (click)="selectFile()">
+        <button type="button" md-raised-button color=primary (click)="selectFile()">
           {{label}}
         </button>
     </span>`

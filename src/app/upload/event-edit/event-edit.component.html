@@ -22,8 +22,8 @@
         <md-error>Nationality required</md-error>
       </md-input-container>
 
-      <md-autocomplete #auto="mdAutocomplete">
-        <md-option *ngFor="let nation of filteredNations | async" [value]="nation.fullname">
+      <md-autocomplete #auto="mdAutocomplete" [displayWith]="displayFn">
+        <md-option *ngFor="let nation of filteredNations | async" [value]="nation.abrievation">
           {{ nation.fullname }}
         </md-option>
       </md-autocomplete>
@@ -42,6 +42,7 @@
 
       <md-input-container>
         <input mdInput formControlName="webpage" placeholder="Web page">
+       <md-error>Invalid URL</md-error>
       </md-input-container>
 
       <div fxLayout="row" fxLayoutAlign="space-between center">

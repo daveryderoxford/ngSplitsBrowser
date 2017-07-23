@@ -1,0 +1,32 @@
+/* Structure */
+.example-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 500px;
+  min-width: 300px;
+}
+
+.example-header {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  font-size: 20px;
+}
+
+.selected {
+  background: rgb(235,235,235);
+}
+
+.center {
+  text-align: center;
+}
+
+.mat-table {
+  overflow: auto;
+}
+
+/* Fix for stickuy headers */ 
+#md-table-wrap{display: flex; height:100%; overflow: hidden; position: relative;}
+.mat-table{width:100%; height: calc(100% - 46px); overflow: scroll; margin-top: 48px;}
+.mat-header-row{position: absolute; top: 0; left: 0; width: 100%; background: #fff; z-index: 5}

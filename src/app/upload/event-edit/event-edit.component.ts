@@ -43,19 +43,26 @@ export class EventEditComponent implements OnInit {
       nationality: ['', Validators.required],
       club: ['', Validators.required],
       type: ['', Validators.required],
-      webpage: '',
+      webpage: ['', Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
     });
-  }
-
-  ngOnInit() {
     this.filteredNations = this.f.get('nationality').valueChanges
       .startWith(null)
       .map(val => val ? this.filterNations(val) : Nations.getNations().slice());
+
+  }
+
+  ngOnInit() {
+
   }
 
   private filterNations(name: string): Nation[] {
     const ret = Nations.getNations().filter(nation => new RegExp(`^${name}`, 'gi').test(nation.fullname));
     return (ret);
+  }
+
+  displayFn(abrievation: string) {
+    const nation = Nations.getNations().find((nation: Nation) => { return (nation.abrievation === abrievation) });
+    return (nation ? nation.fullname : '');
   }
 
   private ngOnChanges(changes: SimpleChanges) {
@@ -76,12 +83,24 @@ export class EventEditComponent implements OnInit {
     }
   }
 
-  async submit() {
+  private addhttp(url: string | null): string | null {
+  if (url) {
+    if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
+      url = 'http://' + url;
+    }
+  }
+    return url;
+  }
 
-    if (this.f.valid) {
+async submit() {
 
-      try {
-        this.showProgressBar = true;
+  if (this.f.valid) {
+
+    try {
+      this.showProgressBar = true;
+
+      this.f.value.webpage = this.addhttp(this.f.value.webpage);
+
         if (this.new) {
           await this.eventService.saveNew(this.f.value);
         } else {

@@ -1,0 +1,90 @@
+<app-navbar></app-navbar>
+
+<div class="example-container mat-elevation-z8">
+
+  <md-tab-group dynamicHeight>
+    <md-tab label="All">
+
+      <md-table [dataSource]="dataSource">
+
+        <!-- Date Definition -->
+        <ng-container cdkColumnDef="date">
+          <md-header-cell *cdkHeaderCellDef> Date </md-header-cell>
+          <md-cell *cdkCellDef="let row"> {{row.eventdate | date }} </md-cell>
+        </ng-container>
+
+        <!-- Age Definition -->
+        <ng-container cdkColumnDef="name">
+          <md-header-cell *cdkHeaderCellDef> Name </md-header-cell>
+          <md-cell *cdkCellDef="let row"> {{row.name}} </md-cell>
+        </ng-container>
+
+        <!-- Nationality Definition -->
+        <ng-container cdkColumnDef="nationality">
+          <md-header-cell *cdkHeaderCellDef>Nationality</md-header-cell>
+          <md-cell *cdkCellDef="let row" ngClass=center> {{row.nationality}} </md-cell>
+        </ng-container>
+
+        <!-- Club Definition -->
+        <ng-container cdkColumnDef="club">
+          <md-header-cell *cdkHeaderCellDef>Club</md-header-cell>
+          <md-cell *cdkCellDef="let row" ngClass=center> {{row.club}} </md-cell>
+        </ng-container>
+
+        <!-- Type Definition -->
+        <ng-container cdkColumnDef="type">
+          <md-header-cell *cdkHeaderCellDef>Type</md-header-cell>
+          <md-cell *cdkCellDef="let row" ngClass=center> {{row.type}} </md-cell>
+        </ng-container>
+
+        <!-- website -->
+        <ng-container cdkColumnDef="website">
+          <md-header-cell *cdkHeaderCellDef>Website</md-header-cell>
+          <md-cell *cdkCellDef="let row" ngClass=center>
+            <a *ngIf="(row.webpage !== '') && (row.webpage !== undefined)" href={{row.webpage}}>
+              <md-icon>link</md-icon>
+            </a>
+          </md-cell>
+        </ng-container>
+
+        <!-- Actions -->
+        <ng-container cdkColumnDef="actions">
+          <md-header-cell *cdkHeaderCellDef>Actions</md-header-cell>
+          <md-cell *cdkCellDef="let row" ngClass=center>
+            <div *ngIf="row === currentRow">
+              <md-icon>home</md-icon>
+            </div>
+          </md-cell>
+        </ng-container>
+
+        <!-- Header and Row Declarations -->
+        <md-header-row *cdkHeaderRowDef="displayedColumns"></md-header-row>
+        <md-row *cdkRowDef="let row; columns: displayedColumns;" (click)=oeventClicked(row) (mouseenter)="onMouseEnter(row)" (mouseleave)="onMouseLeave(row)" [ngClass]="rowStyle(row)">
+        </md-row>
+      </md-table>
+
+      <md-paginator #paginator [pageIndex]="0" [pageSize]="25" [pageSizeOptions]="[25, 50, 100]">
+      </md-paginator>
+
+    </md-tab>
+
+    <md-tab label="By Class">
+
+      <md-accordion multi="true" class="md-expansion-demo-width">
+
+        <md-expansion-panel *ngFor="let club of clubs | async">
+          <md-expansion-panel-header>{{club.name}} {{club.nationality}} {{club.numEvents}} event</md-expansion-panel-header>
+          <p>This is the content text that makes sense here.</p>
+        </md-expansion-panel>
+
+      </md-accordion>
+
+    </md-tab>
+
+    <md-tab label="My Events">
+      <h1>My events</h1>
+      <p>...</p>
+    </md-tab>
+  </md-tab-group>
+
+</div>

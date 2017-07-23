@@ -8,6 +8,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 
 import { DialogsService } from 'app/dialogs/dialogs.service';
 import { EventAdminService } from 'app/upload/event-admin.service';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-event-admin',
@@ -16,7 +17,7 @@ import { EventAdminService } from 'app/upload/event-admin.service';
 })
 export class EventAdminComponent implements OnInit {
 
-  events: FirebaseListObservable<OEvent[]>;
+  events: Observable<any[]>;
 
   selectedEvent: OEvent = null;
   new = false;
@@ -35,8 +36,16 @@ export class EventAdminComponent implements OnInit {
       }
     };
 
-    this.events = this.db.list('/events', opts);
+    this.events = this.db.list('/events', opts)
+                     .map( arr => arr.sort( (a, b) => this.compareDates(a, b) ));
+  }
 
+  compareDates(a: OEvent, b: OEvent) {
+    if (a.eventdate < b.eventdate) {
+       return(1);
+    } else {
+      return(-1);
+    }
   }
 
   async uploadSplits(files: File[]) {

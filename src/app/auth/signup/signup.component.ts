@@ -20,16 +20,19 @@ export class SignupComponent {
             email: ['', [Validators.required, Validators.email]],
             password: ['', Validators.required],
             confirmPassword: ['', Validators.required],
-        }, this.passwordMatch);
+        }, { validator: this.passwordMissMatch } );
 
     }
 
-    passwordMatch(g: FormGroup): any {
-        let ret: any;
-        if (g.get('password').value === g.get('confirmPassword').value) {
-            ret = null;
-        } else {
-            ret = { valid: false };
+    passwordMissMatch(g: FormGroup): any {
+        const p1 = g.get('password');
+        const p2 = g.get('confirmPassword');
+        let ret: {[error: string]: any} = {};
+
+       if ( (p1.touched || p2.touched) && 
+            (p1.value !== p2.value)  && 
+            (p2 !== null) ) {
+            ret = { passwordMissMatch: true };
         }
 
         return (ret);

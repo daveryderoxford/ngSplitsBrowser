@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 
-import { ExtUserData } from 'app/model/user';
+import { FullUserData } from 'app/model/user';
 import { Nations, Nation } from 'app/model/nations';
 import { Observable } from 'rxjs/Observable';
 import { UserDataService } from 'app/user/user-data.service';
@@ -30,11 +30,10 @@ export class UserComponent implements OnInit {
         private router: Router,
         private userdata: UserDataService ) {
 
-
         this.userForm = this.formBuilder.group({
             firstName: [''],
             lastName: [''],
-            yearOfBirth: [''],
+            yearOfBirth: ['', [ Validators.min(1900),  Validators.max(new Date().getFullYear()) ] ],
             club: [''],
             nationality: [''],
             nationalId: [''],

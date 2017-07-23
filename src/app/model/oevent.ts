@@ -14,7 +14,6 @@ export interface OEvent extends EventInfo {
      legacyPassword?: string;
      date_club_index?: string;
      club_date_index?: string;
-     user_date_index?: string;
 }
 
 export interface EventInfo {
@@ -40,7 +39,6 @@ export interface EventSummary {
 export interface CourseSummary {
     name: string;
     length: number;
-    controls: number;
     climb: number;
     numcompetitors: number;
     classes: Array<string>;

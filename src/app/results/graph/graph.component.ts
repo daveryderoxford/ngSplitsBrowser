@@ -23,13 +23,9 @@ interface SplitsBrowserOptions {
 export class GraphComponent implements OnInit {
 
   event: OEvent;
-  private parentNativeElement: any;
 
   constructor( private route: ActivatedRoute,
-               private rs: ResultsSelectionService,
-                element: ElementRef) {
-      this.parentNativeElement = element.nativeElement;
-
+               private rs: ResultsSelectionService) {
     }
 
   ngOnInit() {

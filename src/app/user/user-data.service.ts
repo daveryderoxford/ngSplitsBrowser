@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ExtUserData } from 'app/model/user';
+import { FullUserData, UserResultData } from 'app/model/user';
 import { AngularFireAuth } from 'angularfire2/auth';
 
 import * as firebase from 'firebase/app';
 import { FirebaseApp } from 'angularfire2';
 import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
+import { EventInfo } from "app/model/oevent";
 
 @Injectable()
 export class UserDataService {
@@ -13,7 +14,8 @@ export class UserDataService {
     private afAuth: AngularFireAuth,
     private db: AngularFireDatabase) { }
 
-  getUser(): FirebaseObjectObservable<ExtUserData> {
+    /** Get a reference to use data for a user creating it if it does not exist */
+  getUser(): FirebaseObjectObservable<FullUserData> {
 
     const obs = this.db.object(this.getPath());
 
@@ -28,13 +30,13 @@ export class UserDataService {
 
   }
 
-  async updateDetails(details): Promise<any> {
+  /** Saves  */
+  async updateDetails(details: EventInfo): Promise<any> {
     await this.getRef().update(details);
   }
 
   private createUser() {
     const user = {
-     // $key: this.afAuth.auth.currentUser.uid,
       firstName: '',
       lastName: '',
       club: '',
@@ -51,12 +53,23 @@ export class UserDataService {
 
   private getPath(): string {
     const uid = this.afAuth.auth.currentUser.uid;
-    return ('users/' + uid)
-
+    return ('users/' + uid);
   }
 
   private getRef() {
     return (this.db.database.ref(this.getPath()));
+  }
+
+   /** Add a result for the currently signed in user  */
+  async addResult(result: UserResultData): Promise<any> {
+
+      // Add event in date order.
+
+
+  }
+
+  async removeResult(result: UserResultData): Promise<any> {
+
   }
 
 }

@@ -2,7 +2,7 @@
 
 <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
 
-    <div fxFlex=450px fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
+    <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
 
         <h5> Register user </h5>
 
@@ -16,7 +16,7 @@
 
                     <md-input-container>
                         <input mdInput formControlName="email" type="email" placeholder="Email">
-                        <md-error *ngIf="signupForm.controls.email.errors?.email">Invalid email</md-error>
+                        <md-error>Invalid email</md-error>
                     </md-input-container>
  
                     <md-input-container>
@@ -28,7 +28,7 @@
                     <md-input-container>
                         <input mdInput formControlName="confirmPassword" type="password" placeholder="Confirm Password">
                            <md-error>Confirm password required</md-error>
-                           <md-hint *ngIf="signupForm.errors?.passwordMatch" class=error>Passwords do not match</md-hint>
+                           <md-hint *ngIf="signupForm.errors?.passwordMissMatch" class=error>Passwords do not match</md-hint>
                     </md-input-container>
 
                     <div fxLayout="row" fxLayoutAlign="space-between center">

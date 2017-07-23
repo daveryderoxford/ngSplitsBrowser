@@ -1,9 +1,25 @@
 
 /** data associated with a user */
-export interface ExtUserData extends UserInfo {
+import { EventInfo } from 'app/model/oevent';
+
+export interface FullUserData extends UserInfo {
     $key: string;  // Firsbase user Id.
-    events: Array<string>;
+    results: Array<UserResultData>;
 }
+
+export interface UserResultData extends EventInfo {
+   course: string;
+   class: string;
+   distance: number;
+   climb: string;
+   courseWinner: string;
+   coursePosition: number;
+   courseWinningTime: number;
+   classWinner: string;
+   classWinningTime: number;
+   classPosition: number;
+   time: number;  // in milliseconds
+ }
 
 export interface UserInfo {
     firstName: string;

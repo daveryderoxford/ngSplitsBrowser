@@ -9,8 +9,8 @@
       <h3>Orienteering results analysis</h3>
     </div>
 
-    <div fxFlex=300px>
-      <md-list>
+    <div fxFlexAlign=end>
+      <md-list dense>
         <h3 md-subheader>Recent Results</h3>
         <div *ngFor="let event of events | async" (click)="eventClicked(event)">
           <md-list-item>
@@ -25,11 +25,11 @@
     </div>
   </div>
 
-  <div fxFlex='100%' class="gray_background panel_margin">
+  <div class="gray_background panel_margin">
 
-
-    <div fxLayout="row" fxFlex='100%' fxLayoutGap=30px fxLayoutAlign="space-around" fxLayout.xs="column" fxFlex.xs='100%' fxLayoutAlign.xs="start center"
-      class="gray_background">
+    <div fxLayout="row" fxFlex='100%' fxLayoutGap=30px fxLayoutAlign="space-around" 
+         fxLayout.xs="column" fxFlex.xs='100%' fxLayoutAlign.xs="start center"
+         class="gray_background">
 
       <md-card>
         <md-card-header>
@@ -95,3 +95,5 @@
       <div></div>
     </div>
   </div>
+
+   

@@ -22,7 +22,7 @@
 
 div#sbContainer, div.sbErrors
 {
-    font: 12px sans-serif;
+    font: 14px;
 }
 
 .topRowStart
@@ -114,7 +114,7 @@ span.competitorClassLabel
 
 svg text
 {
-    font: 10px sans-serif;
+    font: 12px sans-serif;
 }
 
 svg text#sb-text-size-element
@@ -136,14 +136,12 @@ svg rect.background2
 {
     fill: none;
     stroke: #000;
-    shape-rendering: crispEdges;
 }
 
 line.controlLine
 {
     fill: none;
     stroke: #000;
-    shape-rendering: crispEdges;
 }
 
 path.graphLine, line.competitorLegendLine
@@ -227,7 +225,7 @@ div.competitorListPlaceholder
 
 div.competitor
 {
-    font: 12px sans-serif;
+    font: 14px sans-serif;
     padding: 2px;
 }
 
@@ -333,9 +331,9 @@ Non-standard CSS here, but that's all we can do.
 */
 div#sbContainer
 {
+  user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
+  margin: 10px;
 }
-
-.sb {}

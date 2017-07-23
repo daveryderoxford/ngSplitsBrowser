@@ -6,7 +6,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 
 import * as firebase from 'firebase/app';
 import { FirebaseApp } from 'angularfire2';
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
 
 import {SplitsBrowser} from './filereader/splitsbrowser.data'
 
@@ -17,30 +17,31 @@ export class EventAdminService {
     private firebaseApp: FirebaseApp,
     private af: AngularFireDatabase) { }
 
-  /** Create new event speciting event info */
+  /** Create new event specifying event info */
   async saveNew(eventInfo: EventInfo) {
     const event = <OEvent>eventInfo;
 
     // Reformat the date to an ISO date.  I should not need ot do this.
     event.eventdate = new Date(event.eventdate).toISOString();
-
     event.user = this.afAuth.auth.currentUser.uid;
-    event.user_date_index = event.user + this.decTimeIndex(event.eventdate);
 
-     this.setIndices(event);
 
     // save the new event
     const events: FirebaseListObservable<OEvent[]> = this.af.list('/events/');
     console.log('EventService:  Adding Event ' + JSON.stringify(event));
-    const p = await events.push(event);
+    const e = await events.push(event);
+
+   // await this.updateClubLookup(e.key, event);
+
     console.log('EventService:  Event added');
-    return (p);
+
   }
 
-  async updateEventInfo(key: string, eventInfo: OEvent) {
+
+  /** Update the event info for an event */
+  async updateEventInfo(key: string, eventInfo: EventInfo) {
     const event = <OEvent>eventInfo;
 
-    this.setIndices(event);
     console.log('EventService: Updating key ' + key);
 
     const events: FirebaseListObservable<OEvent[]> = this.af.list('/events/');
@@ -49,35 +50,6 @@ export class EventAdminService {
     return (p);
   }
 
-  private setIndices(event: OEvent) {
-    event.club_date_index  = this.padRight(event.club, 20) + this.decTimeIndex(event.eventdate);
-    event.date_club_index = this.decTimeIndex(event.eventdate) + this.padRight(event.club, 20);
-  }
-
-  private decTimeIndex(dateStr: string): string {
-    const d1 = new Date('2050-01-01 00:00:00').getTime() / 1000;
-    const d2 = new Date(dateStr).getTime() / 1000;
-    const minusDate =  d1 - d2;
-
-    const str = this.padLeft(minusDate.toString(), 15)
-    return (str);
-  }
-
-  private padRight(str: string, length: number): string {
-    const maxUTF8Character = '\uffff';
-    while (str.length < length) {
-      str = str + maxUTF8Character;
-    }
-    return str;
-  }
-
-  private padLeft(str: string, length: number): string {
-    const maxUTF8Character = '\uffff';
-    while (str.length < length) {
-      str = maxUTF8Character + str;
-    }
-    return str;
-  }
 
   async delete(oevent: OEvent) {
     // Delete results file
@@ -98,7 +70,7 @@ export class EventAdminService {
       });
   }
 
-  /** Asymc functiom to read and parse splits and upload splits.*/
+  /** Async functiom to read and parse splits and upload splits.*/
     async uploadSplits(oevent: OEvent, file: File, fileFormat: SplitsFileFormat = 'auto') {
 
     const text = await this.loadTextFile(file);
@@ -189,7 +161,6 @@ export class EventAdminService {
     const summary: CourseSummary = {
       name: course.name,
       length: course.length,
-      controls: course.controls,
       climb: course.climb,
       classes: new Array(),
       numcompetitors: 0,

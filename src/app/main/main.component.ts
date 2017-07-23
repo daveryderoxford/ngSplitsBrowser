@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { OEvent } from 'app/model/oevent';
 
 import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -14,19 +15,24 @@ export class MainComponent implements OnInit {
 
   events: FirebaseListObservable<OEvent[]>;
 
-  constructor( private db: AngularFireDatabase) { }
+  constructor( private db: AngularFireDatabase,
+               private router: Router) { }
 
  ngOnInit() {
 
     const opts = {
       query: {
         orderByChild: 'date_club_index',
-        limitToFirst: 10
+        limitToFirst: 4
       }
     };
 
     this.events = this.db.list('/events', opts);
 
+  }
+
+  eventClicked(event: OEvent) {
+     this.router.navigate(['/graph', event.$key ]);
   }
 
 }

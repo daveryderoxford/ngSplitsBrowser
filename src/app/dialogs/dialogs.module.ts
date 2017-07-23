@@ -3,6 +3,7 @@ import { MdDialogModule, MdButtonModule} from '@angular/material';
 import { NgModule } from '@angular/core';
 
 import { ConfirmDialogComponent } from './confirm-dialog.component';
+import { MessageDialogComponent } from './message-dialog.component';
 
 @NgModule({
     imports: [
@@ -14,6 +15,7 @@ import { ConfirmDialogComponent } from './confirm-dialog.component';
     ],
     declarations: [
         ConfirmDialogComponent,
+        MessageDialogComponent,
     ],
     providers: [
         DialogsService,

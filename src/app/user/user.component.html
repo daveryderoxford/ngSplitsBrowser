@@ -2,9 +2,9 @@
 
 <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
 
-  <div fxFlex=450px fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
+  <div  fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
 
-    <h5> Splitsbrowser Login </h5>
+    <h5> User details</h5>
 
     <div class=error>{{error}}</div>
 
@@ -39,6 +39,8 @@
 
           <md-input-container>
             <input mdInput formControlName="yearOfBirth" type="number" placeholder="Year of birth">
+            <md-hint align="end">yyyy</md-hint>
+           <md-error>Invalid year</md-error>
           </md-input-container>
 
           <md-input-container>
