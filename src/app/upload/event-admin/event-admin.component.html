@@ -1,53 +1,53 @@
 <app-navbar></app-navbar>
 
-<md-sidenav-container class=fill-client-area>
-  <md-sidenav #sidenav mode="side" opened="true" fxFlex=300px>
+<mat-sidenav-container class=fill-client-area>
+  <mat-sidenav #sidenav mode="side" opened="true" fxFlex=300px>
 
     <div fxLayout="column" class=side-nav-content>
 
       <h4 fxFlexAlign="center">Events</h4>
-      <button md-raised-button color=primary  (click)="addEvent()" fxFlexAlign="start" fxFlexOffset="5">
+      <button mat-raised-button color=primary  (click)="addEvent()" fxFlexAlign="start" fxFlexOffset="5">
          Add event
        </button>
 
       <div class=scrolling-content class=fill-client-area>
 
-        <md-nav-list fxFlex>
-          <md-divider></md-divider>
+        <mat-nav-list fxFlex>
+          <mat-divider></mat-divider>
 
           <div *ngFor="let event of events | async" (click)="eventClicked(event)">
-            <md-list-item>
-              <h2 md-line> {{ event.eventdate | date }} {{ event.name }} </h2>
-              <p md-line>
+            <mat-list-item>
+              <h2 matLine> {{ event.eventdate | date }} {{ event.name }} </h2>
+              <p matLine>
                 <span>  {{event.nationality}}  {{event.club}} </span>
               </p>
-            </md-list-item>
-            <md-divider></md-divider>
+            </mat-list-item>
+            <mat-divider></mat-divider>
           </div>
-        </md-nav-list>
+        </mat-nav-list>
       </div>
     </div>
-  </md-sidenav>
+  </mat-sidenav>
 
   <div fxFlex=450px fxLayout="column" class=.my-content>
 
   <div *ngIf="selectedEvent || new">
 
-    <md-card>
+    <mat-card>
 
-      <md-card-content>
+      <mat-card-content>
           <app-event-edit [oevent]="selectedEvent"></app-event-edit>
-      </md-card-content>
-    </md-card>
+      </mat-card-content>
+    </mat-card>
 
     <div *ngIf="!new">
 
-      <md-card>
-        <md-card-title>
+      <mat-card>
+        <mat-card-title>
           Upload Splits
-        </md-card-title>
+        </mat-card-title>
 
-        <md-card-content>
+        <mat-card-content>
           <div fxLayout=row>
           <file-button color=primary (onFileSelect)="uploadSplits($event)" label="Upload Splits"></file-button>   
           <span fxFlexAlign=end *ngIf=selectedEvent.summary>  
@@ -58,19 +58,19 @@
           </span>
           <span *ngIf=!selectedEvent.summary color=red> Splits not yet uploded</span>
           </div>
-        </md-card-content>
-      </md-card>
+        </mat-card-content>
+      </mat-card>
 
-      <md-card>
-        <md-card-title>
+      <mat-card>
+        <mat-card-title>
           Delete Event
-        </md-card-title>
+        </mat-card-title>
 
-        <md-card-content>
-          <button md-raised-button color=primary aria-label="delete" (click)="deleteEvent()">Delete</button>
-        </md-card-content>
-      </md-card>
+        <mat-card-content>
+          <button mat-raised-button color=primary aria-label="delete" (click)="deleteEvent()">Delete</button>
+        </mat-card-content>
+      </mat-card>
     </div>
     </div>
   </div>
-</md-sidenav-container>
+</mat-sidenav-container>

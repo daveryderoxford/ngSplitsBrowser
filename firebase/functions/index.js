@@ -42,15 +42,19 @@ var functions = require("firebase-functions");
 var admin = require("firebase-admin");
 admin.initializeApp(functions.config().firebase);
 exports.eventIndices = functions.database.ref('/events/{key}').onWrite(function (event) { return __awaiter(_this, void 0, void 0, function () {
-    var written;
+    var written, previous;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 written = event.data.val();
+                previous = event.data.previous.val();
+                if (!((written.club !== previous.club) ||
+                    (written.eventdate !== previous.eventdate))) return [3 /*break*/, 2];
                 written.club_date_index = padRight(written.club.toLowerCase(), 10) + decreasingTimeIndex(written.eventdate);
                 written.date_club_index = decreasingTimeIndex(written.eventdate) + padRight(written.club.toLowerCase(), 10);
                 return [4 /*yield*/, event.data.ref.set(written)];
             case 1: return [2 /*return*/, (_a.sent())];
+            case 2: return [2 /*return*/];
         }
     });
 }); });

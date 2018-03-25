@@ -1,25 +1,28 @@
- 
-<md-toolbar class=bottom-shaddow>
-   <a routerLink="/">Splitsbrowser</a>
+<mat-toolbar class=bottom-shaddow>
 
-  <div fxLayout="row" fxFlex fxLayoutAlign="end center">
+  <mat-toolbar-row>
+    <a routerLink="/">Splitsbrowser</a>
 
-    <button md-button routerLink="/events">Results</button>
-    <button md-button routerLink="/admin/event-admin">Manage</button>
+    <div fxLayout="row" fxFlex fxLayoutAlign="end center">
 
-    <a *ngIf="!authorised" md-icon-button routerLink="/login">
-         <md-icon class="material-icons md-26">account_box</md-icon>
-    </a>
-    
-    <a *ngIf="authorised" md-icon-button [mdMenuTriggerFor]="appMenu">
-      <md-icon class="material-icons md-26">account_box</md-icon>
-    </a>
+      <button mat-button routerLink="/events">Results</button>
+      <button mat-button routerLink="/admin/event-admin">Manage</button>
+      <button mat-button (click)="importResults()">Import</button>
 
-  </div>
+      <a *ngIf="!authorised" mat-icon-button routerLink="/login">
+        <mat-icon class="material-icons md-26">account_box</mat-icon>
+      </a>
 
-</md-toolbar> 
+      <a *ngIf="authorised" mat-icon-button [matMenuTriggerFor]="appMenu">
+        <mat-icon class="material-icons md-26">account_box</mat-icon>
+      </a>
 
-<md-menu #appMenu="mdMenu" xPosition="before">
-  <button routerLink="/user" md-menu-item>User settings</button>
-  <button (click)="logout()" md-menu-item>Logout</button>
-</md-menu>
+    </div>
+  </mat-toolbar-row>
+
+</mat-toolbar>
+
+<mat-menu #appMenu="matMenu" xPosition="before">
+  <button routerLink="/user" mat-menu-item>User settings</button>
+  <button (click)="logout()" mat-menu-item>Logout</button>
+</mat-menu>

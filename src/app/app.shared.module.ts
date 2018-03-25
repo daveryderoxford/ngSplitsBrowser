@@ -9,8 +9,8 @@ import { FlexLayoutModule } from '@angular/flex-layout';
 import { DialogsModule } from 'app/dialogs/dialogs.module';
 
 import {
-    MdCoreModule, MdRippleModule, MdButtonModule, MdCardModule, MdIconModule,
-    MdMenuModule, MdToolbarModule, MdTooltipModule
+    MatRippleModule, MatButtonModule, MatCardModule, MatIconModule,
+    MatMenuModule, MatToolbarModule, MatTooltipModule
 } from '@angular/material';
 
 import { NavbarComponent } from 'app/navbar/navbar.component';
@@ -22,14 +22,13 @@ import { AngularFireDatabase } from 'angularfire2/database';
         CommonModule,
         BrowserModule,
         BrowserAnimationsModule,
-        MdCoreModule,
-        MdRippleModule,
-        MdButtonModule,
-        MdCardModule,
-        MdIconModule,
-        MdMenuModule,
-        MdToolbarModule,
-        MdTooltipModule,
+        MatRippleModule,
+        MatButtonModule,
+        MatCardModule,
+        MatIconModule,
+        MatMenuModule,
+        MatToolbarModule,
+        MatTooltipModule,
         RouterModule,
         FlexLayoutModule,
         DialogsModule,

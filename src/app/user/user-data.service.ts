@@ -1,11 +1,16 @@
 import { Injectable } from '@angular/core';
-import { FullUserData, UserResultData } from 'app/model/user';
+import { UserData, UserResultData } from 'app/model/user';
 import { AngularFireAuth } from 'angularfire2/auth';
 
 import * as firebase from 'firebase/app';
 import { FirebaseApp } from 'angularfire2';
-import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
-import { EventInfo } from "app/model/oevent";
+import { AngularFireDatabase } from 'angularfire2/database';
+import { OEvent } from 'app/model/oevent';
+import { Competitor } from 'app/model/competitor';
+import { CourseClass } from 'app/model/courseclass';
+import { Course } from 'app/model/course';
+import { EventInfo } from '../../../firebase/functions/src/index';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class UserDataService {
@@ -14,26 +19,26 @@ export class UserDataService {
     private afAuth: AngularFireAuth,
     private db: AngularFireDatabase) { }
 
-    /** Get a reference to use data for a user creating it if it does not exist */
-  getUser(): FirebaseObjectObservable<FullUserData> {
+  /** Get a reference to use data for a user creating it if it does not exist */
+  getUser(): Observable<UserData> {
 
-    const obs = this.db.object(this.getPath());
+    const user = this.db.object<UserData>(this.getPath()).valueChanges();
 
-    // if user does  does not exist create a user object
-    obs.subscribe((userData) => {
-      if (!userData.$exists()) {
+    // if user does does not exist create a user object
+    user.subscribe((userData) => {
+      if (!userData) {
         this.createUser();
       }
     });
 
-    return (obs);
+    return (user);
 
   }
 
-  /** Saves  */
-  async updateDetails(details: EventInfo): Promise<any> {
-    await this.getRef().update(details);
-  }
+    /** Saves  */
+    async updateDetails(details: EventInfo): Promise<any> {
+      await this.getRef().update(details);
+    }
 
   private createUser() {
     const user = {
@@ -57,19 +62,71 @@ export class UserDataService {
   }
 
   private getRef() {
-    return (this.db.database.ref(this.getPath()));
+    return (this.db.object(this.getPath()));
   }
 
-   /** Add a result for the currently signed in user  */
-  async addResult(result: UserResultData): Promise<any> {
+  /** Add a result for the currently signed in user  */
+  async addResult(user: UserData, result: Competitor, courseclass: CourseClass, course: Course, event: OEvent): Promise<any> {
 
-      // Add event in date order.
+    const courseWinner = this.getCourseWinner(course);
 
+    // Denormalise the result.
+    const userResult: UserResultData = {
+      eventInfo: event,
+      course: course.name,
+      courseclass: courseclass.name,
 
+      name: result.name,
+      classPosition: result.order,
+      totalTime: result.totalTime,
+
+      distance: course.length,
+      climb: course.climb,
+
+      courseWinner: courseWinner.name,
+      courseWinningTime: courseWinner.totalTime,
+
+      classWinner: courseclass.competitors[0].name,
+      classWinningTime: courseclass.competitors[0].totalTime,
+    }
+
+    user.results.push(userResult);
+
+    user.results.sort((a, b) => {
+      const d1 = new Date(a.eventInfo.eventdate);
+      const d2 = new Date(b.eventInfo.eventdate);
+      return ( d1.valueOf() - d2.valueOf() );
+    });
+
+    return (this.getRef().set(user));
+
+  }
+
+  private getCourseWinner(course: Course): Competitor {
+
+    if (course.classes.length === 0) {
+      return (null);
+    }
+
+    let winner = course.classes[0].competitors[0];
+    course.classes.forEach((eclass) => {
+      if (eclass.competitors[0].totalTime < winner.totalTime) {
+        winner = eclass.competitors[0];
+      }
+    });
+    return (winner);
   }
 
   async removeResult(result: UserResultData): Promise<any> {
+    const user = await this.db.object<UserData>(this.getPath()).valueChanges().toPromise();
+
+    const index = user.results.indexOf(result);
+    if (index > -1) {
+      user.results.splice(index, 1);
+    }
+    return (this.getRef().set(user));
 
   }
 
 }
+

@@ -8,39 +8,39 @@
 
         <div class=error>{{error}}</div>
 
-        <md-card>
+        <mat-card>
 
             <form [formGroup]="signupForm" (ngSubmit)="signup()">
 
                 <div fxLayout="column" fxFlex fxLayoutAlign="space-around">
 
-                    <md-input-container>
-                        <input mdInput formControlName="email" type="email" placeholder="Email">
-                        <md-error>Invalid email</md-error>
-                    </md-input-container>
+                    <mat-form-field>
+                        <input matInput formControlName="email" type="email" placeholder="Email">
+                        <mat-error>Invalid email</mat-error>
+                    </mat-form-field>
  
-                    <md-input-container>
-                        <input mdInput formControlName="password" type="password" placeholder="Password">
-                           <md-error>Password required</md-error>
+                    <mat-form-field>
+                        <input matInput formControlName="password" type="password" placeholder="Password">
+                           <mat-error>Password required</mat-error>
 
-                    </md-input-container>
+                    </mat-form-field>
 
-                    <md-input-container>
-                        <input mdInput formControlName="confirmPassword" type="password" placeholder="Confirm Password">
-                           <md-error>Confirm password required</md-error>
-                           <md-hint *ngIf="signupForm.errors?.passwordMissMatch" class=error>Passwords do not match</md-hint>
-                    </md-input-container>
+                    <mat-form-field>
+                        <input matInput formControlName="confirmPassword" type="password" placeholder="Confirm Password">
+                           <mat-error>Confirm password required</mat-error>
+                           <mat-hint *ngIf="signupForm.errors?.passwordMissMatch" class=error>Passwords do not match</mat-hint>
+                    </mat-form-field>
 
                     <div fxLayout="row" fxLayoutAlign="space-between center">
-                        <button [disabled]="signupForm.invalid" md-raised-button color=primary type="submit" aria-label="Signup">Sign up</button>
-                        <a md-button routerLink="/login">Already have user name</a>
+                        <button [disabled]="signupForm.invalid" mat-raised-button color=primary type="submit" aria-label="Signup">Sign up</button>
+                        <a mat-button routerLink="/login">Already have user name</a>
                     </div>
  
                 </div>
 
             </form>
 
-        </md-card>
+        </mat-card>
 
     </div>
 

@@ -27,6 +27,7 @@
 }
 
 /* Fix for stickuy headers */ 
-#md-table-wrap{display: flex; height:100%; overflow: hidden; position: relative;}
+/*
+#mat-table-wrap{display: flex; height:100%; overflow: hidden; position: relative;}
 .mat-table{width:100%; height: calc(100% - 46px); overflow: scroll; margin-top: 48px;}
-.mat-header-row{position: absolute; top: 0; left: 0; width: 100%; background: #fff; z-index: 5}
+.mat-header-row{position: absolute; top: 0; left: 0; width: 100%; background: #fff; z-index: 5} */

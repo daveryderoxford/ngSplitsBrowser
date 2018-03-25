@@ -1,13 +1,25 @@
 
-export type EventType = 'IOF' | 'International' | 'National' | 'Regional'| 'Local';
-export class EventTypes {
-    static types: Array<EventType> = ['IOF' , 'International' , 'National' , 'Regional', 'Local'];
+export type EventGrade = 'IOF' | 'International' | 'National' | 'Regional'| 'Club' | 'Local';
+
+export class EventGrades {
+    static grades: Array<EventGrade> = ['IOF' , 'International' , 'National' , 'Regional', 'Club', 'Local'];
 }
 
-export type SplitsFileFormat = 'auto' | 'IOFv3' |  'IOFv2' | 'SI-CSV' | 'SB-CSV' | 'HTML';
+export type EventDiscipline = 'Sprint' | 'Urban' | 'Middle' | 'Long' | 'Ultralong'| 'Other' ;
+export class EventDisciplines {
+    static disciplines: Array<EventDiscipline> = ['Sprint', 'Urban', 'Middle', 'Long', 'Ultralong', 'Other' ];
+}
+
+export type EventType = 'Foot' | 'Bike' | 'Ski' | 'Trail' | 'Other' ;
+export class EventTypes {
+    static types: Array<EventType> = ['Foot', 'Bike' , 'Ski' , 'Trail' , 'Other' ];
+}
+
+export type SplitsFileFormat = 'auto' | 'IOFv3' |  'IOFv2' | 'SICSV' | 'SBCSV' | 'SIHTML' | 'ABMHTML' ;
+
 
 export interface OEvent extends EventInfo {
-     $key?: string;
+     key?: string;
      user: string;
      splits?: SplitsData | null;
      summary?: EventSummary | null;
@@ -21,7 +33,9 @@ export interface EventInfo {
      nationality: string;
      eventdate: string;
      club: string;
+     grade: number;
      type: string;
+     discipline: string;
      webpage: string;
      email: string;
 }
@@ -29,6 +43,8 @@ export interface EventInfo {
 export interface SplitsData {
      splitsFilename: string;
      splitsFileFormat: SplitsFileFormat;
+     valid: boolean;
+     failurereason?: string;
 }
 
 export interface EventSummary {
@@ -42,6 +58,5 @@ export interface CourseSummary {
     climb: number;
     numcompetitors: number;
     classes: Array<string>;
-    winner: string;
 }
 

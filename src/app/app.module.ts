@@ -35,6 +35,8 @@ import { VirtualScrollModule } from 'angular2-virtual-scroll';
 // Services
 import { ResultsSelectionService } from './results/results-selection.service';
 import { UserDataService } from 'app/user/user-data.service';
+import { BulkImportService } from 'app/utils/bulk-import.service';
+import { HttpModule } from '@angular/http';
 
 export const appRoutes: Routes = [
   { path: '', component: MainComponent },
@@ -70,12 +72,14 @@ export const appRoutes: Routes = [
     UploadModule,
     SharedModule,
     VirtualScrollModule,
+    HttpModule,
   ],
   providers: [
     AuthGuard,
     ResultsSelectionService,
     UserDataService,
-  ],
+    BulkImportService
+   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -10,18 +10,18 @@
     </div>
 
     <div fxFlexAlign=end>
-      <md-list dense>
-        <h3 md-subheader>Recent Results</h3>
+      <mat-list dense>
+        <h3 matSubheader>Recent Results</h3>
         <div *ngFor="let event of events | async" (click)="eventClicked(event)">
-          <md-list-item>
-            <span md-line class='list-header'> {{ event.eventdate |  date }}  {{ event.name }} </span>
-            <span md-line>
+          <mat-list-item>
+            <span matLine class='list-header'> {{ event.eventdate |  date }}  {{ event.name }} </span>
+            <span matLine>
                   {{event.nationality}}  {{event.club}}
               </span>
 
-          </md-list-item>
+          </mat-list-item>
         </div>
-      </md-list>
+      </mat-list>
     </div>
   </div>
 
@@ -31,58 +31,58 @@
          fxLayout.xs="column" fxFlex.xs='100%' fxLayoutAlign.xs="start center"
          class="gray_background">
 
-      <md-card>
-        <md-card-header>
-          <md-icon md-card-avatar color=primary class="material-icons.md-36">directions_run</md-icon>
-          <md-card-title>Competitors</md-card-title>
-          <md-card-subtitle>Orienteering results analysis</md-card-subtitle>
-        </md-card-header>
+      <mat-card>
+        <mat-card-header>
+          <mat-icon mat-card-avatar color=primary class="material-icons.md-36">directions_run</mat-icon>
+          <mat-card-title>Competitors</mat-card-title>
+          <mat-card-subtitle>Orienteering results analysis</mat-card-subtitle>
+        </mat-card-header>
 
-        <md-card-content>
+        <mat-card-content>
           <p>
             Splitsbrowser supports viewing of the results of orienteering events. Competitors can maintain a list of events they have
             attended.
           </p>
-        </md-card-content>
-        <md-card-actions>
-           <button md-button routerLink="/about">About</button>
-          <button md-button routerLink="/admin">Results</button>
-        </md-card-actions>
-      </md-card>
+        </mat-card-content>
+        <mat-card-actions>
+           <button mat-button routerLink="/about">About</button>
+          <button mat-button routerLink="/admin">Results</button>
+        </mat-card-actions>
+      </mat-card>
 
-      <md-card>
-        <md-card-header>
-          <div md-card-avatar class="example-header-image"></div>
-          <md-card-title>Event organisers</md-card-title>
-          <md-card-subtitle>Upload event results for viewing</md-card-subtitle>
-        </md-card-header>
+      <mat-card>
+        <mat-card-header>
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Event organisers</mat-card-title>
+          <mat-card-subtitle>Upload event results for viewing</mat-card-subtitle>
+        </mat-card-header>
 
-        <md-card-content>
+        <mat-card-content>
           <p>
             Event organisers may upload event results In order to download event a event you will need to register as user
           </p>
-        </md-card-content>
-        <md-card-actions>
-          <button md-button routerLink="/admin">Add Event</button>
-        </md-card-actions>
-      </md-card>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button routerLink="/admin">Add Event</button>
+        </mat-card-actions>
+      </mat-card>
 
-      <md-card>
-        <md-card-header>
-          <div md-card-avatar class="example-header-image"></div>
-          <md-card-title>Developers</md-card-title>
-          <md-card-subtitle>Enhance Splitsbrowser or </md-card-subtitle>
-        </md-card-header>
+      <mat-card>
+        <mat-card-header>
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Developers</mat-card-title>
+          <mat-card-subtitle>Enhance Splitsbrowser or </mat-card-subtitle>
+        </mat-card-header>
 
-        <md-card-content>
+        <mat-card-content>
           <p>
             Splitsbrowser is based on Open Source software. The source code and is avalible on Github.
           </p>
-        </md-card-content>
-        <md-card-actions>
-          <a md-button href="https://github.com/daveryderoxford/ngSplitsBrowser">GitHub</a>
-        </md-card-actions>
-      </md-card>
+        </mat-card-content>
+        <mat-card-actions>
+          <a mat-button href="https://github.com/daveryderoxford/ngSplitsBrowser">GitHub</a>
+        </mat-card-actions>
+      </mat-card>
 
     </div>
   </div>

@@ -8,26 +8,26 @@
 
             <div class=error>{{error}}</div>
 
-            <md-card>
+            <mat-card>
 
                 <form [formGroup]="recoverForm" (ngSubmit)="recover()">
 
                     <div fxLayout="column" fxFlex fxLayoutAlign="space-around">
 
-                        <md-input-container>
-                            <input mdInput formControlName="email" type="email" placeholder="Email">
-                            <md-error>Invalid email</md-error>
-                        </md-input-container>
+                        <mat-form-field>
+                            <input matInput formControlName="email" type="email" placeholder="Email">
+                            <mat-error>Invalid email</mat-error>
+                        </mat-form-field>
 
                         <BR>
                         <div fxLayout="row" fxLayoutAlign="space-between center">
-                            <button [disabled]="recoverForm.invalid" md-raised-button color=primary type="submit" aria-label="login">Recover</button>
-                            <a md-button routerLink="/login">Remembered your password?</a>
+                            <button [disabled]="recoverForm.invalid" mat-raised-button color=primary type="submit" aria-label="login">Recover</button>
+                            <a mat-button routerLink="/login">Remembered your password?</a>
 
                         </div>
                     </div>
                 </form>
 
-            </md-card>
+            </mat-card>
         </div>
     </div>

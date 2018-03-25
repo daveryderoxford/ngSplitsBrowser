@@ -6,7 +6,7 @@ import { Component, Output, EventEmitter, ViewChild, ElementRef, Input } from '@
   'template': `
         <span>
         <input [accept]="accept" [multiple]="multiple" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
-        <button type="button" md-raised-button color=primary (click)="selectFile()">
+        <button type="button" mat-raised-button color=primary (click)="selectFile()">
           {{label}}
         </button>
     </span>`

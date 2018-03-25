@@ -1,6 +1,6 @@
 /*!
  *  SplitsBrowser - Orienteering results analysis.
- *  
+ *
  *  Copyright (C) 2000-2016 Dave Ryder, Reinhard Balling, Andris Strazdins,
  *                          Ed Nash, Luke Woodward
  *
@@ -18,77 +18,82 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+// tslint:disable:quotemark
+// tslint:disable:max-line-length
+
 // Tell JSHint not to complain that this isn't used anywhere.
 /* exported SplitsBrowser */
 /* exported SplitsBrowser */
 import * as $ from 'jquery';
 import * as d3 from 'd3';
 
-export var SplitsBrowser = {}; 
+export let SplitsBrowser = {} as any;
 
-SplitsBrowser.Version = "3.4.1";
-SplitsBrowser.Model = {};
-SplitsBrowser.Input = {};
-SplitsBrowser.Controls = {};
-SplitsBrowser.Messages = {};
+SplitsBrowser.Version = '4.0.0';
+
+SplitsBrowser.Model = {} as any;
+SplitsBrowser.Input = {} as any;
+SplitsBrowser.Controls = {} as any;
+SplitsBrowser.Messages = {} as any;
 
 
 (function () {
-    "use strict";
-    
+    'use strict'
+
     // Whether a warning about missing messages has been given.  We don't
     // really want to irritate the user with many alert boxes if there's a
     // problem with the messages.
-    var warnedAboutMessages = false;
-    
+    let warnedAboutMessages = false;
+
     // Default alerter function, just calls window.alert.
-    var alertFunc = function (message) { window.alert(message); };
-    
+    let alertFunc = function (message) { window.alert(message); };
+
     // The currently-chosen language, or null if none chosen or found yet.
-    var currentLanguage = null;
-    
+    let currentLanguage = null;
+
     // The list of all languages read in, or null if none.
-    var allLanguages = null;
-    
+    let allLanguages = null;
+
     // The messages object.
-    var messages = SplitsBrowser.Messages;
-    
+    const messages = SplitsBrowser.Messages;
+
     /**
     * Issue a warning about the messages, if a warning hasn't already been
     * issued.
     * @sb-param {String} warning - The warning message to issue.
-    */ 
+    */
     function warn(warning) {
         if (!warnedAboutMessages) {
             alertFunc(warning);
             warnedAboutMessages = true;
         }
     }
-    
+
     /**
     * Sets the alerter to use when a warning message should be shown.
     *
     * This function is intended only for testing purposes.
-    
+
     * @sb-param {Function} alerter - The function to be called when a warning is
     *     to be shown.
     */
     SplitsBrowser.setMessageAlerter = function (alerter) {
         alertFunc = alerter;
     };
-    
+
     /**
     * Attempts to get a message, returning a default string if it does not
     * exist.
     * @sb-param {String} key - The key of the message.
-    * @sb-param {String} defaultValue - Value to be used 
+    * @sb-param {String} defaultValue - Value to be used
     * @sb-return {String} The message with the given key, if the key exists,
     *     otherwise the default value.
     */
     SplitsBrowser.tryGetMessage = function (key, defaultValue) {
         return (currentLanguage !== null && messages[currentLanguage].hasOwnProperty(key)) ? SplitsBrowser.getMessage(key) : defaultValue;
     };
-    
+
     /**
     * Returns the message with the given key.
     * @sb-param {String} key - The key of the message.
@@ -99,20 +104,21 @@ SplitsBrowser.Messages = {};
         if (allLanguages === null) {
             SplitsBrowser.initialiseMessages();
         }
-        
+
         if (currentLanguage !== null) {
             if (messages[currentLanguage].hasOwnProperty(key)) {
                 return messages[currentLanguage][key];
             } else {
-                warn("Message not found for key '" + key + "' in language '" + currentLanguage + "'");
-                return "?????";
+                // tslint:disable-next-line:quotemark
+                warn("Message not found for key '" + key + '\' in language \'' + currentLanguage + "'");
+                return '?????';
             }
         } else {
-            warn("No messages found.  Has a language file been loaded?");
-            return "?????";
+            warn('No messages found.  Has a language file been loaded?');
+            return '?????';
         }
     };
-    
+
     /**
     * Returns the message with the given key, with some string formatting
     * applied to the result.
@@ -122,31 +128,31 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} key - The key of the message.
     * @sb-param {Object} params - Object mapping parameter names to values.
     * @sb-return {String} The resulting message.
-    */ 
+    */
     SplitsBrowser.getMessageWithFormatting = function (key, params) {
-        var message = SplitsBrowser.getMessage(key);
-        for (var paramName in params) {
+        let message = SplitsBrowser.getMessage(key);
+        for (const paramName in params) {
             if (params.hasOwnProperty(paramName)) {
                 // Irritatingly there isn't a way of doing global replace
                 // without using regexps.  So we must escape any magic regex
                 // metacharacters first, so that we have a regexp that will
                 // match a single static string.
-                var paramNameRegexEscaped = paramName.replace(/([.+*?|{}()^$\[\]\\])/g, "\\$1");
-                message = message.replace(new RegExp(paramNameRegexEscaped, "g"), params[paramName]);
+                const paramNameRegexEscaped = paramName.replace(/([.+*?|{}()^$\[\]\\])/g, '\\$1');
+                message = message.replace(new RegExp(paramNameRegexEscaped, 'g'), params[paramName]);
             }
         }
-        
+
         return message;
     };
-    
+
     /**
     * Returns an array of codes of languages that have been loaded.
     * @sb-return {Array} Array of language codes.
     */
-    SplitsBrowser.getAllLanguages = function () {
+    SplitsBrowser.getAllLanguages = function (): Array<string> {
         return allLanguages.slice(0);
     };
-    
+
     /**
     * Returns the language code of the current language, e.g. "en_gb".
     * @sb-return {String} Language code of the current language.
@@ -154,20 +160,20 @@ SplitsBrowser.Messages = {};
     SplitsBrowser.getLanguage = function () {
         return currentLanguage;
     };
-    
+
     /**
     * Returns the name of the language with the given code.
     * @sb-param {String} language - The code of the language, e.g. "en_gb".
     * @sb-return {String} The name of the language, e.g. "English".
     */
     SplitsBrowser.getLanguageName = function (language) {
-        if (messages.hasOwnProperty(language) && messages[language].hasOwnProperty("Language")) {
+        if (messages.hasOwnProperty(language) && messages[language].hasOwnProperty('Language')) {
             return messages[language].Language;
         } else {
-            return "?????";
+            return '?????';
         }
     };
-    
+
     /**
     * Sets the current language.
     * @sb-param {String} language - The code of the new language to set.
@@ -177,27 +183,27 @@ SplitsBrowser.Messages = {};
             currentLanguage = language;
         }
     };
-    
+
     /**
     * Initialises the messages from those read in.
     *
     * @sb-param {String} defaultLanguage - (Optional) The default language to choose.
     */
     SplitsBrowser.initialiseMessages = function (defaultLanguage) {
-        allLanguages = [];
+        allLanguages = [] as Array<string>;
         if (messages !== SplitsBrowser.Messages) {
             // SplitsBrowser.Messages has changed since the JS source was
             // loaded and now.  Likely culprit is an old-format language file.
-            warn("You appear to have loaded a messages file in the old format.  This file, and all " +
-                 "others loaded after it, will not work.\n\nPlease check the messages files.");
+            warn('You appear to have loaded a messages file in the old format.  This file, and all ' +
+                'others loaded after it, will not work.\n\nPlease check the messages files.');
         }
-    
-        for (var messageKey in messages) {
+
+        for (const messageKey in messages) {
             if (messages.hasOwnProperty(messageKey)) {
                 allLanguages.push(messageKey);
             }
         }
-        
+
         if (allLanguages.length === 0) {
             warn("No messages files were found.");
         } else if (defaultLanguage && messages.hasOwnProperty(defaultLanguage)) {
@@ -209,11 +215,11 @@ SplitsBrowser.Messages = {};
 })();
 
 (function () {
-    "use strict";
-    
+    'use strict';
+
     // Minimum length of a course that is considered to be given in metres as
     // opposed to kilometres.
-    var MIN_COURSE_LENGTH_METRES = 500;
+    const MIN_COURSE_LENGTH_METRES = 500;
 
     /**
      * Utility function used with filters that simply returns the object given.
@@ -228,7 +234,7 @@ SplitsBrowser.Messages = {};
     * @sb-returns True if the value is not null, false otherwise.
     */
     SplitsBrowser.isNotNull = function (x) { return x !== null; };
-    
+
     /**
     * Returns whether the value given is the numeric value NaN.
     *
@@ -242,7 +248,7 @@ SplitsBrowser.Messages = {};
     * @sb-return True if x is NaN, false if x is any other value.
     */
     SplitsBrowser.isNaNStrict = function (x) { return x !== x; };
-    
+
     /**
     * Returns whether the value given is neither null nor NaN.
     * @sb-param {?Number} x - A value to test.
@@ -257,7 +263,7 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} message - The exception detail message.
     */
     function InvalidData(message) {
-        this.name = "InvalidData";
+        this.name = 'InvalidData';
         this.message = message;
     }
 
@@ -266,7 +272,7 @@ SplitsBrowser.Messages = {};
     * @sb-returns {String} String representation.
     */
     InvalidData.prototype.toString = function () {
-        return this.name + ": " + this.message;
+        return this.name + ': ' + this.message;
     };
 
     /**
@@ -277,7 +283,7 @@ SplitsBrowser.Messages = {};
     SplitsBrowser.throwInvalidData = function (message) {
         throw new InvalidData(message);
     };
-    
+
     /**
     * Exception object raised if a data parser for a format deems that the data
     * given is not of that format.
@@ -285,10 +291,10 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} message - The exception message.
     */
     function WrongFileFormat(message) {
-        this.name = "WrongFileFormat";
+        this.name = 'WrongFileFormat';
         this.message = message;
     }
-    
+
     /**
     * Returns a string representation of this exception.
     * @sb-returns {String} String representation.
@@ -296,7 +302,7 @@ SplitsBrowser.Messages = {};
     WrongFileFormat.prototype.toString = function () {
         return this.name + ": " + this.message;
     };
-    
+
     /**
     * Utility funciton to throw a 'WrongFileFormat' exception object.
     * @sb-param {string} message - The exception message.
@@ -305,7 +311,7 @@ SplitsBrowser.Messages = {};
     SplitsBrowser.throwWrongFileFormat = function (message) {
         throw new WrongFileFormat(message);
     };
-    
+
     /**
     * Parses a course length.
     *
@@ -316,18 +322,18 @@ SplitsBrowser.Messages = {};
     * @sb-return {?Number} The parsed course length, or null if not valid.
     */
     SplitsBrowser.parseCourseLength = function (stringValue) {
-        var courseLength = parseFloat(stringValue.replace(",", "."));
+        let courseLength = parseFloat(stringValue.replace(",", "."));
         if (!isFinite(courseLength)) {
             return null;
         }
-        
+
         if (courseLength >= MIN_COURSE_LENGTH_METRES) {
             courseLength /= 1000;
         }
-        
+
         return courseLength;
     };
-    
+
     /**
     * Parses a course climb, specified as a whole number of metres.
     *
@@ -335,14 +341,14 @@ SplitsBrowser.Messages = {};
     * @sb-return {?Number} The parsed course climb, or null if not valid.
     */
     SplitsBrowser.parseCourseClimb = function (stringValue) {
-        var courseClimb = parseInt(stringValue, 10);
+        const courseClimb = parseInt(stringValue, 10);
         if (SplitsBrowser.isNaNStrict(courseClimb)) {
             return null;
         } else {
             return courseClimb;
         }
     };
-    
+
     /**
     * Normalise line endings so that all lines end with LF, instead of
     * CRLF or CR.
@@ -353,7 +359,7 @@ SplitsBrowser.Messages = {};
     SplitsBrowser.normaliseLineEndings = function (stringValue) {
         return stringValue.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
     };
-    
+
 })();
 
 
@@ -361,58 +367,58 @@ SplitsBrowser.Messages = {};
     "use strict";
 
     SplitsBrowser.NULL_TIME_PLACEHOLDER = "-----";
-    
-    var isNaNStrict = SplitsBrowser.isNaNStrict;
-    
+
+    const isNaNStrict = SplitsBrowser.isNaNStrict;
+
     /**
     * Formats a time period given as a number of seconds as a string in the form
     * [-][h:]mm:ss.ss .
     * @sb-param {Number} seconds - The number of seconds.
     * @sb-param {?Number} precision - Optional number of decimal places to format
-    *     using, or the default if not specified. 
+    *     using, or the default if not specified.
     * @sb-returns {string} The string formatting of the time.
     */
     SplitsBrowser.formatTime = function (seconds, precision) {
-        
+
         if (seconds === null) {
             return SplitsBrowser.NULL_TIME_PLACEHOLDER;
         } else if (isNaNStrict(seconds)) {
             return "???";
         }
-    
-        var result = "";
+
+        let result = "";
         if (seconds < 0) {
             result = "-";
             seconds = -seconds;
         }
-        
-        var hours = Math.floor(seconds / (60 * 60));
-        var mins = Math.floor(seconds / 60) % 60;
-        var secs = seconds % 60;
+
+        const hours = Math.floor(seconds / (60 * 60));
+        const mins = Math.floor(seconds / 60) % 60;
+        const secs = seconds % 60;
         if (hours > 0) {
             result += hours.toString() + ":";
         }
-        
+
         if (mins < 10) {
             result += "0";
         }
-        
+
         result += mins + ":";
-        
+
         if (secs < 10) {
             result += "0";
         }
-        
+
         if (typeof precision === "number") {
             result += secs.toFixed(precision);
         } else {
             result += Math.round(secs * 100) / 100;
         }
-        
+
         return result;
     };
-    
-    /**  
+
+    /**
     * Parse a time of the form MM:SS or H:MM:SS into a number of seconds.
     * @sb-param {string} time - The time of the form MM:SS.
     * @sb-return {?Number} The number of seconds.
@@ -420,8 +426,8 @@ SplitsBrowser.Messages = {};
     SplitsBrowser.parseTime = function (time) {
         time = time.trim();
         if (/^(\d+:)?\d+:\d\d([,.]\d+)?$/.test(time)) {
-            var timeParts = time.replace(",", ".").split(":");
-            var totalTime = 0;
+            const timeParts = time.replace(",", ".").split(":");
+            let totalTime = 0;
             timeParts.forEach(function (timePart) {
                 totalTime = totalTime * 60 + parseFloat(timePart);
             });
@@ -436,24 +442,24 @@ SplitsBrowser.Messages = {};
 (function () {
     "use strict";
 
-    var NUMBER_TYPE = typeof 0;
-    
-    var isNotNull = SplitsBrowser.isNotNull;
-    var isNaNStrict = SplitsBrowser.isNaNStrict;
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
+    const NUMBER_TYPE = typeof 0;
+
+    const isNotNull = SplitsBrowser.isNotNull;
+    const isNaNStrict = SplitsBrowser.isNaNStrict;
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
 
     /**
     * Function used with the JavaScript sort method to sort competitors in order
     * by finishing time.
-    * 
+    *
     * Competitors that mispunch are sorted to the end of the list.
-    * 
+    *
     * The return value of this method will be:
     * (1) a negative number if competitor a comes before competitor b,
     * (2) a positive number if competitor a comes after competitor a,
     * (3) zero if the order of a and b makes no difference (i.e. they have the
     *     same total time, or both mispunched.)
-    * 
+    *
     * @sb-param {SplitsBrowser.Model.Competitor} a - One competitor to compare.
     * @sb-param {SplitsBrowser.Model.Competitor} b - The other competitor to compare.
     * @sb-returns {Number} Result of comparing two competitors.
@@ -469,7 +475,7 @@ SplitsBrowser.Messages = {};
             return (b.totalTime === null) ? -1 : a.totalTime - b.totalTime;
         }
     };
-    
+
     /**
     * Returns the sum of two numbers, or null if either is null.
     * @sb-param {?Number} a - One number, or null, to add.
@@ -480,18 +486,18 @@ SplitsBrowser.Messages = {};
     function addIfNotNull(a, b) {
         return (a === null || b === null) ? null : (a + b);
     }
-    
+
     /**
     * Returns the difference of two numbers, or null if either is null.
     * @sb-param {?Number} a - One number, or null, to add.
     * @sb-param {?Number} b - The other number, or null, to add.
     * @sb-return {?Number} null if at least one of a or b is null,
     *      otherwise a - b.
-    */    
+    */
     function subtractIfNotNull(a, b) {
         return (a === null || b === null) ? null : (a - b);
     }
-    
+
     /**
     * Convert an array of cumulative times into an array of split times.
     * If any null cumulative splits are given, the split times to and from that
@@ -512,12 +518,12 @@ SplitsBrowser.Messages = {};
         } else if (cumTimes.length === 1) {
             throwInvalidData("Array of cumulative times must contain more than just a single zero");
         }
-        
-        var splitTimes = [];
-        for (var i = 0; i + 1 < cumTimes.length; i += 1) {
+
+        const splitTimes = [];
+        for (let i = 0; i + 1 < cumTimes.length; i += 1) {
             splitTimes.push(subtractIfNotNull(cumTimes[i + 1], cumTimes[i]));
         }
-        
+
         return splitTimes;
     }
 
@@ -548,7 +554,9 @@ SplitsBrowser.Messages = {};
     * @sb-param {Array} originalCumTimes - Array of cumulative split times, as
     *     numbers, with nulls for missed controls.
     */
-    function Competitor(order, name, club, startTime, originalSplitTimes, originalCumTimes) {
+
+    // tslint:disable-next-line:no-shadowed-variable
+    const Competitor: any = function Competitor(order, name, club, startTime, originalSplitTimes, originalCumTimes): void {
 
         if (typeof order !== NUMBER_TYPE) {
             throwInvalidData("Competitor order must be a number, got " + typeof order + " '" + order + "' instead");
@@ -566,7 +574,7 @@ SplitsBrowser.Messages = {};
         this.className = null;
         this.yearOfBirth = null;
         this.gender = null; // "M" or "F" for male or female.
-        
+
         this.originalSplitTimes = originalSplitTimes;
         this.originalCumTimes = originalCumTimes;
         this.splitTimes = null;
@@ -575,30 +583,31 @@ SplitsBrowser.Messages = {};
         this.cumRanks = null;
         this.timeLosses = null;
 
+        // tslint:disable-next-line:max-line-length
         this.totalTime = (originalCumTimes === null || originalCumTimes.indexOf(null) > -1) ? null : originalCumTimes[originalCumTimes.length - 1];
     }
-    
+
     /**
     * Marks this competitor as being non-competitive.
     */
     Competitor.prototype.setNonCompetitive = function () {
         this.isNonCompetitive = true;
     };
-    
+
     /**
     * Marks this competitor as not starting.
     */
     Competitor.prototype.setNonStarter = function () {
         this.isNonStarter = true;
     };
-    
+
     /**
     * Marks this competitor as not finishing.
     */
     Competitor.prototype.setNonFinisher = function () {
         this.isNonFinisher = true;
     };
-    
+
     /**
     * Marks this competitor as disqualified, for reasons other than a missing
     * punch.
@@ -606,14 +615,14 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.disqualify = function () {
         this.isDisqualified = true;
     };
-    
+
     /**
     * Marks this competitor as over maximum time.
     */
     Competitor.prototype.setOverMaxTime = function () {
         this.isOverMaxTime = true;
     };
-    
+
     /**
     * Sets the name of the class that the competitor belongs to.
     * This is the course-class, not the competitor's age class.
@@ -622,7 +631,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.setClassName = function (className) {
         this.className = className;
     };
-    
+
     /**
     * Sets the competitor's year of birth.
     * @sb-param {Number} yearOfBirth - The competitor's year of birth.
@@ -630,7 +639,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.setYearOfBirth = function (yearOfBirth) {
         this.yearOfBirth = yearOfBirth;
     };
-    
+
     /**
     * Sets the competitor's gender.  This should be "M" or "F".
     * @sb-param {String} gender - The competitor's gender, "M" or "F".
@@ -638,7 +647,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.setGender = function (gender) {
         this.gender = gender;
     };
-    
+
     /**
     * Create and return a Competitor object where the competitor's times are given
     * as a list of cumulative times.
@@ -661,10 +670,10 @@ SplitsBrowser.Messages = {};
     * @sb-return {Competitor} Created competitor.
     */
     Competitor.fromOriginalCumTimes = function (order, name, club, startTime, cumTimes) {
-        var splitTimes = splitTimesFromCumTimes(cumTimes);
+        const splitTimes = splitTimesFromCumTimes(cumTimes);
         return new Competitor(order, name, club, startTime, splitTimes, cumTimes);
     };
-    
+
     /**
     * Create and return a Competitor object where the competitor's times are given
     * as a list of cumulative times.
@@ -686,12 +695,12 @@ SplitsBrowser.Messages = {};
     * @sb-return {Competitor} Created competitor.
     */
     Competitor.fromCumTimes = function (order, name, club, startTime, cumTimes) {
-        var competitor = Competitor.fromOriginalCumTimes(order, name, club, startTime, cumTimes);
+        const competitor = Competitor.fromOriginalCumTimes(order, name, club, startTime, cumTimes);
         competitor.splitTimes = competitor.originalSplitTimes;
         competitor.cumTimes = competitor.originalCumTimes;
         return competitor;
     };
-    
+
     /**
     * Sets the 'repaired' cumulative times for a competitor.  This also
     * calculates the repaired split times.
@@ -701,7 +710,7 @@ SplitsBrowser.Messages = {};
         this.cumTimes = cumTimes;
         this.splitTimes = splitTimesFromCumTimes(cumTimes);
     };
-    
+
     /**
     * Returns whether this competitor completed the course and did not get
     * disqualified.
@@ -722,14 +731,14 @@ SplitsBrowser.Messages = {};
         // Trim the leading zero
         return this.originalCumTimes.slice(1).some(isNotNull);
     };
-    
+
     /**
     * Returns the competitor's split to the given control.  If the control
     * index given is zero (i.e. the start), zero is returned.  If the
     * competitor has no time recorded for that control, null is returned.
     * If the value is missing, because the value read from the file was
     * invalid, NaN is returned.
-    * 
+    *
     * @sb-param {Number} controlIndex - Index of the control (0 = start).
     * @sb-return {?Number} The split time in seconds for the competitor to the
     *      given control.
@@ -737,12 +746,12 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getSplitTimeTo = function (controlIndex) {
         return (controlIndex === 0) ? 0 : this.splitTimes[controlIndex - 1];
     };
-    
+
     /**
     * Returns the competitor's 'original' split to the given control.  This is
     * always the value read from the source data file, or derived directly from
     * this data, before any attempt was made to repair the competitor's data.
-    * 
+    *
     * If the control index given is zero (i.e. the start), zero is returned.
     * If the competitor has no time recorded for that control, null is
     * returned.
@@ -753,7 +762,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getOriginalSplitTimeTo = function (controlIndex) {
         return (controlIndex === 0) ? 0 : this.originalSplitTimes[controlIndex - 1];
     };
-    
+
     /**
     * Returns whether the control with the given index is deemed to have a
     * dubious split time.
@@ -764,7 +773,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.isSplitTimeDubious = function (controlIndex) {
         return (controlIndex > 0 && this.originalSplitTimes[controlIndex - 1] !== this.splitTimes[controlIndex - 1]);
     };
-    
+
     /**
     * Returns the competitor's cumulative split to the given control.  If the
     * control index given is zero (i.e. the start), zero is returned.   If the
@@ -778,7 +787,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getCumulativeTimeTo = function (controlIndex) {
         return this.cumTimes[controlIndex];
     };
-    
+
     /**
     * Returns the 'original' cumulative time the competitor took to the given
     * control.  This is always the value read from the source data file, before
@@ -790,7 +799,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getOriginalCumulativeTimeTo = function (controlIndex) {
         return this.originalCumTimes[controlIndex];
     };
-    
+
     /**
     * Returns whether the control with the given index is deemed to have a
     * dubious cumulative time.
@@ -801,7 +810,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.isCumulativeTimeDubious = function (controlIndex) {
         return this.originalCumTimes[controlIndex] !== this.cumTimes[controlIndex];
     };
-    
+
     /**
     * Returns the rank of the competitor's split to the given control.  If the
     * control index given is zero (i.e. the start), or if the competitor has no
@@ -814,12 +823,12 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getSplitRankTo = function (controlIndex) {
         return (this.splitRanks === null || controlIndex === 0) ? null : this.splitRanks[controlIndex - 1];
     };
-    
+
     /**
     * Returns the rank of the competitor's cumulative split to the given
     * control.  If the control index given is zero (i.e. the start), or if the
     * competitor has no time recorded for that control, or if the ranks have
-    * not been set on this competitor, null is returned.  
+    * not been set on this competitor, null is returned.
     * @sb-param {Number} controlIndex - Index of the control (0 = start).
     * @sb-return {Number} The split time in seconds for the competitor to the
     *      given control.
@@ -827,7 +836,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getCumulativeRankTo = function (controlIndex) {
         return (this.cumRanks === null || controlIndex === 0) ? null : this.cumRanks[controlIndex - 1];
     };
-    
+
     /**
     * Returns the time loss of the competitor at the given control, or null if
     * time losses cannot be calculated for the competitor or have not yet been
@@ -838,7 +847,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getTimeLossAt = function (controlIndex) {
         return (controlIndex === 0 || this.timeLosses === null) ? null : this.timeLosses[controlIndex - 1];
     };
-    
+
     /**
     * Returns all of the competitor's cumulative time splits.
     * @sb-return {Array} The cumulative split times in seconds for the competitor.
@@ -846,7 +855,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getAllCumulativeTimes = function () {
         return this.cumTimes;
     };
-    
+
     /**
     * Returns all of the competitor's cumulative time splits.
     * @sb-return {Array} The cumulative split times in seconds for the competitor.
@@ -854,10 +863,10 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getAllOriginalCumulativeTimes = function () {
         return this.originalCumTimes;
     };
-    
+
     /**
     * Returns whether this competitor is missing a start time.
-    * 
+    *
     * The competitor is missing its start time if it doesn't have a start time
     * and it also has at least one split.  (A competitor that has no start time
     * and no splits either didn't start the race.)
@@ -868,7 +877,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.lacksStartTime = function () {
         return this.startTime === null && this.splitTimes.some(isNotNull);
     };
-    
+
     /**
     * Sets the split and cumulative-split ranks for this competitor.
     * @sb-param {Array} splitRanks - Array of split ranks for this competitor.
@@ -886,26 +895,27 @@ SplitsBrowser.Messages = {};
     */
     Competitor.prototype.getCumTimesAdjustedToReference = function (referenceCumTimes) {
         if (referenceCumTimes.length !== this.cumTimes.length) {
-            throwInvalidData("Cannot adjust competitor times because the numbers of times are different (" + this.cumTimes.length + " and " + referenceCumTimes.length + ")");
+            // tslint:disable-next-line:max-line-length
+            throwInvalidData('Cannot adjust competitor times because the numbers of times are different (' + this.cumTimes.length + ' and ' + referenceCumTimes.length + ')');
         } else if (referenceCumTimes.indexOf(null) > -1) {
             throwInvalidData("Cannot adjust competitor times because a null value is in the reference data");
         }
 
-        var adjustedTimes = this.cumTimes.map(function (time, idx) { return subtractIfNotNull(time, referenceCumTimes[idx]); });
+        const adjustedTimes = this.cumTimes.map(function (time, idx) { return subtractIfNotNull(time, referenceCumTimes[idx]); });
         return adjustedTimes;
     };
-    
+
     /**
     * Returns the cumulative times of this competitor with the start time added on.
     * @sb-param {Array} referenceCumTimes - The reference cumulative-split-time data to adjust by.
     * @sb-return {Array} The array of adjusted data.
     */
     Competitor.prototype.getCumTimesAdjustedToReferenceWithStartAdded = function (referenceCumTimes) {
-        var adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
-        var startTime = this.startTime;
+        const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
+        const startTime = this.startTime;
         return adjustedTimes.map(function (adjTime) { return addIfNotNull(adjTime, startTime); });
     };
-    
+
     /**
     * Returns an array of percentages that this competitor's splits were behind
     * those of a reference competitor.
@@ -914,17 +924,18 @@ SplitsBrowser.Messages = {};
     */
     Competitor.prototype.getSplitPercentsBehindReferenceCumTimes = function (referenceCumTimes) {
         if (referenceCumTimes.length !== this.cumTimes.length) {
-            throwInvalidData("Cannot determine percentages-behind because the numbers of times are different (" + this.cumTimes.length + " and " + referenceCumTimes.length + ")");
+            // tslint:disable-next-line:max-line-length
+            throwInvalidData('Cannot determine percentages-behind because the numbers of times are different (' + this.cumTimes.length + ' and ' + referenceCumTimes.length + ')');
         } else if (referenceCumTimes.indexOf(null) > -1) {
             throwInvalidData("Cannot determine percentages-behind because a null value is in the reference data");
         }
-        
-        var percentsBehind = [0];
+
+        const percentsBehind = [0];
         this.splitTimes.forEach(function (splitTime, index) {
             if (splitTime === null) {
                 percentsBehind.push(null);
             } else {
-                var referenceSplit = referenceCumTimes[index + 1] - referenceCumTimes[index];
+                const referenceSplit = referenceCumTimes[index + 1] - referenceCumTimes[index];
                 if (referenceSplit > 0) {
                     percentsBehind.push(100 * (splitTime - referenceSplit) / referenceSplit);
                 } else {
@@ -932,10 +943,10 @@ SplitsBrowser.Messages = {};
                 }
             }
         });
-        
+
         return percentsBehind;
     };
-    
+
     /**
     * Determines the time losses for this competitor.
     * @sb-param {Array} fastestSplitTimes - Array of fastest split times.
@@ -943,11 +954,12 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.determineTimeLosses = function (fastestSplitTimes) {
         if (this.completed()) {
             if (fastestSplitTimes.length !== this.splitTimes.length) {
-                throwInvalidData("Cannot determine time loss of competitor with " + this.splitTimes.length + " split times using " + fastestSplitTimes.length + " fastest splits");
-            }  else if (fastestSplitTimes.some(isNaNStrict)) {
+                // tslint:disable-next-line:max-line-length
+                throwInvalidData('Cannot determine time loss of competitor with ' + this.splitTimes.length + ' split times using ' + fastestSplitTimes.length + ' fastest splits');
+            } else if (fastestSplitTimes.some(isNaNStrict)) {
                 throwInvalidData("Cannot determine time loss of competitor when there is a NaN value in the fastest splits");
             }
-            
+
             if (fastestSplitTimes.some(function (split) { return split === 0; })) {
                 // Someone registered a zero split on this course.  In this
                 // situation the time losses don't really make sense.
@@ -963,28 +975,28 @@ SplitsBrowser.Messages = {};
                 // (split[i] - fastest[i])/fastest[i].  A control's split ratio
                 // is its time loss rate plus 1.  Not subtracting one at the start
                 // means that we then don't have to add it back on at the end.
-                
-                var splitRatios = this.splitTimes.map(function (splitTime, index) {
+
+                const splitRatios = this.splitTimes.map(function (splitTime, index) {
                     return splitTime / fastestSplitTimes[index];
                 });
-                
+
                 splitRatios.sort(d3.ascending);
-                
-                var medianSplitRatio;
+
+                let medianSplitRatio;
                 if (splitRatios.length % 2 === 1) {
                     medianSplitRatio = splitRatios[(splitRatios.length - 1) / 2];
                 } else {
-                    var midpt = splitRatios.length / 2;
+                    const midpt = splitRatios.length / 2;
                     medianSplitRatio = (splitRatios[midpt - 1] + splitRatios[midpt]) / 2;
                 }
-                
+
                 this.timeLosses = this.splitTimes.map(function (splitTime, index) {
                     return Math.round(splitTime - fastestSplitTimes[index] * medianSplitRatio);
                 });
             }
         }
     };
-    
+
     /**
     * Returns whether this competitor 'crosses' another.  Two competitors are
     * considered to have crossed if their chart lines on the Race Graph cross.
@@ -995,18 +1007,18 @@ SplitsBrowser.Messages = {};
         if (other.cumTimes.length !== this.cumTimes.length) {
             throwInvalidData("Two competitors with different numbers of controls cannot cross");
         }
-        
+
         // We determine whether two competitors cross by keeping track of
         // whether this competitor is ahead of other at any point, and whether
         // this competitor is behind the other one.  If both, the competitors
         // cross.
-        var beforeOther = false;
-        var afterOther = false;
-        
-        for (var controlIdx = 0; controlIdx < this.cumTimes.length; controlIdx += 1) {
+        let beforeOther = false;
+        let afterOther = false;
+
+        for (let controlIdx = 0; controlIdx < this.cumTimes.length; controlIdx += 1) {
             if (this.cumTimes[controlIdx] !== null && other.cumTimes[controlIdx] !== null) {
-                var thisTotalTime = this.startTime + this.cumTimes[controlIdx];
-                var otherTotalTime = other.startTime + other.cumTimes[controlIdx];
+                const thisTotalTime = this.startTime + this.cumTimes[controlIdx];
+                const otherTotalTime = other.startTime + other.cumTimes[controlIdx];
                 if (thisTotalTime < otherTotalTime) {
                     beforeOther = true;
                 } else if (thisTotalTime > otherTotalTime) {
@@ -1014,10 +1026,10 @@ SplitsBrowser.Messages = {};
                 }
             }
         }
-         
+
         return beforeOther && afterOther;
     };
-    
+
     /**
     * Returns an array of objects that record the indexes around which times in
     * the given array are NaN.
@@ -1025,29 +1037,29 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of objects that record indexes around dubious times.
     */
     function getIndexesAroundDubiousTimes(times) {
-        var dubiousTimeInfo = [];
-        var startIndex = 1;
+        const dubiousTimeInfo = [];
+        let startIndex = 1;
         while (startIndex + 1 < times.length) {
             if (isNaNStrict(times[startIndex])) {
-                var endIndex = startIndex;
+                let endIndex = startIndex;
                 while (endIndex + 1 < times.length && isNaNStrict(times[endIndex + 1])) {
                     endIndex += 1;
                 }
-                
+
                 if (endIndex + 1 < times.length && times[startIndex - 1] !== null && times[endIndex + 1] !== null) {
-                    dubiousTimeInfo.push({start: startIndex - 1, end: endIndex + 1});
+                    dubiousTimeInfo.push({ start: startIndex - 1, end: endIndex + 1 });
                 }
-                
+
                 startIndex = endIndex + 1;
-                
+
             } else {
                 startIndex += 1;
             }
         }
-        
+
         return dubiousTimeInfo;
     }
-    
+
     /**
     * Returns an array of objects that list the controls around those that have
     * dubious cumulative times.
@@ -1057,7 +1069,7 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getControlIndexesAroundDubiousCumulativeTimes = function () {
         return getIndexesAroundDubiousTimes(this.cumTimes);
     };
-    
+
     /**
     * Returns an array of objects that list the controls around those that have
     * dubious cumulative times.
@@ -1067,16 +1079,16 @@ SplitsBrowser.Messages = {};
     Competitor.prototype.getControlIndexesAroundDubiousSplitTimes = function () {
         return getIndexesAroundDubiousTimes([0].concat(this.splitTimes));
     };
-    
+
     SplitsBrowser.Model.Competitor = Competitor;
 })();
 
-(function (){
+(function () {
     "use strict";
 
-    var isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
-    
+    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+
     /**
      * Object that represents a collection of competitor data for a class.
      * @constructor.
@@ -1094,7 +1106,7 @@ SplitsBrowser.Messages = {};
             comp.setClassName(name);
         });
     }
-    
+
     /**
     * Records that this course-class has competitor data that SplitsBrowser has
     * deduced as dubious.
@@ -1102,21 +1114,21 @@ SplitsBrowser.Messages = {};
     CourseClass.prototype.recordHasDubiousData = function () {
         this.hasDubiousData = true;
     };
-     
+
     /**
     * Determines the time losses for the competitors in this course-class.
     */
     CourseClass.prototype.determineTimeLosses = function () {
-        var fastestSplitTimes = d3.range(1, this.numControls + 2).map(function (controlIdx) {
-            var splitRec = this.getFastestSplitTo(controlIdx);
+        const fastestSplitTimes = d3.range(1, this.numControls + 2).map(function (controlIdx) {
+            const splitRec = this.getFastestSplitTo(controlIdx);
             return (splitRec === null) ? null : splitRec.split;
         }, this);
-        
+
         this.competitors.forEach(function (comp) {
             comp.determineTimeLosses(fastestSplitTimes);
         });
     };
-    
+
     /**
     * Returns whether this course-class is empty, i.e. has no competitors.
     * @sb-return {boolean} True if this course-class has no competitors, false if it
@@ -1125,7 +1137,7 @@ SplitsBrowser.Messages = {};
     CourseClass.prototype.isEmpty = function () {
         return (this.competitors.length === 0);
     };
-    
+
     /**
     * Sets the course that this course-class belongs to.
     * @sb-param {SplitsBrowser.Model.Course} course - The course this class belongs to.
@@ -1147,11 +1159,11 @@ SplitsBrowser.Messages = {};
         if (typeof controlIdx !== "number" || controlIdx < 1 || controlIdx > this.numControls + 1) {
             throwInvalidData("Cannot return splits to leg '" + controlIdx + "' in a course with " + this.numControls + " control(s)");
         }
-    
-        var fastestSplit = null;
-        var fastestCompetitor = null;
+
+        let fastestSplit = null;
+        let fastestCompetitor = null;
         this.competitors.forEach(function (comp) {
-            var compSplit = comp.getSplitTimeTo(controlIdx);
+            const compSplit = comp.getSplitTimeTo(controlIdx);
             if (isNotNullNorNaN(compSplit)) {
                 if (fastestSplit === null || compSplit < fastestSplit) {
                     fastestSplit = compSplit;
@@ -1159,11 +1171,11 @@ SplitsBrowser.Messages = {};
                 }
             }
         });
-        
+
         // @ts-ignore  fastestCompetitor must be set of fastest splt was found
-        return (fastestSplit === null) ? null : {split: fastestSplit, name: fastestCompetitor.name};
+        return (fastestSplit === null) ? null : { split: fastestSplit, name: fastestCompetitor.name };
     };
-    
+
     /**
     * Returns all competitors that visited the control in the given time
     * interval.
@@ -1180,33 +1192,33 @@ SplitsBrowser.Messages = {};
         if (typeof controlNum !== "number" || isNaN(controlNum) || controlNum < 0 || controlNum > this.numControls + 1) {
             throwInvalidData("Control number must be a number between 0 and " + this.numControls + " inclusive");
         }
-        
-        var matchingCompetitors = [];
+
+        const matchingCompetitors = [];
         this.competitors.forEach(function (comp) {
-            var cumTime = comp.getCumulativeTimeTo(controlNum);
+            const cumTime = comp.getCumulativeTimeTo(controlNum);
             if (cumTime !== null && comp.startTime !== null) {
-                var actualTimeAtControl = cumTime + comp.startTime;
+                const actualTimeAtControl = cumTime + comp.startTime;
                 if (intervalStart <= actualTimeAtControl && actualTimeAtControl <= intervalEnd) {
-                    matchingCompetitors.push({name: comp.name, time: actualTimeAtControl});
+                    matchingCompetitors.push({ name: comp.name, time: actualTimeAtControl });
                 }
             }
         });
-        
+
         return matchingCompetitors;
     };
-    
+
     SplitsBrowser.Model.CourseClass = CourseClass;
 })();
 
 (function () {
     "use strict";
-    
-    var isNotNull = SplitsBrowser.isNotNull;
-    var isNaNStrict = SplitsBrowser.isNaNStrict;
-    var isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    var throwInvalidData = SplitsBrowser.throwInvalidData; 
-    var compareCompetitors = SplitsBrowser.Model.compareCompetitors;
-    
+
+    const isNotNull = SplitsBrowser.isNotNull;
+    const isNaNStrict = SplitsBrowser.isNaNStrict;
+    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+    const compareCompetitors = SplitsBrowser.Model.compareCompetitors;
+
     /**
     * Utility function to merge the lists of all competitors in a number of
     * classes.  All classes must contain the same number of controls.
@@ -1217,16 +1229,16 @@ SplitsBrowser.Messages = {};
         if (classes.length === 0) {
             return [];
         }
-        
-        var allCompetitors = [];
-        var expectedControlCount = classes[0].numControls;
+
+        const allCompetitors = [];
+        const expectedControlCount = classes[0].numControls;
         classes.forEach(function (courseClass) {
             if (courseClass.numControls !== expectedControlCount) {
                 throwInvalidData("Cannot merge classes with " + expectedControlCount + " and " + courseClass.numControls + " controls");
             }
-            
+
             courseClass.competitors.forEach(function (comp) {
-                if (!comp.isNonStarter) { 
+                if (!comp.isNonStarter) {
                     allCompetitors.push(comp);
                 }
             });
@@ -1244,26 +1256,26 @@ SplitsBrowser.Messages = {};
     */
     function getRanks(sourceData) {
         // First, sort the source data, removing nulls.
-        var sortedData = sourceData.filter(isNotNullNorNaN);
+        const sortedData = sourceData.filter(isNotNullNorNaN);
         sortedData.sort(d3.ascending);
-        
+
         // Now construct a map that maps from source value to rank.
-        //DKR was  var rankMap = new d3.map();
-        var rankMap =  d3.map();
-        sortedData.forEach(function(value, index) {
+        // DKR was  var rankMap = new d3.map();
+        const rankMap = d3.map();
+        sortedData.forEach(function (value, index) {
             if (!rankMap.has(value)) {
                 rankMap.set(value, index + 1);
             }
         });
-        
+
         // Finally, build and return the list of ranks.
-        var ranks = sourceData.map(function(value) {
+        const ranks = sourceData.map(function (value) {
             return isNotNullNorNaN(value) ? rankMap.get(value) : value;
         });
-        
+
         return ranks;
     }
-    
+
     /**
     * An object that represents the currently-selected classes.
     * @constructor
@@ -1275,17 +1287,17 @@ SplitsBrowser.Messages = {};
         this.numControls = (classes.length > 0) ? classes[0].numControls : null;
         this.computeRanks();
     }
-    
+
     /**
     * Returns whether this course-class set is empty, i.e. whether it has no
     * competitors at all.
     * @sb-return {boolean} True if the course-class set is empty, false if it is not
     *     empty.
-    */    
+    */
     CourseClassSet.prototype.isEmpty = function () {
         return this.allCompetitors.length === 0;
     };
-    
+
     /**
     * Returns the course used by all of the classes that make up this set.  If
     * there are no classes, null is returned instead.
@@ -1294,7 +1306,7 @@ SplitsBrowser.Messages = {};
     CourseClassSet.prototype.getCourse = function () {
         return (this.classes.length > 0) ? this.classes[0].course : null;
     };
-    
+
     /**
     * Returns the name of the 'primary' class, i.e. that that has been
     * chosen in the drop-down list.  If there are no classes, null is returned
@@ -1304,7 +1316,7 @@ SplitsBrowser.Messages = {};
     CourseClassSet.prototype.getPrimaryClassName = function () {
         return (this.classes.length > 0) ? this.classes[0].name : null;
     };
-    
+
     /**
     * Returns the number of classes that this course-class set is made up of.
     * @sb-return {Number} The number of classes that this course-class set is
@@ -1313,7 +1325,7 @@ SplitsBrowser.Messages = {};
     CourseClassSet.prototype.getNumClasses = function () {
         return this.classes.length;
     };
-    
+
     /**
     * Returns whether any of the classes within this set have data that
     * SplitsBrowser can identify as dubious.
@@ -1334,25 +1346,25 @@ SplitsBrowser.Messages = {};
     *    ranges of null and/or NaN values.
     */
     function getBlankRanges(times, includeEnd) {
-        var blankRangeInfo = [];
-        var startIndex = 1;
+        const blankRangeInfo = [];
+        let startIndex = 1;
         while (startIndex + 1 < times.length) {
             if (isNotNullNorNaN(times[startIndex])) {
                 startIndex += 1;
             } else {
-                var endIndex = startIndex;
+                let endIndex = startIndex;
                 while (endIndex + 1 < times.length && !isNotNullNorNaN(times[endIndex + 1])) {
                     endIndex += 1;
                 }
-                
+
                 if (endIndex + 1 < times.length || includeEnd) {
-                    blankRangeInfo.push({start: startIndex - 1, end: endIndex + 1});
+                    blankRangeInfo.push({ start: startIndex - 1, end: endIndex + 1 });
                 }
-                
+
                 startIndex = endIndex + 1;
             }
         }
-        
+
         return blankRangeInfo;
     }
 
@@ -1364,31 +1376,31 @@ SplitsBrowser.Messages = {};
     */
     function fillBlankRangesInCumulativeTimes(cumTimes) {
         cumTimes = cumTimes.slice(0);
-        var blankRanges = getBlankRanges(cumTimes, false);
-        for (var rangeIndex = 0; rangeIndex < blankRanges.length; rangeIndex += 1) {
-            var range = blankRanges[rangeIndex];
-            var timeBefore = cumTimes[range.start];
-            var timeAfter = cumTimes[range.end];
-            var avgTimePerControl = (timeAfter - timeBefore) / (range.end - range.start);
-            for (var index = range.start + 1; index < range.end; index += 1) {
+        const blankRanges = getBlankRanges(cumTimes, false);
+        for (let rangeIndex = 0; rangeIndex < blankRanges.length; rangeIndex += 1) {
+            const range = blankRanges[rangeIndex];
+            const timeBefore = cumTimes[range.start];
+            const timeAfter = cumTimes[range.end];
+            const avgTimePerControl = (timeAfter - timeBefore) / (range.end - range.start);
+            for (let index = range.start + 1; index < range.end; index += 1) {
                 cumTimes[index] = timeBefore + (index - range.start) * avgTimePerControl;
             }
         }
-        
-        var lastNaNTimeIndex = cumTimes.length;
+
+        let lastNaNTimeIndex = cumTimes.length;
         while (lastNaNTimeIndex >= 0 && isNaNStrict(cumTimes[lastNaNTimeIndex - 1])) {
             lastNaNTimeIndex -= 1;
         }
-        
+
         if (lastNaNTimeIndex > 0) {
-            for (var timeIndex = lastNaNTimeIndex; timeIndex < cumTimes.length; timeIndex += 1) {
+            for (let timeIndex = lastNaNTimeIndex; timeIndex < cumTimes.length; timeIndex += 1) {
                 cumTimes[timeIndex] = cumTimes[timeIndex - 1] + ((timeIndex === cumTimes.length - 1) ? 60 : 180);
             }
         }
-        
+
         return cumTimes;
     }
-    
+
     /**
     * Returns an array of the cumulative times of the winner of the set of
     * classes.
@@ -1398,8 +1410,8 @@ SplitsBrowser.Messages = {};
         if (this.allCompetitors.length === 0) {
             return null;
         }
-        
-        var firstCompetitor = this.allCompetitors[0];
+
+        const firstCompetitor = this.allCompetitors[0];
         return (firstCompetitor.completed()) ? fillBlankRangesInCumulativeTimes(firstCompetitor.cumTimes) : null;
     };
 
@@ -1414,7 +1426,7 @@ SplitsBrowser.Messages = {};
     CourseClassSet.prototype.getFastestCumTimes = function () {
         return this.getFastestCumTimesPlusPercentage(0);
     };
-    
+
     /**
     * Return the imaginary competitor who recorded the fastest time on each leg
     * of the given classes, with a given percentage of their time added.
@@ -1428,38 +1440,38 @@ SplitsBrowser.Messages = {};
         if (this.numControls === null) {
             return null;
         }
-    
-        var ratio = 1 + percent / 100;
-        
-        var fastestSplits = new Array(this.numControls + 1);
+
+        const ratio = 1 + percent / 100;
+
+        const fastestSplits = new Array(this.numControls + 1);
         fastestSplits[0] = 0;
-        
-        for (var controlIdx = 1; controlIdx <= this.numControls + 1; controlIdx += 1) {
-            var fastestForThisControl = null;
-            for (var competitorIdx = 0; competitorIdx < this.allCompetitors.length; competitorIdx += 1) {
-                var thisTime = this.allCompetitors[competitorIdx].getSplitTimeTo(controlIdx);
+
+        for (let controlIdx = 1; controlIdx <= this.numControls + 1; controlIdx += 1) {
+            let fastestForThisControl = null;
+            for (let competitorIdx = 0; competitorIdx < this.allCompetitors.length; competitorIdx += 1) {
+                const thisTime = this.allCompetitors[competitorIdx].getSplitTimeTo(controlIdx);
                 if (isNotNullNorNaN(thisTime) && (fastestForThisControl === null || thisTime < fastestForThisControl)) {
                     fastestForThisControl = thisTime;
                 }
             }
-            
+
             fastestSplits[controlIdx] = fastestForThisControl;
         }
-     
+
         if (!fastestSplits.every(isNotNull)) {
             // We don't have fastest splits for every control, so there was one
             // control that either nobody punched or everybody had a dubious
             // split for.
-            
+
             // Find the blank-ranges of the fastest times.  Include the end
             // of the range in case there are no cumulative times at the last
             // control but there is to the finish.
-            var fastestBlankRanges = getBlankRanges(fastestSplits, true);
-            
+            const fastestBlankRanges = getBlankRanges(fastestSplits, true);
+
             // Find all blank-ranges of competitors.
-            var allCompetitorBlankRanges = [];
+            const allCompetitorBlankRanges = [];
             this.allCompetitors.forEach(function (competitor) {
-                var competitorBlankRanges = getBlankRanges(competitor.getAllCumulativeTimes(), false);
+                const competitorBlankRanges = getBlankRanges(competitor.getAllCumulativeTimes(), false);
                 competitorBlankRanges.forEach(function (range) {
                     allCompetitorBlankRanges.push({
                         start: range.start,
@@ -1469,52 +1481,52 @@ SplitsBrowser.Messages = {};
                     });
                 });
             });
-            
+
             // Now, for each blank range of the fastest times, find the
             // size of the smallest competitor blank range that covers it,
             // and then the fastest split among those competitors.
             fastestBlankRanges.forEach(function (fastestRange) {
-                var coveringCompetitorRanges = allCompetitorBlankRanges.filter(function (compRange) {
+                const coveringCompetitorRanges = allCompetitorBlankRanges.filter(function (compRange) {
                     return compRange.start <= fastestRange.start && fastestRange.end <= compRange.end + 1;
                 });
-                
-                var minSize = null;
-                var minOverallSplit = null;
+
+                let minSize = null;
+                let minOverallSplit = null;
                 coveringCompetitorRanges.forEach(function (coveringRange) {
                     if (minSize === null || coveringRange.size < minSize) {
                         minSize = coveringRange.size;
                         minOverallSplit = null;
                     }
-                    
+
                     if (minOverallSplit === null || coveringRange.overallSplit < minOverallSplit) {
                         minOverallSplit = coveringRange.overallSplit;
                     }
                 });
-                
+
                 // Assume that the fastest competitor across the range had
                 // equal splits for all controls on the range.  This won't
                 // always make sense but it's the best we can do.
                 if (minSize !== null && minOverallSplit !== null) {
-                    for (var index = fastestRange.start + 1; index < fastestRange.end; index += 1) {
+                    for (let index = fastestRange.start + 1; index < fastestRange.end; index += 1) {
                         fastestSplits[index] = minOverallSplit / minSize;
                     }
                 }
             });
         }
-                
+
         if (!fastestSplits.every(isNotNull)) {
             // Could happen if the competitors are created from split times and
             // the splits are not complete, and also if nobody punches the
             // final few controls.  Set any remaining missing splits to 3
             // minutes for intermediate controls and 1 minute for the finish.
-            for (var index = 0; index < fastestSplits.length; index += 1) {
+            for (let index = 0; index < fastestSplits.length; index += 1) {
                 if (fastestSplits[index] === null) {
                     fastestSplits[index] = (index === fastestSplits.length - 1) ? 60 : 180;
                 }
             }
         }
-        
-        var fastestCumTimes = new Array(this.numControls + 1);
+
+        const fastestCumTimes = new Array(this.numControls + 1);
         fastestSplits.forEach(function (fastestSplit, index) {
             fastestCumTimes[index] = (index === 0) ? 0 : fastestCumTimes[index - 1] + fastestSplit * ratio;
         });
@@ -1540,25 +1552,25 @@ SplitsBrowser.Messages = {};
             // Nothing to compute.
             return;
         }
-        
-        var splitRanksByCompetitor = [];
-        var cumRanksByCompetitor = [];
-        
+
+        const splitRanksByCompetitor = [];
+        const cumRanksByCompetitor = [];
+
         this.allCompetitors.forEach(function () {
             splitRanksByCompetitor.push([]);
             cumRanksByCompetitor.push([]);
         });
-        
+
         d3.range(1, this.numControls + 2).forEach(function (control) {
-            var splitsByCompetitor = this.allCompetitors.map(function(comp) { return comp.getSplitTimeTo(control); });
-            var splitRanksForThisControl = getRanks(splitsByCompetitor);
+            const splitsByCompetitor = this.allCompetitors.map(function (comp) { return comp.getSplitTimeTo(control); });
+            const splitRanksForThisControl = getRanks(splitsByCompetitor);
             this.allCompetitors.forEach(function (_comp, idx) { splitRanksByCompetitor[idx].push(splitRanksForThisControl[idx]); });
         }, this);
-        
+
         d3.range(1, this.numControls + 2).forEach(function (control) {
             // We want to null out all subsequent cumulative ranks after a
             // competitor mispunches.
-            var cumSplitsByCompetitor = this.allCompetitors.map(function (comp, idx) {
+            const cumSplitsByCompetitor = this.allCompetitors.map(function (comp, idx) {
                 // -1 for previous control, another -1 because the cumulative
                 // time to control N is cumRanksByCompetitor[idx][N - 1].
                 if (control > 1 && cumRanksByCompetitor[idx][control - 1 - 1] === null) {
@@ -1571,15 +1583,15 @@ SplitsBrowser.Messages = {};
                     return comp.getCumulativeTimeTo(control);
                 }
             });
-            var cumRanksForThisControl = getRanks(cumSplitsByCompetitor);
+            const cumRanksForThisControl = getRanks(cumSplitsByCompetitor);
             this.allCompetitors.forEach(function (_comp, idx) { cumRanksByCompetitor[idx].push(cumRanksForThisControl[idx]); });
         }, this);
-        
+
         this.allCompetitors.forEach(function (comp, idx) {
             comp.setSplitAndCumulativeRanks(splitRanksByCompetitor[idx], cumRanksByCompetitor[idx]);
         });
     };
-    
+
     /**
     * Returns the best few splits to a given control.
     *
@@ -1603,22 +1615,24 @@ SplitsBrowser.Messages = {};
         } else {
             // Compare competitors by split time at this control, and, if those
             // are equal, total time.
-            var comparator = function (compA, compB) {
-                var compASplit = compA.getSplitTimeTo(controlIdx);
-                var compBSplit = compB.getSplitTimeTo(controlIdx);
+            const comparator = function (compA, compB) {
+                const compASplit = compA.getSplitTimeTo(controlIdx);
+                const compBSplit = compB.getSplitTimeTo(controlIdx);
                 return (compASplit === compBSplit) ? d3.ascending(compA.totalTime, compB.totalTime) : d3.ascending(compASplit, compBSplit);
             };
-            
-            var competitors = this.allCompetitors.filter(function (comp) { return comp.completed() && !isNaNStrict(comp.getSplitTimeTo(controlIdx)); });
+
+            const competitors = this.allCompetitors.filter(function (comp) {
+                return comp.completed() && !isNaNStrict(comp.getSplitTimeTo(controlIdx));
+            });
             competitors.sort(comparator);
-            var results = [];
-            for (var i = 0; i < competitors.length && i < numSplits; i += 1) {
-                results.push({name: competitors[i].name, split: competitors[i].getSplitTimeTo(controlIdx)});
+            const results = [];
+            for (let i = 0; i < competitors.length && i < numSplits; i += 1) {
+                results.push({ name: competitors[i].name, split: competitors[i].getSplitTimeTo(controlIdx) });
             }
-            
+
             return results;
         }
-    };    
+    };
 
     /**
     * Return data from the current classes in a form suitable for plotting in a chart.
@@ -1638,22 +1652,22 @@ SplitsBrowser.Messages = {};
             throw new TypeError("chartType undefined or missing");
         }
 
-        var competitorData = this.allCompetitors.map(function (comp) { return chartType.dataSelector(comp, referenceCumTimes); });
-        var selectedCompetitorData = currentIndexes.map(function (index) { return competitorData[index]; });
+        const competitorData = this.allCompetitors.map(function (comp) { return chartType.dataSelector(comp, referenceCumTimes); });
+        const selectedCompetitorData = currentIndexes.map(function (index) { return competitorData[index]; });
 
-        var xMin = d3.min(referenceCumTimes);
-        var xMax = d3.max(referenceCumTimes);
-        var yMin;
-        var yMax;
+        const xMin = d3.min(referenceCumTimes);
+        const xMax = d3.max(referenceCumTimes);
+        let yMin;
+        let yMax;
         if (currentIndexes.length === 0) {
-            // No competitors selected.  
+            // No competitors selected.
             if (this.isEmpty()) {
                 // No competitors at all.  Make up some values.
                 yMin = 0;
                 yMax = 60;
             } else {
                 // Set yMin and yMax to the boundary values of the first competitor.
-                var firstCompetitorTimes = competitorData[0];
+                const firstCompetitorTimes = competitorData[0];
                 yMin = d3.min(firstCompetitorTimes);
                 yMax = d3.max(firstCompetitorTimes);
             }
@@ -1667,18 +1681,22 @@ SplitsBrowser.Messages = {};
             // make sure that they're not equal.
             yMax = yMin + 1;
         }
-        
-        var controlIndexAdjust = (chartType.skipStart) ? 1 : 0;
-        var dubiousTimesInfo = currentIndexes.map(function (competitorIndex) {
-            var indexPairs = chartType.indexesAroundDubiousTimesFunc(this.allCompetitors[competitorIndex]);
+
+        const controlIndexAdjust = (chartType.skipStart) ? 1 : 0;
+        const dubiousTimesInfo = currentIndexes.map(function (competitorIndex) {
+            const indexPairs = chartType.indexesAroundDubiousTimesFunc(this.allCompetitors[competitorIndex]);
             return indexPairs.filter(function (indexPair) { return indexPair.start >= controlIndexAdjust; })
-                             .map(function (indexPair) { return { start: indexPair.start - controlIndexAdjust, end: indexPair.end - controlIndexAdjust }; });
+                .map(function (indexPair) {
+                    return {
+                        start: indexPair.start - controlIndexAdjust, end: indexPair.end - controlIndexAdjust
+                    };
+                });
         }, this);
 
-        var cumulativeTimesByControl = d3.transpose(selectedCompetitorData);
-        var xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
-        var zippedData = d3.zip(xData, cumulativeTimesByControl);
-        var competitorNames = currentIndexes.map(function (index) { return this.allCompetitors[index].name; }, this);
+        const cumulativeTimesByControl = d3.transpose(selectedCompetitorData);
+        const xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
+        const zippedData = d3.zip(xData, cumulativeTimesByControl);
+        const competitorNames = currentIndexes.map(function (index) { return this.allCompetitors[index].name; }, this);
         return {
             dataColumns: zippedData.map(function (data) { return { x: data[0], ys: data[1] }; }),
             competitorNames: competitorNames,
@@ -1688,15 +1706,15 @@ SplitsBrowser.Messages = {};
             dubiousTimesInfo: dubiousTimesInfo
         };
     };
-    
+
     SplitsBrowser.Model.CourseClassSet = CourseClassSet;
 })();
 
 (function () {
     "use strict";
-    
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
-    
+
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+
     /**
     * A collection of 'classes', all runners within which ran the same physical
     * course.
@@ -1710,23 +1728,24 @@ SplitsBrowser.Messages = {};
     * @sb-param {?Array} controls - Array of codes of the controls that make
     *     up this course.  This may be null if no such information is provided.
     */
-    function Course(name, classes, length, climb, controls) {
+    // tslint:disable-next-line:no-shadowed-variable
+    const Course: any = function Course(name, classes, length, climb, controls) {
         this.name = name;
         this.classes = classes;
         this.length = length;
         this.climb = climb;
         this.controls = controls;
     }
-    
+
     /** 'Magic' control code that represents the start. */
     Course.START = "__START__";
-    
+
     /** 'Magic' control code that represents the finish. */
     Course.FINISH = "__FINISH__";
-    
-    var START = Course.START;
-    var FINISH = Course.FINISH;
-    
+
+    const START = Course.START;
+    const FINISH = Course.FINISH;
+
     /**
     * Returns an array of the 'other' classes on this course.
     * @sb-param {SplitsBrowser.Model.CourseClass} courseClass - A course-class
@@ -1734,7 +1753,7 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of other course-classes.
     */
     Course.prototype.getOtherClasses = function (courseClass) {
-        var otherClasses = this.classes.filter(function (cls) { return cls !== courseClass; });
+        const otherClasses = this.classes.filter(function (cls) { return cls !== courseClass; });
         if (otherClasses.length === this.classes.length) {
             // Given class not found.
             throwInvalidData("Course.getOtherClasses: given class is not in this course");
@@ -1742,7 +1761,7 @@ SplitsBrowser.Messages = {};
             return otherClasses;
         }
     };
-    
+
     /**
     * Returns the number of course-classes that use this course.
     * @sb-return {Number} Number of course-classes that use this course.
@@ -1750,7 +1769,7 @@ SplitsBrowser.Messages = {};
     Course.prototype.getNumClasses = function () {
         return this.classes.length;
     };
-    
+
     /**
     * Returns whether this course has control code data.
     * @sb-return {boolean} true if this course has control codes, false if it does
@@ -1759,7 +1778,7 @@ SplitsBrowser.Messages = {};
     Course.prototype.hasControls = function () {
         return (this.controls !== null);
     };
-    
+
     /**
     * Returns the code of the control at the given number.
     *
@@ -1787,7 +1806,7 @@ SplitsBrowser.Messages = {};
             throwInvalidData("Cannot get control code of control " + controlNum + " because it is out of range");
         }
     };
-    
+
     /**
     * Returns whether this course uses the given leg.
     *
@@ -1803,7 +1822,7 @@ SplitsBrowser.Messages = {};
     Course.prototype.usesLeg = function (startCode, endCode) {
         return this.getLegNumber(startCode, endCode) >= 0;
     };
-    
+
     /**
     * Returns the number of a leg in this course, given the start and end
     * control codes.
@@ -1826,7 +1845,7 @@ SplitsBrowser.Messages = {};
             // No controls, so no, it doesn't contain the leg specified.
             return -1;
         }
-        
+
         if (startCode === START && endCode === FINISH) {
             // No controls - straight from the start to the finish.
             // This leg is only present, and is leg 1, if there are no
@@ -1838,17 +1857,17 @@ SplitsBrowser.Messages = {};
         } else if (endCode === FINISH) {
             return (this.controls.length > 0 && this.controls[this.controls.length - 1] === startCode) ? (this.controls.length + 1) : -1;
         } else {
-            for (var controlIdx = 1; controlIdx < this.controls.length; controlIdx += 1) {
+            for (let controlIdx = 1; controlIdx < this.controls.length; controlIdx += 1) {
                 if (this.controls[controlIdx - 1] === startCode && this.controls[controlIdx] === endCode) {
                     return controlIdx + 1;
                 }
             }
-            
+
             // If we get here, the given leg is not part of this course.
             return -1;
         }
     };
-    
+
     /**
     * Returns the fastest splits recorded for a given leg of the course.
     *
@@ -1866,25 +1885,25 @@ SplitsBrowser.Messages = {};
         if (this.legs === null) {
             throwInvalidData("Cannot determine fastest splits for a leg because leg information is not available");
         }
-        
-        var legNumber = this.getLegNumber(startCode, endCode);
+
+        const legNumber = this.getLegNumber(startCode, endCode);
         if (legNumber < 0) {
-            var legStr = ((startCode === START) ? "start" : startCode) + " to " + ((endCode === FINISH) ? "end" : endCode);
-            throwInvalidData("Leg from " +  legStr + " not found in course " + this.name);
+            const legStr = ((startCode === START) ? "start" : startCode) + " to " + ((endCode === FINISH) ? "end" : endCode);
+            throwInvalidData("Leg from " + legStr + " not found in course " + this.name);
         }
-        
-        var controlNum = legNumber;
-        var fastestSplits = [];
+
+        const controlNum = legNumber;
+        const fastestSplits = [];
         this.classes.forEach(function (courseClass) {
-            var classFastest = courseClass.getFastestSplitTo(controlNum);
+            const classFastest = courseClass.getFastestSplitTo(controlNum);
             if (classFastest !== null) {
-                fastestSplits.push({name: classFastest.name, className: courseClass.name, split: classFastest.split});
+                fastestSplits.push({ name: classFastest.name, className: courseClass.name, split: classFastest.split });
             }
         });
-        
+
         return fastestSplits;
     };
-    
+
     /**
     * Returns a list of all competitors on this course that visit the control
     * with the given code in the time interval given.
@@ -1911,7 +1930,7 @@ SplitsBrowser.Messages = {};
         } else if (controlCode === FINISH) {
             return this.getCompetitorsAtControlNumInTimeRange(this.controls.length + 1, intervalStart, intervalEnd);
         } else {
-            var controlIdx = this.controls.indexOf(controlCode);
+            const controlIdx = this.controls.indexOf(controlCode);
             if (controlIdx >= 0) {
                 return this.getCompetitorsAtControlNumInTimeRange(controlIdx + 1, intervalStart, intervalEnd);
             } else {
@@ -1920,7 +1939,7 @@ SplitsBrowser.Messages = {};
             }
         }
     };
-    
+
     /**
     * Returns a list of all competitors on this course that visit the control
     * with the given number in the time interval given.
@@ -1934,16 +1953,16 @@ SplitsBrowser.Messages = {};
     *     within the given time interval.
     */
     Course.prototype.getCompetitorsAtControlNumInTimeRange = function (controlNum, intervalStart, intervalEnd) {
-        var matchingCompetitors = [];
+        const matchingCompetitors = [];
         this.classes.forEach(function (courseClass) {
             courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach(function (comp) {
-                matchingCompetitors.push({name: comp.name, time: comp.time, className: courseClass.name});
+                matchingCompetitors.push({ name: comp.name, time: comp.time, className: courseClass.name });
             });
         });
-        
+
         return matchingCompetitors;
     };
-    
+
     /**
     * Returns whether the course has the given control.
     * @sb-param {String} controlCode - The code of the control.
@@ -1953,7 +1972,7 @@ SplitsBrowser.Messages = {};
     Course.prototype.hasControl = function (controlCode) {
         return this.controls !== null && this.controls.indexOf(controlCode) > -1;
     };
-    
+
     /**
     * Returns the control code(s) of the control(s) after the one with the
     * given code.
@@ -1971,10 +1990,10 @@ SplitsBrowser.Messages = {};
         } else if (controlCode === START) {
             return [(this.controls.length === 0) ? FINISH : this.controls[0]];
         } else {
-            var lastControlIdx = -1;
-            var nextControls = [];
+            let lastControlIdx = -1;
+            const nextControls = [];
             do {
-                var controlIdx = this.controls.indexOf(controlCode, lastControlIdx + 1);
+                const controlIdx = this.controls.indexOf(controlCode, lastControlIdx + 1);
                 if (controlIdx === -1) {
                     break;
                 } else if (controlIdx === this.controls.length - 1) {
@@ -1982,25 +2001,25 @@ SplitsBrowser.Messages = {};
                 } else {
                     nextControls.push(this.controls[controlIdx + 1]);
                 }
-                
+
                 lastControlIdx = controlIdx;
             } while (true); // Loop exits when broken.
-            
+
             if (nextControls.length === 0) {
                 throwInvalidData("Control '" + controlCode + "' not found on course " + this.name);
             } else {
                 return nextControls;
             }
         }
-    };  
-    
+    };
+
     SplitsBrowser.Model.Course = Course;
 })();
 
 (function () {
     "use strict";
-    
-    var Course = SplitsBrowser.Model.Course;
+
+    const Course = SplitsBrowser.Model.Course;
 
     /**
     * Contains all of the data for an event.
@@ -2010,16 +2029,16 @@ SplitsBrowser.Messages = {};
     *     courses of the event.
     * @sb-param {Array} warnings - Array of strings containing warning messages
     *     encountered when reading in the event dara.
-    */ 
+    */
     function Event(classes, courses, warnings) {
         this.classes = classes;
         this.courses = courses;
         this.warnings = warnings;
     }
-    
+
     /**
     * Determines time losses for each competitor in each class.
-    * 
+    *
     * This method should be called after reading in the event data but before
     * attempting to plot it.
     */
@@ -2028,7 +2047,7 @@ SplitsBrowser.Messages = {};
             courseClass.determineTimeLosses();
         });
     };
-    
+
     /**
     * Returns whether the event data needs any repairing.
     *
@@ -2045,7 +2064,7 @@ SplitsBrowser.Messages = {};
             });
         });
     };
-    
+
     /**
     * Returns the fastest splits for each class on a given leg.
     *
@@ -2059,18 +2078,18 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
     Event.prototype.getFastestSplitsForLeg = function (startCode, endCode) {
-        var fastestSplits = [];
+        let fastestSplits = [];
         this.courses.forEach(function (course) {
             if (course.usesLeg(startCode, endCode)) {
                 fastestSplits = fastestSplits.concat(course.getFastestSplitsForLeg(startCode, endCode));
             }
         });
-        
+
         fastestSplits.sort(function (a, b) { return d3.ascending(a.split, b.split); });
-        
+
         return fastestSplits;
     };
-    
+
     /**
     * Returns a list of competitors that visit the control with the given code
     * within the given time interval.
@@ -2086,18 +2105,18 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
     Event.prototype.getCompetitorsAtControlInTimeRange = function (controlCode, intervalStart, intervalEnd) {
-        var competitors = [];
+        const competitors = [];
         this.courses.forEach(function (course) {
             course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach(function (comp) {
                 competitors.push(comp);
             });
         });
-        
+
         competitors.sort(function (a, b) { return d3.ascending(a.time, b.time); });
-        
+
         return competitors;
     };
-    
+
     /**
     * Returns the list of controls that follow after a given control.
     * @sb-param {String} controlCode - The code for the control.
@@ -2105,29 +2124,29 @@ SplitsBrowser.Messages = {};
     *    with each object listing course name and next control.
     */
     Event.prototype.getNextControlsAfter = function (controlCode) {
-        var courses = this.courses;
+        let courses = this.courses;
         if (controlCode !== Course.START) {
             courses = courses.filter(function (course) { return course.hasControl(controlCode); });
         }
-        
-        return courses.map(function (course) { return {course: course, nextControls: course.getNextControls(controlCode)}; });
+
+        return courses.map(function (course) { return { course: course, nextControls: course.getNextControls(controlCode) }; });
     };
-    
+
     SplitsBrowser.Model.Event = Event;
 })();
 
 (function () {
-    
+
     /**
     * Converts a number of seconds into the corresponding number of minutes.
     * This conversion is as simple as dividing by 60.
     * @sb-param {Number} seconds - The number of seconds to convert.
     * @sb-return {Number} The corresponding number of minutes.
     */
-    function secondsToMinutes(seconds) { 
+    function secondsToMinutes(seconds) {
         return (seconds === null) ? null : seconds / 60;
     }
-    
+
     /**
     * Returns indexes around the given competitor's dubious cumulative times.
     * @sb-param {Competitor} competitor - The competitor to get the indexes for.
@@ -2137,7 +2156,7 @@ SplitsBrowser.Messages = {};
     function getIndexesAroundDubiousCumulativeTimes(competitor) {
         return competitor.getControlIndexesAroundDubiousCumulativeTimes();
     }
-    
+
     /**
     * Returns indexes around the given competitor's dubious split times.
     * @sb-param {Competitor} competitor - The competitor to get the indexes for.
@@ -2151,7 +2170,9 @@ SplitsBrowser.Messages = {};
     SplitsBrowser.Model.ChartTypes = {
         SplitsGraph: {
             nameKey: "SplitsGraphChartType",
-            dataSelector: function (comp, referenceCumTimes) { return comp.getCumTimesAdjustedToReference(referenceCumTimes).map(secondsToMinutes); },
+            dataSelector: function (comp, referenceCumTimes) {
+                return comp.getCumTimesAdjustedToReference(referenceCumTimes).map(secondsToMinutes);
+            },
             skipStart: false,
             yAxisLabelKey: "SplitsGraphYAxisLabel",
             isRaceGraph: false,
@@ -2161,7 +2182,9 @@ SplitsBrowser.Messages = {};
         },
         RaceGraph: {
             nameKey: "RaceGraphChartType",
-            dataSelector: function (comp, referenceCumTimes) { return comp.getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes).map(secondsToMinutes); },
+            dataSelector: function (comp, referenceCumTimes) {
+                return comp.getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes).map(secondsToMinutes);
+            },
             skipStart: false,
             yAxisLabelKey: "RaceGraphYAxisLabel",
             isRaceGraph: true,
@@ -2170,7 +2193,7 @@ SplitsBrowser.Messages = {};
             indexesAroundDubiousTimesFunc: getIndexesAroundDubiousCumulativeTimes
         },
         PositionAfterLeg: {
-            nameKey:  "PositionAfterLegChartType",
+            nameKey: "PositionAfterLegChartType",
             dataSelector: function (comp) { return comp.cumRanks; },
             skipStart: true,
             yAxisLabelKey: "PositionYAxisLabel",
@@ -2212,12 +2235,12 @@ SplitsBrowser.Messages = {};
     };
 })();
 
-(function (){
+(function () {
     "use strict";
-    
-    var NUMBER_TYPE = typeof 0;
-    
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
+
+    const NUMBER_TYPE = typeof 0;
+
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
 
     /**
     * Represents the currently-selected competitors, and offers a callback
@@ -2245,7 +2268,7 @@ SplitsBrowser.Messages = {};
     CompetitorSelection.prototype.isSelected = function (index) {
         return this.currentIndexes.indexOf(index) > -1;
     };
-    
+
     /**
     * Returns whether the selection consists of exactly one competitor.
     * @sb-returns {boolean} True if precisely one competitor is selected, false if
@@ -2254,7 +2277,7 @@ SplitsBrowser.Messages = {};
     CompetitorSelection.prototype.isSingleRunnerSelected = function () {
         return this.currentIndexes.length === 1;
     };
-    
+
     /**
     * Returns the index of the single selected competitor.
     *
@@ -2272,22 +2295,22 @@ SplitsBrowser.Messages = {};
     * that 'cross' this runner and are also marked as visible.
     * @sb-param {Array} competitorDetails - Array of competitor details to
     *     check within.
-    */    
+    */
     CompetitorSelection.prototype.selectCrossingRunners = function (competitorDetails) {
         if (this.isSingleRunnerSelected()) {
-            var refCompetitor = competitorDetails[this.currentIndexes[0]].competitor;
-            
+            const refCompetitor = competitorDetails[this.currentIndexes[0]].competitor;
+
             competitorDetails.forEach(function (compDetails, idx) {
                 if (compDetails.visible && compDetails.competitor.crosses(refCompetitor)) {
                     this.currentIndexes.push(idx);
                 }
             }, this);
-            
+
             this.currentIndexes.sort(d3.ascending);
             this.fireChangeHandlers();
         }
     };
-    
+
     /**
     * Fires all of the change handlers currently registered.
     */
@@ -2319,7 +2342,7 @@ SplitsBrowser.Messages = {};
     CompetitorSelection.prototype.getSelectedIndexes = function () {
         return this.currentIndexes.slice(0);
     };
-    
+
     /**
     * Set the selected competitors to those in the given array.
     * @sb-param {Array} selectedIndex - Array of indexes of selected competitors.
@@ -2330,7 +2353,7 @@ SplitsBrowser.Messages = {};
             this.fireChangeHandlers();
         }
     };
-    
+
     /**
     * Register a handler to be called whenever the list of indexes changes.
     *
@@ -2357,7 +2380,7 @@ SplitsBrowser.Messages = {};
     * @sb-param {Function} handler - The handler to register.
     */
     CompetitorSelection.prototype.deregisterChangeHandler = function (handler) {
-        var index = this.changeHandlers.indexOf(handler);
+        const index = this.changeHandlers.indexOf(handler);
         if (index > -1) {
             this.changeHandlers.splice(index, 1);
         }
@@ -2370,7 +2393,7 @@ SplitsBrowser.Messages = {};
     CompetitorSelection.prototype.toggle = function (index) {
         if (typeof index === NUMBER_TYPE) {
             if (0 <= index && index < this.count) {
-                var position = this.currentIndexes.indexOf(index);
+                const position = this.currentIndexes.indexOf(index);
                 if (position === -1) {
                     this.currentIndexes.push(index);
                     this.currentIndexes.sort(d3.ascending);
@@ -2386,7 +2409,7 @@ SplitsBrowser.Messages = {};
             throwInvalidData("Index is not a number");
         }
     };
-    
+
     /**
     * Selects a number of competitors, firing the change handlers once at the
     * end if any indexes were added.
@@ -2398,18 +2421,18 @@ SplitsBrowser.Messages = {};
         }, this)) {
             throwInvalidData("Indexes not all numeric and in range");
         }
-        
+
         // Remove from the set of indexes given any that are already selected.
-        var currentIndexSet = d3.set(this.currentIndexes);
+        const currentIndexSet = d3.set(this.currentIndexes);
         indexes = indexes.filter(function (index) { return !currentIndexSet.has(index); });
-        
+
         if (indexes.length > 0) {
             this.currentIndexes = this.currentIndexes.concat(indexes);
             this.currentIndexes.sort(d3.ascending);
             this.fireChangeHandlers();
         }
     };
-    
+
     /**
     * Deselects a number of competitors, firing the change handlers once at the
     * end if any indexes were removed.
@@ -2421,24 +2444,24 @@ SplitsBrowser.Messages = {};
         }, this)) {
             throwInvalidData("Indexes not all numeric and in range");
         }
-        
+
         // Remove from the set of indexes given any that are not already selected.
-        var currentIndexSet = d3.set(this.currentIndexes);
-        var anyRemoved = false;
-        for (var i = 0; i < indexes.length; i += 1) {
+        const currentIndexSet = d3.set(this.currentIndexes);
+        let anyRemoved = false;
+        for (let i = 0; i < indexes.length; i += 1) {
             if (currentIndexSet.has(indexes[i])) {
                 currentIndexSet.remove(indexes[i]);
                 anyRemoved = true;
             }
         }
-        
+
         if (anyRemoved) {
             this.currentIndexes = currentIndexSet.values().map(function (index) { return parseInt(index, 10); });
             this.currentIndexes.sort(d3.ascending);
             this.fireChangeHandlers();
         }
     };
-    
+
     /**
     * Migrates the selected competitors from one list to another.
     *
@@ -2461,13 +2484,13 @@ SplitsBrowser.Messages = {};
         } else if (!$.isArray(newCompetitors)) {
             throwInvalidData("CompetitorSelection.migrate: newCompetitors not an array");
         } else if (oldCompetitors.length !== this.count) {
-            throwInvalidData("CompetitorSelection.migrate: oldCompetitors list must have the same length as the current count"); 
+            throwInvalidData("CompetitorSelection.migrate: oldCompetitors list must have the same length as the current count");
         } else if (newCompetitors.length === 0 && this.currentIndexes.length > 0) {
             throwInvalidData("CompetitorSelection.migrate: newCompetitors list must not be empty if current list has competitors selected");
         }
-    
-        var selectedCompetitors = this.currentIndexes.map(function (index) { return oldCompetitors[index]; });
-        
+
+        const selectedCompetitors = this.currentIndexes.map(function (index) { return oldCompetitors[index]; });
+
         this.count = newCompetitors.length;
         this.currentIndexes = [];
         newCompetitors.forEach(function (comp, idx) {
@@ -2483,65 +2506,65 @@ SplitsBrowser.Messages = {};
 
 (function () {
     "use strict";
-    
-    var isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
+
+    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
 
     // Maximum number of minutes added to finish splits to ensure that all
     // competitors have sensible finish splits.
-    var MAX_FINISH_SPLIT_MINS_ADDED = 5;
-    
+    const MAX_FINISH_SPLIT_MINS_ADDED = 5;
+
     /**
      * Construct a Repairer, for repairing some data.
     */
-    var Repairer = function () {
+    const Repairer = function () {
         this.madeAnyChanges = false;
     };
 
-   /**
-    * Returns the positions at which the first pair of non-ascending cumulative
-    * times are found.  This is returned as an object with 'first' and 'second'
-    * properties.
-    *
-    * If the entire array of cumulative times is strictly ascending, this
-    * returns null.
-    * 
-    * @sb-param {Array} cumTimes - Array of cumulative times.
-    * @sb-return {?Object} Object containing indexes of non-ascending entries, or
-    *     null if none found.
-    */
+    /**
+     * Returns the positions at which the first pair of non-ascending cumulative
+     * times are found.  This is returned as an object with 'first' and 'second'
+     * properties.
+     *
+     * If the entire array of cumulative times is strictly ascending, this
+     * returns null.
+     *
+     * @sb-param {Array} cumTimes - Array of cumulative times.
+     * @sb-return {?Object} Object containing indexes of non-ascending entries, or
+     *     null if none found.
+     */
     function getFirstNonAscendingIndexes(cumTimes) {
         if (cumTimes.length === 0 || cumTimes[0] !== 0) {
             throwInvalidData("cumulative times array does not start with a zero cumulative time");
         }
-        
-        var lastNumericTimeIndex = 0;
-        
-        for (var index = 1; index < cumTimes.length; index += 1) {
-            var time = cumTimes[index];
+
+        let lastNumericTimeIndex = 0;
+
+        for (let index = 1; index < cumTimes.length; index += 1) {
+            const time = cumTimes[index];
             if (isNotNullNorNaN(time)) {
                 // This entry is numeric.
                 if (time <= cumTimes[lastNumericTimeIndex]) {
-                    return {first: lastNumericTimeIndex, second: index};
+                    return { first: lastNumericTimeIndex, second: index };
                 }
-                
+
                 lastNumericTimeIndex = index;
             }
         }
-        
+
         // If we get here, the entire array is in strictly-ascending order.
         return null;
     }
-    
-    
+
+
     /**
     * Remove, by setting to NaN, any cumulative time that is equal to the
     * previous cumulative time.
     * @sb-param {Array} cumTimes - Array of cumulative times.
     */
     Repairer.prototype.removeCumulativeTimesEqualToPrevious = function (cumTimes) {
-        var lastCumTime = cumTimes[0];
-        for (var index = 1; index + 1 < cumTimes.length; index += 1) {
+        let lastCumTime = cumTimes[0];
+        for (let index = 1; index + 1 < cumTimes.length; index += 1) {
             if (cumTimes[index] !== null && cumTimes[index] === lastCumTime) {
                 cumTimes[index] = NaN;
                 this.madeAnyChanges = true;
@@ -2550,13 +2573,13 @@ SplitsBrowser.Messages = {};
             }
         }
     };
-    
+
     /**
     * Remove from the cumulative times given any individual times that cause
     * negative splits and whose removal leaves all of the remaining splits in
     * strictly-ascending order.
     *
-    * This method does not compare the last two cumulative times, so if the 
+    * This method does not compare the last two cumulative times, so if the
     * finish time is not after the last control time, no changes will be made.
     *
     * @sb-param {Array} cumTimes - Array of cumulative times.
@@ -2565,9 +2588,9 @@ SplitsBrowser.Messages = {};
     */
     Repairer.prototype.removeCumulativeTimesCausingNegativeSplits = function (cumTimes) {
 
-        var nonAscIndexes = getFirstNonAscendingIndexes(cumTimes);
+        let nonAscIndexes = getFirstNonAscendingIndexes(cumTimes);
         while (nonAscIndexes !== null && nonAscIndexes.second + 1 < cumTimes.length) {
-            
+
             // So, we have a pair of cumulative times that are not in strict
             // ascending order, with the second one not being the finish.  If
             // the second time is not the finish cumulative time for a
@@ -2583,16 +2606,16 @@ SplitsBrowser.Messages = {};
             // removes their total time as well.  If the competitor didn't
             // complete the course, then we're not so bothered; they've
             // mispunched so they don't have a total time anyway.
-            
-            var first = nonAscIndexes.first;
-            var second = nonAscIndexes.second;
-            
-            var progress = false;
-            
-            for (var attempt = 1; attempt <= 3; attempt += 1) {
+
+            const first = nonAscIndexes.first;
+            const second = nonAscIndexes.second;
+
+            let progress = false;
+
+            for (let attempt = 1; attempt <= 3; attempt += 1) {
                 // 1 = remove second, 2 = remove first, 3 = remove first and the one before.
-                var adjustedCumTimes = cumTimes.slice();
-                
+                const adjustedCumTimes = cumTimes.slice();
+
                 if (attempt === 3 && (first === 1 || !isNotNullNorNaN(cumTimes[first - 1]))) {
                     // Can't remove first and the one before because there
                     // isn't a time before or it's already blank.
@@ -2605,8 +2628,8 @@ SplitsBrowser.Messages = {};
                         adjustedCumTimes[first] = NaN;
                         adjustedCumTimes[first - 1] = NaN;
                     }
-                    
-                    var nextNonAscIndexes = getFirstNonAscendingIndexes(adjustedCumTimes);
+
+                    const nextNonAscIndexes = getFirstNonAscendingIndexes(adjustedCumTimes);
                     if (nextNonAscIndexes === null || nextNonAscIndexes.first > second) {
                         progress = true;
                         cumTimes = adjustedCumTimes;
@@ -2616,33 +2639,35 @@ SplitsBrowser.Messages = {};
                     }
                 }
             }
-            
+
             if (!progress) {
                 break;
             }
         }
-    
+
         return cumTimes;
     };
-    
+
     /**
     * Removes the finish cumulative time from a competitor if it is absurd.
     *
     * It is absurd if it is less than the time at the previous control by at
     * least the maximum amount of time that can be added to finish splits.
-    * 
+    *
     * @sb-param {Array} cumTimes - The cumulative times to perhaps remove the
     *     finish split from.
     */
     Repairer.prototype.removeFinishTimeIfAbsurd = function (cumTimes) {
-        var finishTime = cumTimes[cumTimes.length - 1];
-        var lastControlTime = cumTimes[cumTimes.length - 2];
-        if (isNotNullNorNaN(finishTime) && isNotNullNorNaN(lastControlTime) && finishTime <= lastControlTime - MAX_FINISH_SPLIT_MINS_ADDED * 60) {
+        const finishTime = cumTimes[cumTimes.length - 1];
+        const lastControlTime = cumTimes[cumTimes.length - 2];
+        if (isNotNullNorNaN(finishTime) &&
+            isNotNullNorNaN(lastControlTime) &&
+            finishTime <= lastControlTime - MAX_FINISH_SPLIT_MINS_ADDED * 60) {
             cumTimes[cumTimes.length - 1] = NaN;
             this.madeAnyChanges = true;
         }
     };
-    
+
     /**
     * Attempts to repair the cumulative times for a competitor.  The repaired
     * cumulative times are written back into the competitor.
@@ -2651,19 +2676,19 @@ SplitsBrowser.Messages = {};
     *     wish to repair.
     */
     Repairer.prototype.repairCompetitor = function (competitor) {
-        var cumTimes = competitor.originalCumTimes.slice(0);
-        
+        let cumTimes = competitor.originalCumTimes.slice(0);
+
         this.removeCumulativeTimesEqualToPrevious(cumTimes);
-        
+
         cumTimes = this.removeCumulativeTimesCausingNegativeSplits(cumTimes);
-        
+
         if (!competitor.completed()) {
             this.removeFinishTimeIfAbsurd(cumTimes);
         }
-        
+
         competitor.setRepairedCumulativeTimes(cumTimes);
     };
-    
+
     /**
     * Attempt to repair all of the data within a course-class.
     * @sb-param {CourseClass} courseClass - The class whose data we wish to
@@ -2674,12 +2699,12 @@ SplitsBrowser.Messages = {};
         courseClass.competitors.forEach(function (competitor) {
             this.repairCompetitor(competitor);
         }, this);
-        
+
         if (this.madeAnyChanges) {
             courseClass.recordHasDubiousData();
         }
     };
-    
+
     /**
     * Attempt to carry out repairs to the data in an event.
     * @sb-param {Event} eventData - The event data to repair.
@@ -2689,22 +2714,22 @@ SplitsBrowser.Messages = {};
             this.repairCourseClass(courseClass);
         }, this);
     };
-    
+
     /**
     * Attempt to carry out repairs to the data in an event.
     * @sb-param {Event} eventData - The event data to repair.
     */
     function repairEventData(eventData) {
-        var repairer = new Repairer();
+        const repairer = new Repairer();
         repairer.repairEventData(eventData);
     }
-    
+
     /**
     * Transfer the 'original' data for each competitor to the 'final' data.
     *
     * This is used if the input data has been read in a format that requires
     * the data to be checked, but the user has opted not to perform any such
-    * reparations and wishes to view the 
+    * reparations and wishes to view the
     * @sb-param {Event} eventData - The event data to repair.
     */
     function transferCompetitorData(eventData) {
@@ -2714,7 +2739,7 @@ SplitsBrowser.Messages = {};
             });
         });
     }
-    
+
     SplitsBrowser.DataRepair = {
         repairEventData: repairEventData,
         transferCompetitorData: transferCompetitorData
@@ -2723,18 +2748,18 @@ SplitsBrowser.Messages = {};
 
 (function () {
     "use strict";
-    
-    var isTrue = SplitsBrowser.isTrue;
-    var isNotNull = SplitsBrowser.isNotNull;
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
-    var throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    var normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    var parseTime = SplitsBrowser.parseTime;
-    var Competitor = SplitsBrowser.Model.Competitor;
-    var compareCompetitors = SplitsBrowser.Model.compareCompetitors;
-    var CourseClass = SplitsBrowser.Model.CourseClass;
-    var Course = SplitsBrowser.Model.Course;
-    var Event = SplitsBrowser.Model.Event;
+
+    const isTrue = SplitsBrowser.isTrue;
+    const isNotNull = SplitsBrowser.isNotNull;
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
+    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
+    const parseTime = SplitsBrowser.parseTime;
+    const Competitor = SplitsBrowser.Model.Competitor;
+    const compareCompetitors = SplitsBrowser.Model.compareCompetitors;
+    const CourseClass = SplitsBrowser.Model.CourseClass;
+    const Course = SplitsBrowser.Model.Course;
+    const Event = SplitsBrowser.Model.Event;
 
     /**
     * Parse a row of competitor data.
@@ -2747,8 +2772,8 @@ SplitsBrowser.Messages = {};
     */
     function parseCompetitors(index, line, controlCount, className, warnings) {
         // Expect forename, surname, club, start time then (controlCount + 1) split times in the form MM:SS.
-        var parts = line.split(",");
-        
+        const parts = line.split(",");
+
         while (parts.length > controlCount + 5 && parts[3].match(/[^0-9.,:-]/)) {
             // As this line is too long and the 'start time' cell has something
             // that appears not to be a start time, assume that the club name
@@ -2756,15 +2781,15 @@ SplitsBrowser.Messages = {};
             parts[2] += "," + parts[3];
             parts.splice(3, 1);
         }
-        
-        var originalPartCount = parts.length;
-        var forename = parts.shift() || "";
-        var surname = parts.shift() || "";
-        var name = (forename + " " + surname).trim() || "<name unknown>";
+
+        const originalPartCount = parts.length;
+        const forename = parts.shift() || "";
+        const surname = parts.shift() || "";
+        const name = (forename + " " + surname).trim() || "<name unknown>";
         if (originalPartCount === controlCount + 5) {
-            var club = parts.shift();
-            var startTimeStr = parts.shift();
-            var startTime = parseTime(startTimeStr);
+            const club = parts.shift();
+            const startTimeStr = parts.shift();
+            let startTime = parseTime(startTimeStr);
             if (startTime === 0) {
                 startTime = null;
             } else if (!startTimeStr.match(/^\d+:\d\d:\d\d$/)) {
@@ -2772,11 +2797,11 @@ SplitsBrowser.Messages = {};
                 // minutes and seconds.
                 startTime *= 60;
             }
-            
-            var cumTimes = [0];
-            var lastCumTimeRecorded = 0;
+
+            const cumTimes = [0];
+            let lastCumTimeRecorded = 0;
             parts.map(function (part) {
-                var splitTime = parseTime(part);
+                const splitTime = parseTime(part);
                 if (splitTime !== null && splitTime > 0) {
                     lastCumTimeRecorded += splitTime;
                     cumTimes.push(lastCumTimeRecorded);
@@ -2784,17 +2809,17 @@ SplitsBrowser.Messages = {};
                     cumTimes.push(null);
                 }
             });
-            
-            var competitor = Competitor.fromCumTimes(index + 1, name, club, startTime, cumTimes);
+
+            const competitor = Competitor.fromCumTimes(index + 1, name, club, startTime, cumTimes);
             if (lastCumTimeRecorded === 0) {
                 competitor.setNonStarter();
             }
             return competitor;
         } else {
-            var difference = originalPartCount - (controlCount + 5);
-            var error = (difference < 0) ? (-difference) + " too few" : difference + " too many";
-            warnings.push("Competitor '" + name + "' appears to have the wrong number of split times - " + error + 
-                                  " (row " + (index + 1) + " of class '" + className + "')");
+            const difference = originalPartCount - (controlCount + 5);
+            const error = (difference < 0) ? (-difference) + " too few" : difference + " too many";
+            warnings.push("Competitor '" + name + "' appears to have the wrong number of split times - " + error +
+                " (row " + (index + 1) + " of class '" + className + "')");
             return null;
         }
     }
@@ -2805,17 +2830,17 @@ SplitsBrowser.Messages = {};
     * @sb-param {Array} warnings - Array of warnings to add any warnings found to.
     * @sb-return {SplitsBrowser.Model.CourseClass} Parsed class data.
     */
-    function parseCourseClass (courseClass, warnings) {
-        var lines = courseClass.split(/\r?\n/).filter(isTrue);
+    function parseCourseClass(courseClass, warnings) {
+        const lines = courseClass.split(/\r?\n/).filter(isTrue);
         if (lines.length === 0) {
             throwInvalidData("parseCourseClass got an empty list of lines");
         }
 
-        var firstLineParts = lines.shift().split(",");
+        const firstLineParts = lines.shift().split(",");
         if (firstLineParts.length === 2) {
-            var className = firstLineParts.shift();
-            var controlCountStr = firstLineParts.shift();
-            var controlCount = parseInt(controlCountStr, 10);
+            const className = firstLineParts.shift();
+            const controlCountStr = firstLineParts.shift();
+            const controlCount = parseInt(controlCountStr, 10);
             if (isNaN(controlCount)) {
                 throwInvalidData("Could not read control count: '" + controlCountStr + "'");
             } else if (controlCount < 0 && lines.length > 0) {
@@ -2823,15 +2848,19 @@ SplitsBrowser.Messages = {};
                 // any competitors.  Event 7632 ends with a line 'NOCLAS,-1' -
                 // we may as well ignore this.
                 throwInvalidData("Expected a non-negative control count, got " + controlCount + " instead");
-            } else {              
-                var competitors = lines.map(function (line, index) { return parseCompetitors(index, line, controlCount, className, warnings); })
-                                       .filter(isNotNull);
+            } else {
+                const competitors = lines.map(function (line, index) {
+                    return parseCompetitors(index, line, controlCount, className, warnings);
+                })
+                    .filter(isNotNull);
 
                 competitors.sort(compareCompetitors);
                 return new CourseClass(className, controlCount, competitors);
             }
         } else {
-            throwWrongFileFormat("Expected first line to have two parts (class name and number of controls), got " + firstLineParts.length + " part(s) instead");
+            const err = "Expected first line to have two parts (class name and number of controls), got " +
+                               firstLineParts.length + " part(s) instead";
+            throwWrongFileFormat(err);
         }
     }
 
@@ -2840,64 +2869,64 @@ SplitsBrowser.Messages = {};
     * @sb-param {string} eventData - String containing the entire event data.
     * @sb-return {SplitsBrowser.Model.Event} All event data read in.
     */
-    function parseEventData (eventData) {
-    
+    function parseEventData(eventData) {
+
         if (/<html/i.test(eventData)) {
             throwWrongFileFormat("Cannot parse this file as CSV as it appears to be HTML");
         }
 
         eventData = normaliseLineEndings(eventData);
-        
+
         // Remove trailing commas.
         eventData = eventData.replace(/,+\n/g, "\n").replace(/,+$/, "");
 
-        var classSections = eventData.split(/\n\n/).map(function (s) { return s.trim(); }).filter(isTrue);
-        var warnings = [];
-       
-        var classes = classSections.map(function (section) { return parseCourseClass(section, warnings); });
-        
+        const classSections = eventData.split(/\n\n/).map(function (s) { return s.trim(); }).filter(isTrue);
+        const warnings = [];
+
+        let classes = classSections.map(function (section) { return parseCourseClass(section, warnings); });
+
         classes = classes.filter(function (courseClass) { return !courseClass.isEmpty(); });
-        
+
         if (classes.length === 0) {
             throwInvalidData("No competitor data was found");
         }
-        
+
         // Nulls are for the course length, climb and controls, which aren't in
         // the source data files, so we can't do anything about them.
-        var courses = classes.map(function (cls) { return new Course(cls.name, [cls], null, null, null); });
-        
-        for (var i = 0; i < classes.length; i += 1) {
+        const courses = classes.map(function (cls) { return new Course(cls.name, [cls], null, null, null); });
+
+        for (let i = 0; i < classes.length; i += 1) {
             classes[i].setCourse(courses[i]);
         }
-        
+
         return new Event(classes, courses, warnings);
     }
-    
+
     SplitsBrowser.Input.CSV = { parseEventData: parseEventData };
 })();
 
 
 (function () {
     "use strict";
-    
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
-    var throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    var isNaNStrict = SplitsBrowser.isNaNStrict;
-    var parseCourseLength = SplitsBrowser.parseCourseLength;
-    var parseCourseClimb = SplitsBrowser.parseCourseClimb;
-    var normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    var parseTime = SplitsBrowser.parseTime;
-    var fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    var CourseClass = SplitsBrowser.Model.CourseClass;
-    var Course = SplitsBrowser.Model.Course;
-    var Event = SplitsBrowser.Model.Event;
-    
-    var DELIMITERS = [";", ",", "\t", "\\"];
-    
+
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
+    const isNaNStrict = SplitsBrowser.isNaNStrict;
+    const parseCourseLength = SplitsBrowser.parseCourseLength;
+    const parseCourseClimb = SplitsBrowser.parseCourseClimb;
+    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
+    const parseTime = SplitsBrowser.parseTime;
+    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
+    const CourseClass = SplitsBrowser.Model.CourseClass;
+    const Course = SplitsBrowser.Model.Course;
+    const Event = SplitsBrowser.Model.Event;
+
+    const DELIMITERS = [";", ",", "\t", "\\"];
+
     // Indexes of the various columns relative to the column for control-1.
-    
-    var COLUMN_INDEXES = {};
-    
+
+    const COLUMN_INDEXES: any = new Object();
+
     [44, 46, 60].forEach(function (columnOffset) {
         COLUMN_INDEXES[columnOffset] = {
             course: columnOffset - 7,
@@ -2910,24 +2939,24 @@ SplitsBrowser.Messages = {};
             control1: columnOffset
         };
     });
-    
+
     [44, 46].forEach(function (columnOffset) {
         COLUMN_INDEXES[columnOffset].nonCompetitive = columnOffset - 38;
         COLUMN_INDEXES[columnOffset].startTime = columnOffset - 37;
         COLUMN_INDEXES[columnOffset].time = columnOffset - 35;
         COLUMN_INDEXES[columnOffset].classifier = columnOffset - 34;
-        COLUMN_INDEXES[columnOffset].club =  columnOffset - 31;
+        COLUMN_INDEXES[columnOffset].club = columnOffset - 31;
         COLUMN_INDEXES[columnOffset].className = columnOffset - 28;
     });
-    
+
     COLUMN_INDEXES[44].combinedName = 3;
     COLUMN_INDEXES[44].yearOfBirth = 4;
-    
+
     COLUMN_INDEXES[46].forename = 4;
     COLUMN_INDEXES[46].surname = 3;
     COLUMN_INDEXES[46].yearOfBirth = 5;
     COLUMN_INDEXES[46].gender = 6;
-    
+
     COLUMN_INDEXES[60].forename = 6;
     COLUMN_INDEXES[60].surname = 5;
     COLUMN_INDEXES[60].yearOfBirth = 7;
@@ -2941,10 +2970,10 @@ SplitsBrowser.Messages = {};
     COLUMN_INDEXES[60].className = 26;
     COLUMN_INDEXES[60].classNameFallback = COLUMN_INDEXES[60].course;
     COLUMN_INDEXES[60].clubFallback = 18;
-    
+
     // Minimum control offset.
-    var MIN_CONTROLS_OFFSET = 37;
-    
+    const MIN_CONTROLS_OFFSET = 37;
+
     /**
     * Remove any leading and trailing double-quotes from the given string.
     * @sb-param {String} value - The value to trim quotes from.
@@ -2954,10 +2983,10 @@ SplitsBrowser.Messages = {};
         if (value[0] === '"' && value[value.length - 1] === '"') {
             value = value.substring(1, value.length - 1).replace(/""/g, '"').trim();
         }
-        
+
         return value;
     }
-    
+
     /**
     * Constructs an OE-format data reader.
     *
@@ -2967,23 +2996,23 @@ SplitsBrowser.Messages = {};
     */
     function Reader(data) {
         this.data = normaliseLineEndings(data);
-        
+
         // Map that associates classes to all of the competitors running on
         // that class.
-        this.classes = d3.map();
-        
+        this.classes = <any>d3.map();
+
         // Map that associates course names to length and climb values.
-        this.courseDetails = d3.map();
-        
+        this.courseDetails = <any>d3.map();
+
         // Set of all pairs of classes and courses.
         // (While it is common that one course may have multiple classes, it
         // seems also that one class can be made up of multiple courses, e.g.
         // M21E at BOC 2013.)
         this.classCoursePairs = [];
-        
+
         // The indexes of the columns that we read data from.
         this.columnIndexes = null;
-        
+
         // Warnings about competitors that cannot be read in.
         this.warnings = [];
     }
@@ -2996,18 +3025,18 @@ SplitsBrowser.Messages = {};
         if (this.lines.length <= 1) {
             throwWrongFileFormat("No data found to read");
         }
-        
-        var firstDataLine = this.lines[1];
-        for (var i = 0; i < DELIMITERS.length; i += 1) {
-            var delimiter = DELIMITERS[i];
+
+        const firstDataLine = this.lines[1];
+        for (let i = 0; i < DELIMITERS.length; i += 1) {
+            const delimiter = DELIMITERS[i];
             if (firstDataLine.split(delimiter).length > MIN_CONTROLS_OFFSET) {
                 return delimiter;
             }
         }
-        
+
         throwWrongFileFormat("Data appears not to be in the OE CSV format");
     };
-    
+
     /**
     * Identifies which variation on the OE CSV format we are parsing.
     *
@@ -3018,46 +3047,46 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} delimiter - The character used to delimit the columns of
     *     data.
     */
-    Reader.prototype.identifyFormatVariation = function (delimiter) { 
-        
-        var firstLine = this.lines[1].split(delimiter);
-        
-        var controlCodeRegexp = /^[A-Za-z0-9]+$/;
-        for (var columnOffset in COLUMN_INDEXES) {
+    Reader.prototype.identifyFormatVariation = function (delimiter) {
+
+        const firstLine = this.lines[1].split(delimiter);
+
+        const controlCodeRegexp = /^[A-Za-z0-9]+$/;
+        for (const columnOffset in COLUMN_INDEXES) {
             if (COLUMN_INDEXES.hasOwnProperty(columnOffset)) {
                 // Convert columnOffset to a number.  It will presently be a
                 // string because it is an object property.
-                columnOffset = parseInt(columnOffset, 10);
-                
+                const columnOffsetNum = parseInt(columnOffset, 10);
+
                 // We want there to be a control code at columnOffset, with
                 // both preceding columns either blank or containing a valid
                 // time.
-                if (columnOffset < firstLine.length &&
-                        controlCodeRegexp.test(firstLine[columnOffset]) &&
-                        (firstLine[columnOffset - 2].trim() === "" || parseTime(firstLine[columnOffset - 2]) !== null) &&
-                        (firstLine[columnOffset - 1].trim() === "" || parseTime(firstLine[columnOffset - 1]) !== null)) {
-                           
+                if (columnOffsetNum < firstLine.length &&
+                    controlCodeRegexp.test(firstLine[columnOffset]) &&
+                    (firstLine[columnOffsetNum - 2].trim() === "" || parseTime(firstLine[columnOffsetNum - 2]) !== null) &&
+                    (firstLine[columnOffsetNum - 1].trim() === "" || parseTime(firstLine[columnOffsetNum - 1]) !== null)) {
+
                     // Now check the control count exists.  If not, we've
                     // probably got a triple-column CSV file instead.
-                    var controlCountColumnIndex = COLUMN_INDEXES[columnOffset].controlCount;
+                    const controlCountColumnIndex = COLUMN_INDEXES[columnOffset].controlCount;
                     if (firstLine[controlCountColumnIndex].trim() !== "") {
-                        this.columnIndexes = COLUMN_INDEXES[columnOffset];
+                        this.columnIndexes = COLUMN_INDEXES[columnOffsetNum];
                         return;
                     }
                 }
             }
         }
-        
+
         throwWrongFileFormat("Did not find control 1 at any of the supported indexes");
     };
-    
+
     /**
     * Returns the name of the class in the given row.
     * @sb-param {Array} row - Array of row data.
     * @sb-return {String} Class name.
     */
     Reader.prototype.getClassName = function (row) {
-        var className = row[this.columnIndexes.className];
+        let className = row[this.columnIndexes.className];
         if (className === "" && this.columnIndexes.hasOwnProperty("classNameFallback")) {
             // 'Nameless' variation: no class names.
             className = row[this.columnIndexes.classNameFallback];
@@ -3072,14 +3101,14 @@ SplitsBrowser.Messages = {};
     * @sb-return {?Number} Parsed start time, or null for none.
     */
     Reader.prototype.getStartTime = function (row) {
-        var startTimeStr = row[this.columnIndexes.startPunch];
+        let startTimeStr = row[this.columnIndexes.startPunch];
         if (startTimeStr === "") {
             startTimeStr = row[this.columnIndexes.startTime];
         }
-        
+
         return parseTime(startTimeStr);
     };
-    
+
     /**
     * Returns the number of controls to expect on the given line.
     * @sb-param {Array} row - Array of row data items.
@@ -3087,8 +3116,8 @@ SplitsBrowser.Messages = {};
     * @sb-return {Number?} The number of controls, or null if the count could not be read.
     */
     Reader.prototype.getNumControls = function (row, lineNumber) {
-        var className = this.getClassName(row);
-        var name;
+        const className = this.getClassName(row);
+        let name;
         if (className.trim() === "") {
             name = this.getName(row) || "<name unknown>";
             this.warnings.push("Could not find a class for competitor '" + name + "' (line " + lineNumber + ")");
@@ -3096,17 +3125,19 @@ SplitsBrowser.Messages = {};
         } else if (this.classes.has(className)) {
             return this.classes.get(className).numControls;
         } else {
-            var numControls = parseInt(row[this.columnIndexes.controlCount], 10);
+            const numControls = parseInt(row[this.columnIndexes.controlCount], 10);
             if (isFinite(numControls)) {
                 return numControls;
             } else {
                 name = this.getName(row) || "<name unknown>";
-                this.warnings.push("Could not read the control count '" + row[this.columnIndexes.controlCount] + "' for competitor '" + name + "' from line " + lineNumber);
+                const err = "Could not read the control count '" +
+                              row[this.columnIndexes.controlCount] + "' for competitor '" + name + "' from line " + lineNumber;
+                this.warnings.push(err);
                 return null;
             }
-        }    
+        }
     };
-    
+
     /**
     * Reads the cumulative times out of a row of competitor data.
     * @sb-param {Array} row - Array of row data items.
@@ -3115,32 +3146,32 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of cumulative times.
     */
     Reader.prototype.readCumulativeTimes = function (row, lineNumber, numControls) {
-        
-        var cumTimes = [0];
-        
-        for (var controlIdx = 0; controlIdx < numControls; controlIdx += 1) {
-            var cellIndex = this.columnIndexes.control1 + 1 + 2 * controlIdx;
-            var cumTimeStr = (cellIndex < row.length) ? row[cellIndex] : null;
-            var cumTime = (cumTimeStr === null) ? null : parseTime(cumTimeStr);
+
+        const cumTimes = [0];
+
+        for (let controlIdx = 0; controlIdx < numControls; controlIdx += 1) {
+            const cellIndex = this.columnIndexes.control1 + 1 + 2 * controlIdx;
+            const cumTimeStr = (cellIndex < row.length) ? row[cellIndex] : null;
+            const cumTime = (cumTimeStr === null) ? null : parseTime(cumTimeStr);
             cumTimes.push(cumTime);
         }
-        
-        var totalTime = parseTime(row[this.columnIndexes.time]);
+
+        let totalTime = parseTime(row[this.columnIndexes.time]);
         if (totalTime === null) {
             // 'Nameless' variation: total time missing, so calculate from
             // start and finish times.
-            var startTime = this.getStartTime(row);
-            var finishTime = parseTime(row[this.columnIndexes.finish]);
+            const startTime = this.getStartTime(row);
+            const finishTime = parseTime(row[this.columnIndexes.finish]);
             if (startTime !== null && finishTime !== null) {
                 totalTime = finishTime - startTime;
             }
         }
-        
+
         cumTimes.push(totalTime);
-    
+
         return cumTimes;
     };
-    
+
     /**
     * Checks to see whether the given row contains a new class, and if so,
     * creates it.
@@ -3148,12 +3179,12 @@ SplitsBrowser.Messages = {};
     * @sb-param {Number} numControls - The number of controls to read.
     */
     Reader.prototype.createClassIfNecessary = function (row, numControls) {
-        var className = this.getClassName(row);
+        const className = this.getClassName(row);
         if (!this.classes.has(className)) {
             this.classes.set(className, { numControls: numControls, competitors: [] });
         }
     };
-    
+
     /**
     * Checks to see whether the given row contains a new course, and if so,
     * creates it.
@@ -3161,11 +3192,13 @@ SplitsBrowser.Messages = {};
     * @sb-param {Number} numControls - The number of controls to read.
     */
     Reader.prototype.createCourseIfNecessary = function (row, numControls) {
-        var courseName = row[this.columnIndexes.course];
+        const courseName = row[this.columnIndexes.course];
         if (!this.courseDetails.has(courseName)) {
-            var controlNums = d3.range(0, numControls).map(function (controlIdx) { return row[this.columnIndexes.control1 + 2 * controlIdx]; }, this);
+            const controlNums = d3.range(0, numControls).map(function (controlIdx) {
+                return row[this.columnIndexes.control1 + 2 * controlIdx];
+            }, this);
             this.courseDetails.set(courseName, {
-                length: parseCourseLength(row[this.columnIndexes.distance]), 
+                length: parseCourseLength(row[this.columnIndexes.distance]),
                 climb: parseCourseClimb(row[this.columnIndexes.climb]),
                 controls: controlNums
             });
@@ -3178,9 +3211,9 @@ SplitsBrowser.Messages = {};
     * @sb-param {Array} row - Array of row data items.
     */
     Reader.prototype.createClassCoursePairIfNecessary = function (row) {
-        var className = this.getClassName(row);
-        var courseName = row[this.columnIndexes.course];
-        
+        const className = this.getClassName(row);
+        const courseName = row[this.columnIndexes.course];
+
         if (!this.classCoursePairs.some(function (pair) { return pair[0] === className && pair[1] === courseName; })) {
             this.classCoursePairs.push([className, courseName]);
         }
@@ -3192,22 +3225,22 @@ SplitsBrowser.Messages = {};
     * @sb-return {String} The name of the competitor.
     */
     Reader.prototype.getName = function (row) {
-        var name = "";
+        let name = "";
 
         if (this.columnIndexes.hasOwnProperty("forename") && this.columnIndexes.hasOwnProperty("surname")) {
-            var forename = row[this.columnIndexes.forename];
-            var surname = row[this.columnIndexes.surname];
+            const forename = row[this.columnIndexes.forename];
+            const surname = row[this.columnIndexes.surname];
             name = (forename + " " + surname).trim();
         }
-        
+
         if (name === "" && this.columnIndexes.hasOwnProperty("combinedName")) {
             // 'Nameless' or 44-column variation.
             name = row[this.columnIndexes.combinedName];
         }
-        
+
         return name;
     };
-    
+
     /**
     * Reads in the competitor-specific data from the given row and adds it to
     * the event data read so far.
@@ -3215,33 +3248,33 @@ SplitsBrowser.Messages = {};
     * @sb-param {Array} cumTimes - Array of cumulative times for the competitor.
     */
     Reader.prototype.addCompetitor = function (row, cumTimes) {
-    
-        var className = this.getClassName(row);
-        var placing = row[this.columnIndexes.placing];
-        var club = row[this.columnIndexes.club];
+
+        const className = this.getClassName(row);
+        const placing = row[this.columnIndexes.placing];
+        let club = row[this.columnIndexes.club];
         if (club === "" && this.columnIndexes.hasOwnProperty("clubFallback")) {
             // Nameless variation: no club name, just number...
             club = row[this.columnIndexes.clubFallback];
         }
-        
-        var startTime = this.getStartTime(row);
 
-        var name = this.getName(row);
-        var isPlacingNonNumeric = (placing !== "" && isNaNStrict(parseInt(placing, 10)));
+        const startTime = this.getStartTime(row);
+
+        let name = this.getName(row);
+        const isPlacingNonNumeric = (placing !== "" && isNaNStrict(parseInt(placing, 10)));
         if (isPlacingNonNumeric && name.substring(name.length - placing.length) === placing) {
             name = name.substring(0, name.length - placing.length).trim();
         }
 
-        var order = this.classes.get(className).competitors.length + 1;
-        var competitor = fromOriginalCumTimes(order, name, club, startTime, cumTimes);
+        const order = this.classes.get(className).competitors.length + 1;
+        const competitor = fromOriginalCumTimes(order, name, club, startTime, cumTimes);
         if ((row[this.columnIndexes.nonCompetitive] === "1" || isPlacingNonNumeric) && competitor.completed()) {
             // Competitor either marked as non-competitive, or has completed
             // the course but has a non-numeric placing.  In the latter case,
             // assume that they are non-competitive.
             competitor.setNonCompetitive();
         }
-        
-        var classifier = row[this.columnIndexes.classifier];
+
+        const classifier = row[this.columnIndexes.classifier];
         if (classifier !== "" && classifier !== "0") {
             if (classifier === "1") {
                 competitor.setNonStarter();
@@ -3255,17 +3288,17 @@ SplitsBrowser.Messages = {};
         } else if (!competitor.hasAnyTimes()) {
             competitor.setNonStarter();
         }
-        
-        var yearOfBirthStr = row[this.columnIndexes.yearOfBirth];
+
+        const yearOfBirthStr = row[this.columnIndexes.yearOfBirth];
         if (yearOfBirthStr !== "") {
-            var yearOfBirth = parseInt(yearOfBirthStr, 10);
+            const yearOfBirth = parseInt(yearOfBirthStr, 10);
             if (!isNaNStrict(yearOfBirth)) {
                 competitor.setYearOfBirth(yearOfBirth);
             }
         }
-        
+
         if (this.columnIndexes.hasOwnProperty("gender")) {
-            var gender = row[this.columnIndexes.gender];
+            const gender = row[this.columnIndexes.gender];
             if (gender === "M" || gender === "F") {
                 competitor.setGender(gender);
             }
@@ -3273,7 +3306,7 @@ SplitsBrowser.Messages = {};
 
         this.classes.get(className).competitors.push(competitor);
     };
-    
+
     /**
     * Parses the given line and adds it to the event data accumulated so far.
     * @sb-param {String} line - The line to parse.
@@ -3283,76 +3316,76 @@ SplitsBrowser.Messages = {};
     *     data.
     */
     Reader.prototype.readLine = function (line, lineNumber, delimiter) {
-    
+
         if (line.trim() === "") {
             // Skip this blank line.
             return;
         }
-    
-        var row = line.split(delimiter).map(function (s) { return s.trim(); }).map(dequote);
-        
+
+        const row = line.split(delimiter).map(function (s) { return s.trim(); }).map(dequote);
+
         // Check the row is long enough to have all the data besides the
         // controls data.
         if (row.length < MIN_CONTROLS_OFFSET) {
             throwInvalidData("Too few items on line " + lineNumber + " of the input file: expected at least " + MIN_CONTROLS_OFFSET + ", got " + row.length);
         }
-        
-        var numControls = this.getNumControls(row, lineNumber);
+
+        const numControls = this.getNumControls(row, lineNumber);
         if (numControls !== null) {
-            var cumTimes = this.readCumulativeTimes(row, lineNumber, numControls);
-            
+            const cumTimes = this.readCumulativeTimes(row, lineNumber, numControls);
+
             this.createClassIfNecessary(row, numControls);
             this.createCourseIfNecessary(row, numControls);
             this.createClassCoursePairIfNecessary(row);
-            
+
             this.addCompetitor(row, cumTimes);
         }
     };
-    
+
     /**
     * Creates maps that describe the many-to-many join between the class names
-    * and course names. 
+    * and course names.
     * @sb-return {Object} Object that contains two maps describing the
     *     many-to-many join.
-    */    
+    */
     Reader.prototype.getMapsBetweenClassesAndCourses = function () {
-        
-        var classesToCourses = d3.map();
-        var coursesToClasses = d3.map();
-        
+
+        const classesToCourses = d3.map<any>();
+        const coursesToClasses = d3.map<any>();
+
         this.classCoursePairs.forEach(function (pair) {
-            var className = pair[0];
-            var courseName = pair[1];
-            
+            const className = pair[0];
+            const courseName = pair[1];
+
             if (classesToCourses.has(className)) {
                 classesToCourses.get(className).push(courseName);
             } else {
                 classesToCourses.set(className, [courseName]);
             }
-            
+
             if (coursesToClasses.has(courseName)) {
                 coursesToClasses.get(courseName).push(className);
             } else {
                 coursesToClasses.set(courseName, [className]);
             }
         });
-        
-        return {classesToCourses: classesToCourses, coursesToClasses: coursesToClasses};
+
+        return { classesToCourses: classesToCourses, coursesToClasses: coursesToClasses };
     };
-    
+
     /**
     * Creates and return a list of CourseClass objects from all of the data read.
     * @sb-return {Array} Array of CourseClass objects.
     */
     Reader.prototype.createClasses = function () {
-        var classNames = this.classes.keys();
+        const classNames = this.classes.keys();
         classNames.sort();
         return classNames.map(function (className) {
-            var courseClass = this.classes.get(className);
+            const courseClass = this.classes.get(className);
             return new CourseClass(className, courseClass.numControls, courseClass.competitors);
         }, this);
     };
-    
+
     /**
     * Find all of the courses and classes that are related to the given course.
     *
@@ -3362,7 +3395,7 @@ SplitsBrowser.Messages = {};
     * Essentially, we have a many-to-many join, and we want to pull out of that
     * all of the classes and courses linked to the one course with the given
     * name.
-    * 
+    *
     * (For the graph theorists among you, imagine the bipartite graph with
     * classes on one side and courses on the other.  We want to find the
     * connected subgraph that this course belongs to.)
@@ -3379,58 +3412,58 @@ SplitsBrowser.Messages = {};
     */
     Reader.prototype.createCourseFromLinkedClassesAndCourses = function (initCourseName, manyToManyMaps, doneCourseNames, classesMap) {
 
-        var courseNamesToDo = [initCourseName];
-        var classNamesToDo = [];
-        var relatedCourseNames = [];
-        var relatedClassNames = [];
-        
-        var courseName;
-        var className;
-        
+        const courseNamesToDo = [initCourseName];
+        const classNamesToDo = [];
+        const relatedCourseNames = [];
+        const relatedClassNames = [];
+
+        let courseName;
+        let className;
+
         while (courseNamesToDo.length > 0 || classNamesToDo.length > 0) {
             while (courseNamesToDo.length > 0) {
                 courseName = courseNamesToDo.shift();
-                var classNames = manyToManyMaps.coursesToClasses.get(courseName);
-                for (var clsIdx = 0; clsIdx < classNames.length; clsIdx += 1) {
+                const classNames = manyToManyMaps.coursesToClasses.get(courseName);
+                for (let clsIdx = 0; clsIdx < classNames.length; clsIdx += 1) {
                     className = classNames[clsIdx];
                     if (classNamesToDo.indexOf(className) < 0 && relatedClassNames.indexOf(className) < 0) {
                         classNamesToDo.push(className);
                     }
                 }
-                
+
                 relatedCourseNames.push(courseName);
             }
-            
+
             while (classNamesToDo.length > 0) {
                 className = classNamesToDo.shift();
-                var courseNames = manyToManyMaps.classesToCourses.get(className);
-                for (var crsIdx = 0; crsIdx < courseNames.length; crsIdx += 1) {
+                const courseNames = manyToManyMaps.classesToCourses.get(className);
+                for (let crsIdx = 0; crsIdx < courseNames.length; crsIdx += 1) {
                     courseName = courseNames[crsIdx];
                     if (courseNamesToDo.indexOf(courseName) < 0 && relatedCourseNames.indexOf(courseName) < 0) {
                         courseNamesToDo.push(courseName);
                     }
                 }
-                
+
                 relatedClassNames.push(className);
             }
         }
-        
+
         // Mark all of the courses that we handled here as done.
-        relatedCourseNames.forEach(function (courseName) {
-            doneCourseNames.add(courseName);
+        relatedCourseNames.forEach(function (courseName1) {
+            doneCourseNames.add(courseName1);
         });
-        
-        var classesForThisCourse = relatedClassNames.map(function (className) { return classesMap.get(className); });
-        var details = this.courseDetails.get(initCourseName);
-        var course = new Course(initCourseName, classesForThisCourse, details.length, details.climb, details.controls);
-        
+
+        const classesForThisCourse = relatedClassNames.map(function (className1) { return classesMap.get(className1); });
+        const details = this.courseDetails.get(initCourseName);
+        const course = new Course(initCourseName, classesForThisCourse, details.length, details.climb, details.controls);
+
         classesForThisCourse.forEach(function (courseClass) {
             courseClass.setCourse(course);
         });
-        
+
         return course;
     };
-    
+
     /**
     * Sort through the data read in and create Course objects representing each
     * course in the event.
@@ -3438,97 +3471,97 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of course objects.
     */
     Reader.prototype.determineCourses = function (classes) {
-        
-        var manyToManyMaps = this.getMapsBetweenClassesAndCourses();
-        
+
+        const manyToManyMaps = this.getMapsBetweenClassesAndCourses();
+
         // As we work our way through the courses and classes, we may find one
         // class made up from multiple courses (e.g. in BOC2013, class M21E
         // uses course 1A and 1B).  In this set we collect up all of the
         // courses that we have now processed, so that if we later come across
         // one we've already dealt with, we can ignore it.
-        var doneCourseNames = d3.set();
-        
-        var classesMap = d3.map();
+        const doneCourseNames = d3.set();
+
+        const classesMap = d3.map();
         classes.forEach(function (courseClass) {
             classesMap.set(courseClass.name, courseClass);
         });
-        
+
         // List of all Course objects created so far.
-        var courses = [];
+        const courses = [];
         manyToManyMaps.coursesToClasses.keys().forEach(function (courseName) {
             if (!doneCourseNames.has(courseName)) {
-                var course = this.createCourseFromLinkedClassesAndCourses(courseName, manyToManyMaps, doneCourseNames, classesMap);
+                const course = this.createCourseFromLinkedClassesAndCourses(courseName, manyToManyMaps, doneCourseNames, classesMap);
                 courses.push(course);
             }
         }, this);
-        
+
         return courses;
     };
-    
+
     /**
     * Parses the read-in data and returns it.
     * @sb-return {SplitsBrowser.Model.Event} Event-data read.
     */
     Reader.prototype.parseEventData = function () {
-        
+
         this.warnings = [];
-        
+
         this.lines = this.data.split(/\n/);
-        
-        var delimiter = this.identifyDelimiter();
-        
+
+        const delimiter = this.identifyDelimiter();
+
         this.identifyFormatVariation(delimiter);
-        
+
         // Discard the header row.
         this.lines.shift();
-        
+
         this.lines.forEach(function (line, lineIndex) {
             this.readLine(line, lineIndex + 1, delimiter);
         }, this);
-        
-        var classes = this.createClasses();
+
+        const classes = this.createClasses();
         if (classes.length === 0 && this.warnings.length > 0) {
             // A warning was generated for every single competitor in the file.
             // This file is quite probably not an OE-CSV file.
             throwWrongFileFormat("This file may have looked vaguely like an OE CSV file but no data could be read out of it");
         }
-        
-        var courses = this.determineCourses(classes);
+
+        const courses = this.determineCourses(classes);
         return new Event(classes, courses, this.warnings);
     };
-    
-    SplitsBrowser.Input.OE = {};
-    
+
+    SplitsBrowser.Input.OE = {} as any;
+
     /**
     * Parse OE data read from a semicolon-separated data string.
     * @sb-param {String} data - The input data string read.
     * @sb-return {SplitsBrowser.Model.Event} All event data read.
     */
     SplitsBrowser.Input.OE.parseEventData = function (data) {
-        var reader = new Reader(data);
+        const reader = new Reader(data);
         return reader.parseEventData();
     };
 })();
 
 (function () {
     "use strict";
-    
-    var isNotNull = SplitsBrowser.isNotNull;
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
-    var throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    var parseCourseLength = SplitsBrowser.parseCourseLength;
-    var normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    var parseTime = SplitsBrowser.parseTime;
-    var fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    var CourseClass = SplitsBrowser.Model.CourseClass;
-    var Course = SplitsBrowser.Model.Course;
-    var Event = SplitsBrowser.Model.Event;
+
+    const isNotNull = SplitsBrowser.isNotNull;
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
+    const parseCourseLength = SplitsBrowser.parseCourseLength;
+    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
+    const parseTime = SplitsBrowser.parseTime;
+    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
+    const CourseClass = SplitsBrowser.Model.CourseClass;
+    const Course = SplitsBrowser.Model.Course;
+    const Event = SplitsBrowser.Model.Event;
 
     // Regexps to help with parsing.
-    var HTML_TAG_STRIP_REGEXP = /<[^>]+>/g;
-    var DISTANCE_FIND_REGEXP = /([0-9.,]+)\s*(?:Km|km)/;
-    var CLIMB_FIND_REGEXP = /(\d+)\s*(?:Cm|Hm|hm|m)/;
-    
+    const HTML_TAG_STRIP_REGEXP = /<[^>]+>/g;
+    const DISTANCE_FIND_REGEXP = /([0-9.,]+)\s*(?:Km|km)/;
+    const CLIMB_FIND_REGEXP = /(\d+)\s*(?:Cm|Hm|hm|m)/;
+
     /**
     * Returns whether the given string is nonempty.
     * @sb-param {String} string - The string to check.
@@ -3538,7 +3571,7 @@ SplitsBrowser.Messages = {};
     function isNonEmpty(string) {
         return string !== null && string !== "";
     }
-    
+
     /**
     * Returns whether the given string contains a number.  The string is
     * considered to contain a number if, after stripping whitespace, the string
@@ -3551,16 +3584,16 @@ SplitsBrowser.Messages = {};
         // isFinite is not enough on its own: isFinite("") is true.
         return string !== "" && isFinite(string);
     }
-    
+
     /**
     * Splits a line by whitespace.
     * @sb-param {String} line - The line to split.
     * @sb-return {Array} Array of whitespace-separated strings.
-    */ 
-    function splitByWhitespace (line) {
+    */
+    function splitByWhitespace(line) {
         return line.split(/\s+/g).filter(isNonEmpty);
     }
-    
+
     /**
     * Strips all HTML tags from a string and returns the remaining string.
     * @sb-param {String} text - The HTML string to strip tags from.
@@ -3569,7 +3602,7 @@ SplitsBrowser.Messages = {};
     function stripHtml(text) {
         return text.replace(HTML_TAG_STRIP_REGEXP, "");
     }
-    
+
     /**
     * Returns all matches of the given regexp within the given text,
     * after being stripped of HTML.
@@ -3583,8 +3616,8 @@ SplitsBrowser.Messages = {};
     *     matches.
     */
     function getHtmlStrippedRegexMatches(regexp, text) {
-        var matches = [];
-        var match;
+        const matches = [];
+        let match;
         while (true) {
             match = regexp.exec(text);
             if (match === null) {
@@ -3593,7 +3626,7 @@ SplitsBrowser.Messages = {};
                 matches.push(stripHtml(match[1]));
             }
         }
-        
+
         return matches;
     }
 
@@ -3607,7 +3640,7 @@ SplitsBrowser.Messages = {};
     function getFontBits(text) {
         return getHtmlStrippedRegexMatches(/<font[^>]*>(.*?)<\/font>/g, text);
     }
-    
+
     /**
     * Returns the contents of all <td> ... </td> elements within the given
     * text.  The contents of the <td> elements are stripped of all other HTML
@@ -3618,7 +3651,7 @@ SplitsBrowser.Messages = {};
     function getTableDataBits(text) {
         return getHtmlStrippedRegexMatches(/<td[^>]*>(.*?)<\/td>/g, text).map(function (s) { return s.trim(); });
     }
-    
+
     /**
     * Returns the contents of all <td> ... </td> elements within the given
     * text.  The contents of the <td> elements are stripped of all other HTML
@@ -3629,7 +3662,7 @@ SplitsBrowser.Messages = {};
     function getNonEmptyTableDataBits(text) {
         return getTableDataBits(text).filter(function (bit) { return bit !== ""; });
     }
-    
+
     /**
     * Returns the contents of all <th> ... </th> elements within the given
     * text.  The contents of the <th> elements are stripped of all other HTML
@@ -3638,10 +3671,10 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of strings of text inside <td> elements.
     */
     function getNonEmptyTableHeaderBits(text) {
-        var matches = getHtmlStrippedRegexMatches(/<th[^>]*>(.*?)<\/th>/g, text);
+        const matches = getHtmlStrippedRegexMatches(/<th[^>]*>(.*?)<\/th>/g, text);
         return matches.filter(function (bit) { return bit !== ""; });
     }
-    
+
     /**
     * Attempts to read a course distance from the given string.
     * @sb-param {String} text - The text string to read a course distance from.
@@ -3649,14 +3682,14 @@ SplitsBrowser.Messages = {};
     *     distance could be parsed.
     */
     function tryReadDistance(text) {
-        var distanceMatch = DISTANCE_FIND_REGEXP.exec(text);
+        const distanceMatch = DISTANCE_FIND_REGEXP.exec(text);
         if (distanceMatch === null) {
             return null;
         } else {
             return parseCourseLength(distanceMatch[1]);
         }
     }
-    
+
     /**
     * Attempts to read a course climb from the given string.
     * @sb-param {String} text - The text string to read a course climb from.
@@ -3664,7 +3697,7 @@ SplitsBrowser.Messages = {};
     *     could be parsed.
     */
     function tryReadClimb(text) {
-        var climbMatch = CLIMB_FIND_REGEXP.exec(text);
+        const climbMatch = CLIMB_FIND_REGEXP.exec(text);
         if (climbMatch === null) {
             return null;
         } else {
@@ -3681,12 +3714,12 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of control codes, with null indicating the finish.
     */
     function readControlCodes(labels) {
-        var controlCodes = [];
-        for (var labelIdx = 0; labelIdx < labels.length; labelIdx += 1) {
-            var label = labels[labelIdx];
-            var parenPos = label.indexOf("(");
+        const controlCodes = [];
+        for (let labelIdx = 0; labelIdx < labels.length; labelIdx += 1) {
+            const label = labels[labelIdx];
+            const parenPos = label.indexOf("(");
             if (parenPos > -1 && label[label.length - 1] === ")") {
-                var controlCode = label.substring(parenPos + 1, label.length - 1);
+                const controlCode = label.substring(parenPos + 1, label.length - 1);
                 controlCodes.push(controlCode);
             } else if (labelIdx + 1 === labels.length) {
                 controlCodes.push(null);
@@ -3694,7 +3727,7 @@ SplitsBrowser.Messages = {};
                 throwInvalidData("Unrecognised control header label: '" + label + "'");
             }
         }
-    
+
         return controlCodes;
     }
 
@@ -3708,7 +3741,7 @@ SplitsBrowser.Messages = {};
     *
     * This method does not return anything, instead it mutates the arrays
     * given.
-    * 
+    *
     * @sb-param {Array} cumTimes - Array of cumulative times.
     * @sb-param {Array} splitTimes - Array of split times.
     */
@@ -3739,7 +3772,7 @@ SplitsBrowser.Messages = {};
         this.cumTimes = cumTimes;
         this.competitive = competitive;
     }
-    
+
     /**
     * Returns whether this competitor record is a 'continuation' record.
     * A continuation record is one that has no name, club, class name or total
@@ -3750,7 +3783,7 @@ SplitsBrowser.Messages = {};
     CompetitorParseRecord.prototype.isContinuation = function () {
         return (this.name === "" && this.club === "" && this.className === null && this.totalTime === "" && !this.competitive);
     };
-    
+
     /**
     * Appends the cumulative split times in another CompetitorParseRecord to
     * this one.  The one given must be a 'continuation' record.
@@ -3773,18 +3806,18 @@ SplitsBrowser.Messages = {};
     */
     CompetitorParseRecord.prototype.toCompetitor = function (order) {
         // Prepend a zero cumulative time.
-        var cumTimes = [0].concat(this.cumTimes);
-        
+        const cumTimes = [0].concat(this.cumTimes);
+
         // The null is for the start time.
-        var competitor = fromOriginalCumTimes(order, this.name, this.club, null, cumTimes);
+        const competitor = fromOriginalCumTimes(order, this.name, this.club, null, cumTimes);
         if (competitor.completed() && !this.competitive) {
             competitor.setNonCompetitive();
         }
-        
+
         if (!competitor.hasAnyTimes()) {
             competitor.setNonStarter();
         }
-        
+
         return competitor;
     };
 
@@ -3796,19 +3829,19 @@ SplitsBrowser.Messages = {};
     *
     * A 'Recognizer' is used to handle the finer details of the format parsing.
     * A recognizer should contain methods 'isTextOfThisFormat',
-    * 'preprocess', 'canIgnoreThisLine', 'isCourseHeaderLine', 
+    * 'preprocess', 'canIgnoreThisLine', 'isCourseHeaderLine',
     * 'parseCourseHeaderLine', 'parseControlsLine' and 'parseCompetitor'.
     * See the documentation on the objects below for more information about
     * what these methods do.
     */
-    
+
     /**
     * A Recognizer that handles the 'older' HTML format based on preformatted
     * text.
     * @constructor
     */
-    var OldHtmlFormatRecognizer = function () {
-        // There exists variations of the format depending on what the second 
+    const OldHtmlFormatRecognizer = function () {
+        // There exists variations of the format depending on what the second
         // <font> ... </font> element on each row contains.  It can be blank,
         // contain a number (start number, perhaps?) or something else.
         // If blank or containing a number, the competitor's name is in column
@@ -3816,7 +3849,7 @@ SplitsBrowser.Messages = {};
         // name is in column 1 and there are three preceding columns.
         this.precedingColumnCount = null;
     };
-    
+
     /**
     * Returns whether this recognizer is likely to recognize the given HTML
     * text and possibly be able to parse it.  If this method returns true, the
@@ -3831,49 +3864,49 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} text - The entire input text read in.
     * @sb-return {boolean} True if the text contains any pre-formatted HTML, false
     *     otherwise
-    */ 
+    */
     OldHtmlFormatRecognizer.prototype.isTextOfThisFormat = function (text) {
         return (text.indexOf("<pre>") >= 0 && text.indexOf("<font") >= 0);
     };
-    
+
     /**
     * Performs some pre-processing on the text before it is read in.
     *
     * This object strips everything up to and including the opening
     * &lt;pre&gt; tag, and everything from the closing &lt;/pre&gt; tag
     * to the end of the text.
-    * 
+    *
     * @sb-param {String} text - The HTML text to preprocess.
     * @sb-return {String} The preprocessed text.
     */
     OldHtmlFormatRecognizer.prototype.preprocess = function (text) {
-        var prePos = text.indexOf("<pre>");
+        const prePos = text.indexOf("<pre>");
         if (prePos === -1) {
             throw new Error("Cannot find opening pre tag");
         }
-            
-        var lineEndPos = text.indexOf("\n", prePos);
+
+        let lineEndPos = text.indexOf("\n", prePos);
         text = text.substring(lineEndPos + 1);
-            
+
         // Replace blank lines.
         text = text.replace(/\n{2,}/g, "\n");
-        
-        var closePrePos = text.lastIndexOf("</pre>");
+
+        const closePrePos = text.lastIndexOf("</pre>");
         if (closePrePos === -1) {
             throwInvalidData("Found opening <pre> but no closing </pre>");
         }
-            
+
         lineEndPos = text.lastIndexOf("\n", closePrePos);
         text = text.substring(0, lineEndPos);
         return text.trim();
     };
-    
+
     /**
     * Returns whether the HTML parser can ignore the given line altogether.
     *
     * The parser will call this method with every line read in, apart from
     * the second line of each pair of competitor data rows.  These are always
-    * assumed to be in pairs.  
+    * assumed to be in pairs.
     *
     * This recognizer ignores only blank lines.
     *
@@ -3883,7 +3916,7 @@ SplitsBrowser.Messages = {};
     OldHtmlFormatRecognizer.prototype.canIgnoreThisLine = function (line) {
         return line === "";
     };
-    
+
     /**
     * Returns whether the given line is the first line of a course.
     *
@@ -3901,7 +3934,7 @@ SplitsBrowser.Messages = {};
     OldHtmlFormatRecognizer.prototype.isCourseHeaderLine = function (line) {
         return (getFontBits(line).length === 2);
     };
-    
+
     /**
     * Parse a course header line and return the course name, distance and
     * climb.
@@ -3912,27 +3945,27 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Object containing the parsed course details.
     */
     OldHtmlFormatRecognizer.prototype.parseCourseHeaderLine = function (line) {
-        var bits = getFontBits(line);
+        const bits = getFontBits(line);
         if (bits.length !== 2) {
             throw new Error("Course header line should have two parts");
         }
-        
-        var nameAndControls = bits[0];
-        var distanceAndClimb = bits[1];
-        
-        var openParenPos = nameAndControls.indexOf("(");
-        var courseName = (openParenPos > -1) ? nameAndControls.substring(0, openParenPos) : nameAndControls;
-        
-        var distance = tryReadDistance(distanceAndClimb);
-        var climb = tryReadClimb(distanceAndClimb);
-        
+
+        const nameAndControls = bits[0];
+        const distanceAndClimb = bits[1];
+
+        const openParenPos = nameAndControls.indexOf("(");
+        const courseName = (openParenPos > -1) ? nameAndControls.substring(0, openParenPos) : nameAndControls;
+
+        const distance = tryReadDistance(distanceAndClimb);
+        const climb = tryReadClimb(distanceAndClimb);
+
         return {
             name: courseName.trim(),
             distance: distance,
             climb: climb
         };
     };
-    
+
     /**
     * Parse control codes from the given line and return a list of them.
     *
@@ -3944,13 +3977,13 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of control codes.
     */
     OldHtmlFormatRecognizer.prototype.parseControlsLine = function (line) {
-        var lastFontPos = line.lastIndexOf("</font>");
-        var controlsText = (lastFontPos === -1) ? line : line.substring(lastFontPos + "</font>".length);
+        const lastFontPos = line.lastIndexOf("</font>");
+        const controlsText = (lastFontPos === -1) ? line : line.substring(lastFontPos + "</font>".length);
 
-        var controlLabels = splitByWhitespace(controlsText.trim());
+        const controlLabels = splitByWhitespace(controlsText.trim());
         return readControlCodes(controlLabels);
     };
-    
+
     /**
     * Read either cumulative or split times from the given line of competitor
     * data.
@@ -3959,15 +3992,15 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of times.
     */
     OldHtmlFormatRecognizer.prototype.readCompetitorSplitDataLine = function (line) {
-        for (var i = 0; i < this.precedingColumnCount; i += 1) {
-            var closeFontPos = line.indexOf("</font>");
+        for (let i = 0; i < this.precedingColumnCount; i += 1) {
+            const closeFontPos = line.indexOf("</font>");
             line = line.substring(closeFontPos + "</font>".length);
         }
-        
-        var times = splitByWhitespace(stripHtml(line));
+
+        const times = splitByWhitespace(stripHtml(line));
         return times;
     };
-    
+
     /**
     * Parse two lines of competitor data into a CompetitorParseRecord object
     * containing the data.
@@ -3976,45 +4009,45 @@ SplitsBrowser.Messages = {};
     * @sb-return {CompetitorParseRecord} The parsed competitor.
     */
     OldHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLine, secondLine) {
-        var firstLineBits = getFontBits(firstLine);
-        var secondLineBits = getFontBits(secondLine);
-        
+        const firstLineBits = getFontBits(firstLine);
+        const secondLineBits = getFontBits(secondLine);
+
         if (this.precedingColumnCount === null) {
             // If column 1 is blank or a number, we have four preceding
             // columns.  Otherwise we have three.
-            var column1 = firstLineBits[1].trim();
+            const column1 = firstLineBits[1].trim();
             this.precedingColumnCount = (column1.match(/^\d*$/)) ? 4 : 3;
         }
 
-        var competitive = hasNumber(firstLineBits[0]);
-        var name = firstLineBits[this.precedingColumnCount - 2].trim();
-        var totalTime = firstLineBits[this.precedingColumnCount - 1].trim();
-        var club = secondLineBits[this.precedingColumnCount - 2].trim();
-        
-        var cumulativeTimes = this.readCompetitorSplitDataLine(firstLine);
-        var splitTimes = this.readCompetitorSplitDataLine(secondLine);
+        const competitive = hasNumber(firstLineBits[0]);
+        const name = firstLineBits[this.precedingColumnCount - 2].trim();
+        const totalTime = firstLineBits[this.precedingColumnCount - 1].trim();
+        const club = secondLineBits[this.precedingColumnCount - 2].trim();
+
+        let cumulativeTimes = this.readCompetitorSplitDataLine(firstLine);
+        const splitTimes = this.readCompetitorSplitDataLine(secondLine);
         cumulativeTimes = cumulativeTimes.map(parseTime);
 
         removeExtraControls(cumulativeTimes, splitTimes);
-        
-        var className = null;
+
+        let className = null;
         if (name !== null && name !== "") {
-            var lastCloseFontPos = -1;
-            for (var i = 0; i < this.precedingColumnCount; i += 1) {
+            let lastCloseFontPos = -1;
+            for (let i = 0; i < this.precedingColumnCount; i += 1) {
                 lastCloseFontPos = firstLine.indexOf("</font>", lastCloseFontPos + 1);
             }
-            
-            var firstLineUpToLastPreceding = firstLine.substring(0, lastCloseFontPos + "</font>".length);
-            var firstLineMinusFonts = firstLineUpToLastPreceding.replace(/<font[^>]*>(.*?)<\/font>/g, "");
-            var lineParts = splitByWhitespace(firstLineMinusFonts);
+
+            const firstLineUpToLastPreceding = firstLine.substring(0, lastCloseFontPos + "</font>".length);
+            const firstLineMinusFonts = firstLineUpToLastPreceding.replace(/<font[^>]*>(.*?)<\/font>/g, "");
+            const lineParts = splitByWhitespace(firstLineMinusFonts);
             if (lineParts.length > 0) {
                 className = lineParts[0];
             }
         }
-        
+
         return new CompetitorParseRecord(name, club, className, totalTime, cumulativeTimes, competitive);
     };
-    
+
     /**
     * Constructs a recognizer for formatting the 'newer' format of HTML
     * event results data.
@@ -4023,7 +4056,7 @@ SplitsBrowser.Messages = {};
     * course.
     * @constructor
     */
-    var NewHtmlFormatRecognizer = function () {
+    const NewHtmlFormatRecognizer = function () {
         this.timesOffset = null;
     };
 
@@ -4042,41 +4075,41 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} text - The entire input text read in.
     * @sb-return {boolean} True if the text contains at least five HTML table
     *     tags.
-    */ 
+    */
     NewHtmlFormatRecognizer.prototype.isTextOfThisFormat = function (text) {
-        var tablePos = -1;
-        for (var i = 0; i < 5; i += 1) {
+        let tablePos = -1;
+        for (let i = 0; i < 5; i += 1) {
             tablePos = text.indexOf("<table", tablePos + 1);
             if (tablePos === -1) {
                 // Didn't find another table.
                 return false;
             }
         }
-        
+
         return true;
     };
-    
+
     /**
     * Performs some pre-processing on the text before it is read in.
     *
     * This recognizer performs a fair amount of pre-processing, to remove
     * parts of the file we don't care about, and to reshape what there is left
     * so that it is in a more suitable form to be parsed.
-    * 
+    *
     * @sb-param {String} text - The HTML text to preprocess.
     * @sb-return {String} The preprocessed text.
     */
     NewHtmlFormatRecognizer.prototype.preprocess = function (text) {
         // Remove the first table and end of the <div> it is contained in.
-        var tableEndPos = text.indexOf("</table>");
+        const tableEndPos = text.indexOf("</table>");
         if (tableEndPos === -1) {
             throwInvalidData("Could not find any closing </table> tags");
         }
 
         text = text.substring(tableEndPos + "</table>".length);
 
-        var closeDivPos = text.indexOf("</div>");
-        var openTablePos = text.indexOf("<table");
+        const closeDivPos = text.indexOf("</div>");
+        const openTablePos = text.indexOf("<table");
         if (closeDivPos > -1 && closeDivPos < openTablePos) {
             text = text.substring(closeDivPos + "</div>".length);
         }
@@ -4085,11 +4118,11 @@ SplitsBrowser.Messages = {};
         // own line, with table and table-row tags starting on new lines,
         // and closing table and table-row tags at the end of lines.
         text = text.replace(/>\n+</g, "><").replace(/><tr>/g, ">\n<tr>").replace(/<\/tr></g, "</tr>\n<")
-                   .replace(/><table/g, ">\n<table").replace(/<\/table></g, "</table>\n<");
-        
+            .replace(/><table/g, ">\n<table").replace(/<\/table></g, "</table>\n<");
+
         // Remove all <col> elements.
         text = text.replace(/<\/col[^>]*>/g, "");
-        
+
         // Remove all rows that contain only a single non-breaking space.
         // In the file I have, the &nbsp; entities are missing their
         // semicolons.  However, this could well be fixed in the future.
@@ -4097,17 +4130,17 @@ SplitsBrowser.Messages = {};
 
         // Remove any anchor elements used for navigation...
         text = text.replace(/<a id="[^"]*"><\/a>/g, "");
-        
+
         // ... and the navigation div.  Use [\s\S] to match everything
         // including newlines - JavaScript regexps have no /s modifier.
         text = text.replace(/<div id="navigation">[\s\S]*?<\/div>/g, "");
-        
+
         // Finally, remove the trailing </body> and </html> elements.
         text = text.replace("</body></html>", "");
-        
+
         return text.trim();
     };
-    
+
     /**
     * Returns whether the HTML parser can ignore the given line altogether.
     *
@@ -4125,7 +4158,7 @@ SplitsBrowser.Messages = {};
     */
     NewHtmlFormatRecognizer.prototype.canIgnoreThisLine = function (line) {
         if (line.indexOf("<th>") > -1) {
-            var bits = getNonEmptyTableHeaderBits(line);
+            const bits = getNonEmptyTableHeaderBits(line);
             this.timesOffset = bits.length;
             return true;
         } else {
@@ -4133,7 +4166,7 @@ SplitsBrowser.Messages = {};
         }
     };
 
-    
+
     /**
     * Returns whether the given line is the first line of a course.
     *
@@ -4150,7 +4183,7 @@ SplitsBrowser.Messages = {};
     NewHtmlFormatRecognizer.prototype.isCourseHeaderLine = function (line) {
         return line.indexOf('<td id="header"') > -1;
     };
-    
+
     /**
     * Parse a course header line and return the course name, distance and
     * climb.
@@ -4161,33 +4194,33 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Object containing the parsed course details.
     */
     NewHtmlFormatRecognizer.prototype.parseCourseHeaderLine = function (line) {
-        var dataBits = getNonEmptyTableDataBits(line);
+        const dataBits = getNonEmptyTableDataBits(line);
         if (dataBits.length === 0) {
             throwInvalidData("No parts found in course header line");
         }
-            
-        var name = dataBits[0];
-        var openParenPos = name.indexOf("(");
+
+        let name = dataBits[0];
+        const openParenPos = name.indexOf("(");
         if (openParenPos > -1) {
             name = name.substring(0, openParenPos);
         }
-            
+
         name = name.trim();
-        
-        var distance = null;
-        var climb = null;
-        
-        for (var bitIndex = 1; bitIndex < dataBits.length; bitIndex += 1) {
+
+        let distance = null;
+        let climb = null;
+
+        for (let bitIndex = 1; bitIndex < dataBits.length; bitIndex += 1) {
             if (distance === null) {
                 distance = tryReadDistance(dataBits[bitIndex]);
             }
-                    
+
             if (climb === null) {
                 climb = tryReadClimb(dataBits[bitIndex]);
             }
         }
-                    
-        return {name: name, distance: distance, climb: climb };
+
+        return { name: name, distance: distance, climb: climb };
     };
 
     /**
@@ -4201,10 +4234,10 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of control codes.
     */
     NewHtmlFormatRecognizer.prototype.parseControlsLine = function (line) {
-        var bits = getNonEmptyTableDataBits(line);
+        const bits = getNonEmptyTableDataBits(line);
         return readControlCodes(bits);
     };
-    
+
     /**
     * Read either cumulative or split times from the given line of competitor
     * data.
@@ -4213,19 +4246,19 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of times.
     */
     NewHtmlFormatRecognizer.prototype.readCompetitorSplitDataLine = function (line) {
-        var bits = getTableDataBits(line);
-        
-        var startPos = this.timesOffset;
-        
+        const bits = getTableDataBits(line);
+
+        const startPos = this.timesOffset;
+
         // Discard the empty bits at the end.
-        var endPos = bits.length;
+        let endPos = bits.length;
         while (endPos > 0 && bits[endPos - 1] === "") {
             endPos -= 1;
         }
-        
+
         return bits.slice(startPos, endPos).filter(isNonEmpty);
     };
-    
+
     /**
     * Parse two lines of competitor data into a CompetitorParseRecord object
     * containing the data.
@@ -4234,32 +4267,32 @@ SplitsBrowser.Messages = {};
     * @sb-return {CompetitorParseRecord} The parsed competitor.
     */
     NewHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLine, secondLine) {
-        var firstLineBits = getTableDataBits(firstLine);
-        var secondLineBits = getTableDataBits(secondLine);
-        
-        var competitive = hasNumber(firstLineBits[0]);
-        var nameOffset = (this.timesOffset === 3) ? 1 : 2;
-        var name = firstLineBits[nameOffset];
-        var totalTime = firstLineBits[this.timesOffset - 1];
-        var club = secondLineBits[nameOffset];
-        
-        var className = (this.timesOffset === 5 && name !== "") ? firstLineBits[3] : null;
-        
-        var cumulativeTimes = this.readCompetitorSplitDataLine(firstLine);
-        var splitTimes = this.readCompetitorSplitDataLine(secondLine);
+        const firstLineBits = getTableDataBits(firstLine);
+        const secondLineBits = getTableDataBits(secondLine);
+
+        const competitive = hasNumber(firstLineBits[0]);
+        const nameOffset = (this.timesOffset === 3) ? 1 : 2;
+        const name = firstLineBits[nameOffset];
+        const totalTime = firstLineBits[this.timesOffset - 1];
+        const club = secondLineBits[nameOffset];
+
+        const className = (this.timesOffset === 5 && name !== "") ? firstLineBits[3] : null;
+
+        let cumulativeTimes = this.readCompetitorSplitDataLine(firstLine);
+        const splitTimes = this.readCompetitorSplitDataLine(secondLine);
         cumulativeTimes = cumulativeTimes.map(parseTime);
-        
+
         removeExtraControls(cumulativeTimes, splitTimes);
-        
-        var nonZeroCumTimeCount = cumulativeTimes.filter(isNotNull).length;
-        
+
+        const nonZeroCumTimeCount = cumulativeTimes.filter(isNotNull).length;
+
         if (nonZeroCumTimeCount !== splitTimes.length) {
             throwInvalidData("Cumulative and split times do not have the same length: " + nonZeroCumTimeCount + " cumulative times, " + splitTimes.length + " split times");
         }
-        
+
         return new CompetitorParseRecord(name, club, className, totalTime, cumulativeTimes, competitive);
     };
-    
+
     /**
     * Constructs a recognizer for formatting an HTML format supposedly from
     * 'OEvent'.
@@ -4268,7 +4301,7 @@ SplitsBrowser.Messages = {};
     * table before it containing various (ignored) header information.
     * @constructor
     */
-    var OEventTabularHtmlFormatRecognizer = function () {
+    const OEventTabularHtmlFormatRecognizer = function () {
         this.usesClasses = false;
     };
 
@@ -4287,59 +4320,59 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} text - The entire input text read in.
     * @sb-return {boolean} True if the text contains precisely two HTML table
     *     tags.
-    */ 
+    */
     OEventTabularHtmlFormatRecognizer.prototype.isTextOfThisFormat = function (text) {
-        var table1Pos = text.indexOf("<table");
+        const table1Pos = text.indexOf("<table");
         if (table1Pos >= 0) {
-            var table2Pos = text.indexOf("<table", table1Pos + 1);
+            const table2Pos = text.indexOf("<table", table1Pos + 1);
             if (table2Pos >= 0) {
-                var table3Pos = text.indexOf("<table", table2Pos + 1);
+                const table3Pos = text.indexOf("<table", table2Pos + 1);
                 if (table3Pos < 0) {
                     // Format characterised by precisely two tables.
                     return true;
                 }
             }
         }
-        
+
         return false;
     };
-    
+
     /**
     * Performs some pre-processing on the text before it is read in.
     *
     * This recognizer performs a fair amount of pre-processing, to remove
     * parts of the file we don't care about, and to reshape what there is left
     * so that it is in a more suitable form to be parsed.
-    * 
+    *
     * @sb-param {String} text - The HTML text to preprocess.
     * @sb-return {String} The preprocessed text.
     */
     OEventTabularHtmlFormatRecognizer.prototype.preprocess = function (text) {
         // Remove the first table.
-        var tableEndPos = text.indexOf("</table>");
+        const tableEndPos = text.indexOf("</table>");
         if (tableEndPos === -1) {
             throwInvalidData("Could not find any closing </table> tags");
         }
-        
+
         if (text.indexOf('<td colspan="25">') >= 0) {
             // The table has 25 columns with classes and 24 without.
             this.usesClasses = true;
         }
 
         text = text.substring(tableEndPos + "</table>".length);
-        
+
         // Remove all rows that contain only a single non-breaking space.
         text = text.replace(/<tr[^>]*><td colspan=[^>]*>&nbsp;<\/td><\/tr>/g, "");
-        
+
         // Replace blank lines.
         text = text.replace(/\n{2,}/g, "\n");
-        
+
         // Finally, remove the trailing </body> and </html> elements.
         text = text.replace("</body>", "").replace("</html>", "");
-        
+
         return text.trim();
     };
-    
+
     /**
     * Returns whether the HTML parser can ignore the given line altogether.
     *
@@ -4356,7 +4389,7 @@ SplitsBrowser.Messages = {};
     OEventTabularHtmlFormatRecognizer.prototype.canIgnoreThisLine = function (line) {
         return (line === "" || line.indexOf("<table") > -1 || line.indexOf("</table>") > -1 || line.indexOf("<hr>") > -1);
     };
-    
+
     /**
     * Returns whether the given line is the first line of a course.
     *
@@ -4373,7 +4406,7 @@ SplitsBrowser.Messages = {};
     OEventTabularHtmlFormatRecognizer.prototype.isCourseHeaderLine = function (line) {
         return line.indexOf('<tr class="clubName"') > -1;
     };
-    
+
     /**
     * Parse a course header line and return the course name, distance and
     * climb.
@@ -4384,15 +4417,15 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Object containing the parsed course details.
     */
     OEventTabularHtmlFormatRecognizer.prototype.parseCourseHeaderLine = function (line) {
-        var dataBits = getNonEmptyTableDataBits(line);
+        const dataBits = getNonEmptyTableDataBits(line);
         if (dataBits.length === 0) {
             throwInvalidData("No parts found in course header line");
         }
-            
-        var part = dataBits[0];
-        
-        var name, distance, climb;
-        var match = /^(.*?)\s+\((\d+)m,\s*(\d+)m\)$/.exec(part);
+
+        const part = dataBits[0];
+
+        let name, distance, climb;
+        const match = /^(.*?)\s+\((\d+)m,\s*(\d+)m\)$/.exec(part);
         if (match === null) {
             // Assume just course name.
             name = part;
@@ -4403,8 +4436,8 @@ SplitsBrowser.Messages = {};
             distance = parseInt(match[2], 10) / 1000;
             climb = parseInt(match[3], 10);
         }
-                    
-        return {name: name.trim(), distance: distance, climb: climb };
+
+        return { name: name.trim(), distance: distance, climb: climb };
     };
 
     /**
@@ -4418,13 +4451,13 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of control codes.
     */
     OEventTabularHtmlFormatRecognizer.prototype.parseControlsLine = function (line) {
-        var bits = getNonEmptyTableDataBits(line);
+        const bits = getNonEmptyTableDataBits(line);
         return bits.map(function (bit) {
-            var dashPos = bit.indexOf("-");
+            const dashPos = bit.indexOf("-");
             return (dashPos === -1) ? null : bit.substring(dashPos + 1);
         });
     };
-    
+
     /**
     * Read either cumulative or split times from the given line of competitor
     * data.
@@ -4433,27 +4466,27 @@ SplitsBrowser.Messages = {};
     * @sb-return {Array} Array of times.
     */
     OEventTabularHtmlFormatRecognizer.prototype.readCompetitorSplitDataLine = function (bits) {
-        
-        var startPos = (this.usesClasses) ? 5 : 4;
-        
+
+        const startPos = (this.usesClasses) ? 5 : 4;
+
         // Discard the empty bits at the end.
-        var endPos = bits.length;
+        let endPos = bits.length;
         while (endPos > 0 && bits[endPos - 1] === "") {
             endPos -= 1;
         }
-        
+
         // Alternate cells contain ranks, which we're not interested in.
-        var timeBits = [];
-        for (var index = startPos; index < endPos; index += 2) {
-            var bit = bits[index];
+        const timeBits = [];
+        for (let index = startPos; index < endPos; index += 2) {
+            const bit = bits[index];
             if (isNonEmpty(bit)) {
                 timeBits.push(bit);
             }
         }
-        
+
         return timeBits;
     };
-    
+
     /**
     * Parse two lines of competitor data into a CompetitorParseRecord object
     * containing the data.
@@ -4462,35 +4495,35 @@ SplitsBrowser.Messages = {};
     * @sb-return {CompetitorParseRecord} The parsed competitor.
     */
     OEventTabularHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLine, secondLine) {
-        var firstLineBits = getTableDataBits(firstLine);
-        var secondLineBits = getTableDataBits(secondLine);
-        
-        var competitive = hasNumber(firstLineBits[0]);
-        var name = firstLineBits[2];
-        var totalTime = firstLineBits[(this.usesClasses) ? 4 : 3];
-        var className = (this.usesClasses && name !== "") ? firstLineBits[3] : null;
-        var club = secondLineBits[2];
-        
+        const firstLineBits = getTableDataBits(firstLine);
+        const secondLineBits = getTableDataBits(secondLine);
+
+        const competitive = hasNumber(firstLineBits[0]);
+        const name = firstLineBits[2];
+        const totalTime = firstLineBits[(this.usesClasses) ? 4 : 3];
+        const className = (this.usesClasses && name !== "") ? firstLineBits[3] : null;
+        const club = secondLineBits[2];
+
         // If there is any cumulative time with a blank corresponding split
         // time, use a placeholder value for the split time.  Typically this
         // happens when a competitor has punched one control but not the
         // previous.
-        for (var index = ((this.usesClasses) ? 5 : 4); index < firstLineBits.length && index < secondLineBits.length; index += 2) {
+        for (let index = ((this.usesClasses) ? 5 : 4); index < firstLineBits.length && index < secondLineBits.length; index += 2) {
             if (firstLineBits[index] !== "" && secondLineBits[index] === "") {
                 secondLineBits[index] = "----";
             }
         }
-        
-        var cumulativeTimes = this.readCompetitorSplitDataLine(firstLineBits);
-        var splitTimes = this.readCompetitorSplitDataLine(secondLineBits);
+
+        let cumulativeTimes = this.readCompetitorSplitDataLine(firstLineBits);
+        const splitTimes = this.readCompetitorSplitDataLine(secondLineBits);
         cumulativeTimes = cumulativeTimes.map(parseTime);
-        
+
         removeExtraControls(cumulativeTimes, splitTimes);
-        
+
         if (cumulativeTimes.length !== splitTimes.length) {
             throwInvalidData("Cumulative and split times do not have the same length: " + cumulativeTimes.length + " cumulative times, " + splitTimes.length + " split times");
         }
-        
+
         return new CompetitorParseRecord(name, club, className, totalTime, cumulativeTimes, competitive);
     };
 
@@ -4502,7 +4535,7 @@ SplitsBrowser.Messages = {};
     *     if known, else null.
     * @sb-param {?Number} climb - The climb of the course in metres, if known,
     *     else null.
-    */ 
+    */
     function CourseParseRecord(name, distance, climb) {
         this.name = name;
         this.distance = distance;
@@ -4510,15 +4543,15 @@ SplitsBrowser.Messages = {};
         this.controls = [];
         this.competitors = [];
     }
-    
+
     /**
     * Adds the given list of control codes to those built up so far.
     * @sb-param {Array} controls - Array of control codes read.
-    */ 
+    */
     CourseParseRecord.prototype.addControls = function (controls) {
         this.controls = this.controls.concat(controls);
     };
-    
+
     /**
     * Returns whether the course has all of the controls it needs.
     * The course has all its controls if its last control is the finish, which
@@ -4568,7 +4601,7 @@ SplitsBrowser.Messages = {};
         this.linePos = -1;
         this.currentCompetitor = null;
     }
-    
+
     /**
     * Attempts to read the next unread line from the data given.  If the end of
     * the data has been read, null will be returned.
@@ -4583,11 +4616,11 @@ SplitsBrowser.Messages = {};
             return null;
         }
     };
-    
+
     /**
     * Adds the current competitor being constructed to the current course, and
     * clear the current competitor.
-    * 
+    *
     * If there is no current competitor, nothing happens.
     */
     HtmlFormatParser.prototype.addCurrentCompetitorIfNecessary = function () {
@@ -4596,11 +4629,11 @@ SplitsBrowser.Messages = {};
             this.currentCompetitor = null;
         }
     };
-    
+
     /**
     * Adds the current competitor being constructed to the current course, and
     * the current course being constructed to the list of all courses.
-    * 
+    *
     * If there is no current competitor nor no current course, nothing happens.
     */
     HtmlFormatParser.prototype.addCurrentCompetitorAndCourseIfNecessary = function () {
@@ -4609,7 +4642,7 @@ SplitsBrowser.Messages = {};
             this.courses.push(this.currentCourse);
         }
     };
-    
+
     /**
     * Reads in data for one competitor from two lines of the input data.
     *
@@ -4618,12 +4651,12 @@ SplitsBrowser.Messages = {};
     *     competitor data from.
     */
     HtmlFormatParser.prototype.readCompetitorLines = function (firstLine) {
-        var secondLine = this.tryGetLine();
+        const secondLine = this.tryGetLine();
         if (secondLine === null) {
             throwInvalidData("Hit end of input data unexpectedly while parsing competitor: first line was '" + firstLine + "'");
         }
-            
-        var competitorRecord = this.recognizer.parseCompetitor(firstLine, secondLine);
+
+        const competitorRecord = this.recognizer.parseCompetitor(firstLine, secondLine);
         if (competitorRecord.isContinuation()) {
             if (this.currentCompetitor === null) {
                 throwInvalidData("First row of competitor data has no name nor time");
@@ -4635,20 +4668,20 @@ SplitsBrowser.Messages = {};
             this.currentCompetitor = competitorRecord;
         }
     };
-    
+
     /**
     * Returns whether the classes are unique within courses.  If so, they can
     * be used to subdivide courses.  If not, CourseClasses and Courses must be
     * the same.
     * @sb-return {boolean} True if no two competitors in the same class are on
     *     different classes, false otherwise.
-    */ 
+    */
     HtmlFormatParser.prototype.areClassesUniqueWithinCourses = function () {
-        var classesToCoursesMap = d3.map();
-        for (var courseIndex = 0; courseIndex < this.courses.length; courseIndex += 1) {
-            var course = this.courses[courseIndex];
-            for (var competitorIndex = 0; competitorIndex < course.competitors.length; competitorIndex += 1) {
-                var competitor = course.competitors[competitorIndex];
+        const classesToCoursesMap = d3.map();
+        for (let courseIndex = 0; courseIndex < this.courses.length; courseIndex += 1) {
+            const course = this.courses[courseIndex];
+            for (let competitorIndex = 0; competitorIndex < course.competitors.length; competitorIndex += 1) {
+                const competitor = course.competitors[competitorIndex];
                 if (classesToCoursesMap.has(competitor.className)) {
                     if (classesToCoursesMap.get(competitor.className) !== course.name) {
                         return false;
@@ -4658,10 +4691,10 @@ SplitsBrowser.Messages = {};
                 }
             }
         }
-        
+
         return true;
     };
-    
+
     /**
     * Reads through all of the intermediate parse-record data and creates an
     * Event object with all of the courses and classes.
@@ -4671,53 +4704,53 @@ SplitsBrowser.Messages = {};
         // There is a complication here regarding classes.  Sometimes, classes
         // are repeated within multiple courses.  In this case, ignore the
         // classes given and create a CourseClass for each set.
-        var classesUniqueWithinCourses = this.areClassesUniqueWithinCourses();
-        
-        var newCourses = [];
-        var classes = [];
-        
-        var competitorsHaveClasses = this.courses.every(function (course) {
+        const classesUniqueWithinCourses = this.areClassesUniqueWithinCourses();
+
+        const newCourses = [];
+        const classes = [];
+
+        const competitorsHaveClasses = this.courses.every(function (course) {
             return course.competitors.every(function (competitor) { return isNotNull(competitor.className); });
         });
-        
+
         this.courses.forEach(function (course) {
             // Firstly, sort competitors by class.
-            var classToCompetitorsMap = d3.map();
+            const classToCompetitorsMap = <any>d3.map();
             course.competitors.forEach(function (competitor) {
-                var className = (competitorsHaveClasses && classesUniqueWithinCourses) ? competitor.className : course.name;
+                const className = (competitorsHaveClasses && classesUniqueWithinCourses) ? competitor.className : course.name;
                 if (classToCompetitorsMap.has(className)) {
                     classToCompetitorsMap.get(className).push(competitor);
                 } else {
                     classToCompetitorsMap.set(className, [competitor]);
                 }
             });
-            
-            var classesForThisCourse = [];
-            
+
+            const classesForThisCourse = [];
+
             classToCompetitorsMap.keys().forEach(function (className) {
-                var numControls = course.controls.length - 1;
-                var oldCompetitors = classToCompetitorsMap.get(className);
-                var newCompetitors = oldCompetitors.map(function (competitor, index) {
+                const numControls = course.controls.length - 1;
+                const oldCompetitors = classToCompetitorsMap.get(className);
+                const newCompetitors = oldCompetitors.map(function (competitor, index) {
                     return competitor.toCompetitor(index + 1);
                 });
-                
-                var courseClass = new CourseClass(className, numControls, newCompetitors);
+
+                const courseClass = new CourseClass(className, numControls, newCompetitors);
                 classesForThisCourse.push(courseClass);
                 classes.push(courseClass);
             }, this);
-            
-            var newCourse = new Course(course.name, classesForThisCourse, course.distance, course.climb, course.controls.slice(0, course.controls.length - 1));
+
+            const newCourse = new Course(course.name, classesForThisCourse, course.distance, course.climb, course.controls.slice(0, course.controls.length - 1));
             newCourses.push(newCourse);
             classesForThisCourse.forEach(function (courseClass) {
                 courseClass.setCourse(newCourse);
             });
         }, this);
-        
+
         // Empty array is for warnings, which aren't supported by the HTML
         // format parsers.
         return new Event(classes, newCourses, []);
     };
-    
+
     /**
     * Parses the given HTML text containing results data into an Event object.
     * @sb-param {String} text - The HTML text to parse.
@@ -4726,14 +4759,14 @@ SplitsBrowser.Messages = {};
     HtmlFormatParser.prototype.parse = function (text) {
         this.lines = text.split("\n");
         while (true) {
-            var line = this.tryGetLine();
+            const line = this.tryGetLine();
             if (line === null) {
                 break;
             } else if (this.recognizer.canIgnoreThisLine(line)) {
                 // Do nothing - recognizer says we can ignore this line.
             } else if (this.recognizer.isCourseHeaderLine(line)) {
                 this.addCurrentCompetitorAndCourseIfNecessary();
-                var courseObj = this.recognizer.parseCourseHeaderLine(line);
+                const courseObj = this.recognizer.parseCourseHeaderLine(line);
                 this.currentCourse = new CourseParseRecord(courseObj.name, courseObj.distance, courseObj.climb);
             } else if (this.currentCourse === null) {
                 // Do nothing - still not found the start of the first course.
@@ -4741,25 +4774,25 @@ SplitsBrowser.Messages = {};
                 // Course has all of its controls; read competitor data.
                 this.readCompetitorLines(line);
             } else {
-                var controls = this.recognizer.parseControlsLine(line);
+                const controls = this.recognizer.parseControlsLine(line);
                 this.currentCourse.addControls(controls);
             }
         }
-        
+
         this.addCurrentCompetitorAndCourseIfNecessary();
-        
+
         if (this.courses.length === 0) {
             throwInvalidData("No competitor data was found");
         }
-        
-        var eventData = this.createOverallEventObject();
+
+        const eventData = this.createOverallEventObject();
         return eventData;
     };
-    
-    var RECOGNIZER_CLASSES = [OldHtmlFormatRecognizer, NewHtmlFormatRecognizer, OEventTabularHtmlFormatRecognizer];
-    
+
+    const RECOGNIZER_CLASSES = [OldHtmlFormatRecognizer, NewHtmlFormatRecognizer, OEventTabularHtmlFormatRecognizer];
+
     SplitsBrowser.Input.Html = {};
-    
+
     /**
     * Attempts to parse data as one of the supported HTML formats.
     *
@@ -4772,47 +4805,47 @@ SplitsBrowser.Messages = {};
     */
     SplitsBrowser.Input.Html.parseEventData = function (data) {
         data = normaliseLineEndings(data);
-        for (var recognizerIndex = 0; recognizerIndex < RECOGNIZER_CLASSES.length; recognizerIndex += 1) {
-            var RecognizerClass = RECOGNIZER_CLASSES[recognizerIndex];
-            var recognizer = new RecognizerClass();
+        for (let recognizerIndex = 0; recognizerIndex < RECOGNIZER_CLASSES.length; recognizerIndex += 1) {
+            const RecognizerClass = RECOGNIZER_CLASSES[recognizerIndex];
+            const recognizer = new RecognizerClass();
             if (recognizer.isTextOfThisFormat(data)) {
                 data = recognizer.preprocess(data);
-                var parser = new HtmlFormatParser(recognizer);
-                var parsedEvent = parser.parse(data);
+                const parser = new HtmlFormatParser(recognizer);
+                const parsedEvent = parser.parse(data);
                 return parsedEvent;
             }
         }
-        
+
         // If we get here, the format wasn't recognized.
         throwWrongFileFormat("No HTML recognizers recognised this as HTML they could parse");
     };
-})();    
+})();
 
 
 (function () {
     "use strict";
-    
-    var throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    var normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    var parseTime = SplitsBrowser.parseTime;
-    var parseCourseLength = SplitsBrowser.parseCourseLength;
-    var parseCourseClimb = SplitsBrowser.parseCourseClimb;
-    var fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    var CourseClass = SplitsBrowser.Model.CourseClass;
-    var Course = SplitsBrowser.Model.Course;
-    var Event = SplitsBrowser.Model.Event;
-    
+
+    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
+    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
+    const parseTime = SplitsBrowser.parseTime;
+    const parseCourseLength = SplitsBrowser.parseCourseLength;
+    const parseCourseClimb = SplitsBrowser.parseCourseClimb;
+    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
+    const CourseClass = SplitsBrowser.Model.CourseClass;
+    const Course = SplitsBrowser.Model.Course;
+    const Event = SplitsBrowser.Model.Event;
+
     // This reader reads in alternative CSV formats, where each row defines a
     // separate competitor, and includes course details such as name, controls
     // and possibly distance and climb.
-    
+
     // There is presently one variation supported:
     // * one, distinguished by having three columns per control: control code,
     //   cumulative time and 'points'.  (Points is never used.)  Generally,
     //   these formats are quite sparse; many columns (e.g. club, placing,
     //   start time) are blank or are omitted altogether.
-    
-    var TRIPLE_COLUMN_FORMAT = {
+
+    const TRIPLE_COLUMN_FORMAT = {
         // Control data starts in column AM (index 38).
         controlsOffset: 38,
         // Number of columns per control.
@@ -4828,39 +4861,39 @@ SplitsBrowser.Messages = {};
         finishTime: null,
         allowMultipleCompetitorNames: true
     };
-    
+
     // Supported delimiters.
-    var DELIMITERS = [",", ";"];
-    
+    const DELIMITERS = [",", ";"];
+
     // All control codes except perhaps the finish are alphanumeric.
-    var controlCodeRegexp = /^[A-Za-z0-9]+$/;
-    
-    
+    const controlCodeRegexp = /^[A-Za-z0-9]+$/;
+
+
     /**
     * Trim trailing empty-string entries from the given array.
     * The given array is mutated.
     * @sb-param {Array} array - The array of string values.
     */
-    function trimTrailingEmptyCells (array) {
-        var index = array.length - 1;
+    function trimTrailingEmptyCells(array) {
+        let index = array.length - 1;
         while (index >= 0 && array[index] === "") {
             index -= 1;
         }
-        
+
         array.splice(index + 1, array.length - index - 1);
     }
-    
+
     /**
     * Object used to read data from an alternative CSV file.
     * @constructor
     * @sb-param {Object} format - Object that describes the data format to read.
     */
-    function Reader (format) {
+    function Reader(format) {
         this.format = format;
         this.classes = d3.map();
         this.delimiter = null;
         this.warnings = [];
-        
+
         // Return the offset within the control data that should be used when
         // looking for control codes.  This will be 0 if the format specifies a
         // finish time, and the format step if the format has no finish time.
@@ -4868,7 +4901,7 @@ SplitsBrowser.Messages = {};
         // don't wish to read any control code specified nor validate it.)
         this.controlsTerminationOffset = (format.finishTime === null) ? format.step : 0;
     }
-    
+
     /**
     * Determine the delimiter used to delimit data.
     * @sb-param {String} firstDataLine - The first data line of the file.
@@ -4876,18 +4909,18 @@ SplitsBrowser.Messages = {};
     *    suitable delimiter was found.
     */
     Reader.prototype.determineDelimiter = function (firstDataLine) {
-        for (var index = 0; index < DELIMITERS.length; index += 1) {
-            var delimiter = DELIMITERS[index];
-            var lineParts = firstDataLine.split(delimiter);
+        for (let index = 0; index < DELIMITERS.length; index += 1) {
+            const delimiter = DELIMITERS[index];
+            const lineParts = firstDataLine.split(delimiter);
             trimTrailingEmptyCells(lineParts);
             if (lineParts.length > this.format.controlsOffset) {
                 return delimiter;
             }
         }
-        
+
         return null;
     };
-    
+
     /**
     * Some lines of some formats can have multiple delimited competitors, which
     * will move the following columns out of their normal place.  Identify any
@@ -4902,7 +4935,7 @@ SplitsBrowser.Messages = {};
             }
         }
     };
-    
+
     /**
     * Check the first line of data read in to verify that all of the control
     * codes specified are alphanumeric.
@@ -4910,17 +4943,17 @@ SplitsBrowser.Messages = {};
     *     the header line).
     */
     Reader.prototype.checkControlCodesAlphaNumeric = function (firstLine) {
-        var lineParts = firstLine.split(this.delimiter);
+        const lineParts = firstLine.split(this.delimiter);
         trimTrailingEmptyCells(lineParts);
         this.adjustLinePartsForMultipleCompetitors(lineParts, this.format);
-        
-        for (var index = this.format.controlsOffset; index + this.controlsTerminationOffset < lineParts.length; index += this.format.step) {
+
+        for (let index = this.format.controlsOffset; index + this.controlsTerminationOffset < lineParts.length; index += this.format.step) {
             if (!controlCodeRegexp.test(lineParts[index])) {
                 throwWrongFileFormat("Data appears not to be in an alternative CSV format - data in cell " + index + " of the first row ('" + lineParts[index] + "') is not an number");
             }
         }
     };
-    
+
     /**
     * Adds the competitor to the course with the given name.
     * @sb-param {Competitor} competitor - The competitor object read from the row.
@@ -4929,95 +4962,95 @@ SplitsBrowser.Messages = {};
     */
     Reader.prototype.addCompetitorToCourse = function (competitor, courseName, row) {
         if (this.classes.has(courseName)) {
-            var cls = this.classes.get(courseName);
-            var cumTimes = competitor.getAllOriginalCumulativeTimes();
-            // Subtract one from the list of cumulative times for the 
+            const cls = this.classes.get(courseName);
+            const cumTimes = competitor.getAllOriginalCumulativeTimes();
+            // Subtract one from the list of cumulative times for the
             // cumulative time at the start (always 0), and add one on to
             // the count of controls in the class to cater for the finish.
             if (cumTimes.length - 1 !== (cls.controls.length + 1)) {
                 this.warnings.push("Competitor '" + competitor.name + "' has the wrong number of splits for course '" + courseName + "': " +
-                                   "expected " + (cls.controls.length + 1) + ", actual " + (cumTimes.length - 1));
+                    "expected " + (cls.controls.length + 1) + ", actual " + (cumTimes.length - 1));
             } else {
                 cls.competitors.push(competitor);
             }
         } else {
             // New course/class.
-            
+
             // Determine the list of controls, ignoring the finish.
-            var controls = [];
-            for (var controlIndex = this.format.controlsOffset; controlIndex + this.controlsTerminationOffset < row.length; controlIndex += this.format.step) {
+            const controls = [];
+            for (let controlIndex = this.format.controlsOffset; controlIndex + this.controlsTerminationOffset < row.length; controlIndex += this.format.step) {
                 controls.push(row[controlIndex]);
             }
-        
-            var courseLength = (this.format.length === null) ? null : parseCourseLength(row[this.format.length]);
-            var courseClimb = (this.format.climb === null) ? null : parseCourseClimb(row[this.format.climb]);
-        
-            this.classes.set(courseName, {length: courseLength, climb: courseClimb, controls: controls, competitors: [competitor]});
+
+            const courseLength = (this.format.length === null) ? null : parseCourseLength(row[this.format.length]);
+            const courseClimb = (this.format.climb === null) ? null : parseCourseClimb(row[this.format.climb]);
+
+            this.classes.set(courseName, { length: courseLength, climb: courseClimb, controls: controls, competitors: [competitor] });
         }
     };
-    
+
     /**
     * Read a row of data from a line of the file.
     * @sb-param {String} line - The line of data read from the file.
     */
     Reader.prototype.readDataRow = function (line) {
-        var row = line.split(this.delimiter);
+        const row = line.split(this.delimiter);
         trimTrailingEmptyCells(row);
         this.adjustLinePartsForMultipleCompetitors(row);
-        
+
         if (row.length < this.format.controlsOffset) {
             // Probably a blank line.  Ignore it.
             return;
         }
-        
+
         while ((row.length - this.format.controlsOffset) % this.format.step !== 0) {
             // Competitor might be missing cumulative time to last control.
             row.push("");
         }
-        
-        var competitorName = row[this.format.name];
-        var club = row[this.format.club];
-        var courseName = row[this.format.courseName];
-        var startTime = parseTime(row[this.format.startTime]);
-        
-        var cumTimes = [0];
-        for (var cumTimeIndex = this.format.controlsOffset + 1; cumTimeIndex < row.length; cumTimeIndex += this.format.step) {
+
+        const competitorName = row[this.format.name];
+        const club = row[this.format.club];
+        const courseName = row[this.format.courseName];
+        const startTime = parseTime(row[this.format.startTime]);
+
+        const cumTimes = [0];
+        for (let cumTimeIndex = this.format.controlsOffset + 1; cumTimeIndex < row.length; cumTimeIndex += this.format.step) {
             cumTimes.push(parseTime(row[cumTimeIndex]));
         }
-        
+
         if (this.format.finishTime !== null) {
-            var finishTime = parseTime(row[this.format.finishTime]);
-            var totalTime = (startTime === null || finishTime === null) ? null : (finishTime - startTime);
+            const finishTime = parseTime(row[this.format.finishTime]);
+            const totalTime = (startTime === null || finishTime === null) ? null : (finishTime - startTime);
             cumTimes.push(totalTime);
         }
-        
+
         if (cumTimes.length === 1) {
             // Only cumulative time is the zero.
             if (competitorName !== "") {
                 this.warnings.push(
                     "Competitor '" + competitorName + "' on course '" + (courseName === "" ? "(unnamed)" : courseName) + "' has no times recorded");
             }
-            
+
             return;
         }
-        
-        var order = (this.classes.has(courseName)) ? this.classes.get(courseName).competitors.length + 1 : 1;
-        
-        var competitor = fromOriginalCumTimes(order, competitorName, club, startTime, cumTimes);
+
+        const order = (this.classes.has(courseName)) ? this.classes.get(courseName).competitors.length + 1 : 1;
+
+        const competitor = fromOriginalCumTimes(order, competitorName, club, startTime, cumTimes);
         if (this.format.placing !== null && competitor.completed()) {
-            var placing = row[this.format.placing];
+            const placing = row[this.format.placing];
             if (!placing.match(/^\d*$/)) {
                 competitor.setNonCompetitive();
             }
         }
-        
+
         if (!competitor.hasAnyTimes()) {
             competitor.setNonStarter();
         }
-        
+
         this.addCompetitorToCourse(competitor, courseName, row);
     };
-    
+
     /**
     * Given an array of objects containing information about each of the
     * course-classes in the data, create CourseClass and Course objects,
@@ -5025,72 +5058,72 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Object that contains the courses and classes.
     */
     Reader.prototype.createClassesAndCourses = function () {
-        var courseClasses = [];
+        const courseClasses = [];
 
         // Group the classes by the list of controls.  Two classes using the
         // same list of controls can be assumed to be using the same course.
-        var coursesByControlsLists = d3.map();
-        
+        const coursesByControlsLists = <any>d3.map();
+
         this.classes.entries().forEach(function (keyValuePair) {
-            var className = keyValuePair.key;
-            var cls = keyValuePair.value;
-            var courseClass = new CourseClass(className, cls.controls.length, cls.competitors);
+            const className = keyValuePair.key;
+            const cls = keyValuePair.value;
+            const courseClass = new CourseClass(className, cls.controls.length, cls.competitors);
             courseClasses.push(courseClass);
-            
-            var controlsList = cls.controls.join(",");
+
+            const controlsList = cls.controls.join(",");
             if (coursesByControlsLists.has(controlsList)) {
                 coursesByControlsLists.get(controlsList).classes.push(courseClass);
             } else {
                 coursesByControlsLists.set(
-                    controlsList, {name: className, classes: [courseClass], length: cls.length, climb: cls.climb, controls: cls.controls});
+                    controlsList, { name: className, classes: [courseClass], length: cls.length, climb: cls.climb, controls: cls.controls });
             }
         });
-        
-        var courses = [];
+
+        const courses = [];
         coursesByControlsLists.values().forEach(function (courseObject) {
-            var course = new Course(courseObject.name, courseObject.classes, courseObject.length, courseObject.climb, courseObject.controls);    
+            const course = new Course(courseObject.name, courseObject.classes, courseObject.length, courseObject.climb, courseObject.controls);
             courseObject.classes.forEach(function (courseClass) { courseClass.setCourse(course); });
             courses.push(course);
         });
-        
-        return {classes: courseClasses, courses: courses};
+
+        return { classes: courseClasses, courses: courses };
     };
-    
+
     /**
     * Parse alternative CSV data for an entire event.
     * @sb-param {String} eventData - String containing the entire event data.
     * @sb-return {SplitsBrowser.Model.Event} All event data read in.
-    */    
+    */
     Reader.prototype.parseEventData = function (eventData) {
         this.warnings = [];
         eventData = normaliseLineEndings(eventData);
-        
-        var lines = eventData.split(/\n/);
-        
+
+        const lines = eventData.split(/\n/);
+
         if (lines.length < 2) {
             throwWrongFileFormat("Data appears not to be in an alternative CSV format - too few lines");
         }
-        
-        var firstDataLine = lines[1];
+
+        const firstDataLine = lines[1];
 
         this.delimiter = this.determineDelimiter(firstDataLine);
         if (this.delimiter === null) {
             throwWrongFileFormat("Data appears not to be in an alternative CSV format - first data line has fewer than " + this.format.controlsOffset + " parts when separated by any recognised delimiter");
         }
-        
+
         this.checkControlCodesAlphaNumeric(firstDataLine);
-        
-        for (var rowIndex = 1; rowIndex < lines.length; rowIndex += 1) {
+
+        for (let rowIndex = 1; rowIndex < lines.length; rowIndex += 1) {
             this.readDataRow(lines[rowIndex]);
         }
-        
-        var classesAndCourses = this.createClassesAndCourses();
+
+        const classesAndCourses = this.createClassesAndCourses();
         return new Event(classesAndCourses.classes, classesAndCourses.courses, this.warnings);
     };
-    
+
     SplitsBrowser.Input.AlternativeCSV = {
         parseTripleColumnEventData: function (eventData) {
-            var reader = new Reader(TRIPLE_COLUMN_FORMAT);
+            const reader = new Reader(TRIPLE_COLUMN_FORMAT);
             return reader.parseEventData(eventData);
         }
     };
@@ -5098,19 +5131,19 @@ SplitsBrowser.Messages = {};
 
 (function () {
     "use strict";
-    
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
-    var throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    var isNaNStrict = SplitsBrowser.isNaNStrict;
-    var parseTime = SplitsBrowser.parseTime;
-    var fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    var CourseClass = SplitsBrowser.Model.CourseClass;
-    var Course = SplitsBrowser.Model.Course;
-    var Event = SplitsBrowser.Model.Event;
-    
+
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
+    const isNaNStrict = SplitsBrowser.isNaNStrict;
+    const parseTime = SplitsBrowser.parseTime;
+    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
+    const CourseClass = SplitsBrowser.Model.CourseClass;
+    const Course = SplitsBrowser.Model.Course;
+    const Event = SplitsBrowser.Model.Event;
+
     // Number of feet in a kilometre.
-    var FEET_PER_KILOMETRE = 3280;
-    
+    const FEET_PER_KILOMETRE = 3280;
+
     /**
     * Returns whether the given value is undefined.
     * @sb-param {any} value - The value to check.
@@ -5119,29 +5152,29 @@ SplitsBrowser.Messages = {};
     function isUndefined(value) {
         return typeof value === "undefined";
     }
-    
+
     /**
     * Parses the given XML string and returns the parsed XML.
     * @sb-param {String} xmlString - The XML string to parse.
     * @sb-return {XMLDocument} The parsed XML document.
     */
     function parseXml(xmlString) {
-        var xml;
+        let xml;
         try {
             xml = $.parseXML(xmlString);
         } catch (e) {
             throwInvalidData("XML data not well-formed");
         }
-        
+
         if ($("> *", $(xml)).length === 0) {
             // PhantomJS doesn't always fail parsing invalid XML; we may be
             // left with 'xml' just containing the DOCTYPE and no root element.
             throwInvalidData("XML data not well-formed: " + xmlString);
         }
-        
+
         return xml;
     }
-    
+
     /**
     * Parses and returns a competitor name from the given XML element.
     *
@@ -5154,10 +5187,10 @@ SplitsBrowser.Messages = {};
     * @sb-return {String} Name read from the element.
     */
     function readCompetitorName(nameElement) {
-        
-        var forename = $("> Given", nameElement).text();
-        var surname = $("> Family", nameElement).text();
-    
+
+        const forename = $("> Given", nameElement).text();
+        const surname = $("> Family", nameElement).text();
+
         if (forename === "") {
             return surname;
         } else if (surname === "") {
@@ -5166,16 +5199,16 @@ SplitsBrowser.Messages = {};
             return forename + " " + surname;
         }
     }
-    
+
     // Regexp that matches the year in an ISO-8601 date.
     // Both XML formats use ISO-8601 (YYYY-MM-DD) dates, so parsing is
     // fortunately straightforward.
-    var yearRegexp = /^\d{4}/;
-    
+    const yearRegexp = /^\d{4}/;
+
     // Object that contains various functions for parsing bits of data from
     // IOF v2.0.3 XML event data.
-    var Version2Reader = {};
-    
+    const Version2Reader = {} as any;
+
     /**
     * Returns whether the given event data is likely to be results data of the
     * version 2.0.3 format.
@@ -5191,26 +5224,26 @@ SplitsBrowser.Messages = {};
     Version2Reader.isOfThisVersion = function (data) {
         return data.indexOf("IOFdata.dtd") >= 0;
     };
-        
+
     /**
     * Makes a more thorough check that the parsed XML data is likely to be of
     * the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
     * @sb-param {jQuery.selection} rootElement - The root element.
     */
     Version2Reader.checkVersion = function (rootElement) {
-        var iofVersionElement = $("> IOFVersion", rootElement);
+        const iofVersionElement = $("> IOFVersion", rootElement);
         if (iofVersionElement.length === 0) {
             throwWrongFileFormat("Could not find IOFVersion element");
         } else {
-            var version = iofVersionElement.attr("version");
+            const version = iofVersionElement.attr("version");
             if (isUndefined(version)) {
                 throwWrongFileFormat("Version attribute missing from IOFVersion element");
             } else if (version !== "2.0.3") {
                 throwWrongFileFormat("Found unrecognised IOF XML data format '" + version + "'");
             }
         }
-        
-        var status = rootElement.attr("status");
+
+        const status = rootElement.attr("status");
         if (!isUndefined(status) && status.toLowerCase() !== "complete") {
             throwInvalidData("Only complete IOF data supported; snapshot and delta are not supported");
         }
@@ -5223,9 +5256,9 @@ SplitsBrowser.Messages = {};
     * @sb-return {String} Class name.
     */
     Version2Reader.readClassName = function (classResultElement) {
-        return $("> ClassShortName", classResultElement).text();    
+        return $("> ClassShortName", classResultElement).text();
     };
-    
+
     /**
     * Reads the course details from the given ClassResult element.
     * @sb-param {jQuery.selection} classResultElement - ClassResult element
@@ -5238,21 +5271,21 @@ SplitsBrowser.Messages = {};
         // haven't been specified in any of the files I've seen.
         // So instead grab course details from the class and the first
         // competitor.
-        var courseName = $("> ClassShortName", classResultElement).text();
-        
-        var firstResult = $("> PersonResult > Result", classResultElement).first();
-        var length = null;
-        
+        const courseName = $("> ClassShortName", classResultElement).text();
+
+        const firstResult = $("> PersonResult > Result", classResultElement).first();
+        let length = null;
+
         if (firstResult.length > 0) {
-            var lengthElement = $("> CourseLength", firstResult);
-            var lengthStr = lengthElement.text();
-            
+            const lengthElement = $("> CourseLength", firstResult);
+            const lengthStr = lengthElement.text();
+
             // Course lengths in IOF v2 are a pain, as you have to handle three
             // units.
             if (lengthStr.length > 0) {
                 length = parseFloat(lengthStr);
                 if (isFinite(length)) {
-                    var unit = lengthElement.attr("unit");
+                    const unit = lengthElement.attr("unit");
                     if (isUndefined(unit) || unit === "m") {
                         length /= 1000;
                     } else if (unit === "km") {
@@ -5269,12 +5302,12 @@ SplitsBrowser.Messages = {};
                 }
             }
         }
-        
+
         // Climb does not appear in the per-competitor results, and there is
         // no NumberOfControls.
-        return {id: null, name: courseName, length: length, climb: null, numberOfControls: null};
+        return { id: null, name: courseName, length: length, climb: null, numberOfControls: null };
     };
-    
+
     /**
     * Returns the XML element that contains a competitor's name.  This element
     * should contain child elements with names 'Given' and 'Family'.
@@ -5286,7 +5319,7 @@ SplitsBrowser.Messages = {};
     Version2Reader.getCompetitorNameElement = function (element) {
         return $("> Person > PersonName", element);
     };
-    
+
     /**
     * Returns the name of the competitor's club.
     * @sb-param {jQuery.selection} element - jQuery selection containing a
@@ -5296,7 +5329,7 @@ SplitsBrowser.Messages = {};
     Version2Reader.readClubName = function (element) {
         return $("> Club > ShortName", element).text();
     };
-        
+
     /**
     * Returns the competitor's date of birth, as a string.
     * @sb-param {jQuery.selection} element - jQuery selection containing a
@@ -5315,11 +5348,11 @@ SplitsBrowser.Messages = {};
     *     null if not found.
     */
     Version2Reader.readStartTime = function (resultElement) {
-        var startTimeStr = $("> StartTime > Clock", resultElement).text();
-        var startTime = (startTimeStr === "") ? null : parseTime(startTimeStr);       
+        const startTimeStr = $("> StartTime > Clock", resultElement).text();
+        const startTime = (startTimeStr === "") ? null : parseTime(startTimeStr);
         return startTime;
     };
-    
+
     /**
     * Reads a competitor's total time from the given Result element.
     * @sb-param {jQuery.selection} resultElement - jQuery selection containing a
@@ -5328,8 +5361,8 @@ SplitsBrowser.Messages = {};
     *     null if a valid time was not found.
     */
     Version2Reader.readTotalTime = function (resultElement) {
-        var totalTimeStr = $("> Time", resultElement).text();
-        var totalTime = (totalTimeStr === "") ? null : parseTime(totalTimeStr);
+        const totalTimeStr = $("> Time", resultElement).text();
+        const totalTime = (totalTimeStr === "") ? null : parseTime(totalTimeStr);
         return totalTime;
     };
 
@@ -5340,16 +5373,16 @@ SplitsBrowser.Messages = {};
     * @sb-return {String} Status of the competitor.
     */
     Version2Reader.getStatus = function (resultElement) {
-        var statusElement = $("> CompetitorStatus", resultElement);
+        const statusElement = $("> CompetitorStatus", resultElement);
         return (statusElement.length === 1) ? statusElement.attr("value") : "";
     };
-    
+
     Version2Reader.StatusNonCompetitive = "NotCompeting";
     Version2Reader.StatusNonStarter = "DidNotStart";
     Version2Reader.StatusNonFinisher = "DidNotFinish";
     Version2Reader.StatusDisqualified = "Disqualified";
     Version2Reader.StatusOverMaxTime = "OverTime";
-    
+
     /**
     * Unconditionally returns false - IOF XML version 2.0.3 appears not to
     * support additional controls.
@@ -5358,7 +5391,7 @@ SplitsBrowser.Messages = {};
     Version2Reader.isAdditional = function () {
         return false;
     };
-    
+
     /**
     * Reads a control code and split time from a SplitTime element.
     * @sb-param {jQuery.selection} splitTimeElement - jQuery selection containing
@@ -5367,30 +5400,30 @@ SplitsBrowser.Messages = {};
     */
     Version2Reader.readSplitTime = function (splitTimeElement) {
         // IOF v2 allows ControlCode or Control elements.
-        var code = $("> ControlCode", splitTimeElement).text();
+        let code = $("> ControlCode", splitTimeElement).text();
         if (code === "") {
             code = $("> Control > ControlCode", splitTimeElement).text();
         }
-        
+
         if (code === "") {
             throwInvalidData("Control code missing for control");
         }
 
-        var timeStr = $("> Time", splitTimeElement).text();
-        var time = (timeStr === "") ? null : parseTime(timeStr);
-        return {code: code, time: time};
+        const timeStr = $("> Time", splitTimeElement).text();
+        const time = (timeStr === "") ? null : parseTime(timeStr);
+        return { code: code, time: time };
     };
-    
+
     // Regexp to match ISO-8601 dates.
     // Ignores timezone info - always display times as local time.
     // We don't assume there are separator characters, and we also don't assume
     // that the seconds will be specified.
-    var ISO_8601_RE = /^\d\d\d\d-?\d\d-?\d\dT?(\d\d):?(\d\d)(?::?(\d\d))?/;
-    
+    const ISO_8601_RE = /^\d\d\d\d-?\d\d-?\d\dT?(\d\d):?(\d\d)(?::?(\d\d))?/;
+
     // Object that contains various functions for parsing bits of data from
     // IOF v3.0 XML event data.
-    var Version3Reader = {};
-    
+    const Version3Reader = {} as any;
+
     /**
     * Returns whether the given event data is likely to be results data of the
     * version 3.0 format.
@@ -5406,26 +5439,26 @@ SplitsBrowser.Messages = {};
     Version3Reader.isOfThisVersion = function (data) {
         return data.indexOf("http://www.orienteering.org/datastandard/3.0") >= 0;
     };
-    
+
     /**
     * Makes a more thorough check that the parsed XML data is likely to be of
     * the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
     * @sb-param {jQuery.selection} rootElement - The root element.
-    */    
+    */
     Version3Reader.checkVersion = function (rootElement) {
-        var iofVersion = rootElement.attr("iofVersion");
+        const iofVersion = rootElement.attr("iofVersion");
         if (isUndefined(iofVersion)) {
             throwWrongFileFormat("Could not find IOF version number");
         } else if (iofVersion !== "3.0") {
             throwWrongFileFormat("Found unrecognised IOF XML data format '" + iofVersion + "'");
         }
-        
-        var status = rootElement.attr("status");
+
+        const status = rootElement.attr("status");
         if (!isUndefined(status) && status.toLowerCase() !== "complete") {
             throwInvalidData("Only complete IOF data supported; snapshot and delta are not supported");
         }
     };
-    
+
     /**
     * Reads the class name from a ClassResult element.
     * @sb-param {jQuery.selection} classResultElement - ClassResult element
@@ -5435,7 +5468,7 @@ SplitsBrowser.Messages = {};
     Version3Reader.readClassName = function (classResultElement) {
         return $("> Class > Name", classResultElement).text();
     };
-    
+
     /**
     * Reads the course details from the given ClassResult element.
     * @sb-param {jQuery.selection} classResultElement - ClassResult element
@@ -5445,11 +5478,11 @@ SplitsBrowser.Messages = {};
     *     controls.
     */
     Version3Reader.readCourseFromClass = function (classResultElement, warnings) {
-        var courseElement = $("> Course", classResultElement);
-        var id = $("> Id", courseElement).text() || null;
-        var name = $("> Name", courseElement).text();
-        var lengthStr = $("> Length", courseElement).text();
-        var length;
+        const courseElement = $("> Course", classResultElement);
+        const id = $("> Id", courseElement).text() || null;
+        const name = $("> Name", courseElement).text();
+        const lengthStr = $("> Length", courseElement).text();
+        let length;
         if (lengthStr === "") {
             length = null;
         } else {
@@ -5462,22 +5495,22 @@ SplitsBrowser.Messages = {};
                 length /= 1000;
             }
         }
-        
-        var numberOfControlsStr = $("> NumberOfControls", courseElement).text();
-        var numberOfControls = parseInt(numberOfControlsStr, 10);
+
+        const numberOfControlsStr = $("> NumberOfControls", courseElement).text();
+        let numberOfControls = parseInt(numberOfControlsStr, 10);
         if (isNaNStrict(numberOfControls)) {
             numberOfControls = null;
         }
-        
-        var climbStr = $("> Climb", courseElement).text();
-        var climb = parseInt(climbStr, 10);
+
+        const climbStr = $("> Climb", courseElement).text();
+        let climb = parseInt(climbStr, 10);
         if (isNaNStrict(climb)) {
             climb = null;
         }
-        
-        return {id: id, name: name, length: length, climb: climb, numberOfControls: numberOfControls};
+
+        return { id: id, name: name, length: length, climb: climb, numberOfControls: numberOfControls };
     };
-    
+
     /**
     * Returns the XML element that contains a competitor's name.  This element
     * should contain child elements with names 'Given' and 'Family'.
@@ -5489,7 +5522,7 @@ SplitsBrowser.Messages = {};
     Version3Reader.getCompetitorNameElement = function (element) {
         return $("> Person > Name", element);
     };
-    
+
     /**
     * Returns the name of the competitor's club.
     * @sb-param {jQuery.selection} element - jQuery selection containing a
@@ -5499,7 +5532,7 @@ SplitsBrowser.Messages = {};
     Version3Reader.readClubName = function (element) {
         return $("> Organisation > ShortName", element).text();
     };
-    
+
     /**
     * Returns the competitor's date of birth, as a string.
     * @sb-param {jQuery.selection} element - jQuery selection containing a
@@ -5507,11 +5540,11 @@ SplitsBrowser.Messages = {};
     * @sb-return {String} The competitor's date of birth, as a string.
     */
     Version3Reader.readDateOfBirth = function (element) {
-        var birthDate = $("> Person > BirthDate", element).text();
-        var regexResult = yearRegexp.exec(birthDate);
+        const birthDate = $("> Person > BirthDate", element).text();
+        const regexResult = yearRegexp.exec(birthDate);
         return (regexResult === null) ? null : parseInt(regexResult[0], 10);
     };
-    
+
     /**
     * Reads a competitor's start time from the given Result element.
     * @sb-param {jQuery.selection} element - jQuery selection containing a
@@ -5520,14 +5553,14 @@ SplitsBrowser.Messages = {};
     *     or null if not known.
     */
     Version3Reader.readStartTime = function (resultElement) {
-        var startTimeStr = $("> StartTime", resultElement).text();
-        var result = ISO_8601_RE.exec(startTimeStr);
+        const startTimeStr = $("> StartTime", resultElement).text();
+        const result = ISO_8601_RE.exec(startTimeStr);
         if (result === null) {
             return null;
         } else {
-            var hours = parseInt(result[1], 10);
-            var minutes = parseInt(result[2], 10);
-            var seconds = (isUndefined(result[3])) ? 0 : parseInt(result[3], 10);
+            const hours = parseInt(result[1], 10);
+            const minutes = parseInt(result[2], 10);
+            const seconds = (isUndefined(result[3])) ? 0 : parseInt(result[3], 10);
             return hours * 60 * 60 + minutes * 60 + seconds;
         }
     };
@@ -5538,14 +5571,14 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} timeStr - The time string to read.
     * @sb-return {?Number} The parsed time, in seconds, or null if it could not
     *     be read.
-    */    
+    */
     Version3Reader.readTime = function (timeStr) {
         // IOF v3 allows fractional seconds, so we use parseFloat instead
         // of parseInt.
-        var time = parseFloat(timeStr);
+        const time = parseFloat(timeStr);
         return (isFinite(time)) ? time : null;
     };
-    
+
     /**
     * Read a competitor's total time from the given Time element.
     * @sb-param {jQuery.selection} element - jQuery selection containing a
@@ -5554,7 +5587,7 @@ SplitsBrowser.Messages = {};
     *     was not found or was invalid.
     */
     Version3Reader.readTotalTime = function (resultElement) {
-        var totalTimeStr = $("> Time", resultElement).text();
+        const totalTimeStr = $("> Time", resultElement).text();
         return Version3Reader.readTime(totalTimeStr);
     };
 
@@ -5567,13 +5600,13 @@ SplitsBrowser.Messages = {};
     Version3Reader.getStatus = function (resultElement) {
         return $("> Status", resultElement).text();
     };
-    
+
     Version3Reader.StatusNonCompetitive = "NotCompeting";
     Version3Reader.StatusNonStarter = "DidNotStart";
     Version3Reader.StatusNonFinisher = "DidNotFinish";
     Version3Reader.StatusDisqualified = "Disqualified";
     Version3Reader.StatusOverMaxTime = "OverTime";
-    
+
     /**
     * Returns whether the given split-time element is for an additional
     * control, and hence should be ignored.
@@ -5582,7 +5615,7 @@ SplitsBrowser.Messages = {};
     * @sb-return {boolean} True if the control is additional, false if not.
     */
     Version3Reader.isAdditional = function (splitTimeElement) {
-        return (splitTimeElement.attr("status") === "Additional");
+        return (splitTimeElement.attr('status') === "Additional");
     };
 
     /**
@@ -5592,25 +5625,25 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Object containing code and time.
     */
     Version3Reader.readSplitTime = function (splitTimeElement) {
-        var code = $("> ControlCode", splitTimeElement).text();
+        const code = $("> ControlCode", splitTimeElement).text();
         if (code === "") {
             throwInvalidData("Control code missing for control");
         }
-        
-        var time;
+
+        let time;
         if (splitTimeElement.attr("status") === "Missing") {
             // Missed controls have their time omitted.
             time = null;
         } else {
-            var timeStr = $("> Time", splitTimeElement).text();
+            const timeStr = $("> Time", splitTimeElement).text();
             time = (timeStr === "") ? null : Version3Reader.readTime(timeStr);
         }
-        
-        return {code: code, time: time};
+
+        return { code: code, time: time };
     };
-    
-    var ALL_READERS = [Version2Reader, Version3Reader];
-    
+
+    const ALL_READERS = [Version2Reader, Version3Reader];
+
     /**
     * Check that the XML document passed is in a suitable format for parsing.
     *
@@ -5621,16 +5654,16 @@ SplitsBrowser.Messages = {};
     *     XML reading.
     */
     function validateData(xml, reader) {
-        var rootElement = $("> *", xml);        
-        var rootElementNodeName = rootElement.prop("tagName");
-        
-        if (rootElementNodeName !== "ResultList")  {
+        const rootElement = $("> *", xml);
+        const rootElementNodeName = rootElement.prop("tagName");
+
+        if (rootElementNodeName !== "ResultList") {
             throwWrongFileFormat("Root element of XML document does not have expected name 'ResultList', got '" + rootElementNodeName + "'");
         }
-        
+
         reader.checkVersion(rootElement);
     }
-    
+
     /**
     * Parses data for a single competitor.
     * @sb-param {XMLElement} element - XML PersonResult element.
@@ -5643,55 +5676,55 @@ SplitsBrowser.Messages = {};
     *     competitor could be read.
     */
     function parseCompetitor(element, number, reader, warnings) {
-        var jqElement = $(element);
-        
-        var nameElement = reader.getCompetitorNameElement(jqElement);
-        var name = readCompetitorName(nameElement);
-        
+        const jqElement = $(element);
+
+        const nameElement = reader.getCompetitorNameElement(jqElement);
+        const name = readCompetitorName(nameElement);
+
         if (name === "") {
             warnings.push("Could not find a name for a competitor");
             return null;
         }
-        
-        var club = reader.readClubName(jqElement);
-        
-        var dateOfBirth =  reader.readDateOfBirth(jqElement);
-        var regexResult = yearRegexp.exec(dateOfBirth);
-        var yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
-        
-        var gender = $("> Person", jqElement).attr("sex");
-        
-        var resultElement = $("Result", jqElement);
+
+        const club = reader.readClubName(jqElement);
+
+        const dateOfBirth = reader.readDateOfBirth(jqElement);
+        const regexResult = yearRegexp.exec(dateOfBirth);
+        const yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
+
+        const gender = $("> Person", jqElement).attr("sex");
+
+        const resultElement = $("Result", jqElement);
         if (resultElement.length === 0) {
             warnings.push("Could not find any result information for competitor '" + name + "'");
             return null;
         }
-        
-        var startTime = reader.readStartTime(resultElement);
-        
-        var totalTime = reader.readTotalTime(resultElement);
-        
-        var splitTimes = $("> SplitTime", resultElement).toArray();
-        var splitData = splitTimes.filter(function (splitTime) { return !reader.isAdditional($(splitTime)); })
-                                  .map(function (splitTime) { return reader.readSplitTime($(splitTime)); });
-        
-        var controls = splitData.map(function (datum) { return datum.code; });
-        var cumTimes = splitData.map(function (datum) { return datum.time; });
-        
+
+        const startTime = reader.readStartTime(resultElement);
+
+        const totalTime = reader.readTotalTime(resultElement);
+
+        const splitTimes = $("> SplitTime", resultElement).toArray();
+        const splitData = splitTimes.filter(function (splitTime) { return !reader.isAdditional($(splitTime)); })
+            .map(function (splitTime) { return reader.readSplitTime($(splitTime)); });
+
+        const controls = splitData.map(function (datum) { return datum.code; });
+        const cumTimes = splitData.map(function (datum) { return datum.time; });
+
         cumTimes.unshift(0); // Prepend a zero time for the start.
         cumTimes.push(totalTime);
-        
-        var competitor = fromOriginalCumTimes(number, name, club, startTime, cumTimes);
-        
+
+        const competitor = fromOriginalCumTimes(number, name, club, startTime, cumTimes);
+
         if (yearOfBirth !== null) {
             competitor.setYearOfBirth(yearOfBirth);
         }
-        
+
         if (gender === "M" || gender === "F") {
             competitor.setGender(gender);
         }
-        
-        var status = reader.getStatus(resultElement);
+
+        const status = reader.getStatus(resultElement);
         if (status === reader.StatusNonCompetitive) {
             competitor.setNonCompetitive();
         } else if (status === reader.StatusNonStarter) {
@@ -5703,13 +5736,13 @@ SplitsBrowser.Messages = {};
         } else if (status === reader.StatusOverMaxTime) {
             competitor.setOverMaxTime();
         }
-        
+
         return {
             competitor: competitor,
             controls: controls
         };
     }
-    
+
     /**
     * Parses data for a single class.
     * @sb-param {XMLElement} element - XML ClassResult element
@@ -5719,34 +5752,34 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Object containing parsed data.
     */
     function parseClassData(element, reader, warnings) {
-        var jqElement = $(element);
-        var cls = {name: null, competitors: [], controls: [], course: null};
-        
+        const jqElement = $(element);
+        const cls = { name: null, competitors: [], controls: [], course: null };
+
         cls.course = reader.readCourseFromClass(jqElement, warnings);
-        
-        var className = reader.readClassName(jqElement);
-        
+
+        let className = reader.readClassName(jqElement);
+
         if (className === "") {
             className = "<unnamed class>";
         }
-        
+
         cls.name = className;
-        
-        var personResults = $("> PersonResult", jqElement);
+
+        const personResults = $("> PersonResult", jqElement);
         if (personResults.length === 0) {
             warnings.push("Class '" + className + "' has no competitors");
             return null;
         }
-        
-        for (var index = 0; index < personResults.length; index += 1) {
-            var competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings);
+
+        for (let index = 0; index < personResults.length; index += 1) {
+            const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings);
             if (competitorAndControls !== null) {
-                var competitor = competitorAndControls.competitor;
-                var controls = competitorAndControls.controls;
+                const competitor = competitorAndControls.competitor;
+                const controls = competitorAndControls.controls;
                 if (cls.competitors.length === 0) {
                     // First competitor.  Record the list of controls.
                     cls.controls = controls;
-                    
+
                     // Set the number of controls on the course if we didn't read
                     // it from the XML.  Assume the first competitor's number of
                     // controls is correct.
@@ -5756,12 +5789,12 @@ SplitsBrowser.Messages = {};
                 }
 
                 // Subtract 2 for the start and finish cumulative times.
-                var actualControlCount = competitor.getAllOriginalCumulativeTimes().length - 2;
-                var warning = null;
+                const actualControlCount = competitor.getAllOriginalCumulativeTimes().length - 2;
+                let warning = null;
                 if (actualControlCount !== cls.course.numberOfControls) {
                     warning = "Competitor '" + competitor.name + "' in class '" + className + "' has an unexpected number of controls: expected " + cls.course.numberOfControls + ", actual " + actualControlCount;
                 } else {
-                    for (var controlIndex = 0; controlIndex < actualControlCount; controlIndex += 1) {
+                    for (let controlIndex = 0; controlIndex < actualControlCount; controlIndex += 1) {
                         if (cls.controls[controlIndex] !== controls[controlIndex]) {
                             warning = "Competitor '" + competitor.name + "' has an unexpected control code at control " + (controlIndex + 1) +
                                 ": expected '" + cls.controls[controlIndex] + "', actual '" + controls[controlIndex] + "'";
@@ -5769,7 +5802,7 @@ SplitsBrowser.Messages = {};
                         }
                     }
                 }
-                
+
                 if (warning === null) {
                     cls.competitors.push(competitor);
                 } else {
@@ -5777,13 +5810,13 @@ SplitsBrowser.Messages = {};
                 }
             }
         }
-        
+
         if (cls.course.id === null && cls.controls.length > 0) {
             // No course ID given, so join the controls together with commas
             // and use that instead.  Course IDs are only used internally by
             // this reader in order to merge classes, and the comma-separated
             // list of controls ought to work as a substitute identifier in
-            // lieu of an 'official' course ID. 
+            // lieu of an 'official' course ID.
             //
             // This is intended mainly for IOF XML v2.0.3 files in particular
             // as they tend not to have course IDs.  However, this can also be
@@ -5792,26 +5825,26 @@ SplitsBrowser.Messages = {};
             // Idea thanks to 'dfgeorge' (David George?)
             cls.course.id = cls.controls.join(",");
         }
-        
+
         return cls;
     }
-   
+
     /**
     * Determine which XML reader to use to parse the given event data.
     * @sb-param {String} data - The event data.
     * @sb-return {Object} XML reader used to read version-specific information.
     */
     function determineReader(data) {
-        for (var index = 0; index < ALL_READERS.length; index += 1) {
-            var reader = ALL_READERS[index];
+        for (let index = 0; index < ALL_READERS.length; index += 1) {
+            const reader = ALL_READERS[index];
             if (reader.isOfThisVersion(data)) {
                 return reader;
             }
         }
-        
+
         throwWrongFileFormat("Data apparently not of any recognised IOF XML format");
     }
-   
+
     /**
     * Parses IOF XML data in either the 2.0.3 format or the 3.0 format and
     * returns the data.
@@ -5819,47 +5852,47 @@ SplitsBrowser.Messages = {};
     * @sb-return {Event} Parsed event object.
     */
     function parseEventData(data) {
-    
-        var reader = determineReader(data);
-    
-        var xml = parseXml(data);
-        
+
+        const reader = determineReader(data);
+
+        const xml = parseXml(data);
+
         validateData(xml, reader);
-        
-        var classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
-        
+
+        const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
+
         if (classResultElements.length === 0) {
             throwInvalidData("No class result elements found");
         }
-        
-        var classes = [];
-        
+
+        const classes = [];
+
         // Array of all 'temporary' courses, intermediate objects that contain
         // course data but not yet in a suitable form to return.
-        var tempCourses = [];
-        
+        const tempCourses = [];
+
         // d3 map that maps course IDs plus comma-separated lists of controls
         // to the temporary course with that ID and controls.
         // (We expect that all classes with the same course ID have consistent
         // controls, but we don't assume that.)
-        var coursesMap = d3.map();
-        
-        var warnings = [];
-        
+        const coursesMap = <any>d3.map();
+
+        const warnings = [];
+
         classResultElements.forEach(function (classResultElement) {
-            var parsedClass = parseClassData(classResultElement, reader, warnings);
+            const parsedClass = parseClassData(classResultElement, reader, warnings);
             if (parsedClass === null) {
                 // Class could not be parsed.
                 return;
             }
-            
-            var courseClass = new CourseClass(parsedClass.name, parsedClass.controls.length, parsedClass.competitors);
+
+            const courseClass = new CourseClass(parsedClass.name, parsedClass.controls.length, parsedClass.competitors);
             classes.push(courseClass);
-            
+
             // Add to each temporary course object a list of all classes.
-            var tempCourse = parsedClass.course;
-            var courseKey = tempCourse.id + "," + parsedClass.controls.join(",");
-            
+            const tempCourse = parsedClass.course;
+            const courseKey = tempCourse.id + "," + parsedClass.controls.join(",");
+
             if (tempCourse.id !== null && coursesMap.has(courseKey)) {
                 // We've come across this course before, so just add a class to
                 // it.
@@ -5874,42 +5907,42 @@ SplitsBrowser.Messages = {};
                 }
             }
         });
-        
+
         // Now build up the array of courses.
-        var courses = tempCourses.map(function (tempCourse) {
-            var course = new Course(tempCourse.name, tempCourse.classes, tempCourse.length, tempCourse.climb, tempCourse.controls);
+        const courses = tempCourses.map(function (tempCourse) {
+            const course = new Course(tempCourse.name, tempCourse.classes, tempCourse.length, tempCourse.climb, tempCourse.controls);
             tempCourse.classes.forEach(function (courseClass) { courseClass.setCourse(course); });
             return course;
         });
-        
+
         return new Event(classes, courses, warnings);
     }
-    
+
     SplitsBrowser.Input.IOFXml = { parseEventData: parseEventData };
 })();
 
 (function () {
     "use strict";
-    
+
     // All the parsers for parsing event data that are known about.
-    var PARSERS = [
+    const PARSERS = [
         SplitsBrowser.Input.CSV.parseEventData,
         SplitsBrowser.Input.OE.parseEventData,
         SplitsBrowser.Input.Html.parseEventData,
         SplitsBrowser.Input.AlternativeCSV.parseTripleColumnEventData,
         SplitsBrowser.Input.IOFXml.parseEventData
     ];
-    
+
     /**
     * Attempts to parse the given event data, which may be of any of the
     * supported formats, or may be invalid.  This function returns the results
     * as an Event object if successful, or null in the event of failure.
     * @sb-param {String} data - The data read.
     * @sb-return {Event} Event data read in, or null for failure.
-    */ 
+    */
     SplitsBrowser.Input.parseEventData = function (data) {
-        for (var i = 0; i < PARSERS.length; i += 1) {
-            var parser = PARSERS[i];
+        for (let i = 0; i < PARSERS.length; i += 1) {
+            const parser = PARSERS[i];
             try {
                 return parser(data);
             } catch (e) {
@@ -5918,31 +5951,31 @@ SplitsBrowser.Messages = {};
                 }
             }
         }
-            
+
         // If we get here, none of the parsers succeeded.
         return null;
     };
 })();
 
-(function (){
+(function () {
     "use strict";
 
     // ID of the competitor list div.
     // Must match that used in styles.css.
-    var COMPETITOR_LIST_ID = "competitorList";
-    
+    const COMPETITOR_LIST_ID = "competitorList";
+
     // The number that identifies the left mouse button.
-    var LEFT_BUTTON = 1;
-    
+    const LEFT_BUTTON = 1;
+
     // Dummy index used to represent the mouse being let go off the bottom of
     // the list of competitors.
-    var CONTAINER_COMPETITOR_INDEX = -1;
-    
+    const CONTAINER_COMPETITOR_INDEX = -1;
+
     // ID of the container that contains the list and the filter textbox.
-    var COMPETITOR_LIST_CONTAINER_ID = "competitorListContainer";
-    
-    var getMessage = SplitsBrowser.getMessage;
-    var getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+    const COMPETITOR_LIST_CONTAINER_ID = "competitorListContainer";
+
+    const getMessage = SplitsBrowser.getMessage;
+    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
 
     /**
     * Object that controls a list of competitors from which the user can select.
@@ -5950,7 +5983,7 @@ SplitsBrowser.Messages = {};
     * @sb-param {HTMLElement} parent - Parent element to add this list to.
     * @sb-param {Function} alerter - Function to call to issue an alert message.
     */
-    var CompetitorList = function (parent, alerter) {
+    const CompetitorList = function (parent, alerter) {
         this.parent = parent;
         this.alerter = alerter;
         this.handler = null;
@@ -5964,38 +5997,38 @@ SplitsBrowser.Messages = {};
         this.allCompetitorDivs = [];
         this.inverted = false;
         this.placeholderDiv = null;
-        
+
         this.changeHandlers = [];
-        
+
         this.containerDiv = d3.select(parent).append("div")
-                                             .attr("id", COMPETITOR_LIST_CONTAINER_ID);
-                                               
+            .attr("id", COMPETITOR_LIST_CONTAINER_ID);
+
         this.buttonsPanel = this.containerDiv.append("div");
-                           
-        var outerThis = this;
+
+        const outerThis = this;
         this.allButton = this.buttonsPanel.append("button")
-                                          .attr("id", "selectAllCompetitors")
-                                          .style("width", "50%")
-                                          .on("click", function () { outerThis.selectAllFiltered(); });
-                        
+            .attr("id", "selectAllCompetitors")
+            .style("width", "50%")
+            .on("click", function () { outerThis.selectAllFiltered(); });
+
         this.noneButton = this.buttonsPanel.append("button")
-                                           .attr("id", "selectNoCompetitors")
-                                           .style("width", "50%")
-                                           .on("click", function () { outerThis.selectNoneFiltered(); });
-                                           
-        // Wire up double-click event with jQuery for easier testing.                                           
+            .attr("id", "selectNoCompetitors")
+            .style("width", '50%')
+            .on("click", function () { outerThis.selectNoneFiltered(); });
+
+        // Wire up double-click event with jQuery for easier testing.
         $(this.noneButton.node()).dblclick(function () { outerThis.selectNone(); });
-                        
+
         this.buttonsPanel.append("br");
-                        
+
         this.crossingRunnersButton = this.buttonsPanel.append("button")
-                                                      .attr("id", "selectCrossingRunners")
-                                                      .style("width", "100%")
-                                                      .on("click", function () { outerThis.selectCrossingRunners(); })
-                                                      .style("display", "none");
-        
+            .attr("id", "selectCrossingRunners")
+            .style("width", "100%")
+            .on("click", function () { outerThis.selectCrossingRunners(); })
+            .style("display", "none");
+
         this.filter = this.buttonsPanel.append("input")
-                                       .attr("type", "text");
+            .attr("type", "text");
 
         // Update the filtered list of competitors on any change to the
         // contents of the filter textbox.  The last two are for the benefit of
@@ -6005,21 +6038,21 @@ SplitsBrowser.Messages = {};
         // catch every change.  It's not a problem to update the filter too
         // often: if the filter text hasn't changed, nothing happens.
         this.filter.on("input", function () { outerThis.updateFilterIfChanged(); })
-                   .on("keyup", function () { outerThis.updateFilterIfChangedDelayed(); })
-                   .on("mouseup", function () { outerThis.updateFilterIfChangedDelayed(); });
-                                      
+            .on("keyup", function () { outerThis.updateFilterIfChangedDelayed(); })
+            .on("mouseup", function () { outerThis.updateFilterIfChangedDelayed(); });
+
         this.listDiv = this.containerDiv.append("div")
-                                        .attr("id", COMPETITOR_LIST_ID);
-                                        
+            .attr("id", COMPETITOR_LIST_ID);
+
         this.listDiv.on("mousedown", function () { outerThis.startDrag(CONTAINER_COMPETITOR_INDEX); })
-                    .on("mousemove", function () { outerThis.mouseMove(CONTAINER_COMPETITOR_INDEX); })
-                    .on("mouseup", function () { outerThis.stopDrag(); });
-                              
+            .on("mousemove", function () { outerThis.mouseMove(CONTAINER_COMPETITOR_INDEX); })
+            .on("mouseup", function () { outerThis.stopDrag(); });
+
         d3.select(document.body).on("mouseup", function () { outerThis.stopDrag(); });
-        
+
         this.setMessages();
     };
-    
+
     /**
     * Sets messages within this control, following either its creation or a
     * change of language.
@@ -6030,7 +6063,7 @@ SplitsBrowser.Messages = {};
         this.crossingRunnersButton.text(getMessage("SelectCrossingRunners"));
         this.filter.attr("placeholder", getMessage("CompetitorListFilter"));
     };
-    
+
     /**
     * Retranslates this control following a change of language.
     */
@@ -6041,7 +6074,7 @@ SplitsBrowser.Messages = {};
             this.fireChangeHandlers();
         }
     };
-    
+
     /**
     * Register a handler to be called whenever the filter text changes.
     *
@@ -6065,19 +6098,19 @@ SplitsBrowser.Messages = {};
     * @sb-param {Function} handler - The handler to register.
     */
     CompetitorList.prototype.deregisterChangeHandler = function (handler) {
-        var index = this.changeHandlers.indexOf(handler);
+        const index = this.changeHandlers.indexOf(handler);
         if (index > -1) {
             this.changeHandlers.splice(index, 1);
         }
     };
-    
+
     /**
     * Fires all of the change handlers currently registered.
     */
     CompetitorList.prototype.fireChangeHandlers = function () {
         this.changeHandlers.forEach(function (handler) { handler(); }, this);
     };
-    
+
     /**
     * Returns whether the current mouse event is off the bottom of the list of
     * competitor divs.
@@ -6087,7 +6120,7 @@ SplitsBrowser.Messages = {};
     CompetitorList.prototype.isMouseOffBottomOfCompetitorList = function () {
         return this.lastVisibleDiv === null || d3.mouse(this.lastVisibleDiv)[1] >= $(this.lastVisibleDiv).height();
     };
-    
+
     /**
     * Returns the name of the CSS class to apply to competitor divs currently
     * part of the selection/deselection.
@@ -6096,7 +6129,7 @@ SplitsBrowser.Messages = {};
     CompetitorList.prototype.getDragClassName = function () {
         return (this.inverted) ? "dragDeselected" : "dragSelected";
     };
-    
+
     /**
     * Handles the start of a drag over the list of competitors.
     * @sb-param {Number} index - Index of the competitor div that the drag started
@@ -6107,7 +6140,7 @@ SplitsBrowser.Messages = {};
             this.dragStartCompetitorIndex = index;
             this.currentDragCompetitorIndex = index;
             this.allCompetitorDivs = $("div.competitor");
-            var visibleDivs = this.allCompetitorDivs.filter(":visible");
+            const visibleDivs = this.allCompetitorDivs.filter(":visible");
             this.lastVisibleDiv = (visibleDivs.length === 0) ? null : visibleDivs[visibleDivs.length - 1];
             this.inverted = d3.event.shiftKey;
             if (index === CONTAINER_COMPETITOR_INDEX) {
@@ -6119,12 +6152,12 @@ SplitsBrowser.Messages = {};
             } else {
                 d3.select(this.allCompetitorDivs[index]).classed(this.getDragClassName(), true);
             }
-            
+
             d3.event.stopPropagation();
             this.dragging = true;
         }
     };
-    
+
     /**
     * Handles a mouse-move event. by adjust the range of dragged competitors to
     * include the current index.
@@ -6134,9 +6167,9 @@ SplitsBrowser.Messages = {};
         if (this.dragging) {
             d3.event.stopPropagation();
             if (dragIndex !== this.currentDragCompetitorIndex) {
-                var dragClassName = this.getDragClassName();
+                const dragClassName = this.getDragClassName();
                 d3.selectAll("div.competitor." + dragClassName).classed(dragClassName, false);
-                
+
                 if (this.dragStartCompetitorIndex === CONTAINER_COMPETITOR_INDEX && dragIndex === CONTAINER_COMPETITOR_INDEX) {
                     // Drag is currently all off the list, so do nothing further.
                     return;
@@ -6144,24 +6177,24 @@ SplitsBrowser.Messages = {};
                     // Drag currently goes onto the div's scrollbar.
                     return;
                 }
-                
-                var leastIndex, greatestIndex;
+
+                let leastIndex, greatestIndex;
                 if (this.dragStartCompetitorIndex === CONTAINER_COMPETITOR_INDEX || dragIndex === CONTAINER_COMPETITOR_INDEX) {
                     // One of the ends is off the bottom.
                     leastIndex = this.dragStartCompetitorIndex + dragIndex - CONTAINER_COMPETITOR_INDEX;
                     greatestIndex = this.allCompetitorDivs.length - 1;
                 } else {
                     leastIndex = Math.min(this.dragStartCompetitorIndex, dragIndex);
-                    greatestIndex  = Math.max(this.dragStartCompetitorIndex, dragIndex);
+                    greatestIndex = Math.max(this.dragStartCompetitorIndex, dragIndex);
                 }
-                
-                var selectedCompetitors = [];
-                for (var index = leastIndex; index <= greatestIndex; index += 1) {
+
+                const selectedCompetitors = [];
+                for (let index = leastIndex; index <= greatestIndex; index += 1) {
                     if (this.allCompetitorDetails[index].visible) {
                         selectedCompetitors.push(this.allCompetitorDivs[index]);
                     }
                 }
-                
+
                 d3.selectAll(selectedCompetitors).classed(dragClassName, true);
                 this.currentDragCompetitorIndex = dragIndex;
             }
@@ -6179,19 +6212,19 @@ SplitsBrowser.Messages = {};
             // somewhere outside of this competitor list.  Ignore it.
             return;
         }
-        
+
         this.dragging = false;
-        
-        var selectedCompetitorIndexes = [];
-        var dragClassName = this.getDragClassName();
-        for (var index = 0; index < this.allCompetitorDivs.length; index += 1) {
+
+        const selectedCompetitorIndexes = [];
+        const dragClassName = this.getDragClassName();
+        for (let index = 0; index < this.allCompetitorDivs.length; index += 1) {
             if ($(this.allCompetitorDivs[index]).hasClass(dragClassName)) {
                 selectedCompetitorIndexes.push(index);
             }
         }
-        
+
         d3.selectAll("div.competitor." + dragClassName).classed(dragClassName, false);
-        
+
         if (d3.event.currentTarget === document) {
             // Drag ended outside the list.
         } else if (this.currentDragCompetitorIndex === CONTAINER_COMPETITOR_INDEX && !this.isMouseOffBottomOfCompetitorList()) {
@@ -6204,10 +6237,10 @@ SplitsBrowser.Messages = {};
         } else {
             this.competitorSelection.bulkSelect(selectedCompetitorIndexes);
         }
-        
+
         this.dragStartCompetitorIndex = null;
         this.currentDragCompetitorIndex = null;
-        
+
         d3.event.stopPropagation();
     };
 
@@ -6218,7 +6251,7 @@ SplitsBrowser.Messages = {};
     CompetitorList.prototype.width = function () {
         return $(this.listDiv.node()).width();
     };
-    
+
     /**
     * Sets the overall height of the competitor list.
     * @sb-param {Number} height - The height of the control, in pixels.
@@ -6226,7 +6259,7 @@ SplitsBrowser.Messages = {};
     CompetitorList.prototype.setHeight = function (height) {
         $(this.listDiv.node()).height(height - $(this.buttonsPanel.node()).height());
     };
-    
+
     /**
     * Returns all visible indexes.  This is the indexes of all competitors that
     * have not been excluded by the filters.
@@ -6258,7 +6291,7 @@ SplitsBrowser.Messages = {};
     CompetitorList.prototype.selectNone = function () {
         this.competitorSelection.selectNone();
     };
-    
+
     /**
     * Returns whether the competitor with the given index is selected.
     * @sb-param {Number} index - Index of the competitor within the list.
@@ -6267,7 +6300,7 @@ SplitsBrowser.Messages = {};
     CompetitorList.prototype.isSelected = function (index) {
         return this.competitorSelection !== null && this.competitorSelection.isSelected(index);
     };
-    
+
     /**
     * Select all of the competitors that cross the unique selected competitor.
     */
@@ -6276,27 +6309,27 @@ SplitsBrowser.Messages = {};
         if (this.competitorSelection.isSingleRunnerSelected()) {
             // Only a single runner is still selected, so nobody crossed the
             // selected runner.
-            var competitorName = this.allCompetitors[this.competitorSelection.getSingleRunnerIndex()].name;
-            var filterInEffect = (this.lastFilterString.length > 0);
-            var messageKey = (filterInEffect) ? "RaceGraphNoCrossingRunnersFiltered" : "RaceGraphNoCrossingRunners";
-            this.alerter(getMessageWithFormatting(messageKey, {"$$NAME$$": competitorName}));
+            const competitorName = this.allCompetitors[this.competitorSelection.getSingleRunnerIndex()].name;
+            const filterInEffect = (this.lastFilterString.length > 0);
+            const messageKey = (filterInEffect) ? "RaceGraphNoCrossingRunnersFiltered" : "RaceGraphNoCrossingRunners";
+            this.alerter(getMessageWithFormatting(messageKey, { "$$NAME$$": competitorName }));
         }
     };
-    
+
     /**
     * Enables or disables the crossing-runners button as appropriate.
     */
     CompetitorList.prototype.enableOrDisableCrossingRunnersButton = function () {
         this.crossingRunnersButton.node().disabled = !this.competitorSelection.isSingleRunnerSelected();
     };
-    
+
     /**
     * Sets the chart type, so that the competitor list knows whether to show or
     * hide the Crossing Runners button.
     * @sb-param {Object} chartType - The chart type selected.
     */
     CompetitorList.prototype.setChartType = function (chartType) {
-        this.crossingRunnersButton.style("display", (chartType.isRaceGraph) ? "block" : "none");    
+        this.crossingRunnersButton.style("display", (chartType.isRaceGraph) ? "block" : "none");
     };
 
     /**
@@ -6304,10 +6337,10 @@ SplitsBrowser.Messages = {};
     * those selected and unhighlighting all those no longer selected.
     */
     CompetitorList.prototype.selectionChanged = function () {
-        var outerThis = this;
+        const outerThis = this;
         this.listDiv.selectAll("div.competitor")
-                    .data(d3.range(this.competitorSelection.count))
-                    .classed("selected", function (comp, index) { return outerThis.isSelected(index); });
+            .data(d3.range(this.competitorSelection.count))
+            .classed("selected", function (comp, index) { return outerThis.isSelected(index); });
     };
 
     /**
@@ -6346,47 +6379,47 @@ SplitsBrowser.Messages = {};
         this.allCompetitorDetails = this.allCompetitors.map(function (comp) {
             return { competitor: comp, normedName: normaliseName(comp.name), visible: true };
         });
-        
+
         if (this.placeholderDiv !== null) {
             this.placeholderDiv.remove();
             this.placeholderDiv = null;
         }
-        
-        var competitorDivs = this.listDiv.selectAll("div.competitor").data(this.allCompetitors);
 
-        var outerThis = this;
+        let competitorDivs = this.listDiv.selectAll("div.competitor").data(this.allCompetitors);
+
+        const outerThis = this;
         competitorDivs.enter().append("div")
-                              .classed("competitor", true)
-                              .classed("selected", function (comp, index) { return outerThis.isSelected(index); });
+            .classed("competitor", true)
+            .classed("selected", function (comp, index) { return outerThis.isSelected(index); });
 
         competitorDivs.selectAll("span").remove();
-        
+
         competitorDivs = this.listDiv.selectAll("div.competitor").data(this.allCompetitors);
         if (multipleClasses) {
             competitorDivs.append("span")
-                          .classed("competitorClassLabel", true)
-                          .text(function (comp) { return comp.className; });
+                .classed("competitorClassLabel", true)
+                .text(function (comp) { return comp.className; });
         }
-        
+
         competitorDivs.append("span")
-                      .classed("nonfinisher", function (comp) { return !comp.completed(); })
-                      .text(function (comp) { return (comp.completed()) ? comp.name : "* " + comp.name; });
+            .classed("nonfinisher", function (comp) { return !comp.completed(); })
+            .text(function (comp) { return (comp.completed()) ? comp.name : "* " + comp.name; });
 
         competitorDivs.exit().remove();
-        
+
         if (this.allCompetitors.length === 0) {
             this.placeholderDiv = this.listDiv.append("div")
-                                              .classed("competitorListPlaceholder", true)
-                                              .text(getMessage("NoCompetitorsStarted"));
+                .classed("competitorListPlaceholder", true)
+                .text(getMessage("NoCompetitorsStarted"));
         }
-        
+
         this.allButton.property("disabled", this.allCompetitors.length === 0);
         this.noneButton.property("disabled", this.allCompetitors.length === 0);
         this.filter.property("disabled", this.allCompetitors.length === 0);
-        
+
         competitorDivs.on("mousedown", function (_datum, index) { outerThis.startDrag(index); })
-                      .on("mousemove", function (_datum, index) { outerThis.mouseMove(index); })
-                      .on("mouseup", function () { outerThis.stopDrag(); });
+            .on("mousemove", function (_datum, index) { outerThis.mouseMove(index); })
+            .on("mouseup", function () { outerThis.stopDrag(); });
 
         // Force an update on the filtering.
         this.updateFilter();
@@ -6401,13 +6434,13 @@ SplitsBrowser.Messages = {};
             this.competitorSelection.deregisterChangeHandler(this.handler);
         }
 
-        var outerThis = this;
+        const outerThis = this;
         this.competitorSelection = selection;
         this.handler = function () { outerThis.selectionChanged(); };
         this.competitorSelection.registerChangeHandler(this.handler);
         this.selectionChanged();
     };
-    
+
     /**
     * Returns the filter text currently being used.
     * @sb-return {String} Filter text.
@@ -6415,7 +6448,7 @@ SplitsBrowser.Messages = {};
     CompetitorList.prototype.getFilterText = function () {
         return this.filter.node().value;
     };
-    
+
     /**
     * Sets the filter text to use.
     * @sb-param {String} filterText - The filter text to use.
@@ -6424,57 +6457,57 @@ SplitsBrowser.Messages = {};
         this.filter.node().value = filterText;
         this.updateFilterIfChanged();
     };
-    
+
     /**
     * Updates the filtering.
     */
     CompetitorList.prototype.updateFilter = function () {
-        var currentFilterString = this.filter.node().value;
-        var normedFilter = normaliseName(currentFilterString);
+        const currentFilterString = this.filter.node().value;
+        const normedFilter = normaliseName(currentFilterString);
         this.allCompetitorDetails.forEach(function (comp) {
             comp.visible = (comp.normedName.indexOf(normedFilter) >= 0);
         });
-        
-        var outerThis = this;
+
+        const outerThis = this;
         this.listDiv.selectAll("div.competitor")
-                    .style("display", function (div, index) { return (outerThis.allCompetitorDetails[index].visible) ? null : "none"; });
+            .style("display", function (div, index) { return (outerThis.allCompetitorDetails[index].visible) ? null : "none"; });
     };
-    
+
     /**
     * Updates the filtering following a change in the filter text input, if the
     * filter text has changed since last time.  If not, nothing happens.
     */
     CompetitorList.prototype.updateFilterIfChanged = function () {
-        var currentFilterString = this.getFilterText();
+        const currentFilterString = this.getFilterText();
         if (currentFilterString !== this.lastFilterString) {
             this.updateFilter();
             this.lastFilterString = currentFilterString;
             this.fireChangeHandlers();
         }
     };
-    
+
     /**
     * Updates the filtering following a change in the filter text input
     * in a short whiie.
     */
     CompetitorList.prototype.updateFilterIfChangedDelayed = function () {
-        var outerThis = this;
+        const outerThis = this;
         setTimeout(function () { outerThis.updateFilterIfChanged(); }, 1);
     };
-    
+
     SplitsBrowser.Controls.CompetitorList = CompetitorList;
 })();
 
 
-(function (){
+(function () {
     "use strict";
-    
-    var getMessage = SplitsBrowser.getMessage;
-    var getAllLanguages = SplitsBrowser.getAllLanguages;
-    var getLanguage = SplitsBrowser.getLanguage;
-    var getLanguageName = SplitsBrowser.getLanguageName;
-    var setLanguage = SplitsBrowser.setLanguage;
-    
+
+    const getMessage = SplitsBrowser.getMessage;
+    const getAllLanguages = SplitsBrowser.getAllLanguages;
+    const getLanguage = SplitsBrowser.getLanguage;
+    const getLanguageName = SplitsBrowser.getLanguageName;
+    const setLanguage = SplitsBrowser.setLanguage;
+
     /**
     * A control that wraps a drop-down list used to choose the language to view.
     * @sb-param {HTMLElement} parent - The parent element to add the control to.
@@ -6483,40 +6516,40 @@ SplitsBrowser.Messages = {};
         this.changeHandlers = [];
         this.label = null;
         this.dropDown = null;
-        
+
         this.allLanguages = getAllLanguages();
-        
+
         if (this.allLanguages.length < 2) {
             // User hasn't loaded multiple languages, so no point doing
             // anything further here.
             return;
         }
-        
+
         d3.select(parent).append("div")
-                         .classed("topRowStartSpacer", true);
-        
-        var div = d3.select(parent).append("div")
-                                   .classed("topRowStart", true);
-                                   
+            .classed("topRowStartSpacer", true);
+
+        const div = d3.select(parent).append("div")
+            .classed("topRowStart", true);
+
         this.label = div.append("span");
-           
-        var outerThis = this;
+
+        const outerThis = this;
         this.dropDown = div.append("select").node();
-        $(this.dropDown).bind("change", function() { outerThis.onLanguageChanged(); });
-        
-        var optionsList = d3.select(this.dropDown).selectAll("option").data(this.allLanguages);
+        $(this.dropDown).bind("change", function () { outerThis.onLanguageChanged(); });
+
+        let optionsList = d3.select(this.dropDown).selectAll("option").data(this.allLanguages);
         optionsList.enter().append("option");
-        
+
         optionsList = d3.select(this.dropDown).selectAll("option").data(this.allLanguages);
-        optionsList.attr("value", function (language) { return language; })
-                   .text(function (language) { return getLanguageName(language); });
-                   
+        optionsList.attr("value", function (language: string): string { return language; })
+            .text(function (language) { return getLanguageName(language); });
+
         optionsList.exit().remove();
-        
+
         this.setLanguage(getLanguage());
         this.setMessages();
     }
-    
+
     /**
     * Sets the text of various messages in this control, following either its
     * creation or a change of language.
@@ -6524,7 +6557,7 @@ SplitsBrowser.Messages = {};
     LanguageSelector.prototype.setMessages = function () {
         this.label.text(getMessage("LanguageSelectorLabel"));
     };
-    
+
     /**
     * Add a change handler to be called whenever the selected language is changed.
     *
@@ -6536,39 +6569,39 @@ SplitsBrowser.Messages = {};
     LanguageSelector.prototype.registerChangeHandler = function (handler) {
         if (this.changeHandlers.indexOf(handler) === -1) {
             this.changeHandlers.push(handler);
-        }    
+        }
     };
-    
+
     /**
     * Sets the language.  If the language given is not recognised, nothing
     * happens.
     * @sb-param {String} language - The language code.
     */
     LanguageSelector.prototype.setLanguage = function (language) {
-        var index = this.allLanguages.indexOf(language);
+        const index = this.allLanguages.indexOf(language);
         if (index >= 0) {
             this.dropDown.selectedIndex = index;
             this.onLanguageChanged();
         }
     };
-    
+
     /**
     * Handle a change of the selected option in the drop-down list.
     */
     LanguageSelector.prototype.onLanguageChanged = function () {
         setLanguage(this.dropDown.options[this.dropDown.selectedIndex].value);
-        this.changeHandlers.forEach(function(handler) { handler(); });
+        this.changeHandlers.forEach(function (handler) { handler(); });
     };
-    
+
     SplitsBrowser.Controls.LanguageSelector = LanguageSelector;
 })();
 
 
-(function (){
+(function () {
     "use strict";
-    
-    var throwInvalidData = SplitsBrowser.throwInvalidData;
-    var getMessage = SplitsBrowser.getMessage;
+
+    const throwInvalidData = SplitsBrowser.throwInvalidData;
+    const getMessage = SplitsBrowser.getMessage;
 
     /**
     * A control that wraps a drop-down list used to choose between classes.
@@ -6577,68 +6610,68 @@ SplitsBrowser.Messages = {};
     function ClassSelector(parent) {
         this.changeHandlers = [];
         this.otherClassesEnabled = true;
-        
-        var div = d3.select(parent).append("div")
-                                   .classed("topRowStart", true);
-        
+
+        const div = d3.select(parent).append("div")
+            .classed("topRowStart", true);
+
         this.labelSpan = div.append("span");
-        
-        var outerThis = this;
+
+        const outerThis = this;
         this.dropDown = div.append("select").node();
-        $(this.dropDown).bind("change", function() {
+        $(this.dropDown).bind("change", function () {
             outerThis.updateOtherClasses(d3.set());
             outerThis.onSelectionChanged();
         });
-        
+
         this.otherClassesContainer = d3.select(parent).append("div")
-                                                      .attr("id", "otherClassesContainer")
-                                                      .classed("topRowStart", true)
-                                                      .style("display", "none");
-                                                      
+            .attr("id", "otherClassesContainer")
+            .classed("topRowStart", true)
+            .style("display", "none");
+
         this.otherClassesCombiningLabel = this.otherClassesContainer.append("span")
-                                                                    .classed("otherClassCombining", true);
-        
+            .classed("otherClassCombining", true);
+
         this.otherClassesSelector = this.otherClassesContainer.append("div")
-                                                              .classed("otherClassSelector", true)
-                                                              .style("display", "inline-block");
-                                   
+            .classed("otherClassSelector", true)
+            .style("display", "inline-block");
+
         this.otherClassesSpan = this.otherClassesSelector.append("span");
-        
+
         this.otherClassesList = d3.select(parent).append("div")
-                                                 .classed("otherClassList", true)
-                                                 .classed("transient", true)
-                                                 .style("position", "absolute")
-                                                 .style("display", "none");
-                                   
+            .classed("otherClassList", true)
+            .classed("transient", true)
+            .style("position", "absolute")
+            .style("display", "none");
+
         this.otherClassesSelector.on("click", function () { outerThis.showHideClassSelector(); });
-         
+
         this.setClasses([]);
-        
+
         // Indexes of the selected 'other classes'.
         this.selectedOtherClassIndexes = d3.set();
-        
+
         // Ensure that a click outside of the drop-down list or the selector
         // box closes it.
         // Taken from http://stackoverflow.com/questions/1403615 and adjusted.
         $(document).click(function (e) {
-            var listDiv = outerThis.otherClassesList.node();
+            const listDiv = outerThis.otherClassesList.node();
             if (listDiv.style.display !== "none") {
-                var container = $("div.otherClassList,div.otherClassSelector");
-                if (!container.is(e.target) && container.has(e.target).length === 0) { 
+                const container = $("div.otherClassList,div.otherClassSelector");
+                if (!container.is(e.target) && container.has(e.target).length === 0) {
                     listDiv.style.display = "none";
                 }
             }
         });
-        
+
         this.setMessages();
     }
-    
+
     /**
     * Sets some messages following either the creation of this control or a
     * change of selected language.
     */
     ClassSelector.prototype.setMessages = function () {
-        this.labelSpan.text(getMessage("ClassSelectorLabel"));    
+        this.labelSpan.text(getMessage("ClassSelectorLabel"));
         this.otherClassesCombiningLabel.text(getMessage("AdditionalClassSelectorLabel"));
     };
 
@@ -6656,32 +6689,32 @@ SplitsBrowser.Messages = {};
 
     /**
     * Sets the list of classes that this selector can choose between.
-    * 
+    *
     * If there are no classes, a 'dummy' entry is added
     * @sb-param {Array} classes - Array of CourseClass objects containing class
     *     data.
     */
-    ClassSelector.prototype.setClasses = function(classes) {
+    ClassSelector.prototype.setClasses = function (classes) {
         if ($.isArray(classes)) {
             this.classes = classes;
-            var options;
+            let options;
             if (classes.length === 0) {
                 this.dropDown.disabled = true;
-                options = [getMessage("NoClassesLoadedPlaceholder")];
+                options = [getMessage('NoClassesLoadedPlaceholder')];
             } else {
                 this.dropDown.disabled = false;
-                options = classes.map(function(courseClass) { return courseClass.name; });
+                options = classes.map(function (courseClass) { return courseClass.name; });
             }
-            
-            var optionsList = d3.select(this.dropDown).selectAll("option").data(options);
+
+            let optionsList = d3.select(this.dropDown).selectAll("option").data(options);
             optionsList.enter().append("option");
-            
+
             optionsList = d3.select(this.dropDown).selectAll("option").data(options);
-            optionsList.attr("value", function(_value, index) { return index.toString(); })
-                       .text(function(value) { return value; });
-                       
+            optionsList.attr("value", function (_value, index) { return index.toString(); })
+                .text(function (value: string): string { return value; });
+
             optionsList.exit().remove();
-      
+
             this.updateOtherClasses(d3.set());
         } else {
             throwInvalidData("ClassSelector.setClasses: classes is not an array");
@@ -6699,12 +6732,12 @@ SplitsBrowser.Messages = {};
     * @sb-param {Function} handler - Handler function to be called whenever the class
     *                   changes.
     */
-    ClassSelector.prototype.registerChangeHandler = function(handler) {
+    ClassSelector.prototype.registerChangeHandler = function (handler) {
         if (this.changeHandlers.indexOf(handler) === -1) {
             this.changeHandlers.push(handler);
-        }    
+        }
     };
-    
+
     /**
     * Sets the selected classes.
     * @sb-param {Array} selectedIndexes - Array of indexes of classes.
@@ -6716,7 +6749,7 @@ SplitsBrowser.Messages = {};
             this.onSelectionChanged();
         }
     };
-    
+
     /**
     * Returns the indexes of the selected classes.
     * @sb-param {Array} Indexes of selected classes.
@@ -6725,7 +6758,7 @@ SplitsBrowser.Messages = {};
         if (this.dropDown.disabled) {
             return [];
         } else {
-            var indexes = [this.dropDown.selectedIndex];
+            const indexes = [this.dropDown.selectedIndex];
             this.selectedOtherClassIndexes.each(function (index) { indexes.push(parseInt(index, 10)); });
             return indexes;
         }
@@ -6734,31 +6767,31 @@ SplitsBrowser.Messages = {};
     /**
     * Handle a change of the selected option in the drop-down list.
     */
-    ClassSelector.prototype.onSelectionChanged = function() {
-        var indexes = this.getSelectedClasses();
-        this.changeHandlers.forEach(function(handler) { handler(indexes); });
+    ClassSelector.prototype.onSelectionChanged = function () {
+        const indexes = this.getSelectedClasses();
+        this.changeHandlers.forEach(function (handler) { handler(indexes); });
     };
-    
+
     /**
     * Updates the text in the other-class box at the top.
     *
     * This text contains either a list of the selected classes, or placeholder
     * text if none are selected.
-    */ 
+    */
     ClassSelector.prototype.updateOtherClassText = function () {
-        var classIdxs = this.selectedOtherClassIndexes.values();
+        const classIdxs = this.selectedOtherClassIndexes.values();
         classIdxs.sort(d3.ascending);
-        var text;
+        let text;
         if (classIdxs.length === 0) {
             text = getMessage("NoAdditionalClassesSelectedPlaceholder");
         } else {
             text = classIdxs.map(function (classIdx) { return this.classes[classIdx].name; }, this)
-                            .join(", ");
+                .join(", ");
         }
-        
+
         this.otherClassesSpan.text(text);
     };
-    
+
     /**
     * Updates the other-classes selector div following a change of selected
     * 'main' class.
@@ -6768,51 +6801,51 @@ SplitsBrowser.Messages = {};
         this.otherClassesList.style("display", "none");
         this.selectedOtherClassIndexes = selectedOtherClassIndexes;
         this.updateOtherClassText();
-            
+
         $("div.otherClassItem").off("click");
-            
-        var outerThis = this;
-        var otherClasses;
+
+        const outerThis = this;
+        let otherClasses;
         if (this.classes.length > 0) {
-            var newClass = this.classes[this.dropDown.selectedIndex];
+            const newClass = this.classes[this.dropDown.selectedIndex];
             otherClasses = newClass.course.getOtherClasses(newClass);
         } else {
             otherClasses = [];
         }
-        
-        var otherClassIndexes = otherClasses.map(function (cls) { return this.classes.indexOf(cls); }, this);
-        
-        var otherClassesSelection = this.otherClassesList.selectAll("div")
-                                                         .data(otherClassIndexes);
-        
+
+        const otherClassIndexes = otherClasses.map(function (cls) { return this.classes.indexOf(cls); }, this);
+
+        let otherClassesSelection = this.otherClassesList.selectAll("div")
+            .data(otherClassIndexes);
+
         otherClassesSelection.enter().append("div")
-                                     .classed("otherClassItem", true);
-        
+            .classed("otherClassItem", true);
+
         otherClassesSelection = this.otherClassesList.selectAll("div")
-                                                     .data(otherClassIndexes);
-        
+            .data(otherClassIndexes);
+
         otherClassesSelection.attr("id", function (classIdx) { return "courseClassIdx_" + classIdx; })
-                             .classed("selected", function (classIdx) { return selectedOtherClassIndexes.has(classIdx); })
-                             .text(function (classIdx) { return outerThis.classes[classIdx].name; });
-                             
+            .classed("selected", function (classIdx) { return selectedOtherClassIndexes.has(classIdx); })
+            .text(function (classIdx) { return outerThis.classes[classIdx].name; });
+
         otherClassesSelection.exit().remove();
-        
+
         if (otherClassIndexes.length > 0) {
             this.otherClassesContainer.style("display", null);
         } else {
             this.otherClassesContainer.style("display", "none");
         }
-        
-        var offset = $(this.otherClassesSelector.node()).offset();
-        var height = $(this.otherClassesSelector.node()).outerHeight();
+
+        const offset = $(this.otherClassesSelector.node()).offset();
+        const height = $(this.otherClassesSelector.node()).outerHeight();
         this.otherClassesList.style("left", offset.left + "px")
-                            .style("top", offset.top + height + "px");
-                            
+            .style("top", offset.top + height + "px");
+
         $("div.otherClassItem").each(function (index, div) {
             $(div).on("click", function () { outerThis.toggleOtherClass(otherClassIndexes[index]); });
         });
     };
-    
+
     /**
     * Shows or hides the other-class selector, if it is enabled.
     */
@@ -6821,7 +6854,7 @@ SplitsBrowser.Messages = {};
             this.otherClassesList.style("display", (this.otherClassesList.style("display") === "none") ? null : "none");
         }
     };
-    
+
     /**
     * Toggles the selection of an other class.
     * @sb-param {Number} classIdx - Index of the class among the list of all classes.
@@ -6832,12 +6865,12 @@ SplitsBrowser.Messages = {};
         } else {
             this.selectedOtherClassIndexes.add(classIdx);
         }
-        
+
         d3.select("div#courseClassIdx_" + classIdx).classed("selected", this.selectedOtherClassIndexes.has(classIdx));
         this.updateOtherClassText();
         this.onSelectionChanged();
     };
-    
+
     /**
     * Retranslates this control following a change of selected language.
     */
@@ -6850,18 +6883,18 @@ SplitsBrowser.Messages = {};
             this.otherClassesSpan.text(getMessage("NoAdditionalClassesSelectedPlaceholder"));
         }
     };
-    
+
     SplitsBrowser.Controls.ClassSelector = ClassSelector;
 })();
 
 
-(function (){
+(function () {
     "use strict";
-    
-    var getMessage = SplitsBrowser.getMessage;
-    var getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-    
-    var ALL_COMPARISON_OPTIONS = [
+
+    const getMessage = SplitsBrowser.getMessage;
+    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+
+    const ALL_COMPARISON_OPTIONS = [
         {
             nameKey: "CompareWithWinner",
             selector: function (courseClassSet) { return courseClassSet.getWinnerCumTimes(); },
@@ -6875,34 +6908,34 @@ SplitsBrowser.Messages = {};
             percentage: ""
         }
     ];
-    
+
     // All 'Fastest time + N %' values (not including zero).
-    var FASTEST_PLUS_PERCENTAGES = [5, 25, 50, 100];
-    
+    const FASTEST_PLUS_PERCENTAGES = [5, 25, 50, 100];
+
     FASTEST_PLUS_PERCENTAGES.forEach(function (percent) {
         ALL_COMPARISON_OPTIONS.push({
             nameKey: "CompareWithFastestTimePlusPercentage",
             selector: function (courseClassSet) { return courseClassSet.getFastestCumTimesPlusPercentage(percent); },
-            requiresWinner: false, 
-            percentage: percent
+            requiresWinner: false,
+            percentage: percent.toString()
         });
     });
-    
+
     ALL_COMPARISON_OPTIONS.push({
         nameKey: "CompareWithAnyRunner",
         selector: null,
         requiresWinner: true,
         percentage: ""
     });
-    
+
     // Default selected index of the comparison function.
-    var DEFAULT_COMPARISON_INDEX = 1; // 1 = fastest time.
-    
+    const DEFAULT_COMPARISON_INDEX = 1; // 1 = fastest time.
+
     // The id of the comparison selector.
-    var COMPARISON_SELECTOR_ID = "comparisonSelector";
-    
+    const COMPARISON_SELECTOR_ID = "comparisonSelector";
+
     // The id of the runner selector
-    var RUNNER_SELECTOR_ID = "runnerSelector";
+    const RUNNER_SELECTOR_ID = "runnerSelector";
 
     /**
     * A control that wraps a drop-down list used to choose what to compare
@@ -6920,59 +6953,59 @@ SplitsBrowser.Messages = {};
         this.alerter = alerter;
         this.hasWinner = false;
         this.previousSelectedIndex = -1;
-        
-        var div = d3.select(parent).append("div")
-                                   .classed("topRowStart", true);
-        
+
+        const div = d3.select(parent).append("div")
+            .classed("topRowStart", true);
+
         this.comparisonSelectorLabel = div.append("span")
-                                          .classed("comparisonSelectorLabel", true);
-        
+            .classed("comparisonSelectorLabel", true);
 
-        var outerThis = this;
+
+        const outerThis = this;
         this.dropDown = div.append("select")
-                           .attr("id", COMPARISON_SELECTOR_ID)
-                           .node();
-                            
-        $(this.dropDown).bind("change", function() { outerThis.onSelectionChanged(); });
+            .attr("id", COMPARISON_SELECTOR_ID)
+            .node();
+
+        $(this.dropDown).bind("change", function () { outerThis.onSelectionChanged(); });
 
         this.optionsList = d3.select(this.dropDown).selectAll("option")
-                                                   .data(ALL_COMPARISON_OPTIONS);
+            .data(ALL_COMPARISON_OPTIONS);
         this.optionsList.enter().append("option");
-        
+
         this.optionsList = d3.select(this.dropDown).selectAll("option")
-                                                   .data(ALL_COMPARISON_OPTIONS);
+            .data(ALL_COMPARISON_OPTIONS);
         this.optionsList.attr("value", function (_opt, index) { return index.toString(); });
-                   
+
         this.optionsList.exit().remove();
-        
+
         this.runnerDiv = d3.select(parent).append("div")
-                                          .classed("topRowStart", true)
-                                          .style("display", "none")
-                                          .style("padding-left", "20px");
-        
+            .classed("topRowStart", true)
+            .style("display", "none")
+            .style("padding-left", "20px");
+
         this.runnerSpan = this.runnerDiv.append("span")
-                                        .classed("comparisonSelectorLabel", true);
-        
+            .classed("comparisonSelectorLabel", true);
+
         this.runnerDropDown = this.runnerDiv.append("select")
-                                            .attr("id", RUNNER_SELECTOR_ID)
-                                            .node();
-                                            
+            .attr("id", RUNNER_SELECTOR_ID)
+            .node();
+
         $(this.runnerDropDown).bind("change", function () { outerThis.onSelectionChanged(); });
-        
+
         this.dropDown.selectedIndex = DEFAULT_COMPARISON_INDEX;
         this.previousSelectedIndex = DEFAULT_COMPARISON_INDEX;
-        
+
         this.setMessages();
     }
 
     /**
     * Sets the messages in this control, following its creation or a change of
     * selected language.
-    */ 
+    */
     ComparisonSelector.prototype.setMessages = function () {
-        this.comparisonSelectorLabel.text(getMessage("ComparisonSelectorLabel"));    
+        this.comparisonSelectorLabel.text(getMessage("ComparisonSelectorLabel"));
         this.runnerSpan.text(getMessage("CompareWithAnyRunnerLabel"));
-        this.optionsList.text(function (opt) { return getMessageWithFormatting(opt.nameKey, {"$$PERCENT$$": opt.percentage}); });
+        this.optionsList.text(function (opt) { return getMessageWithFormatting(opt.nameKey, { "$$PERCENT$$": opt.percentage }); });
     };
 
     /**
@@ -6983,10 +7016,10 @@ SplitsBrowser.Messages = {};
     * @sb-param {Function} handler - Handler function to be called whenever the class
     *                   changes.
     */
-    ComparisonSelector.prototype.registerChangeHandler = function(handler) {
+    ComparisonSelector.prototype.registerChangeHandler = function (handler) {
         if (this.changeHandlers.indexOf(handler) === -1) {
             this.changeHandlers.push(handler);
-        }    
+        }
     };
 
     /**
@@ -6997,7 +7030,7 @@ SplitsBrowser.Messages = {};
     ComparisonSelector.prototype.isAnyRunnerSelected = function () {
         return this.dropDown.selectedIndex === ALL_COMPARISON_OPTIONS.length - 1;
     };
-    
+
     /**
     * Sets the course-class set to use.
     * @sb-param {CourseClassSet} courseClassSet - The course-class set to set.
@@ -7011,27 +7044,27 @@ SplitsBrowser.Messages = {};
     * Populates the drop-down list of runners from a course-class set.
     */
     ComparisonSelector.prototype.setRunners = function () {
-        var competitors = this.courseClassSet.allCompetitors;
-        var completingCompetitorIndexes = d3.range(competitors.length).filter(function (idx) { return competitors[idx].completed(); });
-        var completingCompetitors = competitors.filter(function (comp) { return comp.completed(); });
-        
+        const competitors = this.courseClassSet.allCompetitors;
+        const completingCompetitorIndexes = d3.range(competitors.length).filter(function (idx) { return competitors[idx].completed(); });
+        const completingCompetitors = competitors.filter(function (comp) { return comp.completed(); });
+
         this.hasWinner = (completingCompetitors.length > 0);
-        
-        var optionsList = d3.select(this.runnerDropDown).selectAll("option")
-                                                        .data(completingCompetitors);
-        
+
+        let optionsList = d3.select(this.runnerDropDown).selectAll("option")
+            .data(completingCompetitors);
+
         optionsList.enter().append("option");
         optionsList = d3.select(this.runnerDropDown).selectAll("option")
-                                                    .data(completingCompetitors);
+            .data(completingCompetitors);
         optionsList.attr("value", function (_comp, complCompIndex) { return completingCompetitorIndexes[complCompIndex].toString(); })
-                   .text(function (comp) { return comp.name; });
+            .text(function (comp: any) { return comp.name; });
         optionsList.exit().remove();
 
         if (this.previousCompetitorList === null) {
             this.currentRunnerIndex = 0;
         } else if (this.hasWinner) {
-            var oldSelectedRunner = this.previousCompetitorList[this.currentRunnerIndex];
-            var newIndex = this.courseClassSet.allCompetitors.indexOf(oldSelectedRunner);
+            const oldSelectedRunner = this.previousCompetitorList[this.currentRunnerIndex];
+            const newIndex = this.courseClassSet.allCompetitors.indexOf(oldSelectedRunner);
             this.currentRunnerIndex = Math.max(newIndex, 0);
         } else if (ALL_COMPARISON_OPTIONS[this.dropDown.selectedIndex].requiresWinner) {
             // We're currently viewing a comparison type that requires a
@@ -7040,12 +7073,12 @@ SplitsBrowser.Messages = {};
             // there isn't any more.  Switch back to the fastest time.
             this.setComparisonType(1, null);
         }
-        
+
         this.runnerDropDown.selectedIndex = this.currentRunnerIndex;
-       
+
         this.previousCompetitorList = this.courseClassSet.allCompetitors;
     };
-    
+
     /**
     * Sets whether the control is enabled.
     * @sb-param {boolean} isEnabled - True if the control is enabled, false if
@@ -7053,12 +7086,12 @@ SplitsBrowser.Messages = {};
     */
     ComparisonSelector.prototype.setEnabled = function (isEnabled) {
         d3.select(this.parent).selectAll("span.comparisonSelectorLabel")
-                              .classed("disabled", !isEnabled);
-                              
+            .classed("disabled", !isEnabled);
+
         this.dropDown.disabled = !isEnabled;
         this.runnerDropDown.disabled = !isEnabled;
     };
-    
+
     /**
     * Returns the function that compares a competitor's splits against some
     * reference data.
@@ -7066,33 +7099,33 @@ SplitsBrowser.Messages = {};
     */
     ComparisonSelector.prototype.getComparisonFunction = function () {
         if (this.isAnyRunnerSelected()) {
-            var outerThis = this;
+            const outerThis = this;
             return function (courseClassSet) { return courseClassSet.getCumulativeTimesForCompetitor(outerThis.currentRunnerIndex); };
         } else {
             return ALL_COMPARISON_OPTIONS[this.dropDown.selectedIndex].selector;
         }
     };
-    
+
     /**
     * Returns the comparison type.
     * @sb-return {Object} Object containing the comparison type (type index and runner).
     */
     ComparisonSelector.prototype.getComparisonType = function () {
-        var typeIndex = this.dropDown.selectedIndex;
-        var runner;
+        const typeIndex = this.dropDown.selectedIndex;
+        let runner;
         if (typeIndex === ALL_COMPARISON_OPTIONS.length - 1) {
             if (this.runnerDropDown.selectedIndex < 0) {
                 this.runnerDropDown.selectedIndex = 0;
             }
-            
+
             runner = this.courseClassSet.allCompetitors[this.runnerDropDown.selectedIndex];
         } else {
             runner = null;
         }
-    
-        return {index: typeIndex, runner: runner };
+
+        return { index: typeIndex, runner: runner };
     };
-    
+
     /**
     * Sets the comparison type.
     * @sb-param {Number} typeIndex - The index of the comparison type.
@@ -7102,7 +7135,7 @@ SplitsBrowser.Messages = {};
     ComparisonSelector.prototype.setComparisonType = function (typeIndex, runner) {
         if (0 <= typeIndex && typeIndex < ALL_COMPARISON_OPTIONS.length) {
             if (typeIndex === ALL_COMPARISON_OPTIONS.length - 1) {
-                var runnerIndex = this.courseClassSet.allCompetitors.indexOf(runner);
+                const runnerIndex = this.courseClassSet.allCompetitors.indexOf(runner);
                 if (runnerIndex >= 0) {
                     this.dropDown.selectedIndex = typeIndex;
                     this.runnerDropDown.selectedIndex = runnerIndex;
@@ -7114,16 +7147,16 @@ SplitsBrowser.Messages = {};
             }
         }
     };
-    
+
     /**
     * Handle a change of the selected option in either drop-down list.
     */
-    ComparisonSelector.prototype.onSelectionChanged = function() {
-        var runnerDropdownSelectedIndex = Math.max(this.runnerDropDown.selectedIndex, 0);
-        var option = ALL_COMPARISON_OPTIONS[this.dropDown.selectedIndex];
+    ComparisonSelector.prototype.onSelectionChanged = function () {
+        const runnerDropdownSelectedIndex = Math.max(this.runnerDropDown.selectedIndex, 0);
+        const option = ALL_COMPARISON_OPTIONS[this.dropDown.selectedIndex];
         if (!this.hasWinner && option.requiresWinner) {
             // No winner on this course means you can't select this option.
-            this.alerter(getMessageWithFormatting("CannotCompareAsNoWinner", {"$$OPTION$$": getMessage(option.nameKey)}));
+            this.alerter(getMessageWithFormatting("CannotCompareAsNoWinner", { "$$OPTION$$": getMessage(option.nameKey) }));
             this.dropDown.selectedIndex = this.previousSelectedIndex;
         } else {
             this.runnerDiv.style("display", (this.isAnyRunnerSelected()) ? null : "none");
@@ -7132,31 +7165,31 @@ SplitsBrowser.Messages = {};
             this.changeHandlers.forEach(function (handler) { handler(this.getComparisonFunction()); }, this);
         }
     };
-    
+
     SplitsBrowser.Controls.ComparisonSelector = ComparisonSelector;
 })();
 
 
 (function () {
     "use strict";
-    
-    var getMessage = SplitsBrowser.getMessage;
+
+    const getMessage = SplitsBrowser.getMessage;
 
     // ID of the statistics selector control.
     // Must match that used in styles.css.
-    var STATISTIC_SELECTOR_ID = "statisticSelector";
+    const STATISTIC_SELECTOR_ID = "statisticSelector";
 
-    var LABEL_ID_PREFIX = "statisticCheckbox";
+    const LABEL_ID_PREFIX = "statisticCheckbox";
 
     // Internal names of the statistics.
-    var STATISTIC_NAMES = ["TotalTime", "SplitTime", "BehindFastest", "TimeLoss"];
+    const STATISTIC_NAMES = ["TotalTime", "SplitTime", "BehindFastest", "TimeLoss"];
 
     // Message keys for the labels of the four checkboxes.
-    var STATISTIC_NAME_KEYS = ["StatisticsTotalTime", "StatisticsSplitTime", "StatisticsBehindFastest", "StatisticsTimeLoss"];
-    
+    const STATISTIC_NAME_KEYS = ["StatisticsTotalTime", "StatisticsSplitTime", "StatisticsBehindFastest", "StatisticsTimeLoss"];
+
     // Names of statistics that are selected by default when the application
     // starts.
-    var DEFAULT_SELECTED_STATISTICS = ["SplitTime", "TimeLoss"];
+    const DEFAULT_SELECTED_STATISTICS = ["SplitTime", "TimeLoss"];
 
     /**
     * Control that contains a number of checkboxes for enabling and/or disabling
@@ -7164,46 +7197,46 @@ SplitsBrowser.Messages = {};
     * @constructor
     * @sb-param {HTMLElement} parent - The parent element.
     */
-    function StatisticsSelector (parent) {
+    function StatisticsSelector(parent) {
         this.div = d3.select(parent).append("div")
-                                     .classed("topRowEnd", true)
-                                     .attr("id", STATISTIC_SELECTOR_ID);   
+            .classed("topRowEnd", true)
+            .attr("id", STATISTIC_SELECTOR_ID);
 
-        var childDivs = this.div.selectAll("div")
-                                .data(STATISTIC_NAMES)
-                                .enter()
-                                .append("div")
-                                .style("display", "inline-block");
-         
+        const childDivs = this.div.selectAll("div")
+            .data(STATISTIC_NAMES)
+            .enter()
+            .append("div")
+            .style("display", "inline-block");
+
         childDivs.append("input")
-                 .attr("id", function(name) { return LABEL_ID_PREFIX + name; }) 
-                 .attr("type", "checkbox")
-                 .attr("checked", function (name) { return (DEFAULT_SELECTED_STATISTICS.indexOf(name) >= 0) ? "checked" : null; });
-                  
-        this.statisticLabels  = childDivs.append("label")
-                                         .attr("for", function(name) { return LABEL_ID_PREFIX + name; })
-                                         .classed("statisticsSelectorLabel", true);
+            .attr("id", function (name) { return LABEL_ID_PREFIX + name; })
+            .attr("type", "checkbox")
+            .attr("checked", function (name) { return (DEFAULT_SELECTED_STATISTICS.indexOf(name) >= 0) ? "checked" : null; });
 
-        
-        var outerThis = this;
+        this.statisticLabels = childDivs.append("label")
+            .attr("for", function (name) { return LABEL_ID_PREFIX + name; })
+            .classed("statisticsSelectorLabel", true);
+
+
+        const outerThis = this;
         $("input", this.div.node()).bind("change", function () { return outerThis.onCheckboxChanged(); });
-                   
+
         this.handlers = [];
-        
+
         this.setMessages();
     }
-    
+
     /**
     * Sets the messages in this control, following either its creation or a
     * change of selected language.
     */
     StatisticsSelector.prototype.setMessages = function () {
-        this.statisticLabels.text(function (name, index) { return getMessage(STATISTIC_NAME_KEYS[index]); });    
+        this.statisticLabels.text(function (name, index) { return getMessage(STATISTIC_NAME_KEYS[index]); });
     };
-    
+
     /**
     * Deselects all checkboxes.
-    * 
+    *
     * This method is intended only for test purposes.
     */
     StatisticsSelector.prototype.clearAll = function () {
@@ -7217,11 +7250,11 @@ SplitsBrowser.Messages = {};
     */
     StatisticsSelector.prototype.setEnabled = function (isEnabled) {
         this.div.selectAll("label.statisticsSelectorLabel")
-                .classed("disabled", !isEnabled);
+            .classed("disabled", !isEnabled);
         this.div.selectAll("input")
-                .attr("disabled", (isEnabled) ? null : "disabled");
+            .attr("disabled", (isEnabled) ? null : "disabled");
     };
-    
+
     /**
     * Register a change handler to be called whenever the choice of currently-
     * visible statistics is changed.
@@ -7235,7 +7268,7 @@ SplitsBrowser.Messages = {};
             this.handlers.push(handler);
         }
     };
-       
+
     /**
     * Deregister a change handler from being called whenever the choice of
     *  currently-visible statistics is changed.
@@ -7245,7 +7278,7 @@ SplitsBrowser.Messages = {};
     *                             changes.
     */
     StatisticsSelector.prototype.deregisterChangeHandler = function (handler) {
-        var index = this.handlers.indexOf(handler);
+        const index = this.handlers.indexOf(handler);
         if (index !== -1) {
             this.handlers.splice(index, 1);
         }
@@ -7257,14 +7290,14 @@ SplitsBrowser.Messages = {};
     *     are enabled.
     */
     StatisticsSelector.prototype.getVisibleStatistics = function () {
-        var visibleStats = {};
+        const visibleStats = new Object;
         this.div.selectAll("input").nodes().forEach(function (checkbox, index) {
             visibleStats[STATISTIC_NAMES[index]] = checkbox.checked;
         });
-        
+
         return visibleStats;
     };
-    
+
     /**
     * Sets the visible statistics.
     * @sb-param {Object} visibleStats - The statistics to make visible.
@@ -7273,7 +7306,7 @@ SplitsBrowser.Messages = {};
         this.div.selectAll("input").nodes().forEach(function (checkbox, index) {
             checkbox.checked = visibleStats[STATISTIC_NAMES[index]] || false;
         });
-        
+
         this.onCheckboxChanged();
     };
 
@@ -7281,19 +7314,19 @@ SplitsBrowser.Messages = {};
     * Handles the change in state of a checkbox, by firing all of the handlers.
     */
     StatisticsSelector.prototype.onCheckboxChanged = function () {
-        var checkedFlags = this.getVisibleStatistics();
+        const checkedFlags = this.getVisibleStatistics();
         this.handlers.forEach(function (handler) { handler(checkedFlags); });
     };
-    
+
     SplitsBrowser.Controls.StatisticsSelector = StatisticsSelector;
 })();
 
 
-(function (){
+(function () {
     "use strict";
-    
-    var getMessage = SplitsBrowser.getMessage;
-    
+
+    const getMessage = SplitsBrowser.getMessage;
+
     /**
     * A control that wraps a drop-down list used to choose the types of chart to view.
     * @sb-param {HTMLElement} parent - The parent element to add the control to.
@@ -7304,36 +7337,36 @@ SplitsBrowser.Messages = {};
         this.chartTypes = chartTypes;
         this.raceGraphDisabledNotifier = null;
         this.lastSelectedIndex = 0;
-        
-        var div = d3.select(parent).append("div")
-                                   .classed("topRowStart", true);
-                                   
+
+        const div = d3.select(parent).append("div")
+            .classed("topRowStart", true);
+
         this.labelSpan = div.append("span");
-           
-        var outerThis = this;
+
+        const outerThis = this;
         this.dropDown = div.append("select").node();
-        $(this.dropDown).bind("change", function() { outerThis.onSelectionChanged(); });
-        
+        $(this.dropDown).bind("change", function () { outerThis.onSelectionChanged(); });
+
         this.optionsList = d3.select(this.dropDown).selectAll("option").data(chartTypes);
         this.optionsList.enter().append("option");
-        
+
         this.optionsList = d3.select(this.dropDown).selectAll("option").data(chartTypes);
         this.optionsList.attr("value", function (_value, index) { return index.toString(); });
-                   
+
         this.optionsList.exit().remove();
-        
+
         this.setMessages();
     }
-    
+
     /**
     * Sets the messages displayed within this control, following either its
     * creation or a change of selected language.
     */
     ChartTypeSelector.prototype.setMessages = function () {
         this.labelSpan.text(getMessage("ChartTypeSelectorLabel"));
-        this.optionsList.text(function (value) { return getMessage(value.nameKey); });    
+        this.optionsList.text(function (value) { return getMessage(value.nameKey); });
     };
-    
+
     /**
     * Sets the function used to disable the selection of the race graph.
     *
@@ -7354,7 +7387,7 @@ SplitsBrowser.Messages = {};
             this.onSelectionChanged();
         }
     };
-    
+
     /**
     * Add a change handler to be called whenever the selected type of chart is changed.
     *
@@ -7366,7 +7399,7 @@ SplitsBrowser.Messages = {};
     ChartTypeSelector.prototype.registerChangeHandler = function (handler) {
         if (this.changeHandlers.indexOf(handler) === -1) {
             this.changeHandlers.push(handler);
-        }    
+        }
     };
 
     /**
@@ -7376,20 +7409,20 @@ SplitsBrowser.Messages = {};
     ChartTypeSelector.prototype.getChartType = function () {
         return this.chartTypes[Math.max(this.dropDown.selectedIndex, 0)];
     };
-    
+
     /**
     * Sets the chart type.  If the chart type given is not recognised, nothing
     * happens.
     * @sb-param {Object} chartType - The chart type selected.
     */
     ChartTypeSelector.prototype.setChartType = function (chartType) {
-        var index = this.chartTypes.indexOf(chartType);
+        const index = this.chartTypes.indexOf(chartType);
         if (index >= 0) {
             this.dropDown.selectedIndex = index;
             this.onSelectionChanged();
         }
     };
-    
+
     /**
     * Handle a change of the selected option in the drop-down list.
     */
@@ -7398,24 +7431,24 @@ SplitsBrowser.Messages = {};
             this.raceGraphDisabledNotifier();
             this.dropDown.selectedIndex = Math.max(this.lastSelectedIndex, 0);
         }
-        
-        this.changeHandlers.forEach(function(handler) { handler(this.chartTypes[this.dropDown.selectedIndex]); }, this);
+
+        this.changeHandlers.forEach(function (handler) { handler(this.chartTypes[this.dropDown.selectedIndex]); }, this);
         this.lastSelectedIndex = this.dropDown.selectedIndex;
     };
-    
+
     SplitsBrowser.Controls.ChartTypeSelector = ChartTypeSelector;
 })();
 
 
 (function () {
     "use strict";
-    
+
     // ID of the div used to contain the object.
     // Must match the name defined in styles.css.
-    var CONTAINER_DIV_ID = "originalDataSelectorContainer";
-    
-    var getMessage = SplitsBrowser.getMessage;
-    
+    const CONTAINER_DIV_ID = "originalDataSelectorContainer";
+
+    const getMessage = SplitsBrowser.getMessage;
+
     /**
     * Constructs a new OriginalDataSelector object.
     * @constructor
@@ -7425,37 +7458,37 @@ SplitsBrowser.Messages = {};
     function OriginalDataSelector(parent) {
         this.parent = parent;
 
-        var checkboxId = "originalDataCheckbox";
+        const checkboxId = "originalDataCheckbox";
         this.containerDiv = parent.append("div")
-                                  .classed("topRowStart", true)
-                                  .attr("id", CONTAINER_DIV_ID);
+            .classed("topRowStart", true)
+            .attr("id", CONTAINER_DIV_ID);
 
         this.containerDiv.append("div").classed("topRowStartSpacer", true);
-        
-        var span = this.containerDiv.append("span");
-        
-        var outerThis = this;
+
+        const span = this.containerDiv.append("span");
+
+        const outerThis = this;
         this.checkbox = span.append("input")
-                            .attr("type", "checkbox")
-                            .attr("id", checkboxId)
-                            .on("click", function() { outerThis.fireChangeHandlers(); })
-                            .node();
-                                 
+            .attr("type", "checkbox")
+            .attr("id", checkboxId)
+            .on("click", function () { outerThis.fireChangeHandlers(); })
+            .node();
+
         this.label = span.append("label")
-                         .attr("for", checkboxId)
-                         .classed("originalDataSelectorLabel", true);
-                         
+            .attr("for", checkboxId)
+            .classed("originalDataSelectorLabel", true);
+
         this.handlers = [];
         this.setMessages();
     }
-    
+
     /**
     * Sets the messages in this control, following either its creation of a
     * change of selected language.
     */
     OriginalDataSelector.prototype.setMessages = function () {
         this.label.text(getMessage("ShowOriginalData"));
-        this.containerDiv.attr("title", getMessage("ShowOriginalDataTooltip"));    
+        this.containerDiv.attr("title", getMessage("ShowOriginalDataTooltip"));
     };
 
     /**
@@ -7471,7 +7504,7 @@ SplitsBrowser.Messages = {};
             this.handlers.push(handler);
         }
     };
-       
+
     /**
     * Deregister a change handler from being called whenever the choice of
     * original or repaired data is changed.
@@ -7481,19 +7514,19 @@ SplitsBrowser.Messages = {};
     *                             changes.
     */
     OriginalDataSelector.prototype.deregisterChangeHandler = function (handler) {
-        var index = this.handlers.indexOf(handler);
+        const index = this.handlers.indexOf(handler);
         if (index !== -1) {
             this.handlers.splice(index, 1);
         }
     };
-    
+
     /**
     * Fires all change handlers registered.
     */
     OriginalDataSelector.prototype.fireChangeHandlers = function () {
         this.handlers.forEach(function (handler) { handler(this.checkbox.checked); }, this);
     };
-    
+
     /**
     * Returns whether original data is selected.
     * @sb-return {boolean} True if original data is selected, false if not.
@@ -7501,7 +7534,7 @@ SplitsBrowser.Messages = {};
     OriginalDataSelector.prototype.isOriginalDataSelected = function () {
         return this.checkbox.checked;
     };
-    
+
     /**
     * Selects original data.
     */
@@ -7509,7 +7542,7 @@ SplitsBrowser.Messages = {};
         this.checkbox.checked = true;
         this.fireChangeHandlers();
     };
-    
+
     /**
     * Sets whether this original-data selector should be visible.
     * @sb-param {boolean} isVisible - True if the original-data selector should be
@@ -7518,7 +7551,7 @@ SplitsBrowser.Messages = {};
     OriginalDataSelector.prototype.setVisible = function (isVisible) {
         this.containerDiv.style("display", (isVisible) ? null : "none");
     };
-    
+
     /**
     * Sets whether the control is enabled.
     * @sb-param {boolean} isEnabled - True if the control is enabled, false if
@@ -7526,33 +7559,33 @@ SplitsBrowser.Messages = {};
     */
     OriginalDataSelector.prototype.setEnabled = function (isEnabled) {
         this.parent.selectAll("label.originalDataSelectorLabel")
-                   .classed("disabled", !isEnabled);
-                              
+            .classed("disabled", !isEnabled);
+
         this.checkbox.disabled = !isEnabled;
     };
-    
+
     SplitsBrowser.Controls.OriginalDataSelector = OriginalDataSelector;
 
 })();
 
 (function () {
     "use strict";
-    
+
     // The maximum number of fastest splits to show when the popup is open.
-    var MAX_FASTEST_SPLITS = 10;
+    const MAX_FASTEST_SPLITS = 10;
 
     // Width of the time interval, in seconds, when viewing nearby competitors
     // at a control on the race graph.
-    var RACE_GRAPH_COMPETITOR_WINDOW = 240;
-    
-    var formatTime = SplitsBrowser.formatTime;
-    var getMessage = SplitsBrowser.getMessage;
-    var getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-    
-    var Course = SplitsBrowser.Model.Course;
-    
-    var ChartPopupData = {};
-    
+    const RACE_GRAPH_COMPETITOR_WINDOW = 240;
+
+    const formatTime = SplitsBrowser.formatTime;
+    const getMessage = SplitsBrowser.getMessage;
+    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+
+    const Course = SplitsBrowser.Model.Course;
+
+    const ChartPopupData: any = {} as any;
+
     /**
     * Returns the fastest splits to a control.
     * @sb-param {SplitsBrowser.Model.CourseClassSet} courseClassSet - The
@@ -7561,14 +7594,14 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Fastest-split data.
     */
     ChartPopupData.getFastestSplitsPopupData = function (courseClassSet, controlIndex) {
-        var data = courseClassSet.getFastestSplitsTo(MAX_FASTEST_SPLITS, controlIndex);
+        let data = courseClassSet.getFastestSplitsTo(MAX_FASTEST_SPLITS, controlIndex);
         data = data.map(function (comp) {
-            return {time: comp.split, name: comp.name, highlight: false};
+            return { time: comp.split, name: comp.name, highlight: false };
         });
-        
-        return {title: getMessage("SelectedClassesPopupHeader"), data: data, placeholder: getMessage("SelectedClassesPopupPlaceholder")};
+
+        return { title: getMessage("SelectedClassesPopupHeader"), data: data, placeholder: getMessage("SelectedClassesPopupPlaceholder") };
     };
-    
+
     /**
     * Returns the fastest splits for the currently-shown leg.  The list
     * returned contains the fastest splits for the current leg for each class.
@@ -7581,22 +7614,22 @@ SplitsBrowser.Messages = {};
     *     array of data to show within it.
     */
     ChartPopupData.getFastestSplitsForLegPopupData = function (courseClassSet, eventData, controlIndex) {
-        var course = courseClassSet.getCourse();
-        var startCode = course.getControlCode(controlIndex - 1);
-        var endCode = course.getControlCode(controlIndex);
-        
-        var startControl = (startCode === Course.START) ? getMessage("StartName") : startCode;
-        var endControl = (endCode === Course.FINISH) ? getMessage("FinishName") : endCode;
-        
-        var title = getMessageWithFormatting("FastestLegTimePopupHeader", {"$$START$$": startControl, "$$END$$": endControl});
-        
-        var primaryClass = courseClassSet.getPrimaryClassName();
-        var data = eventData.getFastestSplitsForLeg(startCode, endCode)
-                            .map(function (row) { return { name: row.name, className: row.className, time: row.split, highlight: (row.className === primaryClass)}; });
-        
-        return {title: title, data: data, placeholder: null};
+        const course = courseClassSet.getCourse();
+        const startCode = course.getControlCode(controlIndex - 1);
+        const endCode = course.getControlCode(controlIndex);
+
+        const startControl = (startCode === Course.START) ? getMessage("StartName") : startCode;
+        const endControl = (endCode === Course.FINISH) ? getMessage("FinishName") : endCode;
+
+        const title = getMessageWithFormatting("FastestLegTimePopupHeader", { "$$START$$": startControl, "$$END$$": endControl });
+
+        const primaryClass = courseClassSet.getPrimaryClassName();
+        const data = eventData.getFastestSplitsForLeg(startCode, endCode)
+            .map(function (row) { return { name: row.name, className: row.className, time: row.split, highlight: (row.className === primaryClass) }; });
+
+        return { title: title, data: data, placeholder: null };
     };
-    
+
     /**
     * Returns an object containing an array of the competitors visiting a
     * control at a given time.
@@ -7609,30 +7642,30 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Object containing competitor data.
     */
     ChartPopupData.getCompetitorsVisitingCurrentControlPopupData = function (courseClassSet, eventData, controlIndex, time) {
-        var controlCode = courseClassSet.getCourse().getControlCode(controlIndex);
-        var intervalStart = Math.round(time) - RACE_GRAPH_COMPETITOR_WINDOW / 2;
-        var intervalEnd = Math.round(time) + RACE_GRAPH_COMPETITOR_WINDOW / 2;
-        var competitors = eventData.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd);
-            
-        var primaryClass = courseClassSet.getPrimaryClassName();
-        var competitorData = competitors.map(function (row) { return {name: row.name, className: row.className, time: row.time, highlight: (row.className === primaryClass)}; });
-        
-        var controlName;
+        const controlCode = courseClassSet.getCourse().getControlCode(controlIndex);
+        const intervalStart = Math.round(time) - RACE_GRAPH_COMPETITOR_WINDOW / 2;
+        const intervalEnd = Math.round(time) + RACE_GRAPH_COMPETITOR_WINDOW / 2;
+        const competitors = eventData.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd);
+
+        const primaryClass = courseClassSet.getPrimaryClassName();
+        const competitorData = competitors.map(function (row) { return { name: row.name, className: row.className, time: row.time, highlight: (row.className === primaryClass) }; });
+
+        let controlName;
         if (controlCode === Course.START) {
             controlName = getMessage("StartName");
         } else if (controlCode === Course.FINISH) {
             controlName = getMessage("FinishName");
         } else {
-            controlName = getMessageWithFormatting("ControlName", {"$$CODE$$": controlCode});
+            controlName = getMessageWithFormatting("ControlName", { "$$CODE$$": controlCode });
         }
-        
-        var title = getMessageWithFormatting(
+
+        const title = getMessageWithFormatting(
             "NearbyCompetitorsPopupHeader",
-            {"$$START$$": formatTime(intervalStart), "$$END$$": formatTime(intervalEnd), "$$CONTROL$$": controlName});
-        
-        return {title: title, data: competitorData, placeholder: getMessage("NoNearbyCompetitors")};
-    };    
-        
+            { "$$START$$": formatTime(intervalStart), "$$END$$": formatTime(intervalEnd), "$$CONTROL$$": controlName });
+
+        return { title: title, data: competitorData, placeholder: getMessage("NoNearbyCompetitors") };
+    };
+
     /**
     * Compares two course names.
     * @sb-param {String} name1 - One course name to compare.
@@ -7647,23 +7680,23 @@ SplitsBrowser.Messages = {};
             return (name1 < name2) ? -1 : 1;
         } else {
             // Both courses begin with the same letter.
-            var regexResult = /^[^0-9]+/.exec(name1);
+            const regexResult = /^[^0-9]+/.exec(name1);
             if (regexResult !== null && regexResult.length > 0) {
                 // regexResult should be a 1-element array.
-                var result = regexResult[0];
+                const result = regexResult[0];
                 if (0 < result.length && result.length < name1.length && name2.substring(0, result.length) === result) {
-                    var num1 = parseInt(name1.substring(result.length), 10);
-                    var num2 = parseInt(name2.substring(result.length), 10);
+                    const num1 = parseInt(name1.substring(result.length), 10);
+                    const num2 = parseInt(name2.substring(result.length), 10);
                     if (!isNaN(num1) && !isNaN(num2)) {
                         return num1 - num2;
                     }
                 }
             }
-            
+
             return (name1 < name2) ? -1 : 1;
         }
     }
-    
+
     /**
     * Tidy next-control data, by joining up multiple controls into one string,
     * and substituting the display-name of the finish if necessary.
@@ -7672,15 +7705,15 @@ SplitsBrowser.Messages = {};
     */
     function tidyNextControlsList(nextControls) {
         return nextControls.map(function (nextControlRec) {
-            var codes = nextControlRec.nextControls.slice(0);
+            const codes = nextControlRec.nextControls.slice(0);
             if (codes[codes.length - 1] === Course.FINISH) {
                 codes[codes.length - 1] = getMessage("FinishName");
             }
-            
-            return {course: nextControlRec.course, nextControls: codes.join(", ")};
+
+            return { course: nextControlRec.course, nextControls: codes.join(", ") };
         });
     }
-    
+
     /**
     * Returns next-control data to show on the chart popup.
     * @sb-param {SplitsBrowser.Model.Course} course - The course containing the
@@ -7691,22 +7724,22 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} Next-control data.
     */
     ChartPopupData.getNextControlData = function (course, eventData, controlIndex) {
-        var controlIdx = Math.min(controlIndex, course.controls.length);
-        var controlCode = course.getControlCode(controlIdx);
-        var nextControls = eventData.getNextControlsAfter(controlCode);
+        const controlIdx = Math.min(controlIndex, course.controls.length);
+        const controlCode = course.getControlCode(controlIdx);
+        const nextControls = eventData.getNextControlsAfter(controlCode);
         nextControls.sort(function (c1, c2) { return compareCourseNames(c1.course.name, c2.course.name); });
-        var thisControlName = (controlCode === Course.START) ? getMessage("StartName") : getMessageWithFormatting("ControlName", {"$$CODE$$": controlCode});
-        return {thisControl: thisControlName, nextControls: tidyNextControlsList(nextControls) };
+        const thisControlName = (controlCode === Course.START) ? getMessage("StartName") : getMessageWithFormatting("ControlName", { "$$CODE$$": controlCode });
+        return { thisControl: thisControlName, nextControls: tidyNextControlsList(nextControls) };
     };
-    
+
     SplitsBrowser.Model.ChartPopupData = ChartPopupData;
 })();
 
 (function () {
     "use strict";
-    
-    var formatTime = SplitsBrowser.formatTime;
-    
+
+    const formatTime = SplitsBrowser.formatTime;
+
     /**
     * Creates a ChartPopup control.
     * @constructor
@@ -7719,32 +7752,32 @@ SplitsBrowser.Messages = {};
         this.mouseIn = false;
         this.popupDiv = d3.select(parent).append("div");
         this.popupDiv.classed("chartPopup", true)
-                     .style("display", "none")
-                     .style("position", "absolute");
-                     
+            .style("display", "none")
+            .style("position", "absolute");
+
         this.dataHeader = this.popupDiv.append("div")
-                                       .classed("chartPopupHeader", true)
-                                       .append("span");
-                                           
-        var tableContainer = this.popupDiv.append("div")
-                                              .classed("chartPopupTableContainer", true);
-                                                  
-                                           
+            .classed("chartPopupHeader", true)
+            .append("span");
+
+        const tableContainer = this.popupDiv.append("div")
+            .classed("chartPopupTableContainer", true);
+
+
         this.dataTable = tableContainer.append("table");
-                                              
+
         this.popupDiv.selectAll(".nextControls").style("display", "none");
 
         // At this point we need to pass through mouse events to the parent.
         // This is solely for the benefit of IE < 11, as IE11 and other
         // browsers support pointer-events: none, which means that this div
         // receives no mouse events at all.
-        for (var eventName in handlers) {
+        for (const eventName in handlers) {
             if (handlers.hasOwnProperty(eventName)) {
                 $(this.popupDiv.node()).on(eventName, handlers[eventName]);
             }
         }
-        
-        var outerThis = this;
+
+        const outerThis = this;
         $(this.popupDiv.node()).mouseenter(function () { outerThis.mouseIn = true; });
         $(this.popupDiv.node()).mouseleave(function () { outerThis.mouseIn = false; });
     }
@@ -7756,7 +7789,7 @@ SplitsBrowser.Messages = {};
     ChartPopup.prototype.isShown = function () {
         return this.shown;
     };
-    
+
     /**
     * Returns whether the mouse is currently over the popup.
     * @sb-return {boolean} True if the mouse is over the popup, false otherwise.
@@ -7764,7 +7797,7 @@ SplitsBrowser.Messages = {};
     ChartPopup.prototype.isMouseIn = function () {
         return this.mouseIn;
     };
-    
+
     /**
     * Populates the chart popup with data.
     *
@@ -7785,32 +7818,32 @@ SplitsBrowser.Messages = {};
     */
     ChartPopup.prototype.setData = function (competitorData, includeClassNames) {
         this.dataHeader.text(competitorData.title);
-        
-        var rows = this.dataTable.selectAll("tr")
-                                 .data(competitorData.data);
-                                     
+
+        let rows = this.dataTable.selectAll("tr")
+            .data(competitorData.data);
+
         rows.enter().append("tr");
-        
+
         rows = this.dataTable.selectAll("tr")
-                             .data(competitorData.data);
+            .data(competitorData.data);
         rows.classed("highlighted", function (row) { return row.highlight; });
-        
+
         rows.selectAll("td").remove();
         rows.append("td").text(function (row) { return formatTime(row.time); });
         if (includeClassNames) {
             rows.append("td").text(function (row) { return row.className; });
         }
         rows.append("td").text(function (row) { return row.name; });
-        
+
         rows.exit().remove();
-        
+
         if (competitorData.data.length === 0 && competitorData.placeholder !== null) {
             this.dataTable.append("tr")
-                          .append("td")
-                          .text(competitorData.placeholder);
+                .append("td")
+                .text(competitorData.placeholder);
         }
     };
-    
+
     /**
     * Sets the next-controls data.
     *
@@ -7823,20 +7856,20 @@ SplitsBrowser.Messages = {};
     */
     ChartPopup.prototype.setNextControlData = function (nextControlsData) {
         this.dataHeader.text(nextControlsData.thisControl);
-        
-        var rows = this.dataTable.selectAll("tr")
-                                 .data(nextControlsData.nextControls);
+
+        const rows = this.dataTable.selectAll("tr")
+            .data(nextControlsData.nextControls);
         rows.enter().append("tr");
-        
+
         rows.selectAll("td").remove();
         rows.classed("highlighted", false);
         rows.append("td").text(function (nextControlData) { return nextControlData.course.name; });
         rows.append("td").text("-->");
         rows.append("td").text(function (nextControlData) { return nextControlData.nextControls; });
-        
+
         rows.exit().remove();
     };
-    
+
     /**
     * Adjusts the location of the chart popup.
     *
@@ -7847,9 +7880,9 @@ SplitsBrowser.Messages = {};
     */
     ChartPopup.prototype.setLocation = function (location) {
         this.popupDiv.style("left", location.x + "px")
-                     .style("top", location.y + "px");
+            .style("top", location.y + "px");
     };
-    
+
     /**
     * Shows the chart popup.
     *
@@ -7863,7 +7896,7 @@ SplitsBrowser.Messages = {};
         this.shown = true;
         this.setLocation(location);
     };
-    
+
     /**
     * Hides the chart popup.
     */
@@ -7871,7 +7904,7 @@ SplitsBrowser.Messages = {};
         this.popupDiv.style("display", "none");
         this.shown = false;
     };
-    
+
     /**
     * Returns the height of the popup, in units of pixels.
     * @sb-return {Number} Height of the popup, in pixels.
@@ -7879,47 +7912,47 @@ SplitsBrowser.Messages = {};
     ChartPopup.prototype.height = function () {
         return $(this.popupDiv.node()).height();
     };
-    
-    SplitsBrowser.Controls.ChartPopup = ChartPopup;    
+
+    SplitsBrowser.Controls.ChartPopup = ChartPopup;
 })();
 
-(function (){
+(function () {
     "use strict";
 
     // ID of the hidden text-size element.
     // Must match that used in styles.css.
-    var TEXT_SIZE_ELEMENT_ID = "sb-text-size-element";
-    
+    const TEXT_SIZE_ELEMENT_ID = "sb-text-size-element";
+
     // ID of the chart.
     // Must match that used in styles.css
-    var CHART_SVG_ID = "chart";
-    
+    const CHART_SVG_ID = "chart";
+
     // X-offset in pixels between the mouse and the popup that opens.
-    var CHART_POPUP_X_OFFSET = 10;
-    
+    const CHART_POPUP_X_OFFSET = 10;
+
     // Margins on the four sides of the chart.
-    var MARGIN = {
+    const MARGIN = {
         top: 18, // Needs to be high enough not to obscure the upper X-axis.
         right: 0,
         bottom: 18, // Needs to be high enough not to obscure the lower X-axis.
         left: 53 // Needs to be wide enough for times on the race graph.
     };
 
-    var LEGEND_LINE_WIDTH = 10;
-    
+    const LEGEND_LINE_WIDTH = 10;
+
     // Minimum distance between a Y-axis tick label and a competitor's start
     // time, in pixels.
-    var MIN_COMPETITOR_TICK_MARK_DISTANCE = 10;
-    
+    const MIN_COMPETITOR_TICK_MARK_DISTANCE = 10;
+
     // The number that identifies the left mouse button in a jQuery event.
-    var JQUERY_EVENT_LEFT_BUTTON = 1;
-    
+    const JQUERY_EVENT_LEFT_BUTTON = 1;
+
     // The number that identifies the right mouse button in a jQuery event.
-    var JQUERY_EVENT_RIGHT_BUTTON = 3;
+    const JQUERY_EVENT_RIGHT_BUTTON = 3;
 
-    var SPACER = "\xa0\xa0\xa0\xa0";
+    const SPACER = "\xa0\xa0\xa0\xa0";
 
-    var colours = [
+    const colours = [
         "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
         "#FFCC00", "#884400", "#9900FF", "#CCCC00", "#888800", "#CC6699",
         "#00DD00", "#3399FF", "#BB00BB", "#00DDDD", "#FF00FF", "#0088BB",
@@ -7927,14 +7960,14 @@ SplitsBrowser.Messages = {};
     ];
 
     // 'Imports'.
-    var formatTime = SplitsBrowser.formatTime;
-    var getMessage = SplitsBrowser.getMessage;
-    var isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    var isNaNStrict = SplitsBrowser.isNaNStrict;
-    
-    var ChartPopupData = SplitsBrowser.Model.ChartPopupData;
-    var ChartPopup = SplitsBrowser.Controls.ChartPopup;
-    
+    const formatTime = SplitsBrowser.formatTime;
+    const getMessage = SplitsBrowser.getMessage;
+    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
+    const isNaNStrict = SplitsBrowser.isNaNStrict;
+
+    const ChartPopupData = SplitsBrowser.Model.ChartPopupData;
+    const ChartPopup = SplitsBrowser.Controls.ChartPopup;
+
     /**
     * Format a time and a rank as a string, with the split time in mm:ss or h:mm:ss
     * as appropriate.
@@ -7943,18 +7976,18 @@ SplitsBrowser.Messages = {};
     * @sb-returns Time and rank formatted as a string.
     */
     function formatTimeAndRank(time, rank) {
-        var rankStr;
+        let rankStr;
         if (rank === null) {
-            rankStr = "-";
+            rankStr = '-';
         } else if (isNaNStrict(rank)) {
-            rankStr = "?";
+            rankStr = '?';
         } else {
             rankStr = rank.toString();
         }
-        
-        return SPACER + formatTime(time) + " (" + rankStr + ")";
+
+        return SPACER + formatTime(time) + ' (' + rankStr + ')';
     }
-    
+
     /**
     * Formats and returns a competitor's name and optional suffix.
     * @sb-param {String} name - The name of the competitor.
@@ -7963,12 +7996,12 @@ SplitsBrowser.Messages = {};
     * @sb-return Competitor name and suffix, formatted.
     */
     function formatNameAndSuffix(name, suffix) {
-        return (suffix === "") ? name : name + " (" + suffix + ")";
+        return (suffix === '') ? name : name + ' (' + suffix + ')';
     }
 
     /**
     * Returns the 'suffix' to use with the given competitor.
-    * The suffix indicates whether they are non-competitive or a mispuncher, 
+    * The suffix indicates whether they are non-competitive or a mispuncher,
     * were disqualified or did not finish.  If none of the above apply, an
     * empty string is returned.
     * @sb-return {String} Suffix to use with the given competitor.
@@ -7977,17 +8010,17 @@ SplitsBrowser.Messages = {};
         // Non-starters are not catered for here, as this is intended to only
         // be used on the chart and non-starters shouldn't appear on the chart.
         if (competitor.completed() && competitor.isNonCompetitive) {
-            return getMessage("NonCompetitiveShort");
+            return getMessage('NonCompetitiveShort');
         } else if (competitor.isNonFinisher) {
-            return getMessage("DidNotFinishShort"); 
+            return getMessage('DidNotFinishShort');
         } else if (competitor.isDisqualified) {
-            return getMessage("DisqualifiedShort");
+            return getMessage('DisqualifiedShort');
         } else if (competitor.isOverMaxTime) {
-            return getMessage("OverMaxTimeShort");
+            return getMessage('OverMaxTimeShort');
         } else if (competitor.completed()) {
-            return "";
+            return '';
         } else {
-            return getMessage("MispunchedShort");
+            return getMessage('MispunchedShort');
         }
     }
 
@@ -8012,9 +8045,9 @@ SplitsBrowser.Messages = {};
         this.isPopupOpen = false;
         this.popupUpdateFunc = null;
         this.maxStartTimeLabelWidth = 0;
-        
+
         this.mouseOutTimeout = null;
-        
+
         // Indexes of the currently-selected competitors, in the order that
         // they appear in the list of labels.
         this.selectedIndexesOrderedByLastYValue = [];
@@ -8022,60 +8055,60 @@ SplitsBrowser.Messages = {};
         this.referenceCumTimesSorted = [];
         this.referenceCumTimeIndexes = [];
         this.fastestCumTimes = [];
-        
+
         this.isMouseIn = false;
-        
+
         // The position the mouse cursor is currently over, or null for not over
         // the charts.  This index is constrained by the minimum control that a
         // chart type specifies.
         this.currentControlIndex = null;
-        
+
         // The position the mouse cursor is currently over, or null for not over
         // the charts.  Unlike this.currentControlIndex, this index is not
         // constrained by the minimum control that a chart type specifies.
         this.actualControlIndex = null;
-        
+
         this.controlLine = null;
 
         this.currentChartTime = null;
 
-        this.svg = d3.select(this.parent).append("svg")
-                                         .attr("id", CHART_SVG_ID);
+        this.svg = d3.select(this.parent).append('svg')
+            .attr('id', CHART_SVG_ID);
 
-        this.svgGroup = this.svg.append("g");
+        this.svgGroup = this.svg.append('g');
         this.setLeftMargin(MARGIN.left);
 
-        var outerThis = this;
-        var mousemoveHandler = function (event) { outerThis.onMouseMove(event); };
-        var mouseupHandler = function (event) { outerThis.onMouseUp(event); };
-        var mousedownHandler = function (event) { outerThis.onMouseDown(event); };
+        const outerThis = this;
+        const mousemoveHandler = function (event) { outerThis.onMouseMove(event); };
+        const mouseupHandler = function (event) { outerThis.onMouseUp(event); };
+        const mousedownHandler = function (event) { outerThis.onMouseDown(event); };
         $(this.svg.node()).mouseenter(function (event) { outerThis.onMouseEnter(event); })
-                          .mousemove(mousemoveHandler)
-                          .mouseleave(function (event) { outerThis.onMouseLeave(event); })
-                          .mousedown(mousedownHandler)
-                          .mouseup(mouseupHandler);
-                          
+            .mousemove(mousemoveHandler)
+            .mouseleave(function (event) { outerThis.onMouseLeave(event); })
+            .mousedown(mousedownHandler)
+            .mouseup(mouseupHandler);
+
         // Disable the context menu on the chart, so that it doesn't open when
         // showing the right-click popup.
-        $(this.svg.node()).contextmenu(function(e) { e.preventDefault(); });
+        $(this.svg.node()).contextmenu(function (e) { e.preventDefault(); });
 
         // Add an invisible text element used for determining text size.
-        this.textSizeElement = this.svg.append("text").attr("fill", "transparent")
-                                                      .attr("id", TEXT_SIZE_ELEMENT_ID);
-        
-        var handlers = {"mousemove": mousemoveHandler, "mousedown": mousedownHandler, "mouseup": mouseupHandler};
+        this.textSizeElement = this.svg.append('text').attr('fill', 'transparent')
+            .attr('id', TEXT_SIZE_ELEMENT_ID);
+
+        const handlers = { 'mousemove': mousemoveHandler, 'mousedown': mousedownHandler, 'mouseup': mouseupHandler };
         this.popup = new ChartPopup(parent, handlers);
-        
+
         $(document).mouseup(function () { outerThis.popup.hide(); });
     }
-    
+
     /**
     * Sets the left margin of the chart.
     * @sb-param {Number} leftMargin - The left margin of the chart.
     */
     Chart.prototype.setLeftMargin = function (leftMargin) {
         this.currentLeftMargin = leftMargin;
-        this.svgGroup.attr("transform", "translate(" + this.currentLeftMargin + "," + MARGIN.top + ")");
+        this.svgGroup.attr('transform', 'translate(' + this.currentLeftMargin + ',' + MARGIN.top + ')');
     };
 
     /**
@@ -8090,7 +8123,7 @@ SplitsBrowser.Messages = {};
             y: Math.max(event.pageY - this.popup.height() / 2, 0)
         };
     };
-    
+
     /**
     * Returns the fastest splits to the current control.
     * @sb-return {Array} Array of fastest-split data.
@@ -8098,7 +8131,7 @@ SplitsBrowser.Messages = {};
     Chart.prototype.getFastestSplitsPopupData = function () {
         return ChartPopupData.getFastestSplitsPopupData(this.courseClassSet, this.currentControlIndex);
     };
-    
+
     /**
     * Returns the fastest splits for the currently-shown leg.  The list
     * returned contains the fastest splits for the current leg for each class.
@@ -8108,16 +8141,16 @@ SplitsBrowser.Messages = {};
     Chart.prototype.getFastestSplitsForCurrentLegPopupData = function () {
         return ChartPopupData.getFastestSplitsForLegPopupData(this.courseClassSet, this.eventData, this.currentControlIndex);
     };
-    
+
     /**
     * Stores the current time the mouse is at, on the race graph.
     * @sb-param {jQuery.event} event - The mouse-down or mouse-move event.
     */
     Chart.prototype.setCurrentChartTime = function (event) {
-        var yOffset = event.pageY - $(this.svg.node()).offset().top - MARGIN.top;
+        const yOffset = event.pageY - $(this.svg.node()).offset().top - MARGIN.top;
         this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
     };
-    
+
     /**
     * Returns an array of the competitors visiting the current control at the
     * current time.
@@ -8126,7 +8159,7 @@ SplitsBrowser.Messages = {};
     Chart.prototype.getCompetitorsVisitingCurrentControlPopupData = function () {
         return ChartPopupData.getCompetitorsVisitingCurrentControlPopupData(this.courseClassSet, this.eventData, this.currentControlIndex, this.currentChartTime);
     };
-    
+
     /**
     * Returns next-control data to show on the chart popup.
     * @sb-return {Array} Array of next-control data.
@@ -8144,10 +8177,10 @@ SplitsBrowser.Messages = {};
             clearTimeout(this.mouseOutTimeout);
             this.mouseOutTimeout = null;
         }
-        
+
         this.isMouseIn = true;
         if (this.hasData) {
-            this.updateControlLineLocation(event);            
+            this.updateControlLineLocation(event);
         }
     };
 
@@ -8156,16 +8189,16 @@ SplitsBrowser.Messages = {};
     * @sb-param {jQuery.event} event - jQuery event object.
     */
     Chart.prototype.onMouseMove = function (event) {
-        if (this.hasData&& this.isMouseIn && this.xScale !== null) {
+        if (this.hasData && this.isMouseIn && this.xScale !== null) {
             this.updateControlLineLocation(event);
         }
     };
-     
+
     /**
     * Handle the mouse leaving the chart.
     */
     Chart.prototype.onMouseLeave = function () {
-        var outerThis = this;
+        const outerThis = this;
         // Check that the mouse hasn't entered the popup.
         // It seems that the mouseleave event for the chart is sent before the
         // mouseenter event for the popup, so we use a timeout to check a short
@@ -8173,31 +8206,31 @@ SplitsBrowser.Messages = {};
         // This is only necessary for IE9 and IE10; other browsers support
         // "pointer-events: none" in CSS so the popup never gets any mouse
         // events.
-        
+
         // Note that we keep a reference to the 'timeout', so that we can
         // clear it if the mouse subsequently re-enters.  This happens a lot
         // more often than might be expected for a function with a timeout of
         // only a single millisecond.
-        this.mouseOutTimeout = setTimeout(function() {
+        this.mouseOutTimeout = setTimeout(function () {
             if (!outerThis.popup.isMouseIn()) {
                 outerThis.isMouseIn = false;
                 outerThis.removeControlLine();
             }
         }, 1);
     };
-    
+
     /**
     * Handles a mouse button being pressed over the chart.
     * @sb-param {jQuery.Event} event - jQuery event object.
     */
     Chart.prototype.onMouseDown = function (event) {
-        var outerThis = this;
+        const outerThis = this;
         // Use a timeout to open the dialog as we require other events
         // (mouseover in particular) to be processed first, and the precise
         // order of these events is not consistent between browsers.
         setTimeout(function () { outerThis.showPopupDialog(event); }, 1);
     };
-    
+
     /**
     * Handles a mouse button being pressed over the chart.
     * @sb-param {jQuery.event} event - The jQuery onMouseUp event.
@@ -8206,19 +8239,20 @@ SplitsBrowser.Messages = {};
         this.popup.hide();
         event.preventDefault();
     };
-    
+
     /**
     * Shows the popup window, populating it with data as necessary
     * @sb-param {jQuery.event} event - The jQuery onMouseDown event that triggered
     *     the popup.
-    */ 
+    */
     Chart.prototype.showPopupDialog = function (event) {
         if (this.isMouseIn && this.currentControlIndex !== null) {
-            var showPopup = false;
-            var outerThis = this;
+            let showPopup = false;
+            const outerThis = this;
             if (this.isRaceGraph && (event.which === JQUERY_EVENT_LEFT_BUTTON || event.which === JQUERY_EVENT_RIGHT_BUTTON)) {
                 if (this.hasControls) {
                     this.setCurrentChartTime(event);
+                    // tslint:disable-next-line:max-line-length
                     this.popupUpdateFunc = function () { outerThis.popup.setData(outerThis.getCompetitorsVisitingCurrentControlPopupData(), true); };
                     showPopup = true;
                 }
@@ -8227,18 +8261,19 @@ SplitsBrowser.Messages = {};
                 showPopup = true;
             } else if (event.which === JQUERY_EVENT_RIGHT_BUTTON) {
                 if (this.hasControls) {
+                    // tslint:disable-next-line:max-line-length
                     this.popupUpdateFunc = function () { outerThis.popup.setData(outerThis.getFastestSplitsForCurrentLegPopupData(), true); };
                     showPopup = true;
                 }
             }
-            
+
             if (showPopup) {
                 this.updatePopupContents(event);
                 this.popup.show(this.getPopupLocation(event));
             }
         }
     };
-    
+
     /**
     * Updates the chart popup with the contents it should contain.
     *
@@ -8249,15 +8284,15 @@ SplitsBrowser.Messages = {};
     * @sb-param {jQuery.event} event - jQuery mouse-move event.
     */
     Chart.prototype.updatePopupContents = function (event) {
-        var yOffset = event.pageY - $(this.svg.node()).offset().top;
-        var showNextControls = this.hasControls && yOffset < MARGIN.top;
+        const yOffset = event.pageY - $(this.svg.node()).offset().top;
+        const showNextControls = this.hasControls && yOffset < MARGIN.top;
         if (showNextControls) {
             this.updateNextControlInformation();
         } else {
             this.popupUpdateFunc();
         }
     };
-    
+
     /**
     * Updates the next-control information.
     */
@@ -8273,70 +8308,70 @@ SplitsBrowser.Messages = {};
     * @sb-param {Number} controlIndex - The index of the control at which to draw the
     *                                control line.
     */
-    Chart.prototype.drawControlLine = function(controlIndex) {
+    Chart.prototype.drawControlLine = function (controlIndex) {
         this.currentControlIndex = controlIndex;
-        this.updateCompetitorStatistics();    
-        var xPosn = this.xScale(this.referenceCumTimes[controlIndex]);
-        this.controlLine = this.svgGroup.append("line")
-                                        .attr("x1", xPosn)
-                                        .attr("y1", 0)
-                                        .attr("x2", xPosn)
-                                        .attr("y2", this.contentHeight)
-                                        .attr("class", "controlLine")
-                                        .node();
+        this.updateCompetitorStatistics();
+        const xPosn = this.xScale(this.referenceCumTimes[controlIndex]);
+        this.controlLine = this.svgGroup.append('line')
+            .attr('x1', xPosn)
+            .attr('y1', 0)
+            .attr('x2', xPosn)
+            .attr('y2', this.contentHeight)
+            .attr('class', 'controlLine')
+            .node();
     };
-    
+
     /**
     * Updates the location of the control line from the given mouse event.
     * @sb-param {jQuery.event} event - jQuery mousedown or mousemove event.
     */
     Chart.prototype.updateControlLineLocation = function (event) {
 
-        var svgNodeAsJQuery = $(this.svg.node());
-        var offset = svgNodeAsJQuery.offset();
-        var xOffset = event.pageX - offset.left;
-        var yOffset = event.pageY - offset.top;
-        
-        if (this.currentLeftMargin <= xOffset && xOffset < svgNodeAsJQuery.width() - MARGIN.right && 
+        const svgNodeAsJQuery = $(this.svg.node());
+        const offset = svgNodeAsJQuery.offset();
+        const xOffset = event.pageX - offset.left;
+        const yOffset = event.pageY - offset.top;
+
+        if (this.currentLeftMargin <= xOffset && xOffset < svgNodeAsJQuery.width() - MARGIN.right &&
             yOffset < svgNodeAsJQuery.height() - MARGIN.bottom) {
             // In the chart.
             // Get the time offset that the mouse is currently over.
-            var chartX = this.xScale.invert(xOffset - this.currentLeftMargin);
-            var bisectIndex = d3.bisect(this.referenceCumTimesSorted, chartX);
-            
+            const chartX = this.xScale.invert(xOffset - this.currentLeftMargin);
+            const bisectIndex = d3.bisect(this.referenceCumTimesSorted, chartX);
+
             // bisectIndex is the index at which to insert chartX into
             // referenceCumTimes in order to keep the array sorted.  So if
             // this index is N, the mouse is between N - 1 and N.  Find
             // which is nearer.
-            var sortedControlIndex;
+            let sortedControlIndex;
             if (bisectIndex >= this.referenceCumTimesSorted.length) {
                 // Off the right-hand end, use the last control (usually the
                 // finish).
                 sortedControlIndex = this.referenceCumTimesSorted.length - 1;
             } else {
-                var diffToNext = Math.abs(this.referenceCumTimesSorted[bisectIndex] - chartX);
-                var diffToPrev = Math.abs(chartX - this.referenceCumTimesSorted[bisectIndex - 1]);
+                const diffToNext = Math.abs(this.referenceCumTimesSorted[bisectIndex] - chartX);
+                const diffToPrev = Math.abs(chartX - this.referenceCumTimesSorted[bisectIndex - 1]);
                 sortedControlIndex = (diffToPrev < diffToNext) ? bisectIndex - 1 : bisectIndex;
             }
-            
-            var controlIndex = this.referenceCumTimeIndexes[sortedControlIndex];
-            
+
+            const controlIndex = this.referenceCumTimeIndexes[sortedControlIndex];
+
             if (this.actualControlIndex === null || this.actualControlIndex !== controlIndex) {
                 // The control line has appeared for the first time or has moved, so redraw it.
                 this.removeControlLine();
                 this.actualControlIndex = controlIndex;
                 this.drawControlLine(Math.max(this.minViewableControl, controlIndex));
             }
-            
+
             if (this.popup.isShown() && this.currentControlIndex !== null) {
                 if (this.isRaceGraph) {
                     this.setCurrentChartTime(event);
                 }
-                
+
                 this.updatePopupContents(event);
                 this.popup.setLocation(this.getPopupLocation(event));
             }
-            
+
         } else {
             // In the SVG element but outside the chart area.
             this.removeControlLine();
@@ -8348,7 +8383,7 @@ SplitsBrowser.Messages = {};
     * Remove any previously-drawn control line.  If no such line existed, nothing
     * happens.
     */
-    Chart.prototype.removeControlLine = function() {
+    Chart.prototype.removeControlLine = function () {
         this.currentControlIndex = null;
         this.actualControlIndex = null;
         this.updateCompetitorStatistics();
@@ -8367,9 +8402,9 @@ SplitsBrowser.Messages = {};
     *     behind the fastest time.
     */
     Chart.prototype.getTimesBehindFastest = function (controlIndex, indexes) {
-        var selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
-        var fastestSplit = this.fastestCumTimes[controlIndex] - this.fastestCumTimes[controlIndex - 1];
-        var timesBehind = selectedCompetitors.map(function (comp) { var compSplit = comp.getSplitTimeTo(controlIndex); return (compSplit === null) ? null : compSplit - fastestSplit; });
+        const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
+        const fastestSplit = this.fastestCumTimes[controlIndex] - this.fastestCumTimes[controlIndex - 1];
+        const timesBehind = selectedCompetitors.map(function (comp) { const compSplit = comp.getSplitTimeTo(controlIndex); return (compSplit === null) ? null : compSplit - fastestSplit; });
         return timesBehind;
     };
 
@@ -8382,53 +8417,53 @@ SplitsBrowser.Messages = {};
     *     deemed to have lost at the given control.
     */
     Chart.prototype.getTimeLosses = function (controlIndex, indexes) {
-        var selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
-        var timeLosses = selectedCompetitors.map(function (comp) { return comp.getTimeLossAt(controlIndex); });
+        const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
+        const timeLosses = selectedCompetitors.map(function (comp) { return comp.getTimeLossAt(controlIndex); });
         return timeLosses;
     };
-    
+
     /**
     * Updates the statistics text shown after the competitors.
     */
-    Chart.prototype.updateCompetitorStatistics = function() {
-        var selectedCompetitors = this.selectedIndexesOrderedByLastYValue.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
-        var labelTexts = selectedCompetitors.map(function (comp) { return formatNameAndSuffix(comp.name, getSuffix(comp)); });
-        
+    Chart.prototype.updateCompetitorStatistics = function () {
+        const selectedCompetitors = this.selectedIndexesOrderedByLastYValue.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
+        let labelTexts = selectedCompetitors.map(function (comp) { return formatNameAndSuffix(comp.name, getSuffix(comp)); });
+
         if (this.currentControlIndex !== null && this.currentControlIndex > 0) {
             if (this.visibleStatistics.TotalTime) {
-                var cumTimes = selectedCompetitors.map(function (comp) { return comp.getCumulativeTimeTo(this.currentControlIndex); }, this);
-                var cumRanks = selectedCompetitors.map(function (comp) { return comp.getCumulativeRankTo(this.currentControlIndex); }, this);
+                const cumTimes = selectedCompetitors.map(function (comp) { return comp.getCumulativeTimeTo(this.currentControlIndex); }, this);
+                const cumRanks = selectedCompetitors.map(function (comp) { return comp.getCumulativeRankTo(this.currentControlIndex); }, this);
                 labelTexts = d3.zip(labelTexts, cumTimes, cumRanks)
-                               .map(function(triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
+                    .map(function (triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
             }
-                           
+
             if (this.visibleStatistics.SplitTime) {
-                var splitTimes = selectedCompetitors.map(function (comp) { return comp.getSplitTimeTo(this.currentControlIndex); }, this);
-                var splitRanks = selectedCompetitors.map(function (comp) { return comp.getSplitRankTo(this.currentControlIndex); }, this);
+                const splitTimes = selectedCompetitors.map(function (comp) { return comp.getSplitTimeTo(this.currentControlIndex); }, this);
+                const splitRanks = selectedCompetitors.map(function (comp) { return comp.getSplitRankTo(this.currentControlIndex); }, this);
                 labelTexts = d3.zip(labelTexts, splitTimes, splitRanks)
-                               .map(function(triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
+                    .map(function (triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
             }
-             
+
             if (this.visibleStatistics.BehindFastest) {
-                var timesBehind = this.getTimesBehindFastest(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
+                const timesBehind = this.getTimesBehindFastest(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
                 labelTexts = d3.zip(labelTexts, timesBehind)
-                               .map(function(pair) { return pair[0] + SPACER + formatTime(pair[1]); });
+                    .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1]); });
             }
-             
+
             if (this.visibleStatistics.TimeLoss) {
-                var timeLosses = this.getTimeLosses(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
+                const timeLosses = this.getTimeLosses(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
                 labelTexts = d3.zip(labelTexts, timeLosses)
-                               .map(function(pair) { return pair[0] + SPACER + formatTime(pair[1]); });
+                    .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1]); });
             }
         }
-        
+
         // Update the current competitor data.
         if (this.hasData) {
             this.currentCompetitorData.forEach(function (data, index) { data.label = labelTexts[index]; });
         }
-        
+
         // This data is already joined to the labels; just update the text.
-        d3.selectAll("text.competitorLabel").text(function (data) { return data.label; });
+        d3.selectAll('text.competitorLabel').text(function (data: any) { return data.label; });
     };
 
     /**
@@ -8440,16 +8475,16 @@ SplitsBrowser.Messages = {};
     * @sb-returns {function} Tick-formatting function.
     */
     Chart.prototype.getTickFormatter = function () {
-        var outerThis = this;
+        const outerThis = this;
         return function (value, idx) {
-            return (idx === 0) ? getMessage("StartNameShort") : ((idx === outerThis.numControls + 1) ? getMessage("FinishNameShort") : idx.toString());
+            return (idx === 0) ? getMessage('StartNameShort') : ((idx === outerThis.numControls + 1) ? getMessage('FinishNameShort') : idx.toString());
         };
     };
 
     /**
     * Get the width of a piece of text.
     * @sb-param {string} text - The piece of text to measure the width of.
-    * @sb-returns {Number} The width of the piece of text, in pixels. 
+    * @sb-returns {Number} The width of the piece of text, in pixels.
     */
     Chart.prototype.getTextWidth = function (text) {
         return this.textSizeElement.text(text).node().getBBox().width;
@@ -8478,8 +8513,8 @@ SplitsBrowser.Messages = {};
             // find the maximum of an empty array.
             return 0;
         } else {
-            var nameWidths = this.selectedIndexes.map(function (index) {
-                var comp = this.courseClassSet.allCompetitors[index];
+            const nameWidths = this.selectedIndexes.map(function (index) {
+                const comp = this.courseClassSet.allCompetitors[index];
                 return this.getTextWidth(formatNameAndSuffix(comp.name, getSuffix(comp)));
             }, this);
             return d3.max(nameWidths) + this.determineMaxStatisticTextWidth();
@@ -8492,101 +8527,101 @@ SplitsBrowser.Messages = {};
     * returned.
     * @sb-param {Array} values - Array of values.
     * @sb-return {Number} Maximum non-null or NaN value.
-    */    
+    */
     function maxNonNullNorNaNValue(values) {
-        var nonNullNorNaNValues = values.filter(isNotNullNorNaN);
+        const nonNullNorNaNValues: Array<number> = values.filter(isNotNullNorNaN);
         return (nonNullNorNaNValues.length > 0) ? d3.max(nonNullNorNaNValues) : 0;
     }
 
     /**
     * Return the maximum width of a piece of time and rank text shown to the right
-    * of each competitor 
+    * of each competitor
     * @sb-param {string} timeFuncName - Name of the function to call to get the time
                                      data.
     * @sb-param {string} rankFuncName - Name of the function to call to get the rank
                                      data.
     * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
     */
-    Chart.prototype.getMaxTimeAndRankTextWidth = function(timeFuncName, rankFuncName) {
-        var maxTime = 0;
-        var maxRank = 0;
-        
-        var selectedCompetitors = this.selectedIndexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
-        
+    Chart.prototype.getMaxTimeAndRankTextWidth = function (timeFuncName, rankFuncName) {
+        let maxTime = 0;
+        let maxRank = 0;
+
+        const selectedCompetitors = this.selectedIndexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
+
         d3.range(1, this.numControls + 2).forEach(function (controlIndex) {
-            var times = selectedCompetitors.map(function (comp) { return comp[timeFuncName](controlIndex); });
+            const times: Array<number> = selectedCompetitors.map(function (comp): number { return comp[timeFuncName](controlIndex); });
             maxTime = Math.max(maxTime, maxNonNullNorNaNValue(times));
-            
-            var ranks = selectedCompetitors.map(function (comp) { return comp[rankFuncName](controlIndex); });
+
+            const ranks = selectedCompetitors.map(function (comp) { return comp[rankFuncName](controlIndex); });
             maxRank = Math.max(maxRank, maxNonNullNorNaNValue(ranks));
         });
-        
-        var text = formatTimeAndRank(maxTime, maxRank);
+
+        const text = formatTimeAndRank(maxTime, maxRank);
         return this.getTextWidth(text);
     };
 
     /**
     * Return the maximum width of the split-time and rank text shown to the right
-    * of each competitor 
+    * of each competitor
     * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
     */
-    Chart.prototype.getMaxSplitTimeAndRankTextWidth = function() {
-        return this.getMaxTimeAndRankTextWidth("getSplitTimeTo", "getSplitRankTo");
+    Chart.prototype.getMaxSplitTimeAndRankTextWidth = function () {
+        return this.getMaxTimeAndRankTextWidth('getSplitTimeTo', 'getSplitRankTo');
     };
 
     /**
     * Return the maximum width of the cumulative time and cumulative-time rank text
-    * shown to the right of each competitor 
+    * shown to the right of each competitor
     * @sb-returns {Number} Maximum width of cumulative time and cumulative-time rank text, in
     *                   pixels.
     */
-    Chart.prototype.getMaxCumulativeTimeAndRankTextWidth = function() {
-        return this.getMaxTimeAndRankTextWidth("getCumulativeTimeTo", "getCumulativeRankTo");
+    Chart.prototype.getMaxCumulativeTimeAndRankTextWidth = function () {
+        return this.getMaxTimeAndRankTextWidth('getCumulativeTimeTo', 'getCumulativeRankTo');
     };
 
     /**
     * Return the maximum width of the behind-fastest time shown to the right of
-    * each competitor 
+    * each competitor
     * @sb-returns {Number} Maximum width of behind-fastest time rank text, in pixels.
     */
-    Chart.prototype.getMaxTimeBehindFastestWidth = function() {
-        var maxTime = 0;
-        
-        for (var controlIndex = 1; controlIndex <= this.numControls + 1; controlIndex += 1) {
-            var times = this.getTimesBehindFastest(controlIndex, this.selectedIndexes);
+    Chart.prototype.getMaxTimeBehindFastestWidth = function () {
+        let maxTime = 0;
+
+        for (let controlIndex = 1; controlIndex <= this.numControls + 1; controlIndex += 1) {
+            const times = this.getTimesBehindFastest(controlIndex, this.selectedIndexes);
             maxTime = Math.max(maxTime, maxNonNullNorNaNValue(times));
         }
-        
+
         return this.getTextWidth(SPACER + formatTime(maxTime));
     };
 
     /**
     * Return the maximum width of the behind-fastest time shown to the right of
-    * each competitor 
+    * each competitor
     * @sb-returns {Number} Maximum width of behind-fastest time rank text, in pixels.
     */
-    Chart.prototype.getMaxTimeLossWidth = function() {
-        var maxTimeLoss = 0;
-        var minTimeLoss = 0;
-        for (var controlIndex = 1; controlIndex <= this.numControls + 1; controlIndex += 1) {
-            var timeLosses = this.getTimeLosses(controlIndex, this.selectedIndexes);
-            var nonNullTimeLosses = timeLosses.filter(isNotNullNorNaN);
+    Chart.prototype.getMaxTimeLossWidth = function () {
+        let maxTimeLoss = 0;
+        let minTimeLoss = 0;
+        for (let controlIndex = 1; controlIndex <= this.numControls + 1; controlIndex += 1) {
+            const timeLosses = this.getTimeLosses(controlIndex, this.selectedIndexes);
+            const nonNullTimeLosses: Array<number> = timeLosses.filter(isNotNullNorNaN);
             if (nonNullTimeLosses.length > 0) {
                 maxTimeLoss = Math.max(maxTimeLoss, d3.max(nonNullTimeLosses));
                 minTimeLoss = Math.min(minTimeLoss, d3.min(nonNullTimeLosses));
             }
         }
-        
+
         return Math.max(this.getTextWidth(SPACER + formatTime(maxTimeLoss)),
-                        this.getTextWidth(SPACER + formatTime(minTimeLoss)));
+            this.getTextWidth(SPACER + formatTime(minTimeLoss)));
     };
 
     /**
     * Determines the maximum width of the statistics text at the end of the competitor.
     * @sb-returns {Number} Maximum width of the statistics text, in pixels.
     */
-    Chart.prototype.determineMaxStatisticTextWidth = function() {
-        var maxWidth = 0;
+    Chart.prototype.determineMaxStatisticTextWidth = function () {
+        let maxWidth = 0;
         if (this.visibleStatistics.TotalTime) {
             maxWidth += this.getMaxCumulativeTimeAndRankTextWidth();
         }
@@ -8599,10 +8634,10 @@ SplitsBrowser.Messages = {};
         if (this.visibleStatistics.TimeLoss) {
             maxWidth += this.getMaxTimeLossWidth();
         }
-        
+
         return maxWidth;
     };
-    
+
     /**
     * Determines the maximum width of all of the visible start time labels.
     * If none are presently visible, zero is returned.
@@ -8610,13 +8645,13 @@ SplitsBrowser.Messages = {};
     * @sb-return {Number} Maximum width of a start time label.
     */
     Chart.prototype.determineMaxStartTimeLabelWidth = function (chartData) {
-        var maxWidth;
+        let maxWidth;
         if (chartData.competitorNames.length > 0) {
-            maxWidth = d3.max(chartData.competitorNames.map(function (name) { return this.getTextWidth("00:00:00 " + name); }, this));
+            maxWidth = d3.max(chartData.competitorNames.map(function (name) { return this.getTextWidth('00:00:00 ' + name); }, this));
         } else {
             maxWidth = 0;
         }
-        
+
         return maxWidth;
     };
 
@@ -8635,15 +8670,15 @@ SplitsBrowser.Messages = {};
     * between controls.
     */
     Chart.prototype.drawBackgroundRectangles = function () {
-        
+
         // We can't guarantee that the reference cumulative times are in
         // ascending order, but we need such a list of times in order to draw
         // the rectangles.  So, sort the reference cumulative times.
-        var refCumTimesSorted = this.referenceCumTimes.slice(0);
+        const refCumTimesSorted = this.referenceCumTimes.slice(0);
         refCumTimesSorted.sort(d3.ascending);
-        
+
         // Now remove any duplicate times.
-        var index = 1;
+        let index = 1;
         while (index < refCumTimesSorted.length) {
             if (refCumTimesSorted[index] === refCumTimesSorted[index - 1]) {
                 refCumTimesSorted.splice(index, 1);
@@ -8652,24 +8687,24 @@ SplitsBrowser.Messages = {};
             }
         }
 
-        var outerThis = this;
-        
-        var rects = this.svgGroup.selectAll("rect")
-                                 .data(d3.range(refCumTimesSorted.length - 1));
-        
-        rects.enter().append("rect");
+        const outerThis = this;
 
-        rects = this.svgGroup.selectAll("rect")
-                                 .data(d3.range(refCumTimesSorted.length - 1));
-        rects.attr("x", function (index) { return outerThis.xScale(refCumTimesSorted[index]); })
-             .attr("y", 0)
-             .attr("width", function (index) { return outerThis.xScale(refCumTimesSorted[index + 1]) - outerThis.xScale(refCumTimesSorted[index]); })
-             .attr("height", this.contentHeight)
-             .attr("class", function (index) { return (index % 2 === 0) ? "background1" : "background2"; });
+        let rects = this.svgGroup.selectAll('rect')
+            .data(d3.range(refCumTimesSorted.length - 1));
+
+        rects.enter().append('rect');
+
+        rects = this.svgGroup.selectAll('rect')
+            .data(d3.range(refCumTimesSorted.length - 1));
+        rects.attr('x', function (i) { return outerThis.xScale(refCumTimesSorted[i]); })
+            .attr('y', 0)
+            .attr('width', function (i) { return outerThis.xScale(refCumTimesSorted[i + 1]) - outerThis.xScale(refCumTimesSorted[i]); })
+            .attr('height', this.contentHeight)
+            .attr('class', function (i) { return (i % 2 === 0) ? 'background1' : 'background2'; });
 
         rects.exit().remove();
     };
-    
+
     /**
     * Returns a function used to format tick labels on the Y-axis.
     *
@@ -8679,7 +8714,7 @@ SplitsBrowser.Messages = {};
     *
     * For other graph types, this method returns null, which tells d3 to use
     * its default tick formatter.
-    * 
+    *
     * @sb-param {object} chartData - The chart data to read start times from.
     * @sb-return {?Function} Tick formatter function, or null to use the default
     *     d3 formatter.
@@ -8688,17 +8723,19 @@ SplitsBrowser.Messages = {};
         if (this.isRaceGraph) {
             // Assume column 0 of the data is the start times.
             // However, beware that there might not be any data.
-            var startTimes = (chartData.dataColumns.length === 0) ? [] : chartData.dataColumns[0].ys;
+            const startTimes = (chartData.dataColumns.length === 0) ? [] : chartData.dataColumns[0].ys;
             if (startTimes.length === 0) {
                 // No start times - draw all tick marks.
                 return function (time) { return formatTime(time * 60); };
             } else {
                 // Some start times are to be drawn - only draw tick marks if
                 // they are far enough away from competitors.
-                var yScale = this.yScale;
+
+                const yScale = this.yScale;
                 return function (time) {
-                    var nearestOffset = d3.min(startTimes.map(function (startTime) { return Math.abs(yScale(startTime) - yScale(time)); }));
-                    return (nearestOffset >= MIN_COMPETITOR_TICK_MARK_DISTANCE) ? formatTime(Math.round(time * 60)) : "";
+                    const yarray: Array<number> = startTimes.map(function (startTime) { return Math.abs(yScale(startTime) - yScale(time)); });
+                    const nearestOffset = d3.min(yarray);
+                    return (nearestOffset >= MIN_COMPETITOR_TICK_MARK_DISTANCE) ? formatTime(Math.round(time * 60)) : '';
                 };
             }
         } else {
@@ -8713,106 +8750,105 @@ SplitsBrowser.Messages = {};
     * @sb-param {object} chartData - The chart data to use.
     */
     Chart.prototype.drawAxes = function (yAxisLabel, chartData) {
-    
-        var tickFormatter = this.determineYAxisTickFormatter(chartData);
-        
-        var xAxis = d3.axisTop()
-                      .scale(this.xScale)
-                      .tickFormat(this.getTickFormatter())
-                      .tickValues(this.referenceCumTimes);
 
-        var yAxis = d3.axisLeft()
-                      .scale(this.yScale)
-                      .tickFormat(tickFormatter);
-                     
-        var lowerXAxis = d3.axisBottom()
-                           .scale(this.xScaleMinutes);
+        const tickFormatter = this.determineYAxisTickFormatter(chartData);
 
-        this.svgGroup.selectAll("g.axis").remove();
+        const xAxis = d3.axisTop(d3.scaleLinear())
+            .scale(this.xScale)
+            .tickFormat(this.getTickFormatter())
+            .tickValues(this.referenceCumTimes);
 
-        this.svgGroup.append("g")
-                     .attr("class", "x axis")
-                     .call(xAxis);
+        const yAxis = d3.axisLeft(d3.scaleLinear())
+            .scale(this.yScale)
+            .tickFormat(tickFormatter);
 
-        this.svgGroup.append("g")
-                     .attr("class", "y axis")
-                     .call(yAxis)
-                     .append("text")
-                     .attr("transform", "rotate(-90)")
-                     .attr("x", -(this.contentHeight - 6))
-                     .attr("y", 6)
-                     .attr("dy", ".71em")
-                     .style("text-anchor", "start")
-                     .style("fill", "black")
-                     .text(yAxisLabel);
+        const lowerXAxis = d3.axisBottom(d3.scaleLinear())
+            .scale(this.xScaleMinutes);
 
-        this.svgGroup.append("g")
-                     .attr("class", "x axis")
-                     .attr("transform", "translate(0," + this.contentHeight + ")")                     
-                     .call(lowerXAxis)
-                     .append("text")
-                     .attr("x", 60)
-                     .attr("y", -5)
-                     .style("text-anchor", "start")
-                     .style("fill", "black")
-                     .text(getMessage("LowerXAxisChartLabel"));
+        this.svgGroup.selectAll('g.axis').remove();
+
+        this.svgGroup.append('g')
+            .attr('class', 'x axis')
+            .call(xAxis);
+
+        this.svgGroup.append('g')
+            .attr('class', 'y axis')
+            .call(yAxis)
+            .append('text')
+            .attr('transform', 'rotate(-90)')
+            .attr('x', -(this.contentHeight - 6))
+            .attr('y', 6)
+            .attr('dy', '.71em')
+            .style('text-anchor', 'start')
+            .style('fill', 'black')
+            .text(yAxisLabel);
+
+        this.svgGroup.append('g')
+            .attr('class', 'x axis')
+            .attr('transform', 'translate(0,' + this.contentHeight + ')')
+            .call(lowerXAxis)
+            .append('text')
+            .attr('x', 60)
+            .attr('y', -5)
+            .style('text-anchor', 'start')
+            .style('fill', 'black')
+            .text(getMessage('LowerXAxisChartLabel'));
     };
-    
+
     /**
     * Draw the lines on the chart.
     * @sb-param {Array} chartData - Array of chart data.
     */
     Chart.prototype.drawChartLines = function (chartData) {
-        var outerThis = this;
-        var lineFunctionGenerator = function (selCompIdx) {
+        const outerThis = this;
+        const lineFunctionGenerator = function (selCompIdx) {
             if (!chartData.dataColumns.some(function (col) { return isNotNullNorNaN(col.ys[selCompIdx]); })) {
                 // This competitor's entire row is null/NaN, so there's no data
                 // to draw.  WebKit will report an error ('Error parsing d=""')
                 // if no points on the line are defined, as will happen in this
                 // case, so we substitute a single zero point instead.
                 return d3.line()
-                           .x(0)
-                           .y(0)
-                           .defined(function (d, i) { return i === 0; });
-            }
-            else {
-                return d3.line()
-                           .x(function (d) { return outerThis.xScale(d.x); })
-                           .y(function (d) { return outerThis.yScale(d.ys[selCompIdx]); })
-                           .defined(function (d) { return isNotNullNorNaN(d.ys[selCompIdx]); });
+                    .x(0)
+                    .y(0)
+                    .defined(function (d, i) { return i === 0; });
+            } else {
+                return d3.line<any>()
+                    .x(function (d) { return outerThis.xScale(d.x); })
+                    .y(function (d) { return outerThis.yScale(d.ys[selCompIdx]); })
+                    .defined(function (d) { return isNotNullNorNaN(d.ys[selCompIdx]); });
             }
         };
-        
-        this.svgGroup.selectAll("path.graphLine").remove();
-        
-        this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
-        
+
+        this.svgGroup.selectAll('path.graphLine').remove();
+
+        this.svgGroup.selectAll('line.aroundDubiousTimes').remove();
+
         d3.range(this.numLines).forEach(function (selCompIdx) {
-            var strokeColour = colours[this.selectedIndexes[selCompIdx] % colours.length];
-            var highlighter = function () { outerThis.highlight(outerThis.selectedIndexes[selCompIdx]); };
-            var unhighlighter = function () { outerThis.unhighlight(); };
-            
-            this.svgGroup.append("path")
-                         .attr("d", lineFunctionGenerator(selCompIdx)(chartData.dataColumns))
-                         .attr("stroke", strokeColour)
-                         .attr("class", "graphLine competitor" + this.selectedIndexes[selCompIdx])
-                         .on("mouseenter", highlighter)
-                         .on("mouseleave", unhighlighter)
-                         .append("title")
-                         .text(chartData.competitorNames[selCompIdx]);
-                         
+            const strokeColour = colours[this.selectedIndexes[selCompIdx] % colours.length];
+            const highlighter = function () { outerThis.highlight(outerThis.selectedIndexes[selCompIdx]); };
+            const unhighlighter = function () { outerThis.unhighlight(); };
+
+            this.svgGroup.append('path')
+                .attr('d', lineFunctionGenerator(selCompIdx)(chartData.dataColumns))
+                .attr('stroke', strokeColour)
+                .attr('class', 'graphLine competitor' + this.selectedIndexes[selCompIdx])
+                .on('mouseenter', highlighter)
+                .on('mouseleave', unhighlighter)
+                .append('title')
+                .text(chartData.competitorNames[selCompIdx]);
+
             chartData.dubiousTimesInfo[selCompIdx].forEach(function (dubiousTimeInfo) {
-                this.svgGroup.append("line")
-                             .attr("x1", this.xScale(chartData.dataColumns[dubiousTimeInfo.start].x))
-                             .attr("y1", this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[selCompIdx]))
-                             .attr("x2", this.xScale(chartData.dataColumns[dubiousTimeInfo.end].x))
-                             .attr("y2", this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[selCompIdx]))
-                             .attr("stroke", strokeColour)
-                             .attr("class", "aroundDubiousTimes competitor" + this.selectedIndexes[selCompIdx])
-                             .on("mouseenter", highlighter)
-                             .on("mouseleave", unhighlighter)
-                             .append("title")
-                             .text(chartData.competitorNames[selCompIdx]);
+                this.svgGroup.append('line')
+                    .attr('x1', this.xScale(chartData.dataColumns[dubiousTimeInfo.start].x))
+                    .attr('y1', this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[selCompIdx]))
+                    .attr('x2', this.xScale(chartData.dataColumns[dubiousTimeInfo.end].x))
+                    .attr('y2', this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[selCompIdx]))
+                    .attr('stroke', strokeColour)
+                    .attr('class', 'aroundDubiousTimes competitor' + this.selectedIndexes[selCompIdx])
+                    .on('mouseenter', highlighter)
+                    .on('mouseleave', unhighlighter)
+                    .append('title')
+                    .text(chartData.competitorNames[selCompIdx]);
             }, this);
         }, this);
     };
@@ -8822,53 +8858,53 @@ SplitsBrowser.Messages = {};
     * @sb-param {Number} competitorIdx - The index of the competitor to highlight.
     */
     Chart.prototype.highlight = function (competitorIdx) {
-        this.svg.selectAll("path.graphLine.competitor" + competitorIdx).classed("selected", true);
-        this.svg.selectAll("line.competitorLegendLine.competitor" + competitorIdx).classed("selected", true);
-        this.svg.selectAll("text.competitorLabel.competitor" + competitorIdx).classed("selected", true);
-        this.svg.selectAll("text.startLabel.competitor" + competitorIdx).classed("selected", true);
-        this.svg.selectAll("line.aroundDubiousTimes.competitor" + competitorIdx).classed("selected", true);
+        this.svg.selectAll('path.graphLine.competitor' + competitorIdx).classed('selected', true);
+        this.svg.selectAll('line.competitorLegendLine.competitor' + competitorIdx).classed('selected', true);
+        this.svg.selectAll('text.competitorLabel.competitor' + competitorIdx).classed('selected', true);
+        this.svg.selectAll('text.startLabel.competitor' + competitorIdx).classed('selected', true);
+        this.svg.selectAll('line.aroundDubiousTimes.competitor' + competitorIdx).classed('selected', true);
     };
 
     /**
     * Removes any competitor-specific higlighting.
     */
     Chart.prototype.unhighlight = function () {
-        this.svg.selectAll("path.graphLine.selected").classed("selected", false);
-        this.svg.selectAll("line.competitorLegendLine.selected").classed("selected", false);
-        this.svg.selectAll("text.competitorLabel.selected").classed("selected", false);
-        this.svg.selectAll("text.startLabel.selected").classed("selected", false);
-        this.svg.selectAll("line.aroundDubiousTimes.selected").classed("selected", false);
+        this.svg.selectAll('path.graphLine.selected').classed('selected', false);
+        this.svg.selectAll('line.competitorLegendLine.selected').classed('selected', false);
+        this.svg.selectAll('text.competitorLabel.selected').classed('selected', false);
+        this.svg.selectAll('text.startLabel.selected').classed('selected', false);
+        this.svg.selectAll('line.aroundDubiousTimes.selected').classed('selected', false);
     };
 
     /**
     * Draws the start-time labels for the currently-selected competitors.
     * @sb-param {object} chartData - The chart data that contains the start offsets.
-    */ 
+    */
     Chart.prototype.drawCompetitorStartTimeLabels = function (chartData) {
-        var startColumn = chartData.dataColumns[0];
-        var outerThis = this;
-        
-        var startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
-        
-        startLabels.enter().append("text")
-                           .classed("startLabel", true);
-        
-        startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
-        startLabels.attr("x", -7)
-                   .attr("y", function (_compIndex, selCompIndex) { return outerThis.yScale(startColumn.ys[selCompIndex]) + outerThis.getTextHeight(chartData.competitorNames[selCompIndex]) / 4; })
-                   .attr("class", function (compIndex) { return "startLabel competitor" + compIndex; })
-                   .on("mouseenter", function (compIndex) { outerThis.highlight(compIndex); })
-                   .on("mouseleave", function () { outerThis.unhighlight(); })
-                   .text(function (_compIndex, selCompIndex) { return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + " " + chartData.competitorNames[selCompIndex]; });
-        
+        const startColumn = chartData.dataColumns[0];
+        const outerThis = this;
+
+        let startLabels = this.svgGroup.selectAll('text.startLabel').data(this.selectedIndexes);
+
+        startLabels.enter().append('text')
+            .classed('startLabel', true);
+
+        startLabels = this.svgGroup.selectAll('text.startLabel').data(this.selectedIndexes);
+        startLabels.attr('x', -7)
+            .attr('y', function (_compIndex, selCompIndex) { return outerThis.yScale(startColumn.ys[selCompIndex]) + outerThis.getTextHeight(chartData.competitorNames[selCompIndex]) / 4; })
+            .attr('class', function (compIndex) { return 'startLabel competitor' + compIndex; })
+            .on('mouseenter', function (compIndex) { outerThis.highlight(compIndex); })
+            .on('mouseleave', function () { outerThis.unhighlight(); })
+            .text(function (_compIndex, selCompIndex) { return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + ' ' + chartData.competitorNames[selCompIndex]; });
+
         startLabels.exit().remove();
     };
-    
+
     /**
     * Removes all of the competitor start-time labels from the chart.
-    */ 
+    */
     Chart.prototype.removeCompetitorStartTimeLabels = function () {
-        this.svgGroup.selectAll("text.startLabel").remove();
+        this.svgGroup.selectAll('text.startLabel').remove();
     };
 
     /**
@@ -8876,9 +8912,9 @@ SplitsBrowser.Messages = {};
     * do not overlap.
     */
     Chart.prototype.adjustCompetitorLegendLabelsDownwardsIfNecessary = function () {
-        for (var i = 1; i < this.numLines; i += 1) {
-            var prevComp = this.currentCompetitorData[i - 1];
-            var thisComp = this.currentCompetitorData[i];
+        for (let i = 1; i < this.numLines; i += 1) {
+            const prevComp = this.currentCompetitorData[i - 1];
+            const thisComp = this.currentCompetitorData[i];
             if (thisComp.y < prevComp.y + prevComp.textHeight) {
                 thisComp.y = prevComp.y + prevComp.textHeight;
             }
@@ -8902,9 +8938,9 @@ SplitsBrowser.Messages = {};
             // Y-offset, whichever is larger, and move all labels up as
             // much as we can.
             this.currentCompetitorData[this.numLines - 1].y = Math.max(minLastY, this.contentHeight);
-            for (var i = this.numLines - 2; i >= 0; i -= 1) {
-                var nextComp = this.currentCompetitorData[i + 1];
-                var thisComp = this.currentCompetitorData[i];
+            for (let i = this.numLines - 2; i >= 0; i -= 1) {
+                const nextComp = this.currentCompetitorData[i + 1];
+                const thisComp = this.currentCompetitorData[i];
                 if (thisComp.y + thisComp.textHeight > nextComp.y) {
                     thisComp.y = nextComp.y - thisComp.textHeight;
                 } else {
@@ -8912,24 +8948,24 @@ SplitsBrowser.Messages = {};
                     break;
                 }
             }
-        }    
+        }
     };
-    
+
     /**
     * Draw legend labels to the right of the chart.
     * @sb-param {object} chartData - The chart data that contains the final time offsets.
     */
     Chart.prototype.drawCompetitorLegendLabels = function (chartData) {
-        
-        var minLastY = 0;
+
+        let minLastY = 0;
         if (chartData.dataColumns.length === 0) {
             this.currentCompetitorData = [];
         } else {
-            var finishColumn = chartData.dataColumns[chartData.dataColumns.length - 1];
+            const finishColumn = chartData.dataColumns[chartData.dataColumns.length - 1];
             this.currentCompetitorData = d3.range(this.numLines).map(function (i) {
-                var competitorIndex = this.selectedIndexes[i];
-                var name = this.courseClassSet.allCompetitors[competitorIndex].name;
-                var textHeight = this.getTextHeight(name);
+                const competitorIndex = this.selectedIndexes[i];
+                const name = this.courseClassSet.allCompetitors[competitorIndex].name;
+                const textHeight = this.getTextHeight(name);
                 minLastY += textHeight;
                 return {
                     label: formatNameAndSuffix(name, getSuffix(this.courseClassSet.allCompetitors[competitorIndex])),
@@ -8939,56 +8975,56 @@ SplitsBrowser.Messages = {};
                     index: competitorIndex
                 };
             }, this);
-            
+
             minLastY -= this.currentCompetitorData[this.numLines - 1].textHeight;
-            
+
             // Draw the mispunchers at the bottom of the chart, with the last
             // one of them at the bottom.
-            var lastMispuncherY = null;
-            for (var selCompIdx = this.numLines - 1; selCompIdx >= 0; selCompIdx -= 1) {
+            let lastMispuncherY = null;
+            for (let selCompIdx = this.numLines - 1; selCompIdx >= 0; selCompIdx -= 1) {
                 if (this.currentCompetitorData[selCompIdx].y === null) {
                     this.currentCompetitorData[selCompIdx].y = (lastMispuncherY === null) ? this.contentHeight : lastMispuncherY - this.currentCompetitorData[selCompIdx].textHeight;
                     lastMispuncherY = this.currentCompetitorData[selCompIdx].y;
                 }
             }
         }
-        
+
         // Sort by the y-offset values, which doesn't always agree with the end
         // positions of the competitors.
         this.currentCompetitorData.sort(function (a, b) { return a.y - b.y; });
-        
+
         this.selectedIndexesOrderedByLastYValue = this.currentCompetitorData.map(function (comp) { return comp.index; });
 
         this.adjustCompetitorLegendLabelsDownwardsIfNecessary();
-        
+
         this.adjustCompetitorLegendLabelsUpwardsIfNecessary(minLastY);
 
-        var legendLines = this.svgGroup.selectAll("line.competitorLegendLine").data(this.currentCompetitorData);
-        legendLines.enter().append("line").classed("competitorLegendLine", true);
+        let legendLines = this.svgGroup.selectAll('line.competitorLegendLine').data(this.currentCompetitorData);
+        legendLines.enter().append('line').classed('competitorLegendLine', true);
 
-        var outerThis = this;
-        legendLines = this.svgGroup.selectAll("line.competitorLegendLine").data(this.currentCompetitorData);
-        legendLines.attr("x1", this.contentWidth + 1)
-                   .attr("y1", function (data) { return data.y; })
-                   .attr("x2", this.contentWidth + LEGEND_LINE_WIDTH + 1)
-                   .attr("y2", function (data) { return data.y; })
-                   .attr("stroke", function (data) { return data.colour; })
-                   .attr("class", function (data) { return "competitorLegendLine competitor" + data.index; })
-                   .on("mouseenter", function (data) { outerThis.highlight(data.index); })
-                   .on("mouseleave", function () { outerThis.unhighlight(); });
+        const outerThis = this;
+        legendLines = this.svgGroup.selectAll('line.competitorLegendLine').data(this.currentCompetitorData);
+        legendLines.attr('x1', this.contentWidth + 1)
+            .attr('y1', function (data) { return data.y; })
+            .attr('x2', this.contentWidth + LEGEND_LINE_WIDTH + 1)
+            .attr('y2', function (data) { return data.y; })
+            .attr('stroke', function (data) { return data.colour; })
+            .attr('class', function (data) { return 'competitorLegendLine competitor' + data.index; })
+            .on('mouseenter', function (data) { outerThis.highlight(data.index); })
+            .on('mouseleave', function () { outerThis.unhighlight(); });
 
         legendLines.exit().remove();
 
-        var labels = this.svgGroup.selectAll("text.competitorLabel").data(this.currentCompetitorData);
-        labels.enter().append("text").classed("competitorLabel", true);
+        let labels = this.svgGroup.selectAll('text.competitorLabel').data(this.currentCompetitorData);
+        labels.enter().append('text').classed('competitorLabel', true);
 
-        labels = this.svgGroup.selectAll("text.competitorLabel").data(this.currentCompetitorData);
-        labels.attr("x", this.contentWidth + LEGEND_LINE_WIDTH + 2)
-              .attr("y", function (data) { return data.y + data.textHeight / 4; })
-              .attr("class", function (data) { return "competitorLabel competitor" + data.index; })
-              .on("mouseenter", function (data) { outerThis.highlight(data.index); })
-              .on("mouseleave", function () { outerThis.unhighlight(); })
-              .text(function (data) { return data.label; });
+        labels = this.svgGroup.selectAll('text.competitorLabel').data(this.currentCompetitorData);
+        labels.attr('x', this.contentWidth + LEGEND_LINE_WIDTH + 2)
+            .attr('y', function (data) { return data.y + data.textHeight / 4; })
+            .attr('class', function (data) { return 'competitorLabel competitor' + data.index; })
+            .on('mouseenter', function (data) { outerThis.highlight(data.index); })
+            .on('mouseleave', function () { outerThis.unhighlight(); })
+            .text(function (data) { return data.label; });
 
         labels.exit().remove();
     };
@@ -9006,8 +9042,8 @@ SplitsBrowser.Messages = {};
     Chart.prototype.adjustContentSize = function () {
         // Extra length added to the maximum start-time label width to
         // include the lengths of the Y-axis ticks.
-        var EXTRA_MARGIN = 8;
-        var maxTextWidth = this.getMaxGraphEndTextWidth();
+        const EXTRA_MARGIN = 8;
+        const maxTextWidth = this.getMaxGraphEndTextWidth();
         this.setLeftMargin(Math.max(this.maxStartTimeLabelWidth + EXTRA_MARGIN, MARGIN.left));
         this.contentWidth = Math.max(this.overallWidth - this.currentLeftMargin - MARGIN.right - maxTextWidth - (LEGEND_LINE_WIDTH + 2), 100);
         this.contentHeight = Math.max(this.overallHeight - MARGIN.top - MARGIN.bottom, 100);
@@ -9029,9 +9065,9 @@ SplitsBrowser.Messages = {};
     * Clears the graph by removing all controls from it.
     */
     Chart.prototype.clearGraph = function () {
-        this.svgGroup.selectAll("*").remove();
+        this.svgGroup.selectAll('*').remove();
     };
-    
+
     /**
     * Sorts the reference cumulative times, and creates a list of the sorted
     * reference cumulative times and their indexes into the actual list of
@@ -9043,17 +9079,17 @@ SplitsBrowser.Messages = {};
     Chart.prototype.sortReferenceCumTimes = function () {
         // Put together a map that maps cumulative times to the first split to
         // register that time.
-        var cumTimesToControlIndex = d3.map();
+        const cumTimesToControlIndex = d3.map();
         this.referenceCumTimes.forEach(function (cumTime, index) {
             if (!cumTimesToControlIndex.has(cumTime)) {
                 cumTimesToControlIndex.set(cumTime, index);
             }
         });
-        
+
         // Sort and deduplicate the reference cumulative times.
         this.referenceCumTimesSorted = this.referenceCumTimes.slice(0);
         this.referenceCumTimesSorted.sort(d3.ascending);
-        for (var index = this.referenceCumTimesSorted.length - 1; index > 0; index -= 1) {
+        for (let index = this.referenceCumTimesSorted.length - 1; index > 0; index -= 1) {
             if (this.referenceCumTimesSorted[index] === this.referenceCumTimesSorted[index - 1]) {
                 this.referenceCumTimesSorted.splice(index, 1);
             }
@@ -9061,7 +9097,7 @@ SplitsBrowser.Messages = {};
 
         this.referenceCumTimeIndexes = this.referenceCumTimesSorted.map(function (cumTime) { return cumTimesToControlIndex.get(cumTime); });
     };
-    
+
     /**
     * Draws the chart.
     * @sb-param {object} data - Object that contains various chart data.  This
@@ -9081,7 +9117,7 @@ SplitsBrowser.Messages = {};
     * @sb-param {Object} chartType - The type of chart being drawn.
     */
     Chart.prototype.drawChart = function (data, selectedIndexes, visibleStatistics, chartType) {
-        var chartData = data.chartData;
+        const chartData = data.chartData;
         this.numControls = chartData.numControls;
         this.numLines = chartData.competitorNames.length;
         this.selectedIndexes = selectedIndexes;
@@ -9094,7 +9130,7 @@ SplitsBrowser.Messages = {};
         this.minViewableControl = chartType.minViewableControl;
         this.visibleStatistics = visibleStatistics;
         this.hasData = true;
-        
+
         this.maxStatisticTextWidth = this.determineMaxStatisticTextWidth();
         this.maxStartTimeLabelWidth = (this.isRaceGraph) ? this.determineMaxStartTimeLabelWidth(chartData) : 0;
         this.sortReferenceCumTimes();
@@ -9111,25 +9147,25 @@ SplitsBrowser.Messages = {};
             this.removeCompetitorStartTimeLabels();
         }
     };
-    
+
     SplitsBrowser.Controls.Chart = Chart;
 })();
 
 
 (function () {
-    "use strict";
-    
-    var formatTime = SplitsBrowser.formatTime;
-    var compareCompetitors = SplitsBrowser.Model.compareCompetitors;
-    var getMessage = SplitsBrowser.getMessage;
-    var getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-    var isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    
-    var NON_BREAKING_SPACE_CHAR = "\u00a0";
+    'use strict';
+
+    const formatTime = SplitsBrowser.formatTime;
+    const compareCompetitors = SplitsBrowser.Model.compareCompetitors;
+    const getMessage = SplitsBrowser.getMessage;
+    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
+
+    const NON_BREAKING_SPACE_CHAR = '\u00a0';
 
     // Maximum precision to show a results-table entry using.
-    var MAX_PERMITTED_PRECISION = 2;
-    
+    const MAX_PERMITTED_PRECISION = 2;
+
     /**
     * A control that shows an entire table of results.
     * @constructor
@@ -9143,30 +9179,30 @@ SplitsBrowser.Messages = {};
         this.table = null;
         this.buildTable();
     }
-    
+
     /**
     * Build the results table.
     */
     ResultsTable.prototype.buildTable = function () {
-        this.div = d3.select(this.parent).append("div")
-                                         .attr("id", "resultsTableContainer");
-                                         
-        this.headerSpan = this.div.append("div")
-                                  .append("span")
-                                  .classed("resultsTableHeader", true);
-                                  
-        this.table = this.div.append("table")
-                             .classed("resultsTable", true);
-                             
-        this.table.append("thead")
-                  .append("tr");
-                  
-        this.table.append("tbody");
+        this.div = d3.select(this.parent).append('div')
+            .attr('id', 'resultsTableContainer');
+
+        this.headerSpan = this.div.append('div')
+            .append('span')
+            .classed('resultsTableHeader', true);
+
+        this.table = this.div.append('table')
+            .classed('resultsTable', true);
+
+        this.table.append('thead')
+            .append('tr');
+
+        this.table.append('tbody');
     };
-    
+
     /**
     * Determines the precision with which to show the results.
-    * 
+    *
     * If there are some fractional times, then all times should be shown with
     * the same precision, even if not all of them need to.  For example, a
     * a split time between controls punched after 62.7 and 108.7 seconds must
@@ -9176,8 +9212,8 @@ SplitsBrowser.Messages = {};
     * @sb-return {Number} Maximum precision to use.
     */
     function determinePrecision(competitors) {
-        var maxPrecision = 0;
-        var maxPrecisionFactor = 1;        
+        let maxPrecision = 0;
+        let maxPrecisionFactor = 1;
         competitors.forEach(function (competitor) {
             competitor.getAllOriginalCumulativeTimes().forEach(function (cumTime) {
                 if (isNotNullNorNaN(cumTime)) {
@@ -9188,32 +9224,32 @@ SplitsBrowser.Messages = {};
                 }
             });
         });
-        
+
         return maxPrecision;
     }
-    
+
     /**
     * Returns the contents of the time or status column for the given
     * competitor.
-    * 
+    *
     * The status may be a string that indicates the competitor mispunched.
     *
     * @sb-param {Competitor} competitor The competitor to get the status of.
     * @sb-return {String} Time or status for the given competitor.
     */
-    function getTimeOrStatus (competitor) {
+    function getTimeOrStatus(competitor) {
         if (competitor.isNonStarter) {
-            return getMessage("DidNotStartShort");
+            return getMessage('DidNotStartShort');
         } else if (competitor.isNonFinisher) {
-            return getMessage("DidNotFinishShort");
+            return getMessage('DidNotFinishShort');
         } else if (competitor.isDisqualified) {
-            return getMessage("DisqualifiedShort");
+            return getMessage('DisqualifiedShort');
         } else if (competitor.isOverMaxTime) {
-            return getMessage("OverMaxTimeShort");
+            return getMessage('OverMaxTimeShort');
         } else if (competitor.completed()) {
             return formatTime(competitor.totalTime);
         } else {
-            return getMessage("MispunchedShort");
+            return getMessage('MispunchedShort');
         }
     }
 
@@ -9222,136 +9258,136 @@ SplitsBrowser.Messages = {};
     * HTML string without the risk of any injection.
     * @sb-param {String} value The HTML value to escape.
     * @sb-return {String} The HTML value escaped.
-    */ 
+    */
     function escapeHtml(value) {
-        return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+        return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
-    
+
     /**
     * Populates the contents of the table with the course-class data.
     */
     ResultsTable.prototype.populateTable = function () {
-        var headerText = this.courseClass.name + ", ";
+        let headerText = this.courseClass.name + ', ';
         if (this.courseClass.numControls === 1) {
-            headerText += getMessage("ResultsTableHeaderSingleControl");
+            headerText += getMessage('ResultsTableHeaderSingleControl');
         } else {
-            headerText += getMessageWithFormatting("ResultsTableHeaderMultipleControls", {"$$NUM$$": this.courseClass.numControls});
+            headerText += getMessageWithFormatting('ResultsTableHeaderMultipleControls', { '$$NUM$$': this.courseClass.numControls });
         }
 
-        var course = this.courseClass.course;
+        const course = this.courseClass.course;
         if (course.length !== null) {
-            headerText += ", " + getMessageWithFormatting("ResultsTableHeaderCourseLength", {"$$DISTANCE$$": course.length.toFixed(1)});
+            headerText += ', ' + getMessageWithFormatting('ResultsTableHeaderCourseLength', { '$$DISTANCE$$': course.length.toFixed(1) });
         }
         if (course.climb !== null) {
-            headerText += ", " + getMessageWithFormatting("ResultsTableHeaderClimb", {"$$CLIMB$$": course.climb});
+            headerText += ', ' + getMessageWithFormatting('ResultsTableHeaderClimb', { '$$CLIMB$$': course.climb });
         }
-        
+
         this.headerSpan.text(headerText);
-        
-        var headerCellData = [
-            getMessage("ResultsTableHeaderControlNumber"),
-            getMessage("ResultsTableHeaderName"),
-            getMessage("ResultsTableHeaderTime")
+
+        let headerCellData = [
+            getMessage('ResultsTableHeaderControlNumber'),
+            getMessage('ResultsTableHeaderName'),
+            getMessage('ResultsTableHeaderTime')
         ];
-        
-        var controls = this.courseClass.course.controls;
+
+        const controls = this.courseClass.course.controls;
         if (controls === null) {
             headerCellData = headerCellData.concat(d3.range(1, this.courseClass.numControls + 1));
         } else {
             headerCellData = headerCellData.concat(controls.map(function (control, index) {
-                return (index + 1) + NON_BREAKING_SPACE_CHAR + "(" + control + ")";
+                return (index + 1) + NON_BREAKING_SPACE_CHAR + '(' + control + ')';
             }));
         }
-            
-        headerCellData.push(getMessage("FinishName"));
-        
-        var headerCells = this.table.select("thead tr")
-                                    .selectAll("th")
-                                    .data(headerCellData);
-                                                       
-        headerCells.enter().append("th");
+
+        headerCellData.push(getMessage('FinishName'));
+
+        let headerCells = this.table.select('thead tr')
+            .selectAll('th')
+            .data(headerCellData);
+
+        headerCells.enter().append('th');
         headerCells.exit().remove();
-        headerCells = this.table.select("thead tr")
-                                .selectAll("th")
-                                .data(headerCellData);
-                                
+        headerCells = this.table.select('thead tr')
+            .selectAll('th')
+            .data(headerCellData);
+
         headerCells.text(function (header) { return header; });
-        
+
         // Array that accumulates bits of HTML for the table body.
-        var htmlBits = [];
-        
+        const htmlBits = [];
+
         // Adds a two-line cell to the array of table-body HTML parts.
         // If truthy, cssClass is assumed to be HTML-safe and not require
         // escaping.
         function addCell(topLine, bottomLine, cssClass, cumFastest, splitFastest, cumDubious, splitDubious) {
-            htmlBits.push("<td");
+            htmlBits.push('<td');
             if (cssClass) {
-                htmlBits.push(" class=\"" + cssClass + "\"");
+                htmlBits.push(' class="' + cssClass + '"');
             }
-            
-            htmlBits.push("><span");
-            var className = (((cumFastest) ? "fastest" : "") + " " + ((cumDubious) ? "dubious" : "")).trim();
-            if (className !== "") {
-                htmlBits.push(" class=\"" + className + "\"");
+
+            htmlBits.push('><span');
+            let className = (((cumFastest) ? 'fastest' : '') + ' ' + ((cumDubious) ? 'dubious' : '')).trim();
+            if (className !== '') {
+                htmlBits.push(' class="' + className + '"');
             }
-            
-            htmlBits.push(">");
+
+            htmlBits.push('>');
             htmlBits.push(escapeHtml(topLine));
-            htmlBits.push("</span><br><span");
-            className = (((splitFastest) ? "fastest" : "") + " " + ((splitDubious) ? "dubious" : "")).trim();
-            if (className !== "") {
-                htmlBits.push(" class=\"" + className + "\"");
+            htmlBits.push('</span><br><span');
+            className = (((splitFastest) ? 'fastest' : '') + ' ' + ((splitDubious) ? 'dubious' : '')).trim();
+            if (className !== '') {
+                htmlBits.push(' class="' + className + '"');
             }
-            
-            htmlBits.push(">");
+
+            htmlBits.push('>');
             htmlBits.push(escapeHtml(bottomLine));
-            htmlBits.push("</span></td>\n");
+            htmlBits.push('</span></td>\n');
         }
-        
-        var competitors = this.courseClass.competitors.slice(0);
+
+        const competitors = this.courseClass.competitors.slice(0);
         competitors.sort(compareCompetitors);
-        
-        var nonCompCount = 0;
-        var rank = 0;
-        
-        var precision = determinePrecision(competitors);
-        
+
+        let nonCompCount = 0;
+        let rank = 0;
+
+        const precision = determinePrecision(competitors);
+
         competitors.forEach(function (competitor, index) {
-            htmlBits.push("<tr><td>");
-            
+            htmlBits.push('<tr><td>');
+
             if (competitor.isNonCompetitive) {
-                htmlBits.push(escapeHtml(getMessage("NonCompetitiveShort")));
+                htmlBits.push(escapeHtml(getMessage('NonCompetitiveShort')));
                 nonCompCount += 1;
             } else if (competitor.completed()) {
                 if (index === 0 || competitors[index - 1].totalTime !== competitor.totalTime) {
                     rank = index + 1 - nonCompCount;
                 }
-                
-                htmlBits.push("" + rank);
+
+                htmlBits.push('' + rank);
             }
-            
-            htmlBits.push("</td>");
-            
-            addCell(competitor.name, competitor.club, false, false, false, false);
-            addCell(getTimeOrStatus(competitor), NON_BREAKING_SPACE_CHAR, "time", false, false, false, false);
-            
+
+            htmlBits.push('</td>');
+
+            addCell(competitor.name, competitor.club, false, false, false, false, false);
+            addCell(getTimeOrStatus(competitor), NON_BREAKING_SPACE_CHAR, 'time', false, false, false, false);
+
             d3.range(1, this.courseClass.numControls + 2).forEach(function (controlNum) {
-                var formattedCumTime = formatTime(competitor.getOriginalCumulativeTimeTo(controlNum), precision);
-                var formattedSplitTime = formatTime(competitor.getOriginalSplitTimeTo(controlNum), precision);
-                var isCumTimeFastest = (competitor.getCumulativeRankTo(controlNum) === 1);
-                var isSplitTimeFastest = (competitor.getSplitRankTo(controlNum) === 1);
-                var isCumDubious = competitor.isCumulativeTimeDubious(controlNum);
-                var isSplitDubious = competitor.isSplitTimeDubious(controlNum);
-                addCell(formattedCumTime, formattedSplitTime, "time", isCumTimeFastest, isSplitTimeFastest, isCumDubious, isSplitDubious);
+                const formattedCumTime = formatTime(competitor.getOriginalCumulativeTimeTo(controlNum), precision);
+                const formattedSplitTime = formatTime(competitor.getOriginalSplitTimeTo(controlNum), precision);
+                const isCumTimeFastest = (competitor.getCumulativeRankTo(controlNum) === 1);
+                const isSplitTimeFastest = (competitor.getSplitRankTo(controlNum) === 1);
+                const isCumDubious = competitor.isCumulativeTimeDubious(controlNum);
+                const isSplitDubious = competitor.isSplitTimeDubious(controlNum);
+                addCell(formattedCumTime, formattedSplitTime, 'time', isCumTimeFastest, isSplitTimeFastest, isCumDubious, isSplitDubious);
             });
-            
-            htmlBits.push("</tr>\n");
-            
+
+            htmlBits.push('</tr>\n');
+
         }, this);
-        
-        this.table.select("tbody").node().innerHTML = htmlBits.join("");
+
+        this.table.select('tbody').node().innerHTML = htmlBits.join('');
     };
-    
+
     /**
     * Sets the class whose data is displayed.
     * @sb-param {SplitsBrowser.Model.CourseClass} courseClass - The class displayed.
@@ -9362,37 +9398,37 @@ SplitsBrowser.Messages = {};
             this.populateTable();
         }
     };
-    
+
     /**
     * Shows the table of results.
     */
     ResultsTable.prototype.show = function () {
-        this.div.style("display", null);
+        this.div.style('display', null);
     };
-    
+
     /**
     * Hides the table of results.
     */
     ResultsTable.prototype.hide = function () {
-        this.div.style("display", "none");
+        this.div.style('display', 'none');
     };
-    
+
     /**
     * Retranslates the results table following a change of selected language.
     */
     ResultsTable.prototype.retranslate = function () {
         this.populateTable();
     };
-    
+
     SplitsBrowser.Controls.ResultsTable = ResultsTable;
 })();
 
 (function () {
-    "use strict";
-    
-    var ChartTypes = SplitsBrowser.Model.ChartTypes;
-    var CourseClassSet = SplitsBrowser.Model.CourseClassSet;
-    
+    'use strict';
+
+    const ChartTypes = SplitsBrowser.Model.ChartTypes;
+    const CourseClassSet = SplitsBrowser.Model.CourseClassSet;
+
     /**
     * Remove all matches of the given regular expression from the given string.
     * The regexp is not assumed to contain the "g" flag.
@@ -9401,49 +9437,49 @@ SplitsBrowser.Messages = {};
     * @sb-return {String} The given query-string with all regexp matches removed.
     */
     function removeAll(queryString, regexp) {
-        return queryString.replace(new RegExp(regexp.source, "g"), "");
+        return queryString.replace(new RegExp(regexp.source, 'g'), '');
     }
-    
-    var CLASS_NAME_REGEXP = /(?:^|&|\?)class=([^&]+)/;
-    
+
+    const CLASS_NAME_REGEXP = /(?:^|&|\?)class=([^&]+)/;
+
     /**
     * Reads the selected class names from a query string.
     * @sb-param {String} queryString - The query string to read the class name
     *     from.
-    * @sb-param {Event} eventData - The event data read in, used to validate the 
+    * @sb-param {Event} eventData - The event data read in, used to validate the
     *     selected classes.
     * @sb-return {CourseClassSet|null} - Array of selected CourseClass objects, or null
     *     if none were found.
     */
     function readSelectedClasses(queryString, eventData) {
-        var classNameMatch = CLASS_NAME_REGEXP.exec(queryString);
+        const classNameMatch = CLASS_NAME_REGEXP.exec(queryString);
         if (classNameMatch === null) {
             // No class name specified in the URL.
             return null;
         } else {
-            var classesByName = d3.map();
-            for (var index = 0; index < eventData.classes.length; index += 1) {
+            const classesByName = <any>d3.map();
+            for (let index = 0; index < eventData.classes.length; index += 1) {
                 classesByName.set(eventData.classes[index].name, eventData.classes[index]);
             }
-            
-            var classNames = decodeURIComponent(classNameMatch[1]).split(";");
+
+            let classNames = decodeURIComponent(classNameMatch[1]).split(';');
             classNames = d3.set(classNames).values();
-            var selectedClasses = classNames.filter(function (className) { return classesByName.has(className); })
-                                            .map(function (className) { return classesByName.get(className); });
-            
+            let selectedClasses = classNames.filter(function (className) { return classesByName.has(className); })
+                .map(function (className) { return classesByName.get(className); });
+
             if (selectedClasses.length === 0) {
                 // No classes recognised, or none were specified.
                 return null;
             } else {
                 // Ignore any classes that are not on the same course as the
                 // first class.
-                var course = selectedClasses[0].course;
+                const course = selectedClasses[0].course;
                 selectedClasses = selectedClasses.filter(function (selectedClass) { return selectedClass.course === course; });
                 return new CourseClassSet(selectedClasses);
             }
         }
     }
-    
+
     /**
     * Formats the selected classes into the given query-string, removing any
     * previous matches.
@@ -9454,24 +9490,24 @@ SplitsBrowser.Messages = {};
     */
     function formatSelectedClasses(queryString, eventData, classIndexes) {
         queryString = removeAll(queryString, CLASS_NAME_REGEXP);
-        var classNames = classIndexes.map(function (index) { return eventData.classes[index].name; });
-        return queryString + "&class=" + encodeURIComponent(classNames.join(";"));
+        const classNames = classIndexes.map(function (index) { return eventData.classes[index].name; });
+        return queryString + '&class=' + encodeURIComponent(classNames.join(';'));
     }
 
-    var CHART_TYPE_REGEXP = /(?:^|&|\?)chartType=([^&]+)/;
-    
+    const CHART_TYPE_REGEXP = /(?:^|&|\?)chartType=([^&]+)/;
+
     /**
     * Reads the selected chart type from a query string.
     * @sb-param {String} queryString - The query string to read the chart type
     *     from.
     * @sb-return {Object|null} Selected chart type, or null if not recognised.
-    */    
+    */
     function readChartType(queryString) {
-        var chartTypeMatch = CHART_TYPE_REGEXP.exec(queryString);
+        const chartTypeMatch = CHART_TYPE_REGEXP.exec(queryString);
         if (chartTypeMatch === null) {
             return null;
-        } else { 
-            var chartTypeName = chartTypeMatch[1];
+        } else {
+            const chartTypeName = chartTypeMatch[1];
             if (ChartTypes.hasOwnProperty(chartTypeName)) {
                 return ChartTypes[chartTypeName];
             } else {
@@ -9479,7 +9515,7 @@ SplitsBrowser.Messages = {};
             }
         }
     }
-    
+
     /**
     * Formats the given chart type into the query-string
     * @sb-param {String} queryString - The original query-string.
@@ -9488,20 +9524,20 @@ SplitsBrowser.Messages = {};
     */
     function formatChartType(queryString, chartType) {
         queryString = removeAll(queryString, CHART_TYPE_REGEXP);
-        for (var chartTypeName in ChartTypes) {
+        for (const chartTypeName in ChartTypes) {
             if (ChartTypes.hasOwnProperty(chartTypeName) && ChartTypes[chartTypeName] === chartType) {
-                return queryString + "&chartType=" + encodeURIComponent(chartTypeName);
+                return queryString + '&chartType=' + encodeURIComponent(chartTypeName);
             }
         }
-        
+
         // Unrecognised chart type?
         return queryString;
     }
-    
-    var COMPARE_WITH_REGEXP = /(?:^|&|\?)compareWith=([^&]+)/;
-    
-    var BUILTIN_COMPARISON_TYPES = ["Winner", "FastestTime", "FastestTimePlus5", "FastestTimePlus25", "FastestTimePlus50", "FastestTimePlus100"];
-    
+
+    const COMPARE_WITH_REGEXP = /(?:^|&|\?)compareWith=([^&]+)/;
+
+    const BUILTIN_COMPARISON_TYPES = ['Winner', 'FastestTime', 'FastestTimePlus5', 'FastestTimePlus25', 'FastestTimePlus50', 'FastestTimePlus100'];
+
     /**
     * Reads what to compare against.
     * @sb-param {String} queryString - The query string to read the comparison
@@ -9512,21 +9548,21 @@ SplitsBrowser.Messages = {};
     *     recognised.
     */
     function readComparison(queryString, courseClassSet) {
-        var comparisonMatch = COMPARE_WITH_REGEXP.exec(queryString);
+        const comparisonMatch = COMPARE_WITH_REGEXP.exec(queryString);
         if (comparisonMatch === null) {
             return null;
         } else {
-            var comparisonName = decodeURIComponent(comparisonMatch[1]);
-            var defaultIndex = BUILTIN_COMPARISON_TYPES.indexOf(comparisonName);
+            const comparisonName = decodeURIComponent(comparisonMatch[1]);
+            const defaultIndex = BUILTIN_COMPARISON_TYPES.indexOf(comparisonName);
             if (defaultIndex >= 1) {
-                return {index: defaultIndex, runner: null};
+                return { index: defaultIndex, runner: null };
             } else if (defaultIndex === 0 && courseClassSet !== null) {
-                var hasCompleters = courseClassSet.allCompetitors.some(function (competitor) {
+                const hasCompleters = courseClassSet.allCompetitors.some(function (competitor) {
                     return competitor.completed();
                 });
-                
+
                 if (hasCompleters) {
-                    return {index: 0, runner: null};
+                    return { index: 0, runner: null };
                 } else {
                     // Cannot select 'Winner' as there was no winner.
                     return null;
@@ -9536,19 +9572,19 @@ SplitsBrowser.Messages = {};
                 // classes to look for competitor names within.
                 return null;
             } else {
-                for (var competitorIndex = 0; competitorIndex < courseClassSet.allCompetitors.length; competitorIndex += 1) {
-                    var competitor = courseClassSet.allCompetitors[competitorIndex];
+                for (let competitorIndex = 0; competitorIndex < courseClassSet.allCompetitors.length; competitorIndex += 1) {
+                    const competitor = courseClassSet.allCompetitors[competitorIndex];
                     if (competitor.name === comparisonName && competitor.completed()) {
-                        return {index: BUILTIN_COMPARISON_TYPES.length, runner: competitor};
+                        return { index: BUILTIN_COMPARISON_TYPES.length, runner: competitor };
                     }
                 }
-                
+
                 // Didn't find the competitor.
                 return null;
             }
         }
     }
-    
+
     /**
     * Formats the given comparison into the given query-string.
     * @sb-param {String} queryString - The original query-string.
@@ -9557,22 +9593,22 @@ SplitsBrowser.Messages = {};
     */
     function formatComparison(queryString, index, runner) {
         queryString = removeAll(queryString, COMPARE_WITH_REGEXP);
-        var comparison = null;
+        let comparison = null;
         if (typeof index === typeof 0 && 0 <= index && index < BUILTIN_COMPARISON_TYPES.length) {
             comparison = BUILTIN_COMPARISON_TYPES[index];
         } else if (runner !== null) {
             comparison = runner.name;
         }
-        
+
         if (comparison === null) {
             return queryString;
         } else {
-            return queryString + "&compareWith=" + encodeURIComponent(comparison);
+            return queryString + '&compareWith=' + encodeURIComponent(comparison);
         }
     }
-    
-    var SELECTED_COMPETITORS_REGEXP = /(?:^|&|\?)selected=([^&]+)/;
-    
+
+    const SELECTED_COMPETITORS_REGEXP = /(?:^|&|\?)selected=([^&]+)/;
+
     /**
     * Reads what to compare against.
     * @sb-param {String} queryString - The query string to read the comparison
@@ -9586,32 +9622,32 @@ SplitsBrowser.Messages = {};
         if (courseClassSet === null) {
             return null;
         } else {
-            var selectedCompetitorsMatch = SELECTED_COMPETITORS_REGEXP.exec(queryString);
+            const selectedCompetitorsMatch = SELECTED_COMPETITORS_REGEXP.exec(queryString);
             if (selectedCompetitorsMatch === null) {
                 return null;
             } else {
-                var competitorNames = decodeURIComponent(selectedCompetitorsMatch[1]).split(";");
-                if (competitorNames.indexOf("*") >= 0) {
+                let competitorNames = decodeURIComponent(selectedCompetitorsMatch[1]).split(';');
+                if (competitorNames.indexOf('*') >= 0) {
                     // All competitors selected.
                     return d3.range(0, courseClassSet.allCompetitors.length);
                 }
-                
+
                 competitorNames = d3.set(competitorNames).values();
-                var allCompetitorNames = courseClassSet.allCompetitors.map(function (competitor) { return competitor.name; });
-                var selectedCompetitorIndexes = [];
+                const allCompetitorNames = courseClassSet.allCompetitors.map(function (competitor) { return competitor.name; });
+                const selectedCompetitorIndexes = [];
                 competitorNames.forEach(function (competitorName) {
-                    var index = allCompetitorNames.indexOf(competitorName);
+                    const index = allCompetitorNames.indexOf(competitorName);
                     if (index >= 0) {
                         selectedCompetitorIndexes.push(index);
                     }
                 });
-                
+
                 selectedCompetitorIndexes.sort(d3.ascending);
                 return (selectedCompetitorIndexes.length === 0) ? null : selectedCompetitorIndexes;
             }
         }
     }
-    
+
     /**
     * Formats the given selected competitors into the given query-string.
     * @sb-param {String} queryString - The original query-string.
@@ -9623,23 +9659,23 @@ SplitsBrowser.Messages = {};
     */
     function formatSelectedCompetitors(queryString, courseClassSet, selected) {
         queryString = removeAll(queryString, SELECTED_COMPETITORS_REGEXP);
-        var selectedCompetitors = selected.map(function (index) { return courseClassSet.allCompetitors[index]; });
+        const selectedCompetitors = selected.map(function (index) { return courseClassSet.allCompetitors[index]; });
         if (selectedCompetitors.length === 0) {
             return queryString;
         } else if (selectedCompetitors.length === courseClassSet.allCompetitors.length) {
             // Assume all selected competitors are different, so all must be
             // selected.
-            return queryString + "&selected=*";
+            return queryString + '&selected=*';
         } else {
-            var competitorNames = selectedCompetitors.map(function (comp) { return comp.name; }).join(";");
-            return queryString + "&selected=" + encodeURIComponent(competitorNames);
+            const competitorNames = selectedCompetitors.map(function (comp) { return comp.name; }).join(';');
+            return queryString + '&selected=' + encodeURIComponent(competitorNames);
         }
     }
-    
-    var SELECTED_STATISTICS_REGEXP = /(?:^|&|\?)stats=([^&]*)/;
-    
-    var ALL_STATS_NAMES = ["TotalTime", "SplitTime", "BehindFastest", "TimeLoss"];
-    
+
+    const SELECTED_STATISTICS_REGEXP = /(?:^|&|\?)stats=([^&]*)/;
+
+    const ALL_STATS_NAMES = ['TotalTime', 'SplitTime', 'BehindFastest', 'TimeLoss'];
+
     /**
     * Reads the selected statistics from the query string.
     * @sb-param {String} queryString - The query string to read the selected
@@ -9648,28 +9684,28 @@ SplitsBrowser.Messages = {};
     *     if no statistics parameter was found.
     */
     function readSelectedStatistics(queryString) {
-        var statsMatch = SELECTED_STATISTICS_REGEXP.exec(queryString);
+        const statsMatch = SELECTED_STATISTICS_REGEXP.exec(queryString);
         if (statsMatch === null) {
             return null;
         } else {
-            var statsNames = decodeURIComponent(statsMatch[1]).split(";");
-            var stats = {};
+            const statsNames = decodeURIComponent(statsMatch[1]).split(';');
+            const stats: any = {} as any;
             ALL_STATS_NAMES.forEach(function (statsName) { stats[statsName] = false; });
-            
-            for (var index = 0; index < statsNames.length; index += 1) {
-                var name = statsNames[index];
+
+            for (let index = 0; index < statsNames.length; index += 1) {
+                const name = statsNames[index];
                 if (stats.hasOwnProperty(name)) {
                     stats[name] = true;
-                } else if (name !== "") {
+                } else if (name !== '') {
                     // Ignore unrecognised non-empty statistic name.
                     return null;
                 }
             }
-            
+
             return stats;
         }
     }
-    
+
     /**
     * Formats the selected statistics into the given query string.
     * @sb-param {String} queryString - The original query-string.
@@ -9678,12 +9714,12 @@ SplitsBrowser.Messages = {};
     */
     function formatSelectedStatistics(queryString, stats) {
         queryString = removeAll(queryString, SELECTED_STATISTICS_REGEXP);
-        var statsNames = ALL_STATS_NAMES.filter(function (name) { return stats.hasOwnProperty(name) && stats[name]; });
-        return queryString + "&stats=" + encodeURIComponent(statsNames.join(";"));
+        const statsNames = ALL_STATS_NAMES.filter(function (name) { return stats.hasOwnProperty(name) && stats[name]; });
+        return queryString + '&stats=' + encodeURIComponent(statsNames.join(';'));
     }
-    
-    var SHOW_ORIGINAL_REGEXP = /(?:^|&|\?)showOriginal=([^&]*)/;
-    
+
+    const SHOW_ORIGINAL_REGEXP = /(?:^|&|\?)showOriginal=([^&]*)/;
+
     /**
     * Reads the show-original-data flag from the given query-string.
     *
@@ -9695,10 +9731,10 @@ SplitsBrowser.Messages = {};
     * @sb-return {boolean} True to show original data, false not to.
     */
     function readShowOriginal(queryString) {
-        var showOriginalMatch = SHOW_ORIGINAL_REGEXP.exec(queryString);
-        return (showOriginalMatch !== null && showOriginalMatch[1] === "1");
+        const showOriginalMatch = SHOW_ORIGINAL_REGEXP.exec(queryString);
+        return (showOriginalMatch !== null && showOriginalMatch[1] === '1');
     }
-    
+
     /**
     * Formats the show-original-data flag into the given query-string.
     * @sb-param {String} queryString - The original query-string.
@@ -9708,11 +9744,11 @@ SplitsBrowser.Messages = {};
     */
     function formatShowOriginal(queryString, showOriginal) {
         queryString = removeAll(queryString, SHOW_ORIGINAL_REGEXP);
-        return (showOriginal) ? queryString + "&showOriginal=1" : queryString;
+        return (showOriginal) ? queryString + '&showOriginal=1' : queryString;
     }
-    
-    var FILTER_TEXT_REGEXP = /(?:^|&|\?)filterText=([^&]*)/;
-    
+
+    const FILTER_TEXT_REGEXP = /(?:^|&|\?)filterText=([^&]*)/;
+
     /**
     * Reads the filter text from the given query string.
     *
@@ -9722,14 +9758,14 @@ SplitsBrowser.Messages = {};
     * @sb-return {String} The filter text read.
     */
     function readFilterText(queryString) {
-        var filterTextMatch = FILTER_TEXT_REGEXP.exec(queryString);
+        const filterTextMatch = FILTER_TEXT_REGEXP.exec(queryString);
         if (filterTextMatch === null) {
-            return "";
+            return '';
         } else {
             return decodeURIComponent(filterTextMatch[1]);
         }
     }
-    
+
     /**
     * Formats filter text into the given query-string.
     * @sb-param {String} queryString - The original query-string.
@@ -9738,9 +9774,9 @@ SplitsBrowser.Messages = {};
     */
     function formatFilterText(queryString, filterText) {
         queryString = removeAll(queryString, FILTER_TEXT_REGEXP);
-        return (filterText === "") ? queryString : queryString + "&filterText=" + encodeURIComponent(filterText);
+        return (filterText === '') ? queryString : queryString + '&filterText=' + encodeURIComponent(filterText);
     }
-    
+
     /**
     * Attempts to parse the given query string.
     * @sb-param {String} queryString - The query string to parse.
@@ -9748,8 +9784,8 @@ SplitsBrowser.Messages = {};
     * @sb-return {Object} The data parsed from the given query string.
     */
     function parseQueryString(queryString, eventData) {
-        var courseClassSet = readSelectedClasses(queryString, eventData);
-        var classIndexes = (courseClassSet === null) ? null : courseClassSet.classes.map(function (courseClass) { return eventData.classes.indexOf(courseClass); });
+        const courseClassSet = readSelectedClasses(queryString, eventData);
+        const classIndexes = (courseClassSet === null) ? null : courseClassSet.classes.map(function (courseClass) { return eventData.classes.indexOf(courseClass); });
         return {
             classes: classIndexes,
             chartType: readChartType(queryString),
@@ -9784,20 +9820,20 @@ SplitsBrowser.Messages = {};
         queryString = formatSelectedStatistics(queryString, data.stats);
         queryString = formatShowOriginal(queryString, data.showOriginal);
         queryString = formatFilterText(queryString, data.filterText);
-        queryString = queryString.replace(/^\??&/, "");
+        queryString = queryString.replace(/^\??&/, '');
         return queryString;
     }
-    
+
     SplitsBrowser.parseQueryString = parseQueryString;
     SplitsBrowser.formatQueryString = formatQueryString;
 })();
 
 (function () {
-    "use strict";
+    'use strict';
 
-    var getMessage = SplitsBrowser.getMessage;
+    const getMessage = SplitsBrowser.getMessage;
 
-    var CONTAINER_DIV_ID = "warningViewerContainer";
+    const CONTAINER_DIV_ID = 'warningViewerContainer';
 
     /**
     * Constructs a new WarningViewer object.
@@ -9808,173 +9844,173 @@ SplitsBrowser.Messages = {};
     function WarningViewer(parent) {
         this.parent = parent;
         this.warnings = [];
-        
-        this.containerDiv = parent.append("div")
-                                  .classed("topRowStart", true)
-                                  .attr("id", CONTAINER_DIV_ID)
-                                  .style("display", "none");
-                                  
-        this.containerDiv.append("div").classed("topRowStartSpacer", true);
-        
+
+        this.containerDiv = parent.append('div')
+            .classed('topRowStart', true)
+            .attr('id', CONTAINER_DIV_ID)
+            .style('display', 'none');
+
+        this.containerDiv.append('div').classed('topRowStartSpacer', true);
+
         this.warningTriangle = this.createWarningTriangle(this.containerDiv);
-                                  
-        this.warningList = parent.append("div")
-                                 .classed("warningList", true)
-                                 .classed("transient", true)
-                                 .style("position", "absolute")
-                                 .style("display", "none");
-        
+
+        this.warningList = parent.append('div')
+            .classed('warningList', true)
+            .classed('transient', true)
+            .style('position', 'absolute')
+            .style('display', 'none');
+
         // Ensure that a click outside of the warning list or the selector
         // box closes it.
         // Taken from http://stackoverflow.com/questions/1403615 and adjusted.
-        var outerThis = this;
+        const outerThis = this;
         $(document).click(function (e) {
-            if (outerThis.warningList.style("display") !== "none") {
-                var container = $("div#warningTriangleContainer,div.warningList");
-                if (!container.is(e.target) && container.has(e.target).length === 0) { 
-                    outerThis.warningList.style("display", "none");
+            if (outerThis.warningList.style('display') !== 'none') {
+                const container = $('div#warningTriangleContainer,div.warningList');
+                if (!container.is(e.target) && container.has(e.target).length === 0) {
+                    outerThis.warningList.style('display', 'none');
                 }
             }
         });
-        
+
         this.setMessages();
     }
-    
+
     /**
     * Sets the message shown in the tooltip, either as part of initialisation or
     * following a change of selected language.
     */
     WarningViewer.prototype.setMessages = function () {
-        this.containerDiv.attr("title", getMessage("WarningsTooltip"));
+        this.containerDiv.attr('title', getMessage('WarningsTooltip'));
     };
-    
+
     /**
     * Creates the warning triangle.
     * @sb-return {Object} d3 selection containing the warning triangle.
     */
     WarningViewer.prototype.createWarningTriangle = function () {
-        var svgContainer = this.containerDiv.append("div")
-                                   .attr("id", "warningTriangleContainer");
-        var svg = svgContainer.append("svg");
-        
-        svg.style("width", "21px")
-           .style("height", "19px")
-           .style("margin-bottom", "-3px");
-           
-        svg.append("polygon")
-           .attr("points", "1,18 10,0 19,18")
-           .style("stroke", "black")
-           .style("stroke-width", "1.5px")
-           .style("fill", "#ffd426");
-           
-        svg.append("text")
-           .attr("x", 10)
-           .attr("y", 16)
-           .attr("text-anchor", "middle")
-           .style("font-size", "14px")
-           .text("!");
-           
-        var outerThis = this;
-        svgContainer.on("click", function () { outerThis.showHideErrorList(); });
-        
+        const svgContainer = this.containerDiv.append('div')
+            .attr('id', 'warningTriangleContainer');
+        const svg = svgContainer.append('svg');
+
+        svg.style('width', '21px')
+            .style('height', '19px')
+            .style('margin-bottom', '-3px');
+
+        svg.append('polygon')
+            .attr('points', '1,18 10,0 19,18')
+            .style('stroke', 'black')
+            .style('stroke-width', '1.5px')
+            .style('fill', '#ffd426');
+
+        svg.append('text')
+            .attr('x', 10)
+            .attr('y', 16)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '14px')
+            .text('!');
+
+        const outerThis = this;
+        svgContainer.on('click', function () { outerThis.showHideErrorList(); });
+
         return svg;
     };
-    
+
     /**
     * Sets the list of visible warnings.
     * @sb-param {Array} warnings - Array of warning messages.
     */
     WarningViewer.prototype.setWarnings = function (warnings) {
-        var errorsSelection = this.warningList.selectAll("div")
-                                              .data(warnings);
-        
-        errorsSelection.enter().append("div")
-                               .classed("warning", true);
-        
-        errorsSelection = this.warningList.selectAll("div")
-                                          .data(warnings);
-        
+        let errorsSelection = this.warningList.selectAll('div')
+            .data(warnings);
+
+        errorsSelection.enter().append('div')
+            .classed('warning', true);
+
+        errorsSelection = this.warningList.selectAll('div')
+            .data(warnings);
+
         errorsSelection.text(function (errorMessage) { return errorMessage; });
         errorsSelection.exit().remove();
-        this.containerDiv.style("display", (warnings && warnings.length > 0) ? "block" : "none");
+        this.containerDiv.style('display', (warnings && warnings.length > 0) ? 'block' : 'none');
     };
-    
+
     /**
     * Shows or hides the list of warnings.
     */
     WarningViewer.prototype.showHideErrorList = function () {
-        if (this.warningList.style("display") === "none") {
-            var offset = $(this.warningTriangle.node()).offset();
-            var height = $(this.warningTriangle.node()).outerHeight();
-            var width = $(this.warningList.node()).outerWidth();
-            this.warningList.style("left", Math.max(offset.left - width / 2, 0) + "px")
-                                    .style("top", (offset.top + height + 5) + "px")
-                                    .style("display", "block");
+        if (this.warningList.style('display') === 'none') {
+            const offset = $(this.warningTriangle.node()).offset();
+            const height = $(this.warningTriangle.node()).outerHeight();
+            const width = $(this.warningList.node()).outerWidth();
+            this.warningList.style('left', Math.max(offset.left - width / 2, 0) + 'px')
+                .style('top', (offset.top + height + 5) + 'px')
+                .style('display', 'block');
         } else {
-            this.warningList.style("display", "none");
+            this.warningList.style('display', 'none');
         }
     };
-    
+
     SplitsBrowser.Controls.WarningViewer = WarningViewer;
 })();
 
 (function () {
-    "use strict";
+    'use strict';
     // Delay in milliseconds between a resize event being triggered and the
     // page responding to it.
     // (Resize events tend to come more than one at a time; if a resize event
     // comes in while a previous event is waiting, the previous event is
     // cancelled.)
-    var RESIZE_DELAY_MS = 100;
-    
-    var Version = SplitsBrowser.Version;
+    const RESIZE_DELAY_MS = 100;
 
-    var getMessage = SplitsBrowser.getMessage;
-    var tryGetMessage = SplitsBrowser.tryGetMessage;
-    var getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-    var initialiseMessages = SplitsBrowser.initialiseMessages;
-    
-    var Model = SplitsBrowser.Model;
-    var CompetitorSelection = Model.CompetitorSelection;
-    var CourseClassSet = Model.CourseClassSet;
-    var ChartTypes = Model.ChartTypes;
-    
-    var parseEventData = SplitsBrowser.Input.parseEventData;
-    var repairEventData = SplitsBrowser.DataRepair.repairEventData;
-    var transferCompetitorData = SplitsBrowser.DataRepair.transferCompetitorData;
-    var parseQueryString = SplitsBrowser.parseQueryString;
-    var formatQueryString = SplitsBrowser.formatQueryString;
-    
-    var Controls = SplitsBrowser.Controls;
-    var LanguageSelector = Controls.LanguageSelector;
-    var ClassSelector = Controls.ClassSelector;
-    var ChartTypeSelector = Controls.ChartTypeSelector;
-    var ComparisonSelector = Controls.ComparisonSelector;
-    var OriginalDataSelector = Controls.OriginalDataSelector;
-    var StatisticsSelector = Controls.StatisticsSelector;
-    var WarningViewer = Controls.WarningViewer;
-    var CompetitorList = Controls.CompetitorList;
-    var Chart = Controls.Chart;
-    var ResultsTable = Controls.ResultsTable;
-    
+    const Version = SplitsBrowser.Version;
+
+    const getMessage = SplitsBrowser.getMessage;
+    const tryGetMessage = SplitsBrowser.tryGetMessage;
+    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+    const initialiseMessages = SplitsBrowser.initialiseMessages;
+
+    const Model = SplitsBrowser.Model;
+    const CompetitorSelection = Model.CompetitorSelection;
+    const CourseClassSet = Model.CourseClassSet;
+    const ChartTypes = Model.ChartTypes;
+
+    const parseEventData = SplitsBrowser.Input.parseEventData;
+    const repairEventData = SplitsBrowser.DataRepair.repairEventData;
+    const transferCompetitorData = SplitsBrowser.DataRepair.transferCompetitorData;
+    const parseQueryString = SplitsBrowser.parseQueryString;
+    const formatQueryString = SplitsBrowser.formatQueryString;
+
+    const Controls = SplitsBrowser.Controls;
+    const LanguageSelector = Controls.LanguageSelector;
+    const ClassSelector = Controls.ClassSelector;
+    const ChartTypeSelector = Controls.ChartTypeSelector;
+    const ComparisonSelector = Controls.ComparisonSelector;
+    const OriginalDataSelector = Controls.OriginalDataSelector;
+    const StatisticsSelector = Controls.StatisticsSelector;
+    const WarningViewer = Controls.WarningViewer;
+    const CompetitorList = Controls.CompetitorList;
+    const Chart = Controls.Chart;
+    const ResultsTable = Controls.ResultsTable;
+
     /**
     * Checks that D3 version 4 or later is present.
     * @sb-return {Boolean} true if D3 version 4 is present, false if no D3 was found
-    *     or a version of D3 older version 4 was found. 
+    *     or a version of D3 older version 4 was found.
     */
     function checkD3Version4() {
         // DKR d3 imported rather than on the window object
         if (!d3) {
-            alert("D3 was not found.  SplitsBrowser requires D3 version 4 or later.");
+            alert('D3 was not found.  SplitsBrowser requires D3 version 4 or later.');
             return false;
         } else if (parseFloat(d3.version) < 4) {
-            alert("D3 version " + d3.version + " was found.  SplitsBrowser requires D3 version 4 or later.");
+            alert('D3 version ' + d3.version + ' was found.  SplitsBrowser requires D3 version 4 or later.');
             return false;
         } else {
             return true;
         }
     }
-    
+
     /**
     * The 'overall' viewer object responsible for viewing the splits graph.
     * @constructor
@@ -9983,7 +10019,7 @@ SplitsBrowser.Messages = {};
     */
     function Viewer(options) {
         this.options = options;
-    
+
         this.eventData = null;
         this.classes = null;
         this.currentClasses = [];
@@ -9991,9 +10027,9 @@ SplitsBrowser.Messages = {};
         this.referenceCumTimes = null;
         this.fastestCumTimes = null;
         this.previousCompetitorList = [];
-        
+
         this.topBarHeight = (options && options.topBar && $(options.topBar).length > 0) ? $(options.topBar).outerHeight(true) : 0;
-        
+
         this.selection = null;
         this.courseClassSet = null;
         this.languageSelector = null;
@@ -10009,40 +10045,40 @@ SplitsBrowser.Messages = {};
         this.buttonsPanel = null;
         this.competitorListContainer = null;
         this.container = null;
-        
+
         this.currentResizeTimeout = null;
     }
-    
+
     /**
     * Pops up an alert box with the given message.
     *
     * The viewer passes this function to various controls so that they can pop
     * up an alert box in normal use and call some other function during
     * testing.
-    *    
+    *
     * @sb-param {String} message - The message to show.
     */
     function alerter(message) {
         alert(message);
     }
-    
+
     /**
     * Pops up an alert box informing the user that the race graph cannot be
     * chosen as the start times are missing.
-    */ 
+    */
     function alertRaceGraphDisabledAsStartTimesMissing() {
-        alert(getMessage("RaceGraphDisabledAsStartTimesMissing"));
+        alert(getMessage('RaceGraphDisabledAsStartTimesMissing'));
     }
-    
+
     /**
     * Enables or disables the race graph option in the chart type selector
     * depending on whether all visible competitors have start times.
     */
     Viewer.prototype.enableOrDisableRaceGraph = function () {
-        var anyStartTimesMissing = this.courseClassSet.allCompetitors.some(function (competitor) { return competitor.lacksStartTime(); });
+        const anyStartTimesMissing = this.courseClassSet.allCompetitors.some(function (competitor) { return competitor.lacksStartTime(); });
         this.chartTypeSelector.setRaceGraphDisabledNotifier((anyStartTimesMissing) ? alertRaceGraphDisabledAsStartTimesMissing : null);
     };
-    
+
     /**
     * Sets the classes that the viewer can view.
     * @sb-param {SplitsBrowser.Model.Event} eventData - All event data loaded.
@@ -10053,7 +10089,7 @@ SplitsBrowser.Messages = {};
         if (this.classSelector !== null) {
             this.classSelector.setClasses(this.classes);
         }
-        
+
         this.warningViewer.setWarnings(eventData.warnings);
     };
 
@@ -10061,37 +10097,37 @@ SplitsBrowser.Messages = {};
     * Draws the logo in the top panel.
     */
     Viewer.prototype.drawLogo = function () {
-        this.logoSvg = this.topPanel.append("svg")
-                                    .classed("topRowStart", true);
+        this.logoSvg = this.topPanel.append('svg')
+            .classed('topRowStart', true);
 
-        this.logoSvg.style("width", "19px")
-                    .style("height", "19px")
-                    .style("margin-bottom", "-3px");
-               
-        this.logoSvg.append("rect")
-                    .attr("x", "0")
-                    .attr("y", "0")
-                    .attr("width", "19")
-                    .attr("height", "19")
-                    .attr("fill", "white");
-         
-        this.logoSvg.append("polygon")
-                    .attr("points", "0,19 19,0 19,19")
-                    .attr("fill", "red");
-               
-        this.logoSvg.append("polyline")
-                    .attr("points", "0.5,0.5 0.5,18.5 18.5,18.5 18.5,0.5 0.5,0.5 0.5,18.5")
-                    .attr("stroke", "black")
-                    .attr("fill", "none");
-               
-        this.logoSvg.append("polyline")
-                    .attr("points", "1,12 5,8 8,14 17,11")
-                    .attr("fill", "none")
-                    .attr("stroke", "blue")
-                    .attr("stroke-width", "2");
-                                   
-        this.logoSvg.selectAll("*")
-                    .append("title");
+        this.logoSvg.style('width', '19px')
+            .style('height', '19px')
+            .style('margin-bottom', '-3px');
+
+        this.logoSvg.append('rect')
+            .attr('x', '0')
+            .attr('y', '0')
+            .attr('width', '19')
+            .attr('height', '19')
+            .attr('fill', 'white');
+
+        this.logoSvg.append('polygon')
+            .attr('points', '0,19 19,0 19,19')
+            .attr('fill', 'red');
+
+        this.logoSvg.append('polyline')
+            .attr('points', '0.5,0.5 0.5,18.5 18.5,18.5 18.5,0.5 0.5,0.5 0.5,18.5')
+            .attr('stroke', 'black')
+            .attr('fill', 'none');
+
+        this.logoSvg.append('polyline')
+            .attr('points', '1,12 5,8 8,14 17,11')
+            .attr('fill', 'none')
+            .attr('stroke', 'blue')
+            .attr('stroke-width', '2');
+
+        this.logoSvg.selectAll('*')
+            .append('title');
 
         this.setLogoMessages();
     };
@@ -10101,24 +10137,24 @@ SplitsBrowser.Messages = {};
     * selected language.
     */
     Viewer.prototype.setLogoMessages = function () {
-        this.logoSvg.selectAll("title")
-                    .text(getMessageWithFormatting("ApplicationVersion", {"$$VERSION$$": Version}));
+        this.logoSvg.selectAll('title')
+            .text(getMessageWithFormatting('ApplicationVersion', { '$$VERSION$$': Version }));
     };
-    
+
     /**
     * Adds a spacer between controls on the top row.
     */
     Viewer.prototype.addSpacer = function () {
-        this.topPanel.append("div").classed("topRowStartSpacer", true);
+        this.topPanel.append('div').classed('topRowStartSpacer', true);
     };
-    
+
     /**
     * Adds the language selector control to the top panel.
     */
     Viewer.prototype.addLanguageSelector = function () {
         this.languageSelector = new LanguageSelector(this.topPanel.node());
     };
-    
+
     /**
     * Adds the class selector control to the top panel.
     */
@@ -10128,17 +10164,17 @@ SplitsBrowser.Messages = {};
             this.classSelector.setClasses(this.classes);
         }
     };
-    
+
     /**
     * Adds the chart-type selector to the top panel.
     */
     Viewer.prototype.addChartTypeSelector = function () {
-        var chartTypes = [ChartTypes.SplitsGraph, ChartTypes.RaceGraph, ChartTypes.PositionAfterLeg,
-                          ChartTypes.SplitPosition, ChartTypes.PercentBehind, ChartTypes.ResultsTable];
-        
+        const chartTypes = [ChartTypes.SplitsGraph, ChartTypes.RaceGraph, ChartTypes.PositionAfterLeg,
+        ChartTypes.SplitPosition, ChartTypes.PercentBehind, ChartTypes.ResultsTable];
+
         this.chartTypeSelector = new ChartTypeSelector(this.topPanel.node(), chartTypes);
     };
-    
+
     /**
     * Adds the comparison selector to the top panel.
     */
@@ -10148,7 +10184,7 @@ SplitsBrowser.Messages = {};
             this.comparisonSelector.setClasses(this.classes);
         }
     };
-    
+
     /**
     * Adds a checkbox to select the 'original' data or data after SplitsBrowser
     * has attempted to repair it.
@@ -10162,34 +10198,34 @@ SplitsBrowser.Messages = {};
     * settings.
     */
     Viewer.prototype.addDirectLink = function () {
-        this.directLink = this.topPanel.append("a")
-                                       .classed("topRowStart", true)
-                                       .attr("id", "directLinkAnchor")
-                                       .attr("href", document.location.href);
+        this.directLink = this.topPanel.append('a')
+            .classed('topRowStart', true)
+            .attr('id', 'directLinkAnchor')
+            .attr('href', document.location.href);
         this.setDirectLinkMessages();
     };
-    
+
     /**
     * Adds the warning viewer to the top panel.
     */
     Viewer.prototype.addWarningViewer = function () {
         this.warningViewer = new WarningViewer(this.topPanel);
     };
-    
+
     /**
     * Sets the text in the direct-link, following either its creation or a
     * change in selected language.
     */
     Viewer.prototype.setDirectLinkMessages = function () {
-        this.directLink.attr("title", tryGetMessage("DirectLinkToolTip", ""))
-                       .text(getMessage("DirectLink"));
+        this.directLink.attr('title', tryGetMessage('DirectLinkToolTip', ''))
+            .text(getMessage('DirectLink'));
     };
-    
+
     /**
     * Updates the URL that the direct link points to.
     */
     Viewer.prototype.updateDirectLink = function () {
-        var data = {
+        const data = {
             classes: this.classSelector.getSelectedClasses(),
             chartType: this.chartTypeSelector.getChartType(),
             compareWith: this.comparisonSelector.getComparisonType(),
@@ -10198,13 +10234,13 @@ SplitsBrowser.Messages = {};
             showOriginal: this.courseClassSet.hasDubiousData() && this.originalDataSelector.isOriginalDataSelected(),
             filterText: this.competitorList.getFilterText()
         };
-        
-        var oldQueryString = document.location.search;
-        var newQueryString = formatQueryString(oldQueryString, this.eventData, this.courseClassSet, data);
-        var oldHref = document.location.href;        
-        this.directLink.attr("href", oldHref.substring(0, oldHref.length - oldQueryString.length) + "?" + newQueryString.replace(/^\?+/, ""));
+
+        const oldQueryString = document.location.search;
+        const newQueryString = formatQueryString(oldQueryString, this.eventData, this.courseClassSet, data);
+        const oldHref = document.location.href;
+        this.directLink.attr('href', oldHref.substring(0, oldHref.length - oldQueryString.length) + '?' + newQueryString.replace(/^\?+/, ''));
     };
-    
+
     /**
     * Adds the list of competitors, and the buttons, to the page.
     */
@@ -10216,21 +10252,23 @@ SplitsBrowser.Messages = {};
     * Construct the UI inside the HTML body.
     */
     Viewer.prototype.buildUi = function (options) {
+        let body: any;
         // DKR Attach the D3 output to a div with ID of SB container
         if (options && options.containerElement) {
-            var body = d3.select(options.containerElement);
+            body = d3.select(options.containerElement);
         } else {
-           var body = d3.select("body");
+            body = d3.select('body');
         }
-        body.style("overflow", "hidden");
 
-      this.container = body.append("div")
-                           .attr("id", "sbContainer");
-  //     this.container == d3.select('.sb');
-     //  this.container.append("Hi Dave");
-        
-        this.topPanel = this.container.append("div");
-        
+        body.style('overflow', 'hidden');
+
+        this.container = body.append('div')
+            .attr('id', 'sbContainer');
+        //     this.container == d3.select('.sb');
+        //  this.container.append("Hi Dave");
+
+        this.topPanel = this.container.append('div');
+
         this.drawLogo();
         this.addLanguageSelector();
         this.addSpacer();
@@ -10243,32 +10281,32 @@ SplitsBrowser.Messages = {};
         this.addSpacer();
         this.addDirectLink();
         this.addWarningViewer();
-        
+
         this.statisticsSelector = new StatisticsSelector(this.topPanel.node());
 
         // Add an empty div to clear the floating divs and ensure that the
         // top panel 'contains' all of its children.
-        this.topPanel.append("div")
-                     .style("clear", "both");
-        
-        this.mainPanel = this.container.append("div");
-                             
+        this.topPanel.append('div')
+            .style('clear', 'both');
+
+        this.mainPanel = this.container.append('div');
+
         this.addCompetitorList();
         this.chart = new Chart(this.mainPanel.node());
-        
+
         this.resultsTable = new ResultsTable(this.container.node());
         this.resultsTable.hide();
-        
-        var outerThis = this;
-           
+
+        const outerThis = this;
+
         $(window).resize(function () { outerThis.handleWindowResize(); });
-        
+
         // Disable text selection anywhere other than text inputs.
         // This is mainly for the benefit of IE9, which doesn't support any
         // -*-user-select CSS style.
-        $("input:text").bind("selectstart", function (evt) { evt.stopPropagation(); });
-        $(this.container.node()).bind("selectstart", function () { return false; });
-       
+        $('input:text').bind('selectstart', function (evt) { evt.stopPropagation(); });
+        $(this.container.node()).bind('selectstart', function () { return false; });
+
         // Hide 'transient' elements such as the list of other classes in the
         // class selector or warning list when the Escape key is pressed.
         $(document).keydown(function (e) {
@@ -10282,7 +10320,7 @@ SplitsBrowser.Messages = {};
     * Registers change handlers.
     */
     Viewer.prototype.registerChangeHandlers = function () {
-        var outerThis = this;
+        const outerThis = this;
         this.languageSelector.registerChangeHandler(function () { outerThis.retranslate(); });
         this.classSelector.registerChangeHandler(function (indexes) { outerThis.selectClasses(indexes); });
         this.chartTypeSelector.registerChangeHandler(function (chartType) { outerThis.selectChartTypeAndRedraw(chartType); });
@@ -10299,10 +10337,10 @@ SplitsBrowser.Messages = {};
             clearTimeout(this.currentResizeTimeout);
         }
 
-        var outerThis = this;
-        this.currentResizeTimeout = setTimeout(function() { outerThis.postResizeHook(); }, RESIZE_DELAY_MS);
+        const outerThis = this;
+        this.currentResizeTimeout = setTimeout(function () { outerThis.postResizeHook(); }, RESIZE_DELAY_MS);
     };
-    
+
     /**
     * Resize the chart following a change of size of the chart.
     */
@@ -10318,33 +10356,33 @@ SplitsBrowser.Messages = {};
     * Hides all transient elements that happen to be open.
     */
     Viewer.prototype.hideTransientElements = function () {
-        d3.selectAll(".transient").style("display", "none");
+        d3.selectAll('.transient').style('display', 'none');
     };
-    
+
     /**
     * Returns the horizontal margin around the container, i.e. the sum of the
     * left and right margin, padding and border for the body element and the
     * container element.
     * @sb-return {Number} Total horizontal margin.
-    */ 
+    */
     Viewer.prototype.getHorizontalMargin = function () {
-        var body = $("app-graph");
-        var container = $(this.container.node());
+        const body = $('app-graph');
+        const container = $(this.container.node());
         return (body.outerWidth(true) - body.width()) + (container.outerWidth() - container.width());
     };
-    
+
     /**
     * Returns the vertical margin around the container, i.e. the sum of the top
     * and bottom margin, padding and border for the body element and the
     * container element.
     * @sb-return {Number} Total vertical margin.
-    */ 
+    */
     Viewer.prototype.getVerticalMargin = function () {
-        var body = $("app-graph");
-        var container = $(this.container.node());
+        const body = $('app-graph');
+        const container = $(this.container.node());
         return (body.outerHeight(true) - body.height()) + (container.outerHeight() - container.height());
     };
-    
+
     /**
     * Gets the usable height of the window, i.e. the height of the window minus
     * margin and the height of the top bar, if any.  This height is used for
@@ -10352,44 +10390,44 @@ SplitsBrowser.Messages = {};
     * @sb-return {Number} Usable height of the window.
     */
     Viewer.prototype.getUsableHeight = function () {
-        var bodyHeight = $(window).outerHeight() - this.getVerticalMargin() - this.topBarHeight;
-        var topPanelHeight = $(this.topPanel.node()).height();
+        const bodyHeight = $(window).outerHeight() - this.getVerticalMargin() - this.topBarHeight;
+        const topPanelHeight = $(this.topPanel.node()).height();
         return bodyHeight - topPanelHeight;
     };
-    
+
     /**
     * Sets the height of the competitor list.
     */
     Viewer.prototype.setCompetitorListHeight = function () {
         this.competitorList.setHeight(this.getUsableHeight());
     };
-    
+
     /**
     * Determines the size of the chart and sets it.
     */
     Viewer.prototype.setChartSize = function () {
         // Margin around the body element.
-        var horzMargin = this.getHorizontalMargin();
-        var vertMargin = this.getVerticalMargin();
-        
+        const horzMargin = this.getHorizontalMargin();
+        const vertMargin = this.getVerticalMargin();
+
         // Extra amount subtracted off of the width of the chart in order to
         // prevent wrapping, in units of pixels.
-        // 2 to prevent wrapping when zoomed out to 33% in Chrome. 
-        //DKR TODO Temp bdge as chart seems to be wrapping in chrome currently  was 2. Looks like a scrollbar 
-        // width associated the mets viewport tag in the index. 
-        var EXTRA_WRAP_PREVENTION_SPACE = 15;
-        
-        var containerWidth = $(window).width() - horzMargin;
-        var containerHeight = $(window).height() - vertMargin - this.topBarHeight;
+        // 2 to prevent wrapping when zoomed out to 33% in Chrome.
+        // DKR TODO Temp bdge as chart seems to be wrapping in chrome currently  was 2. Looks like a scrollbar
+        // width associated the mets viewport tag in the index.
+        const EXTRA_WRAP_PREVENTION_SPACE = 15;
+
+        const containerWidth = $(window).width() - horzMargin;
+        const containerHeight = $(window).height() - vertMargin - this.topBarHeight;
 
         $(this.container.node()).width(containerWidth).height(containerHeight);
-        
-        var chartWidth = containerWidth - this.competitorList.width() - EXTRA_WRAP_PREVENTION_SPACE;
-        var chartHeight = this.getUsableHeight();
-        
+
+        const chartWidth = containerWidth - this.competitorList.width() - EXTRA_WRAP_PREVENTION_SPACE;
+        const chartHeight = this.getUsableHeight();
+
         this.chart.setSize(chartWidth, chartHeight);
     };
-    
+
     /**
     * Draw the chart using the current data.
     */
@@ -10397,19 +10435,19 @@ SplitsBrowser.Messages = {};
         if (this.chartTypeSelector.getChartType().isResultsTable) {
             return;
         }
-        
+
         this.currentVisibleStatistics = this.statisticsSelector.getVisibleStatistics();
-        
+
         if (this.selectionChangeHandler !== null) {
             this.selection.deregisterChangeHandler(this.selectionChangeHandler);
         }
-        
+
         if (this.statisticsChangeHandler !== null) {
             this.statisticsSelector.deregisterChangeHandler(this.statisticsChangeHandler);
         }
-        
-        var outerThis = this;
-        
+
+        const outerThis = this;
+
         this.selectionChangeHandler = function () {
             outerThis.competitorList.enableOrDisableCrossingRunnersButton();
             outerThis.redraw();
@@ -10417,18 +10455,18 @@ SplitsBrowser.Messages = {};
         };
 
         this.selection.registerChangeHandler(this.selectionChangeHandler);
-        
+
         this.statisticsChangeHandler = function (visibleStatistics) {
             outerThis.currentVisibleStatistics = visibleStatistics;
             outerThis.redraw();
             outerThis.updateDirectLink();
         };
-        
+
         this.statisticsSelector.registerChangeHandler(this.statisticsChangeHandler);
 
         this.updateControlEnabledness();
         if (this.classes.length > 0) {
-            var comparisonFunction = this.comparisonSelector.getComparisonFunction();
+            const comparisonFunction = this.comparisonSelector.getComparisonFunction();
             this.referenceCumTimes = comparisonFunction(this.courseClassSet);
             this.fastestCumTimes = this.courseClassSet.getFastestCumTimes();
             this.chartData = this.courseClassSet.getChartData(this.referenceCumTimes, this.selection.getSelectedIndexes(), this.chartTypeSelector.getChartType());
@@ -10438,30 +10476,30 @@ SplitsBrowser.Messages = {};
 
     /**
     * Redraws the chart using all of the current data.
-    */ 
+    */
     Viewer.prototype.redrawChart = function () {
-        var data = {
+        const data = {
             chartData: this.chartData,
             eventData: this.eventData,
             courseClassSet: this.courseClassSet,
             referenceCumTimes: this.referenceCumTimes,
             fastestCumTimes: this.fastestCumTimes
         };
-            
+
         this.chart.drawChart(data, this.selection.getSelectedIndexes(), this.currentVisibleStatistics, this.chartTypeSelector.getChartType());
     };
-    
+
     /**
     * Redraw the chart, possibly using new data.
     */
     Viewer.prototype.redraw = function () {
-        var chartType = this.chartTypeSelector.getChartType();
+        const chartType = this.chartTypeSelector.getChartType();
         if (!chartType.isResultsTable) {
             this.chartData = this.courseClassSet.getChartData(this.referenceCumTimes, this.selection.getSelectedIndexes(), chartType);
             this.redrawChart();
         }
     };
-    
+
     /**
     * Retranslates the UI following a change of language.
     */
@@ -10481,11 +10519,11 @@ SplitsBrowser.Messages = {};
             this.redrawChart();
         }
     };
-    
+
     /**
     * Sets the currently-selected classes in various objects that need it:
     * current course-class set, comparison selector and results table.
-    * @sb-param {Array} classIndexes - Array of selected class indexes.    
+    * @sb-param {Array} classIndexes - Array of selected class indexes.
     */
     Viewer.prototype.setClasses = function (classIndexes) {
         this.currentClasses = classIndexes.map(function (index) { return this.classes[index]; }, this);
@@ -10495,11 +10533,11 @@ SplitsBrowser.Messages = {};
         this.enableOrDisableRaceGraph();
         this.originalDataSelector.setVisible(this.courseClassSet.hasDubiousData());
     };
-    
+
     /**
     * Initialises the viewer with the given initial classes.
     * @sb-param {Array} classIndexes - Array of selected class indexes.
-    */ 
+    */
     Viewer.prototype.initClasses = function (classIndexes) {
         this.classSelector.selectClasses(classIndexes);
         this.setClasses(classIndexes);
@@ -10508,7 +10546,7 @@ SplitsBrowser.Messages = {};
         this.competitorList.setSelection(this.selection);
         this.previousCompetitorList = this.courseClassSet.allCompetitors;
     };
-    
+
     /**
     * Change the graph to show the classes with the given indexes.
     * @sb-param {Number} classIndexes - The (zero-based) indexes of the classes.
@@ -10520,7 +10558,7 @@ SplitsBrowser.Messages = {};
         } else {
             this.selection.selectNone();
         }
-        
+
         this.setClasses(classIndexes);
         this.competitorList.setCompetitorList(this.courseClassSet.allCompetitors, (this.currentClasses.length > 1));
         this.selection.migrate(this.previousCompetitorList, this.courseClassSet.allCompetitors);
@@ -10532,7 +10570,7 @@ SplitsBrowser.Messages = {};
         this.previousCompetitorList = this.courseClassSet.allCompetitors;
         this.updateDirectLink();
     };
-    
+
     /**
     * Change the graph to compare against a different reference.
     */
@@ -10540,34 +10578,34 @@ SplitsBrowser.Messages = {};
         this.drawChart();
         this.updateDirectLink();
     };
-    
+
     /**
     * Change the type of chart shown.
     * @sb-param {Object} chartType - The type of chart to draw.
     */
     Viewer.prototype.selectChartType = function (chartType) {
         if (chartType.isResultsTable) {
-            this.mainPanel.style("display", "none");
-            
+            this.mainPanel.style('display', 'none');
+
             // Remove any fixed width and height on the container, as well as
             // overflow:hidden on the body, as we need the window to be able
             // to scroll if the results table is too wide or too tall and also
             // adjust size if one or both scrollbars appear.
-            this.container.style("width", null).style("height", null);
-            d3.select("body").style("overflow", null);
-            
+            this.container.style('width', null).style('height', null);
+            d3.select('body').style('overflow', null);
+
             this.resultsTable.show();
         } else {
             this.resultsTable.hide();
-            d3.select("body").style("overflow", "hidden");
-            this.mainPanel.style("display", null);
+            d3.select('body').style('overflow', 'hidden');
+            this.mainPanel.style('display', null);
             this.setChartSize();
         }
-        
+
         this.updateControlEnabledness();
         this.competitorList.setChartType(chartType);
     };
-    
+
     /**
     * Change the type of chart shown.
     * @sb-param {Object} chartType - The type of chart to draw.
@@ -10578,10 +10616,10 @@ SplitsBrowser.Messages = {};
             this.setCompetitorListHeight();
             this.drawChart();
         }
-        
+
         this.updateDirectLink();
     };
-    
+
     /**
     * Selects original or repaired data, doing any recalculation necessary.
     * @sb-param {boolean} showOriginalData - True to show original data, false to
@@ -10593,10 +10631,10 @@ SplitsBrowser.Messages = {};
         } else {
             repairEventData(this.eventData);
         }
-        
+
         this.eventData.determineTimeLosses();
     };
-    
+
     /**
     * Shows original or repaired data.
     * @sb-param {boolean} showOriginalData - True to show original data, false to
@@ -10607,7 +10645,7 @@ SplitsBrowser.Messages = {};
         this.drawChart();
         this.updateDirectLink();
     };
-    
+
     /**
     * Handles a change in the filter text in the competitor list.
     */
@@ -10616,19 +10654,19 @@ SplitsBrowser.Messages = {};
         this.redraw();
         this.updateDirectLink();
     };
-    
+
     /**
     * Updates whether a number of controls are enabled.
     */
     Viewer.prototype.updateControlEnabledness = function () {
-        var chartType = this.chartTypeSelector.getChartType();
+        const chartType = this.chartTypeSelector.getChartType();
         this.classSelector.setOtherClassesEnabled(!chartType.isResultsTable);
         this.comparisonSelector.setEnabled(!chartType.isResultsTable);
         this.statisticsSelector.setEnabled(!chartType.isResultsTable);
         this.originalDataSelector.setEnabled(!chartType.isResultsTable);
         this.competitorList.enableOrDisableCrossingRunnersButton();
     };
-    
+
     /**
     * Updates the state of the viewer to reflect query-string arguments parsed.
     * @sb-param {Object} parsedQueryString - Parsed query-string object.
@@ -10639,41 +10677,41 @@ SplitsBrowser.Messages = {};
         } else {
             this.initClasses(parsedQueryString.classes);
         }
-        
+
         if (parsedQueryString.chartType !== null) {
             this.chartTypeSelector.setChartType(parsedQueryString.chartType);
             this.selectChartType(parsedQueryString.chartType);
         }
-        
+
         if (parsedQueryString.compareWith !== null) {
             this.comparisonSelector.setComparisonType(parsedQueryString.compareWith.index, parsedQueryString.compareWith.runner);
         }
-        
+
         if (parsedQueryString.selected !== null) {
             this.selection.setSelectedIndexes(parsedQueryString.selected);
         }
-        
+
         if (parsedQueryString.stats !== null) {
             this.statisticsSelector.setVisibleStatistics(parsedQueryString.stats);
         }
-        
+
         if (parsedQueryString.showOriginal && this.courseClassSet.hasDubiousData()) {
             this.originalDataSelector.selectOriginalData();
             this.selectOriginalOrRepairedData(true);
         }
-        
-        if (parsedQueryString.filterText !== "") {
+
+        if (parsedQueryString.filterText !== '') {
             this.competitorList.setFilterText(parsedQueryString.filterText);
         }
     };
-    
+
     /**
     * Sets the default selected class.
     */
     Viewer.prototype.setDefaultSelectedClass = function () {
         this.initClasses((this.classes.length > 0) ? [0] : []);
     };
-    
+
     SplitsBrowser.Viewer = Viewer;
 
     /**
@@ -10683,17 +10721,17 @@ SplitsBrowser.Messages = {};
     * @sb-param {Object} params - Object mapping parameter names to values.
     */
     function showLoadFailureMessage(key, params) {
-        var errorDiv = d3.select("body")
-                         .append("div")
-                         .classed("sbErrors", true);
-                         
-        errorDiv.append("h1")
-                .text(getMessage("LoadFailedHeader"));
-          
-        errorDiv.append("p")
-                .text(getMessageWithFormatting(key, params));
+        const errorDiv = d3.select('body')
+            .append('div')
+            .classed('sbErrors', true);
+
+        errorDiv.append('h1')
+            .text(getMessage('LoadFailedHeader'));
+
+        errorDiv.append('p')
+            .text(getMessageWithFormatting(key, params));
     }
-    
+
     /**
     * Reads in the data in the given string and starts SplitsBrowser.
     * @sb-param {String} data - String containing the data to read.
@@ -10707,45 +10745,45 @@ SplitsBrowser.Messages = {};
         if (!checkD3Version4()) {
             return;
         }
-        
-        var eventData;
+
+        let eventData;
         try {
             eventData = parseEventData(data);
         } catch (e) {
-            if (e.name === "InvalidData") {
-                showLoadFailureMessage("LoadFailedInvalidData", {"$$MESSAGE$$": e.message});
+            if (e.name === 'InvalidData') {
+                showLoadFailureMessage('LoadFailedInvalidData', { '$$MESSAGE$$': e.message });
                 return;
             } else {
                 throw e;
             }
         }
-        
+
         if (eventData === null) {
-            showLoadFailureMessage("LoadFailedUnrecognisedData", {});
+            showLoadFailureMessage('LoadFailedUnrecognisedData', new Object);
         } else {
             if (eventData.needsRepair()) {
                 repairEventData(eventData);
             }
-            
-            if (typeof options === "string") {
+
+            if (typeof options === 'string') {
                 // Deprecated; support the top-bar specified only as a
                 // string.
-                options = {topBar: options};
+                options = { topBar: options };
             }
-            
+
             eventData.determineTimeLosses();
-            
+
             if (options && options.defaultLanguage) {
                 initialiseMessages(options.defaultLanguage);
             }
-            
-            var viewer = new Viewer(options);
+
+            const viewer = new Viewer(options);
             viewer.buildUi(options);
             viewer.setEvent(eventData);
-            
-            var queryString = document.location.search;
+
+            const queryString = document.location.search;
             if (queryString !== null && queryString.length > 0) {
-                var parsedQueryString = parseQueryString(queryString, eventData);
+                const parsedQueryString = parseQueryString(queryString, eventData);
                 viewer.updateFromQueryString(parsedQueryString);
             } else {
                 viewer.setDefaultSelectedClass();
@@ -10757,7 +10795,7 @@ SplitsBrowser.Messages = {};
             viewer.registerChangeHandlers();
         }
     };
-    
+
     /**
     * Handles an asynchronous callback that fetched event data, by parsing the
     * data and starting SplitsBrowser.
@@ -10770,13 +10808,13 @@ SplitsBrowser.Messages = {};
     *     the HTML element itself, although this behaviour is deprecated.
     */
     function readEventData(data, status, options) {
-        if (status === "success") {
+        if (status === 'success') {
             SplitsBrowser.readEvent(data, options);
         } else {
-            showLoadFailureMessage("LoadFailedStatusNotSuccess", {"$$STATUS$$": status});
+            showLoadFailureMessage('LoadFailedStatusNotSuccess', { '$$STATUS$$': status });
         }
     }
-    
+
     /**
     * Handles the failure to read an event.
     * @sb-param {jQuery.jqXHR} jqXHR - jQuery jqXHR object.
@@ -10784,7 +10822,7 @@ SplitsBrowser.Messages = {};
     * @sb-param {String} errorThrown - The error message returned from the server.
     */
     function readEventDataError(jqXHR, textStatus, errorThrown) {
-        showLoadFailureMessage("LoadFailedReadError", {"$$ERROR$$": errorThrown});
+        showLoadFailureMessage('LoadFailedReadError', { '$$ERROR$$': errorThrown });
     }
 
     /**
@@ -10800,161 +10838,161 @@ SplitsBrowser.Messages = {};
         if (!checkD3Version4()) {
             return;
         }
-        
-        // Load the event data 
+
+        // Load the event data
         $.ajax({
             url: eventUrl,
-            data: "",
+            data: '',
             success: function (data, status) { readEventData(data, status, options); },
-            dataType: "text",
+            dataType: 'text',
             error: readEventDataError
-        }); 
-    };    
+        });
+    };
 })();
 
 SplitsBrowser.Messages.en_gb = {
 
-    ApplicationVersion: "SplitsBrowser - Version $$VERSION$$",
-    Language: "English",
-    
-    MispunchedShort: "mp",
-    NonCompetitiveShort: "n/c",
-    
-    StartName: "Start",
-    ControlName: "Control $$CODE$$",
-    FinishName: "Finish",
+    ApplicationVersion: 'SplitsBrowser - Version $$VERSION$$',
+    Language: 'English',
+
+    MispunchedShort: 'mp',
+    NonCompetitiveShort: 'n/c',
+
+    StartName: 'Start',
+    ControlName: 'Control $$CODE$$',
+    FinishName: 'Finish',
 
     // The start and finish, as they appear at the top of the chart.
-    StartNameShort: "S",
-    FinishNameShort: "F",
-    
+    StartNameShort: 'S',
+    FinishNameShort: 'F',
+
     // Button labels.
-    SelectAllCompetitors: "All",
-    SelectNoCompetitors: "None",
-    SelectCrossingRunners: "Crossing runners",
-    
-    LowerXAxisChartLabel: "Time (min)",
+    SelectAllCompetitors: 'All',
+    SelectNoCompetitors: 'None',
+    SelectCrossingRunners: 'Crossing runners',
+
+    LowerXAxisChartLabel: 'Time (min)',
 
     // Chart type names and Y-axis labels.
-    SplitsGraphChartType: "Splits graph",
-    SplitsGraphYAxisLabel: "Time (min)",
-    RaceGraphChartType: "Race graph",
-    RaceGraphYAxisLabel: "Time",
-    PositionAfterLegChartType: "Position after leg",
-    SplitPositionChartType: "Split position",
-    PositionYAxisLabel: "Position", // Shared between position-after-leg and split-position.
-    PercentBehindChartType: "Percent behind",
-    PercentBehindYAxisLabel: "Percent behind",
-    ResultsTableChartType: "Results table",
-    
-    ChartTypeSelectorLabel: "View: ",
-    
-    ClassSelectorLabel: "Class: ",
-    AdditionalClassSelectorLabel: "and",
-    NoClassesLoadedPlaceholder: "[No classes loaded]",
-    
+    SplitsGraphChartType: 'Splits graph',
+    SplitsGraphYAxisLabel: 'Time (min)',
+    RaceGraphChartType: 'Race graph',
+    RaceGraphYAxisLabel: 'Time',
+    PositionAfterLegChartType: 'Position after leg',
+    SplitPositionChartType: 'Split position',
+    PositionYAxisLabel: 'Position', // Shared between position-after-leg and split-position.
+    PercentBehindChartType: 'Percent behind',
+    PercentBehindYAxisLabel: 'Percent behind',
+    ResultsTableChartType: 'Results table',
+
+    ChartTypeSelectorLabel: 'View: ',
+
+    ClassSelectorLabel: 'Class: ',
+    AdditionalClassSelectorLabel: 'and',
+    NoClassesLoadedPlaceholder: '[No classes loaded]',
+
     // Placeholder text shown when additional classes are available to be
     // selected but none have been selected.
-    NoAdditionalClassesSelectedPlaceholder: "<select>",
+    NoAdditionalClassesSelectedPlaceholder: '<select>',
 
-    ComparisonSelectorLabel: "Compare with ",
-    CompareWithWinner: "Winner",
-    CompareWithFastestTime: "Fastest time",
-    CompareWithFastestTimePlusPercentage: "Fastest time + $$PERCENT$$%",
-    CompareWithAnyRunner: "Any runner...",
-    CompareWithAnyRunnerLabel: "Runner: ",
+    ComparisonSelectorLabel: 'Compare with ',
+    CompareWithWinner: 'Winner',
+    CompareWithFastestTime: 'Fastest time',
+    CompareWithFastestTimePlusPercentage: 'Fastest time + $$PERCENT$$%',
+    CompareWithAnyRunner: 'Any runner...',
+    CompareWithAnyRunnerLabel: 'Runner: ',
     // Warning message shown to the user when a comparison option cannot be
     // chosen because the course has no winner.
-    CannotCompareAsNoWinner: "Cannot compare against '$$OPTION$$' because no competitors in this class complete the course.",
-    
+    CannotCompareAsNoWinner: 'Cannot compare against \'$$OPTION$$\' because no competitors in this class complete the course.',
+
     // Label of checkbox that shows the original data as opposed to the
     // 'repaired' data.  This only appears if data that needs repair has been
     // loaded.
-    ShowOriginalData: "Show original data",
-  
+    ShowOriginalData: 'Show original data',
+
     // Tooltip of 'Show original' checkbox.  This appears when SplitsBrowser
     // deduces that some of the cumulatives times in the data shown are
     // unrealistic.
-    ShowOriginalDataTooltip: "SplitsBrowser has removed some of the times from the data in the selected class(es), believing these times to be unrealistic.  " +
-                             "Use this checkbox to control whether the amended or original data is plotted.",
-    
-    StatisticsTotalTime: "Total time",
-    StatisticsSplitTime: "Split time",
-    StatisticsBehindFastest: "Behind fastest",
-    StatisticsTimeLoss: "Time loss",
-    
-    ResultsTableHeaderSingleControl: "1 control",
-    ResultsTableHeaderMultipleControls: "$$NUM$$ controls",
-    ResultsTableHeaderCourseLength: "$$DISTANCE$$km",
-    ResultsTableHeaderClimb: "$$CLIMB$$m",
-    
-    ResultsTableHeaderControlNumber: "#",
-    ResultsTableHeaderName: "Name",
-    ResultsTableHeaderTime: "Time",
-    
+    ShowOriginalDataTooltip: 'SplitsBrowser has removed some of the times from the data in the selected class(es), believing these times to be unrealistic.  ' +
+        'Use this checkbox to control whether the amended or original data is plotted.',
+
+    StatisticsTotalTime: 'Total time',
+    StatisticsSplitTime: 'Split time',
+    StatisticsBehindFastest: 'Behind fastest',
+    StatisticsTimeLoss: 'Time loss',
+
+    ResultsTableHeaderSingleControl: '1 control',
+    ResultsTableHeaderMultipleControls: '$$NUM$$ controls',
+    ResultsTableHeaderCourseLength: '$$DISTANCE$$km',
+    ResultsTableHeaderClimb: '$$CLIMB$$m',
+
+    ResultsTableHeaderControlNumber: '#',
+    ResultsTableHeaderName: 'Name',
+    ResultsTableHeaderTime: 'Time',
+
     // Alert message shown when you click 'Crossing runners' but there are no
     // crossing runners to show.
-    RaceGraphNoCrossingRunners: "$$NAME$$ has no crossing runners.",
-    RaceGraphDisabledAsStartTimesMissing: "The Race Graph cannot be shown because the start times of the competitors are missing.",
-    
-    LoadFailedHeader: "SplitsBrowser \u2013 Error",
-    LoadFailedInvalidData: "Sorry, it wasn't possible to read in the results data, as the data appears to be invalid: '$$MESSAGE$$'.",
-    LoadFailedUnrecognisedData: "Sorry, it wasn't possible to read in the results data.  The data doesn't appear to be in any recognised format.",
-    LoadFailedStatusNotSuccess: "Sorry, it wasn't possible to read in the results data.  The status of the request was '$$STATUS$$'.",
-    LoadFailedReadError: "Sorry, it wasn't possible to load the results data.  The error message returned from the server was '$$ERROR$$'.",
-    
+    RaceGraphNoCrossingRunners: '$$NAME$$ has no crossing runners.',
+    RaceGraphDisabledAsStartTimesMissing: 'The Race Graph cannot be shown because the start times of the competitors are missing.',
+
+    LoadFailedHeader: 'SplitsBrowser \u2013 Error',
+    LoadFailedInvalidData: 'Sorry, it wasn\'t possible to read in the results data, as the data appears to be invalid: \'$$MESSAGE$$\'.',
+    LoadFailedUnrecognisedData: 'Sorry, it wasn\'t possible to read in the results data.  The data doesn\'t appear to be in any recognised format.',
+    LoadFailedStatusNotSuccess: 'Sorry, it wasn\'t possible to read in the results data.  The status of the request was \'$$STATUS$$\'.',
+    LoadFailedReadError: 'Sorry, it wasn\'t possible to load the results data.  The error message returned from the server was \'$$ERROR$$\'.',
+
     // Chart popups.
-    
-    SelectedClassesPopupHeader: "Selected classes",
-    
+
+    SelectedClassesPopupHeader: 'Selected classes',
+
     // Placeholder text shown when the Selected classes dialog is empty,
     // because no competitors registered a split for the control, or those
     // that did only registered a dubious split.
-    SelectedClassesPopupPlaceholder: "No competitors",
-    
+    SelectedClassesPopupPlaceholder: 'No competitors',
+
     // Header for the 'Fastest leg time' popup dialog.
-    FastestLegTimePopupHeader: "Fastest leg-time $$START$$ to $$END$$",
+    FastestLegTimePopupHeader: 'Fastest leg-time $$START$$ to $$END$$',
 
     // Header for the nearby-competitors dialog on the race graph.
-    NearbyCompetitorsPopupHeader: "$$START$$ - $$END$$: $$CONTROL$$",
-    
+    NearbyCompetitorsPopupHeader: '$$START$$ - $$END$$: $$CONTROL$$',
+
     // Placeholder text shown in the nearby-competitors dialog on the race
     // graph when there aren't any competitors visiting the control within the
     // +/- 2 minute window.
-    NoNearbyCompetitors: "No competitors",
-    
+    NoNearbyCompetitors: 'No competitors',
+
     // Link that appears at the top and opens SplitsBrowser with the settings
     // (selected classes, competitors, comparison, chart type, etc.) that are
     // currently shown.
-    DirectLink: "Link",
-    DirectLinkToolTip: "Links to a URL that opens SplitsBrowser with the current settings",
-    
+    DirectLink: 'Link',
+    DirectLinkToolTip: 'Links to a URL that opens SplitsBrowser with the current settings',
+
     // The placeholder text shown in the competitor-list filter box when no
     // text has been entered into this box.
-    CompetitorListFilter: "Filter",
-    
+    CompetitorListFilter: 'Filter',
+
     // Labels that appear beside a competitor on the Results Table to indicate
     // that they did not start, did not finish, or were disqualified.
-    DidNotStartShort: "dns",
-    DidNotFinishShort: "dnf",
-    DisqualifiedShort: "dsq",
-    
+    DidNotStartShort: 'dns',
+    DidNotFinishShort: 'dnf',
+    DisqualifiedShort: 'dsq',
+
     // Placeholder message shown inside the competitor list if all competitors
     // in the class did not start.
-    NoCompetitorsStarted: "No competitors started",
-    
+    NoCompetitorsStarted: 'No competitors started',
+
     // Label of the language-selector control.
-    LanguageSelectorLabel: "Language:",
-    
+    LanguageSelectorLabel: 'Language:',
+
     // Label that appears beside a competitor on the Results Table to indicate
     // that they were over the maximum time.
-    OverMaxTimeShort: "over max time",
+    OverMaxTimeShort: 'over max time',
 
     // Alert message shown when you click 'Crossing runners' but there are no
     // crossing runners to show and also a filter is active.
-    RaceGraphNoCrossingRunnersFiltered: "$$NAME$$ has no crossing runners among the filtered competitors.",
-    
+    RaceGraphNoCrossingRunnersFiltered: '$$NAME$$ has no crossing runners among the filtered competitors.',
+
     // Tooltip of the warning-triangle shown along the top if warnings were
     // issued reading in the file.
-    WarningsTooltip: "It was not possible to read all of the data for this event.  One or more competitors or classes may have been omitted.  Click for more details."
+    WarningsTooltip: 'It was not possible to read all of the data for this event.  One or more competitors or classes may have been omitted.  Click for more details.'
 };

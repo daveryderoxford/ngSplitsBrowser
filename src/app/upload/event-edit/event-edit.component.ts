@@ -1,14 +1,11 @@
 import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Observable';
 
-import { AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable } from 'angularfire2/database';
-
-import { OEvent, EventInfo, EventTypes } from 'app/model/oevent';
+import { OEvent, EventInfo, EventGrades, EventTypes, EventDisciplines } from 'app/model/oevent';
 import { Nations, Nation } from 'app/model/nations';
 
-import { MdSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
 import { EventAdminService } from 'app/upload/event-admin.service';
 
 @Component({
@@ -23,15 +20,16 @@ export class EventEditComponent implements OnInit {
   showProgressBar = false;
 
   f: FormGroup;
+  grades = EventGrades.grades;
+  nations = Nations.getNations();
   types = EventTypes.types;
-
-  filteredNations: Observable<Nation[]>;
+  disciplines = EventDisciplines.disciplines;
+  email: string;
 
   constructor(private router: Router,
     private formBuilder: FormBuilder,
-    private af: AngularFireDatabase,
     private eventService: EventAdminService,
-    public snackBar: MdSnackBar
+    public snackBar: MatSnackBar
   ) {
     this.createForm();
   }
@@ -42,29 +40,20 @@ export class EventEditComponent implements OnInit {
       eventdate: ['', Validators.required],
       nationality: ['', Validators.required],
       club: ['', Validators.required],
+      grade: ['', Validators.required],
       type: ['', Validators.required],
+      discipline: ['', Validators.required],
       webpage: ['', Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
     });
-    this.filteredNations = this.f.get('nationality').valueChanges
-      .startWith(null)
-      .map(val => val ? this.filterNations(val) : Nations.getNations().slice());
 
   }
+
 
   ngOnInit() {
 
   }
 
-  private filterNations(name: string): Nation[] {
-    const ret = Nations.getNations().filter(nation => new RegExp(`^${name}`, 'gi').test(nation.fullname));
-    return (ret);
-  }
-
-  displayFn(abrievation: string) {
-    const nation = Nations.getNations().find((nation: Nation) => { return (nation.abrievation === abrievation) });
-    return (nation ? nation.fullname : '');
-  }
-
+  // tslint:disable-next-line:use-life-cycle-interface
   private ngOnChanges(changes: SimpleChanges) {
     // set the form fields then the evnt is changed.
     if (this.oevent === null) {
@@ -104,7 +93,7 @@ async submit() {
         if (this.new) {
           await this.eventService.saveNew(this.f.value);
         } else {
-          await this.eventService.updateEventInfo(this.oevent.$key, this.f.value);
+          await this.eventService.updateEventInfo(this.oevent.key, this.f.value);
         }
         this.showProgressBar = false;
       } catch (err) {

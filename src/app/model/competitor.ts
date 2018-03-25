@@ -41,13 +41,27 @@ declare function Competitor(order: number,
     originalSplitTimes: Array<sbTime>,
     originalCumTimes: Array<sbTime>): Competitor;
 
-export interface Competitor {
+    /** Stored data interface in compacted format */
+    export interface CompetitorData {
+        firstname: string;
+        surname: string;
+        club: string;
+        ecard: number;
+        natId: number;
+        start: number;
+        total: number;
+        nc: boolean;
+        ok: boolean;
+        class: string;
+        splits: firebase.firestore.Blob;
+    }
+
+    export interface Competitor {
     order: number;
     name: string;
     club: string;
     startTime: number;
-    isNonCompetitive: boolean;
-    isNonStarter: boolean;
+    isNonCompetitive: boolean;   isNonStarter: boolean;
     isNonFinisher: boolean;
     isDisqualified: boolean;
     isOverMaxTime: boolean;

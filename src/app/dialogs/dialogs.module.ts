@@ -1,5 +1,5 @@
 import { DialogsService } from './dialogs.service';
-import { MdDialogModule, MdButtonModule} from '@angular/material';
+import { MatDialogModule, MatButtonModule} from '@angular/material';
 import { NgModule } from '@angular/core';
 
 import { ConfirmDialogComponent } from './confirm-dialog.component';
@@ -7,8 +7,8 @@ import { MessageDialogComponent } from './message-dialog.component';
 
 @NgModule({
     imports: [
-        MdDialogModule,
-        MdButtonModule,
+        MatDialogModule,
+        MatButtonModule,
     ],
     exports: [
         ConfirmDialogComponent,

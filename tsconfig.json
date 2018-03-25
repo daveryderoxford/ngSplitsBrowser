@@ -9,12 +9,17 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es5",
+    "allowJs": true, 
+    "diagnostics": true,
     "typeRoots": [
       "node_modules/@types"
     ],
     "lib": [
       "es2016",
       "dom"
-    ]
+    ],
+    "types": [
+    "d3"
+  ]
   }
 }

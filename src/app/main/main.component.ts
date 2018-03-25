@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 
 import { OEvent } from 'app/model/oevent';
 
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 
 
@@ -13,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class MainComponent implements OnInit {
 
-  events: FirebaseListObservable<OEvent[]>;
+  events: Observable<OEvent[]>;
 
   constructor( private db: AngularFireDatabase,
                private router: Router) { }
@@ -27,12 +28,12 @@ export class MainComponent implements OnInit {
       }
     };
 
-    this.events = this.db.list('/events', opts);
+    this.events = this.db.list<OEvent>('/events', ref => ref.orderByChild('date_club_index').limitToFirst(4) ).valueChanges();
 
   }
 
   eventClicked(event: OEvent) {
-     this.router.navigate(['/graph', event.$key ]);
+     this.router.navigate(['/graph', event.key ]);
   }
 
 }

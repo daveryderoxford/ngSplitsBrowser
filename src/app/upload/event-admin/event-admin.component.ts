@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { OEvent, EventInfo } from 'app/model/oevent';
 
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 
 import { DialogsService } from 'app/dialogs/dialogs.service';
@@ -36,7 +36,7 @@ export class EventAdminComponent implements OnInit {
       }
     };
 
-    this.events = this.db.list('/events', opts)
+    this.events = this.db.list<OEvent>('/events', ref => ref.orderByChild('user').equalTo(this.afAuth.auth.currentUser.uid) ).valueChanges()
                      .map( arr => arr.sort( (a, b) => this.compareDates(a, b) ));
   }
 

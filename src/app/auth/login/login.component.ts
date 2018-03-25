@@ -49,10 +49,10 @@ export class LoginComponent implements OnInit {
         this.postSignIn();
     }
 
-    private async signIn(provider: firebase.auth.AuthProvider): firebase.Promise<any> {
+    private async signIn(provider: firebase.auth.AuthProvider): Promise<any> {
         this.error = '';
         try {
-            await this.afAuth.auth.signInWithPopup(provider)
+            await this.afAuth.auth.signInWithPopup(provider);
         } catch (err) {
             this.signinError(err);
         }

@@ -3,50 +3,68 @@
 
     <div fxLayout="column" fxFlex fxLayoutAlign="space-around" fxLayoutGap=10px>
 
-       <md-progress-bar *ngIf="showProgressBar" mode="query"> </md-progress-bar>
+      <mat-progress-bar *ngIf="showProgressBar" mode="query"> </mat-progress-bar>
 
-      <md-input-container>
-        <input mdInput formControlName="name" placeholder="Event Name">
-        <md-error>Name required</md-error>
-      </md-input-container>
+      <mat-form-field>
+        <input matInput formControlName="name" placeholder="Event Name">
+        <mat-error>Name required</mat-error>
+      </mat-form-field>
 
-      <md-input-container>
-        <input mdInput formControlName="eventdate" placeholder="Date" [mdDatepicker]="picker">
-        <button mdSuffix [mdDatepickerToggle]="picker"></button>
-        <md-error>Date required</md-error>
-      </md-input-container>
-      <md-datepicker #picker></md-datepicker>
+      <mat-form-field>
+        <input matInput formControlName="eventdate" placeholder="Date" [matDatepicker]="picker">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error>Date required</mat-error>
+      </mat-form-field>
 
-      <md-input-container>
-        <input type="text" mdInput formControlName="nationality" [mdAutocomplete]="auto" placeholder="Nationality">
-        <md-error>Nationality required</md-error>
-      </md-input-container>
+      <mat-form-field>
+        <mat-select formControlName="nationality" placeholder="Nationality">
+          <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
+            {{ nation.fullname }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-      <md-autocomplete #auto="mdAutocomplete" [displayWith]="displayFn">
-        <md-option *ngFor="let nation of filteredNations | async" [value]="nation.abrievation">
-          {{ nation.fullname }}
-        </md-option>
-      </md-autocomplete>
+      <mat-form-field>
+        <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
+        <mat-hint align="end">Between 2 and 10 characters</mat-hint>
+        <mat-error>Club required</mat-error>
+      </mat-form-field>
 
-      <md-input-container>
-        <input mdInput formControlName="club"  minlength=2 maxlength=10 placeholder="Club abrievation">
-         <md-hint align="end">Between 2 and 10 characters</md-hint>
-        <md-error>Club required</md-error>
-      </md-input-container>
+      <mat-form-field>
 
-      <md-select formControlName="type" placeholder="Type">
-        <md-option *ngFor="let type of types" [value]="type">
-          {{ type }}
-        </md-option>
-      </md-select>
+        <mat-select formControlName="grade" placeholder="Grade">
+          <mat-option *ngFor="let grade of grades; let i = index" [value]="i">
+            {{ grade }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-      <md-input-container>
-        <input mdInput formControlName="webpage" placeholder="Web page">
-       <md-error>Invalid URL</md-error>
-      </md-input-container>
+      <mat-form-field>
+
+        <mat-select formControlName="type" placeholder="Type">
+          <mat-option *ngFor="let type of types" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+
+        <mat-select formControlName="discipline" placeholder="Discipline">
+          <mat-option *ngFor="let discipline of disciplines" [value]="discipline">
+            {{ discipline }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput formControlName="webpage" placeholder="Web page">
+        <mat-error>Invalid URL</mat-error>
+      </mat-form-field>
 
       <div fxLayout="row" fxLayoutAlign="space-between center">
-        <button [disabled]="f.invalid" md-raised-button color=primary type="submit" aria-label="login">Save</button>
+        <button [disabled]="f.invalid" mat-raised-button color=primary type="submit" aria-label="login">Save</button>
       </div>
 
     </div>

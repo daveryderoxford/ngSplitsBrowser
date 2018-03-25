@@ -33,11 +33,17 @@ admin.initializeApp(functions.config().firebase);
 exports.eventIndices = functions.database.ref('/events/{key}').onWrite(async event => {
 
   const written = event.data.val() as OEvent;
+  const previous: OEvent = event.data.previous.val();
 
-  written.club_date_index = padRight(written.club.toLowerCase(), 10) + decreasingTimeIndex(written.eventdate);
-  written.date_club_index = decreasingTimeIndex(written.eventdate) + padRight(written.club.toLowerCase(), 10);
 
-  return (await event.data.ref.set(written));
+  if ((written.club !== previous.club) ||
+    (written.eventdate !== previous.eventdate)) {
+
+    written.club_date_index = padRight(written.club.toLowerCase(), 10) + decreasingTimeIndex(written.eventdate);
+    written.date_club_index = decreasingTimeIndex(written.eventdate) + padRight(written.club.toLowerCase(), 10);
+
+    return (await event.data.ref.set(written));
+  }
 
 });
 
@@ -45,8 +51,8 @@ exports.eventClubReferencesUpdate = functions.database.ref('/events/{key}').onUp
   const written: OEvent = event.data.val();
   const previous: OEvent = event.data.previous.val();
 
-  if ( (written.club !== previous.club) ||
-       (written.nationality !== previous.nationality) ) {
+  if ((written.club !== previous.club) ||
+    (written.nationality !== previous.nationality)) {
     await removeClubReference(previous);
     await addClubReference(written);
   }
@@ -60,7 +66,6 @@ exports.eventClubReferencesCreate = functions.database.ref('/events/{key}').onCr
   await addClubReference(event.data.val());
 });
 
-
 async function addClubReference(event: OEvent): Promise<void> {
   const clubRef = getClubRef(event);
 
@@ -73,13 +78,13 @@ async function addClubReference(event: OEvent): Promise<void> {
       nationality: event.nationality,
       numEvents: 0
     }
-    console.log('Creating new club ' + club.name + '  ' + club.nationality );
+    console.log('Creating new club ' + club.name + '  ' + club.nationality);
   }
   club.numEvents = club.numEvents + 1;
 
   await clubRef.set(club);
 
-  console.log('Added club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents );
+  console.log('Added club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents);
 
 }
 
@@ -88,7 +93,7 @@ async function removeClubReference(event): Promise<void> {
   const clubSnapshot = await clubRef.once('value') as admin.database.DataSnapshot;
   const club: Club = clubSnapshot.val();
 
-  if (!club)  {
+  if (!club) {
     console.log('Removing reference club not found');
     return
   }
@@ -100,7 +105,7 @@ async function removeClubReference(event): Promise<void> {
     await clubRef.set(club);
   }
 
-  console.log('Removed club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents );
+  console.log('Removed club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents);
 }
 
 function getClubRef(event: OEvent): admin.database.Reference {
@@ -127,12 +132,12 @@ function padRight(str: string, length: number): string {
 }
 
 function encodeAsFirebaseKey(string) {
-          return string.replace(/\%/g, '%25')
-            .replace(/\./g, '%2E')
-            .replace(/\#/g, '%23')
-            .replace(/\$/g, '%24')
-            .replace(/\//g, '%2F')
-            .replace(/\[/g, '%5B')
-            .replace(/\]/g, '%5D');
-        };
+  return string.replace(/\%/g, '%25')
+    .replace(/\./g, '%2E')
+    .replace(/\#/g, '%23')
+    .replace(/\$/g, '%24')
+    .replace(/\//g, '%2F')
+    .replace(/\[/g, '%5B')
+    .replace(/\]/g, '%5D');
+};
 

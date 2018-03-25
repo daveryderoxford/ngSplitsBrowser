@@ -1,15 +1,17 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { DataSource } from '@angular/cdk';
-import { MdPaginator } from '@angular/material';
-import { FirebaseListObservable, AngularFireDatabase } from 'angularfire2/database';
-import { OEvent } from 'app/model/oevent';
+import { DataSource } from '@angular/cdk/collections';
+import { MatPaginator } from '@angular/material';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { OEvent, EventGrades } from 'app/model/oevent';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { EventAdminService } from 'app/upload/event-admin.service';
 
 import { ChangeEvent } from 'angular2-virtual-scroll';
 import { Observable } from 'rxjs/Observable';
 import { Club } from 'app/model/club';
+import { DataSnapshot } from '@firebase/database';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-results',
@@ -18,14 +20,15 @@ import { Club } from 'app/model/club';
 })
 export class EventsComponent {
 
-  clubs: FirebaseListObservable<Club[]>;
+  clubs: Observable<Club[]>;
 
-  @ViewChild(MdPaginator) paginator: MdPaginator;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   dataSource: EventDataSource | null;
 
-  displayedColumns = ['date', 'name', 'nationality', 'club', 'type', 'website', 'actions'];
+  displayedColumns = ['date', 'name', 'nationality', 'club', 'grade', 'disapline', 'type', 'website', 'actions'];
   currentRow: any = null;
+  grades = EventGrades.grades;
 
   selectedEvent: OEvent = null;
   new = false;
@@ -35,12 +38,13 @@ export class EventsComponent {
     private router: Router) { }
 
   oeventClicked(event: OEvent) {
-    this.router.navigate(['/graph', event.$key]);
+    this.router.navigate(['/graph', event.key]);
   }
 
+  // tslint:disable-next-line:use-life-cycle-interface
   ngOnInit() {
     this.dataSource = new EventDataSource(this.db, this.paginator);
-    this.clubs = this.db.list('/clubs/');
+    this.clubs = this.db.list<Club>('/clubs/').valueChanges();
   }
 
   onMouseEnter(row) {
@@ -70,7 +74,7 @@ class EventDataSource extends DataSource<any> {
   protected loading = false;
 
   constructor(private db: AngularFireDatabase,
-    private paginator: MdPaginator) {
+    private paginator: MatPaginator) {
     super();
   }
 
@@ -80,29 +84,32 @@ class EventDataSource extends DataSource<any> {
 
   disconnect() { }
 
-  private fetchNextChunk(): FirebaseListObservable<OEvent[]> {
+   private fetchNextChunk(): Observable<OEvent[]> {
 
     const oevents = this.oevents;
-    let opts: any;
     const pageSize = this.paginator.pageSize;
+    let startAt;
 
     if (oevents.length > 0) {
-      opts = {
-        query: {
-          orderByChild: 'date_club_index',
-          startAt: oevents[oevents.length - 1].date_club_index,
-          limitToFirst: pageSize
-        }
-      };
+      startAt = oevents[oevents.length - 1].date_club_index;
     } else {
-      opts = {
-        query: {
-          orderByChild: 'date_club_index',
-          limitToFirst: pageSize
-        }
-      };
+      startAt = 0;
     };
-    return (this.db.list('/events', opts));
+
+    const query = this.db.list<OEvent>('/events',
+      res => res.orderByChild('date_club_index').startAt(startAt).limitToFirst(pageSize));
+
+    const obs: Observable<OEvent[]> = query.snapshotChanges().map( (actions) => {
+      const events = actions.map( (action) => {
+        const oevent = action.payload.val();
+        oevent.key = action.payload.key;
+        return (oevent as OEvent);
+      });
+      return(events);
+    });
+
+    return (obs);
   }
 
 }
+

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 
-import { FullUserData } from 'app/model/user';
+import { UserData } from 'app/model/user';
 import { Nations, Nation } from 'app/model/nations';
 import { Observable } from 'rxjs/Observable';
 import { UserDataService } from 'app/user/user-data.service';
