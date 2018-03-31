@@ -17,6 +17,8 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+// tslint:disable:max-line-length
+
 SplitsBrowser.Messages.nb_no = {
 
     ApplicationVersion: "SplitsBrowser - Versjon $$VERSION$$",
@@ -81,7 +83,7 @@ SplitsBrowser.Messages.nb_no = {
     // deduces that some of the cumulatives times in the data shown are
     // unrealistic.
     ShowOriginalDataTooltip: "SplitsBrowser har fjernet noen av tidene fra dataen i de(n) valgte klassen(e), ettersom disse ser ut til å være urealistiske.  " +
-                             "Bruk denne avkryssningsboksen til å kontrollere om  det er den endrede eller den originale dataen som plottes.",
+        "Bruk denne avkryssningsboksen til å kontrollere om  det er den endrede eller den originale dataen som plottes.",
 
     StatisticsTotalTime: "Totaltid",
     StatisticsSplitTime: "Strekktid",
@@ -158,7 +160,7 @@ SplitsBrowser.Messages.nb_no = {
     // Alert message shown when you click 'Crossing runners' but there are no
     // crossing runners to show and also a filter is active.
     RaceGraphNoCrossingRunnersFiltered: "$$NAME$$ har ingen kryssende løpere blant de filtrerte deltakerne.",
-    
+
     // Tooltip of the warning-triangle shown along the top if warnings were
     // issued reading in the file.
     // TO BE TRANSLATED

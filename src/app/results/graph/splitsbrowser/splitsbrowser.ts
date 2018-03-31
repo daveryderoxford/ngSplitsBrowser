@@ -19,2496 +19,238 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// tslint:disable:quotemark
 // tslint:disable:max-line-length
+
 
 // Tell JSHint not to complain that this isn't used anywhere.
 /* exported SplitsBrowser */
 /* exported SplitsBrowser */
-import * as $ from 'jquery';
-import * as d3 from 'd3';
+import * as $ from "jquery";
+import * as d3 from "d3";
+
+import { isNaNStrict, InvalidData, isNotNullNorNaN, isNotNull, normaliseLineEndings, WrongFileFormat, parseCourseLength, parseCourseClimb, isTrue } from "./util";
+
+// Model
+import { TimeUtilities, sbTime } from "./time";
+import { Competitor } from "./competitor";
+import { CourseClass } from "./course-class";
+import { CourseClassSet } from "./course-class-set";
+import { Course } from "./course";
+import { Results } from "./results";
+
+// Graph
+import { ChartTypeClass , ChartType} from "./chart-types";
+import { CompetitorSelection } from "./competitor-selection";
+import { parseEventData } from "./input";
+
 
 export let SplitsBrowser = {} as any;
 
-SplitsBrowser.Version = '4.0.0';
+SplitsBrowser.Version = "4.0.0";
 
 SplitsBrowser.Model = {} as any;
-SplitsBrowser.Input = {} as any;
 SplitsBrowser.Controls = {} as any;
 SplitsBrowser.Messages = {} as any;
 
+// file messages.js
 
-(function () {
-    'use strict'
+// Whether a warning about missing messages has been given.  We don't
+// really want to irritate the user with many alert boxes if there's a
+// problem with the messages.
+let warnedAboutMessages = true;
 
-    // Whether a warning about missing messages has been given.  We don't
-    // really want to irritate the user with many alert boxes if there's a
-    // problem with the messages.
-    let warnedAboutMessages = false;
+// Default alerter function, just calls window.alert.
+let alertFunc = function (message) { window.alert(message); };
 
-    // Default alerter function, just calls window.alert.
-    let alertFunc = function (message) { window.alert(message); };
+// The currently-chosen language, or null if none chosen or found yet.
+let currentLanguage = null;
 
-    // The currently-chosen language, or null if none chosen or found yet.
-    let currentLanguage = null;
+// The list of all languages read in, or null if none.
+let allLanguages = null;
 
-    // The list of all languages read in, or null if none.
-    let allLanguages = null;
+// The messages object.
+const messages = SplitsBrowser.Messages;
 
-    // The messages object.
-    const messages = SplitsBrowser.Messages;
+/**
+* Issue a warning about the messages, if a warning hasn't already been
+* issued.
+* @sb-param {String} warning - The warning message to issue.
+*/
+function warn(warning: string) {
+    if (!warnedAboutMessages) {
+        alertFunc(warning);
+        warnedAboutMessages = true;
+    }
+}
 
-    /**
-    * Issue a warning about the messages, if a warning hasn't already been
-    * issued.
-    * @sb-param {String} warning - The warning message to issue.
-    */
-    function warn(warning) {
-        if (!warnedAboutMessages) {
-            alertFunc(warning);
-            warnedAboutMessages = true;
+/**
+* Sets the alerter to use when a warning message should be shown.
+*
+* This function is intended only for testing purposes.
+
+* @sb-param {Function} alerter - The function to be called when a warning is
+*     to be shown.
+*/
+SplitsBrowser.setMessageAlerter = function (alerter) {
+    alertFunc = alerter;
+};
+
+/**
+* Attempts to get a message, returning a default string if it does not
+* exist.
+* @sb-param {String} key - The key of the message.
+* @sb-param {String} defaultValue - Value to be used
+* @sb-return {String} The message with the given key, if the key exists,
+*     otherwise the default value.
+*/
+SplitsBrowser.tryGetMessage = function (key: string, defaultValue: string): string {
+    return (currentLanguage !== null && messages[currentLanguage].hasOwnProperty(key)) ? SplitsBrowser.getMessage(key) : defaultValue;
+};
+
+/**
+* Returns the message with the given key.
+* @sb-param {String} key - The key of the message.
+* @sb-return {String} The message with the given key, or a placeholder string
+*     if the message could not be looked up.
+*/
+SplitsBrowser.getMessage = function (key: string): string {
+    if (allLanguages === null) {
+        SplitsBrowser.initialiseMessages();
+    }
+
+    if (currentLanguage !== null) {
+        if (messages[currentLanguage].hasOwnProperty(key)) {
+            return messages[currentLanguage][key];
+        } else {
+            // tslint:disable-next-line:quotemark
+            warn("Message not found for key '" + key + '\' in language \'' + currentLanguage + "'");
+            return "?????";
+        }
+    } else {
+        warn("No messages found.  Has a language file been loaded?");
+        return "?????";
+    }
+};
+
+/**
+* Returns the message with the given key, with some string formatting
+* applied to the result.
+*
+* The object 'params' should map search strings to their replacements.
+*
+* @sb-param {String} key - The key of the message.
+* @sb-param {Object} params - Object mapping parameter names to values.
+* @sb-return {String} The resulting message.
+*/
+SplitsBrowser.getMessageWithFormatting = function (key: string, params: any): string {
+    let message = SplitsBrowser.getMessage(key);
+    for (const paramName in params) {
+        if (params.hasOwnProperty(paramName)) {
+            // Irritatingly there isn't a way of doing global replace
+            // without using regexps.  So we must escape any magic regex
+            // metacharacters first, so that we have a regexp that will
+            // match a single static string.
+            const paramNameRegexEscaped = paramName.replace(/([.+*?|{}()^$\[\]\\])/g, "\\$1");
+            message = message.replace(new RegExp(paramNameRegexEscaped, "g"), params[paramName]);
         }
     }
 
-    /**
-    * Sets the alerter to use when a warning message should be shown.
-    *
-    * This function is intended only for testing purposes.
+    return message;
+};
 
-    * @sb-param {Function} alerter - The function to be called when a warning is
-    *     to be shown.
-    */
-    SplitsBrowser.setMessageAlerter = function (alerter) {
-        alertFunc = alerter;
-    };
+/**
+* Returns an array of codes of languages that have been loaded.
+* @sb-return {Array} Array of language codes.
+*/
+SplitsBrowser.getAllLanguages = function (): Array<string> {
+    return allLanguages.slice(0);
+};
 
-    /**
-    * Attempts to get a message, returning a default string if it does not
-    * exist.
-    * @sb-param {String} key - The key of the message.
-    * @sb-param {String} defaultValue - Value to be used
-    * @sb-return {String} The message with the given key, if the key exists,
-    *     otherwise the default value.
-    */
-    SplitsBrowser.tryGetMessage = function (key, defaultValue) {
-        return (currentLanguage !== null && messages[currentLanguage].hasOwnProperty(key)) ? SplitsBrowser.getMessage(key) : defaultValue;
-    };
+/**
+* Returns the language code of the current language, e.g. "en_gb".
+* @sb-return {String} Language code of the current language.
+*/
+SplitsBrowser.getLanguage = function (): string {
+    return currentLanguage;
+};
 
-    /**
-    * Returns the message with the given key.
-    * @sb-param {String} key - The key of the message.
-    * @sb-return {String} The message with the given key, or a placeholder string
-    *     if the message could not be looked up.
-    */
-    SplitsBrowser.getMessage = function (key) {
-        if (allLanguages === null) {
-            SplitsBrowser.initialiseMessages();
-        }
+/**
+* Returns the name of the language with the given code.
+* @sb-param {String} language - The code of the language, e.g. "en_gb".
+* @sb-return {String} The name of the language, e.g. "English".
+*/
+SplitsBrowser.getLanguageName = function (language: string): string {
+    if (messages.hasOwnProperty(language) && messages[language].hasOwnProperty("Language")) {
+        return messages[language].Language;
+    } else {
+        return "?????";
+    }
+};
 
-        if (currentLanguage !== null) {
-            if (messages[currentLanguage].hasOwnProperty(key)) {
-                return messages[currentLanguage][key];
-            } else {
-                // tslint:disable-next-line:quotemark
-                warn("Message not found for key '" + key + '\' in language \'' + currentLanguage + "'");
-                return '?????';
-            }
-        } else {
-            warn('No messages found.  Has a language file been loaded?');
-            return '?????';
-        }
-    };
+/**
+* Sets the current language.
+* @sb-param {String} language - The code of the new language to set.
+*/
+SplitsBrowser.setLanguage = function (language: string) {
+    if (messages.hasOwnProperty(language)) {
+        currentLanguage = language;
+    }
+};
 
-    /**
-    * Returns the message with the given key, with some string formatting
-    * applied to the result.
-    *
-    * The object 'params' should map search strings to their replacements.
-    *
-    * @sb-param {String} key - The key of the message.
-    * @sb-param {Object} params - Object mapping parameter names to values.
-    * @sb-return {String} The resulting message.
-    */
-    SplitsBrowser.getMessageWithFormatting = function (key, params) {
-        let message = SplitsBrowser.getMessage(key);
-        for (const paramName in params) {
-            if (params.hasOwnProperty(paramName)) {
-                // Irritatingly there isn't a way of doing global replace
-                // without using regexps.  So we must escape any magic regex
-                // metacharacters first, so that we have a regexp that will
-                // match a single static string.
-                const paramNameRegexEscaped = paramName.replace(/([.+*?|{}()^$\[\]\\])/g, '\\$1');
-                message = message.replace(new RegExp(paramNameRegexEscaped, 'g'), params[paramName]);
-            }
-        }
-
-        return message;
-    };
-
-    /**
-    * Returns an array of codes of languages that have been loaded.
-    * @sb-return {Array} Array of language codes.
-    */
-    SplitsBrowser.getAllLanguages = function (): Array<string> {
-        return allLanguages.slice(0);
-    };
-
-    /**
-    * Returns the language code of the current language, e.g. "en_gb".
-    * @sb-return {String} Language code of the current language.
-    */
-    SplitsBrowser.getLanguage = function () {
-        return currentLanguage;
-    };
-
-    /**
-    * Returns the name of the language with the given code.
-    * @sb-param {String} language - The code of the language, e.g. "en_gb".
-    * @sb-return {String} The name of the language, e.g. "English".
-    */
-    SplitsBrowser.getLanguageName = function (language) {
-        if (messages.hasOwnProperty(language) && messages[language].hasOwnProperty('Language')) {
-            return messages[language].Language;
-        } else {
-            return '?????';
-        }
-    };
-
-    /**
-    * Sets the current language.
-    * @sb-param {String} language - The code of the new language to set.
-    */
-    SplitsBrowser.setLanguage = function (language) {
-        if (messages.hasOwnProperty(language)) {
-            currentLanguage = language;
-        }
-    };
-
-    /**
-    * Initialises the messages from those read in.
-    *
-    * @sb-param {String} defaultLanguage - (Optional) The default language to choose.
-    */
-    SplitsBrowser.initialiseMessages = function (defaultLanguage) {
-        allLanguages = [] as Array<string>;
-        if (messages !== SplitsBrowser.Messages) {
-            // SplitsBrowser.Messages has changed since the JS source was
-            // loaded and now.  Likely culprit is an old-format language file.
-            warn('You appear to have loaded a messages file in the old format.  This file, and all ' +
-                'others loaded after it, will not work.\n\nPlease check the messages files.');
-        }
-
-        for (const messageKey in messages) {
-            if (messages.hasOwnProperty(messageKey)) {
-                allLanguages.push(messageKey);
-            }
-        }
-
-        if (allLanguages.length === 0) {
-            warn("No messages files were found.");
-        } else if (defaultLanguage && messages.hasOwnProperty(defaultLanguage)) {
-            currentLanguage = defaultLanguage;
-        } else {
-            currentLanguage = allLanguages[0];
-        }
-    };
-})();
-
-(function () {
-    'use strict';
-
-    // Minimum length of a course that is considered to be given in metres as
-    // opposed to kilometres.
-    const MIN_COURSE_LENGTH_METRES = 500;
-
-    /**
-     * Utility function used with filters that simply returns the object given.
-     * @sb-param x - Any input value
-     * @sb-returns The input value.
-     */
-    SplitsBrowser.isTrue = function (x) { return x; };
-
-    /**
-    * Utility function that returns whether a value is not null.
-    * @sb-param x - Any input value.
-    * @sb-returns True if the value is not null, false otherwise.
-    */
-    SplitsBrowser.isNotNull = function (x) { return x !== null; };
-
-    /**
-    * Returns whether the value given is the numeric value NaN.
-    *
-    * This differs from the JavaScript built-in function isNaN, in that isNaN
-    * attempts to convert the value to a number first, with non-numeric strings
-    * being converted to NaN.  So isNaN("abc") will be true, even though "abc"
-    * isn't NaN.  This function only returns true if you actually pass it NaN,
-    * rather than any value that fails to convert to a number.
-    *
-    * @sb-param {Any} x - Any input value.
-    * @sb-return True if x is NaN, false if x is any other value.
-    */
-    SplitsBrowser.isNaNStrict = function (x) { return x !== x; };
-
-    /**
-    * Returns whether the value given is neither null nor NaN.
-    * @sb-param {?Number} x - A value to test.
-    * @sb-return {boolean} false if the value given is null or NaN, true
-    *     otherwise.
-    */
-    SplitsBrowser.isNotNullNorNaN = function (x) { return x !== null && x === x; };
-
-    /**
-    * Exception object raised if invalid data is passed.
-    * @constructor
-    * @sb-param {String} message - The exception detail message.
-    */
-    function InvalidData(message) {
-        this.name = 'InvalidData';
-        this.message = message;
+/**
+* Initialises the messages from those read in.
+*
+* @sb-param {String} defaultLanguage - (Optional) The default language to choose.
+*/
+SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
+    allLanguages = [] as Array<string>;
+    if (messages !== SplitsBrowser.Messages) {
+        // SplitsBrowser.Messages has changed since the JS source was
+        // loaded and now.  Likely culprit is an old-format language file.
+        warn("You appear to have loaded a messages file in the old format.  This file, and all " +
+            "others loaded after it, will not work.\n\nPlease check the messages files.");
     }
 
-    /**
-    * Returns a string representation of this exception.
-    * @sb-returns {String} String representation.
-    */
-    InvalidData.prototype.toString = function () {
-        return this.name + ': ' + this.message;
-    };
-
-    /**
-    * Utility function to throw an 'InvalidData' exception object.
-    * @sb-param {string} message - The exception message.
-    * @throws {InvalidData} if invoked.
-    */
-    SplitsBrowser.throwInvalidData = function (message) {
-        throw new InvalidData(message);
-    };
-
-    /**
-    * Exception object raised if a data parser for a format deems that the data
-    * given is not of that format.
-    * @constructor
-    * @sb-param {String} message - The exception message.
-    */
-    function WrongFileFormat(message) {
-        this.name = 'WrongFileFormat';
-        this.message = message;
+    for (const messageKey in messages) {
+        if (messages.hasOwnProperty(messageKey)) {
+            allLanguages.push(messageKey);
+        }
     }
 
-    /**
-    * Returns a string representation of this exception.
-    * @sb-returns {String} String representation.
-    */
-    WrongFileFormat.prototype.toString = function () {
-        return this.name + ": " + this.message;
-    };
-
-    /**
-    * Utility funciton to throw a 'WrongFileFormat' exception object.
-    * @sb-param {string} message - The exception message.
-    * @throws {WrongFileFormat} if invoked.
-    */
-    SplitsBrowser.throwWrongFileFormat = function (message) {
-        throw new WrongFileFormat(message);
-    };
-
-    /**
-    * Parses a course length.
-    *
-    * This can be specified as a decimal number of kilometres or metres, with
-    * either a full stop or a comma as the decimal separator.
-    *
-    * @sb-param {String} stringValue - The course length to parse, as a string.
-    * @sb-return {?Number} The parsed course length, or null if not valid.
-    */
-    SplitsBrowser.parseCourseLength = function (stringValue) {
-        let courseLength = parseFloat(stringValue.replace(",", "."));
-        if (!isFinite(courseLength)) {
-            return null;
-        }
-
-        if (courseLength >= MIN_COURSE_LENGTH_METRES) {
-            courseLength /= 1000;
-        }
-
-        return courseLength;
-    };
-
-    /**
-    * Parses a course climb, specified as a whole number of metres.
-    *
-    * @sb-param {String} stringValue - The course climb to parse, as a string.
-    * @sb-return {?Number} The parsed course climb, or null if not valid.
-    */
-    SplitsBrowser.parseCourseClimb = function (stringValue) {
-        const courseClimb = parseInt(stringValue, 10);
-        if (SplitsBrowser.isNaNStrict(courseClimb)) {
-            return null;
-        } else {
-            return courseClimb;
-        }
-    };
-
-    /**
-    * Normalise line endings so that all lines end with LF, instead of
-    * CRLF or CR.
-    * @sb-param {String} stringValue - The string value to normalise line endings
-    *     within
-    * @sb-return {String} String value with the line-endings normalised.
-    */
-    SplitsBrowser.normaliseLineEndings = function (stringValue) {
-        return stringValue.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-    };
-
-})();
+    if (allLanguages.length === 0) {
+        warn("No messages files were found.");
+    } else if (defaultLanguage && messages.hasOwnProperty(defaultLanguage)) {
+        currentLanguage = defaultLanguage;
+    } else {
+        currentLanguage = allLanguages[0];
+    }
+};
 
 
+// old file util.js
+
+// old file time.js
+
+// old file competitor.js'
+
+// old file course-class.js
+
+// old file course-class-set.js
+
+// old file course.js
+
+// old file chart-types.js
+
+// old file competitor-selection.js
+
+// file data-repair.js
 (function () {
     "use strict";
 
-    SplitsBrowser.NULL_TIME_PLACEHOLDER = "-----";
-
-    const isNaNStrict = SplitsBrowser.isNaNStrict;
-
-    /**
-    * Formats a time period given as a number of seconds as a string in the form
-    * [-][h:]mm:ss.ss .
-    * @sb-param {Number} seconds - The number of seconds.
-    * @sb-param {?Number} precision - Optional number of decimal places to format
-    *     using, or the default if not specified.
-    * @sb-returns {string} The string formatting of the time.
-    */
-    SplitsBrowser.formatTime = function (seconds, precision) {
-
-        if (seconds === null) {
-            return SplitsBrowser.NULL_TIME_PLACEHOLDER;
-        } else if (isNaNStrict(seconds)) {
-            return "???";
-        }
-
-        let result = "";
-        if (seconds < 0) {
-            result = "-";
-            seconds = -seconds;
-        }
-
-        const hours = Math.floor(seconds / (60 * 60));
-        const mins = Math.floor(seconds / 60) % 60;
-        const secs = seconds % 60;
-        if (hours > 0) {
-            result += hours.toString() + ":";
-        }
-
-        if (mins < 10) {
-            result += "0";
-        }
-
-        result += mins + ":";
-
-        if (secs < 10) {
-            result += "0";
-        }
-
-        if (typeof precision === "number") {
-            result += secs.toFixed(precision);
-        } else {
-            result += Math.round(secs * 100) / 100;
-        }
-
-        return result;
-    };
-
-    /**
-    * Parse a time of the form MM:SS or H:MM:SS into a number of seconds.
-    * @sb-param {string} time - The time of the form MM:SS.
-    * @sb-return {?Number} The number of seconds.
-    */
-    SplitsBrowser.parseTime = function (time) {
-        time = time.trim();
-        if (/^(\d+:)?\d+:\d\d([,.]\d+)?$/.test(time)) {
-            const timeParts = time.replace(",", ".").split(":");
-            let totalTime = 0;
-            timeParts.forEach(function (timePart) {
-                totalTime = totalTime * 60 + parseFloat(timePart);
-            });
-            return totalTime;
-        } else {
-            // Assume anything unrecognised is a missed split.
-            return null;
-        }
-    };
-})();
-
-(function () {
-    "use strict";
-
-    const NUMBER_TYPE = typeof 0;
-
-    const isNotNull = SplitsBrowser.isNotNull;
-    const isNaNStrict = SplitsBrowser.isNaNStrict;
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-
-    /**
-    * Function used with the JavaScript sort method to sort competitors in order
-    * by finishing time.
-    *
-    * Competitors that mispunch are sorted to the end of the list.
-    *
-    * The return value of this method will be:
-    * (1) a negative number if competitor a comes before competitor b,
-    * (2) a positive number if competitor a comes after competitor a,
-    * (3) zero if the order of a and b makes no difference (i.e. they have the
-    *     same total time, or both mispunched.)
-    *
-    * @sb-param {SplitsBrowser.Model.Competitor} a - One competitor to compare.
-    * @sb-param {SplitsBrowser.Model.Competitor} b - The other competitor to compare.
-    * @sb-returns {Number} Result of comparing two competitors.
-    */
-    SplitsBrowser.Model.compareCompetitors = function (a, b) {
-        if (a.isDisqualified !== b.isDisqualified) {
-            return (a.isDisqualified) ? 1 : -1;
-        } else if (a.totalTime === b.totalTime) {
-            return a.order - b.order;
-        } else if (a.totalTime === null) {
-            return (b.totalTime === null) ? 0 : 1;
-        } else {
-            return (b.totalTime === null) ? -1 : a.totalTime - b.totalTime;
-        }
-    };
-
-    /**
-    * Returns the sum of two numbers, or null if either is null.
-    * @sb-param {?Number} a - One number, or null, to add.
-    * @sb-param {?Number} b - The other number, or null, to add.
-    * @sb-return {?Number} null if at least one of a or b is null,
-    *      otherwise a + b.
-    */
-    function addIfNotNull(a, b) {
-        return (a === null || b === null) ? null : (a + b);
+    interface FirstNonAssendingIndices {
+        first: number;
+        second: number;
     }
-
-    /**
-    * Returns the difference of two numbers, or null if either is null.
-    * @sb-param {?Number} a - One number, or null, to add.
-    * @sb-param {?Number} b - The other number, or null, to add.
-    * @sb-return {?Number} null if at least one of a or b is null,
-    *      otherwise a - b.
-    */
-    function subtractIfNotNull(a, b) {
-        return (a === null || b === null) ? null : (a - b);
-    }
-
-    /**
-    * Convert an array of cumulative times into an array of split times.
-    * If any null cumulative splits are given, the split times to and from that
-    * control are null also.
-    *
-    * The input array should begin with a zero, for the cumulative time to the
-    * start.
-    * @sb-param {Array} cumTimes - Array of cumulative split times.
-    * @sb-return {Array} Corresponding array of split times.
-    */
-    function splitTimesFromCumTimes(cumTimes) {
-        if (!$.isArray(cumTimes)) {
-            throw new TypeError("Cumulative times must be an array - got " + typeof cumTimes + " instead");
-        } else if (cumTimes.length === 0) {
-            throwInvalidData("Array of cumulative times must not be empty");
-        } else if (cumTimes[0] !== 0) {
-            throwInvalidData("Array of cumulative times must have zero as its first item");
-        } else if (cumTimes.length === 1) {
-            throwInvalidData("Array of cumulative times must contain more than just a single zero");
-        }
-
-        const splitTimes = [];
-        for (let i = 0; i + 1 < cumTimes.length; i += 1) {
-            splitTimes.push(subtractIfNotNull(cumTimes[i + 1], cumTimes[i]));
-        }
-
-        return splitTimes;
-    }
-
-    /**
-    * Object that represents the data for a single competitor.
-    *
-    * The first parameter (order) merely stores the order in which the competitor
-    * appears in the given list of results.  Its sole use is to stabilise sorts of
-    * competitors, as JavaScript's sort() method is not guaranteed to be a stable
-    * sort.  However, it is not strictly the finishing order of the competitors,
-    * as it has been known for them to be given not in the correct order.
-    *
-    * The split and cumulative times passed here should be the 'original' times,
-    * before any attempt is made to repair the data.
-    *
-    * It is not recommended to use this constructor directly.  Instead, use one of
-    * the factory methods fromSplitTimes, fromCumTimes or fromOriginalCumTimes to
-    * pass in either the split or cumulative times and have the other calculated.
-    *
-    * @constructor
-    * @sb-param {Number} order - The position of the competitor within the list of
-    *     results.
-    * @sb-param {String} name - The name of the competitor.
-    * @sb-param {String} club - The name of the competitor's club.
-    * @sb-param {String} startTime - The competitor's start time.
-    * @sb-param {Array} originalSplitTimes - Array of split times, as numbers,
-    *      with nulls for missed controls.
-    * @sb-param {Array} originalCumTimes - Array of cumulative split times, as
-    *     numbers, with nulls for missed controls.
-    */
-
-    // tslint:disable-next-line:no-shadowed-variable
-    const Competitor: any = function Competitor(order, name, club, startTime, originalSplitTimes, originalCumTimes): void {
-
-        if (typeof order !== NUMBER_TYPE) {
-            throwInvalidData("Competitor order must be a number, got " + typeof order + " '" + order + "' instead");
-        }
-
-        this.order = order;
-        this.name = name;
-        this.club = club;
-        this.startTime = startTime;
-        this.isNonCompetitive = false;
-        this.isNonStarter = false;
-        this.isNonFinisher = false;
-        this.isDisqualified = false;
-        this.isOverMaxTime = false;
-        this.className = null;
-        this.yearOfBirth = null;
-        this.gender = null; // "M" or "F" for male or female.
-
-        this.originalSplitTimes = originalSplitTimes;
-        this.originalCumTimes = originalCumTimes;
-        this.splitTimes = null;
-        this.cumTimes = null;
-        this.splitRanks = null;
-        this.cumRanks = null;
-        this.timeLosses = null;
-
-        // tslint:disable-next-line:max-line-length
-        this.totalTime = (originalCumTimes === null || originalCumTimes.indexOf(null) > -1) ? null : originalCumTimes[originalCumTimes.length - 1];
-    }
-
-    /**
-    * Marks this competitor as being non-competitive.
-    */
-    Competitor.prototype.setNonCompetitive = function () {
-        this.isNonCompetitive = true;
-    };
-
-    /**
-    * Marks this competitor as not starting.
-    */
-    Competitor.prototype.setNonStarter = function () {
-        this.isNonStarter = true;
-    };
-
-    /**
-    * Marks this competitor as not finishing.
-    */
-    Competitor.prototype.setNonFinisher = function () {
-        this.isNonFinisher = true;
-    };
-
-    /**
-    * Marks this competitor as disqualified, for reasons other than a missing
-    * punch.
-    */
-    Competitor.prototype.disqualify = function () {
-        this.isDisqualified = true;
-    };
-
-    /**
-    * Marks this competitor as over maximum time.
-    */
-    Competitor.prototype.setOverMaxTime = function () {
-        this.isOverMaxTime = true;
-    };
-
-    /**
-    * Sets the name of the class that the competitor belongs to.
-    * This is the course-class, not the competitor's age class.
-    * @sb-param {String} className - The name of the class.
-    */
-    Competitor.prototype.setClassName = function (className) {
-        this.className = className;
-    };
-
-    /**
-    * Sets the competitor's year of birth.
-    * @sb-param {Number} yearOfBirth - The competitor's year of birth.
-    */
-    Competitor.prototype.setYearOfBirth = function (yearOfBirth) {
-        this.yearOfBirth = yearOfBirth;
-    };
-
-    /**
-    * Sets the competitor's gender.  This should be "M" or "F".
-    * @sb-param {String} gender - The competitor's gender, "M" or "F".
-    */
-    Competitor.prototype.setGender = function (gender) {
-        this.gender = gender;
-    };
-
-    /**
-    * Create and return a Competitor object where the competitor's times are given
-    * as a list of cumulative times.
-    *
-    * The first parameter (order) merely stores the order in which the competitor
-    * appears in the given list of results.  Its sole use is to stabilise sorts of
-    * competitors, as JavaScript's sort() method is not guaranteed to be a stable
-    * sort.  However, it is not strictly the finishing order of the competitors,
-    * as it has been known for them to be given not in the correct order.
-    *
-    * This method does not assume that the data given has been 'repaired'.  This
-    * function should therefore be used to create a competitor if the data may
-    * later need to be repaired.
-    *
-    * @sb-param {Number} order - The position of the competitor within the list of results.
-    * @sb-param {String} name - The name of the competitor.
-    * @sb-param {String} club - The name of the competitor's club.
-    * @sb-param {Number} startTime - The competitor's start time, as seconds past midnight.
-    * @sb-param {Array} cumTimes - Array of cumulative split times, as numbers, with nulls for missed controls.
-    * @sb-return {Competitor} Created competitor.
-    */
-    Competitor.fromOriginalCumTimes = function (order, name, club, startTime, cumTimes) {
-        const splitTimes = splitTimesFromCumTimes(cumTimes);
-        return new Competitor(order, name, club, startTime, splitTimes, cumTimes);
-    };
-
-    /**
-    * Create and return a Competitor object where the competitor's times are given
-    * as a list of cumulative times.
-    *
-    * The first parameter (order) merely stores the order in which the competitor
-    * appears in the given list of results.  Its sole use is to stabilise sorts of
-    * competitors, as JavaScript's sort() method is not guaranteed to be a stable
-    * sort.  However, it is not strictly the finishing order of the competitors,
-    * as it has been known for them to be given not in the correct order.
-    *
-    * This method assumes that the data given has been repaired, so it is ready
-    * to be viewed.
-    *
-    * @sb-param {Number} order - The position of the competitor within the list of results.
-    * @sb-param {String} name - The name of the competitor.
-    * @sb-param {String} club - The name of the competitor's club.
-    * @sb-param {Number} startTime - The competitor's start time, as seconds past midnight.
-    * @sb-param {Array} cumTimes - Array of cumulative split times, as numbers, with nulls for missed controls.
-    * @sb-return {Competitor} Created competitor.
-    */
-    Competitor.fromCumTimes = function (order, name, club, startTime, cumTimes) {
-        const competitor = Competitor.fromOriginalCumTimes(order, name, club, startTime, cumTimes);
-        competitor.splitTimes = competitor.originalSplitTimes;
-        competitor.cumTimes = competitor.originalCumTimes;
-        return competitor;
-    };
-
-    /**
-    * Sets the 'repaired' cumulative times for a competitor.  This also
-    * calculates the repaired split times.
-    * @sb-param {Array} cumTimes - The 'repaired' cumulative times.
-    */
-    Competitor.prototype.setRepairedCumulativeTimes = function (cumTimes) {
-        this.cumTimes = cumTimes;
-        this.splitTimes = splitTimesFromCumTimes(cumTimes);
-    };
-
-    /**
-    * Returns whether this competitor completed the course and did not get
-    * disqualified.
-    * @sb-return {boolean} True if the competitor completed the course and did not
-    *     get disqualified, false if the competitor did not complete the course
-    *     or got disqualified.
-    */
-    Competitor.prototype.completed = function () {
-        return this.totalTime !== null && !this.isDisqualified && !this.isOverMaxTime;
-    };
-
-    /**
-    * Returns whether the competitor has any times recorded at all.
-    * @sb-return {boolean} True if the competitor has recorded at least one time,
-    *     false if the competitor has recorded no times.
-    */
-    Competitor.prototype.hasAnyTimes = function () {
-        // Trim the leading zero
-        return this.originalCumTimes.slice(1).some(isNotNull);
-    };
-
-    /**
-    * Returns the competitor's split to the given control.  If the control
-    * index given is zero (i.e. the start), zero is returned.  If the
-    * competitor has no time recorded for that control, null is returned.
-    * If the value is missing, because the value read from the file was
-    * invalid, NaN is returned.
-    *
-    * @sb-param {Number} controlIndex - Index of the control (0 = start).
-    * @sb-return {?Number} The split time in seconds for the competitor to the
-    *      given control.
-    */
-    Competitor.prototype.getSplitTimeTo = function (controlIndex) {
-        return (controlIndex === 0) ? 0 : this.splitTimes[controlIndex - 1];
-    };
-
-    /**
-    * Returns the competitor's 'original' split to the given control.  This is
-    * always the value read from the source data file, or derived directly from
-    * this data, before any attempt was made to repair the competitor's data.
-    *
-    * If the control index given is zero (i.e. the start), zero is returned.
-    * If the competitor has no time recorded for that control, null is
-    * returned.
-    * @sb-param {Number} controlIndex - Index of the control (0 = start).
-    * @sb-return {?Number} The split time in seconds for the competitor to the
-    *      given control.
-    */
-    Competitor.prototype.getOriginalSplitTimeTo = function (controlIndex) {
-        return (controlIndex === 0) ? 0 : this.originalSplitTimes[controlIndex - 1];
-    };
-
-    /**
-    * Returns whether the control with the given index is deemed to have a
-    * dubious split time.
-    * @sb-param {Number} controlIndex - The index of the control.
-    * @sb-return {boolean} True if the split time to the given control is dubious,
-    *     false if not.
-    */
-    Competitor.prototype.isSplitTimeDubious = function (controlIndex) {
-        return (controlIndex > 0 && this.originalSplitTimes[controlIndex - 1] !== this.splitTimes[controlIndex - 1]);
-    };
-
-    /**
-    * Returns the competitor's cumulative split to the given control.  If the
-    * control index given is zero (i.e. the start), zero is returned.   If the
-    * competitor has no cumulative time recorded for that control, null is
-    * returned.  If the competitor recorded a time, but the time was deemed to
-    * be invalid, NaN will be returned.
-    * @sb-param {Number} controlIndex - Index of the control (0 = start).
-    * @sb-return {Number} The cumulative split time in seconds for the competitor
-    *      to the given control.
-    */
-    Competitor.prototype.getCumulativeTimeTo = function (controlIndex) {
-        return this.cumTimes[controlIndex];
-    };
-
-    /**
-    * Returns the 'original' cumulative time the competitor took to the given
-    * control.  This is always the value read from the source data file, before
-    * any attempt was made to repair the competitor's data.
-    * @sb-param {Number} controlIndex - Index of the control (0 = start).
-    * @sb-return {Number} The cumulative split time in seconds for the competitor
-    *      to the given control.
-    */
-    Competitor.prototype.getOriginalCumulativeTimeTo = function (controlIndex) {
-        return this.originalCumTimes[controlIndex];
-    };
-
-    /**
-    * Returns whether the control with the given index is deemed to have a
-    * dubious cumulative time.
-    * @sb-param {Number} controlIndex - The index of the control.
-    * @sb-return {boolean} True if the cumulative time to the given control is
-    *     dubious, false if not.
-    */
-    Competitor.prototype.isCumulativeTimeDubious = function (controlIndex) {
-        return this.originalCumTimes[controlIndex] !== this.cumTimes[controlIndex];
-    };
-
-    /**
-    * Returns the rank of the competitor's split to the given control.  If the
-    * control index given is zero (i.e. the start), or if the competitor has no
-    * time recorded for that control, or the ranks have not been set on this
-    * competitor, null is returned.
-    * @sb-param {Number} controlIndex - Index of the control (0 = start).
-    * @sb-return {Number} The split time in seconds for the competitor to the
-    *      given control.
-    */
-    Competitor.prototype.getSplitRankTo = function (controlIndex) {
-        return (this.splitRanks === null || controlIndex === 0) ? null : this.splitRanks[controlIndex - 1];
-    };
-
-    /**
-    * Returns the rank of the competitor's cumulative split to the given
-    * control.  If the control index given is zero (i.e. the start), or if the
-    * competitor has no time recorded for that control, or if the ranks have
-    * not been set on this competitor, null is returned.
-    * @sb-param {Number} controlIndex - Index of the control (0 = start).
-    * @sb-return {Number} The split time in seconds for the competitor to the
-    *      given control.
-    */
-    Competitor.prototype.getCumulativeRankTo = function (controlIndex) {
-        return (this.cumRanks === null || controlIndex === 0) ? null : this.cumRanks[controlIndex - 1];
-    };
-
-    /**
-    * Returns the time loss of the competitor at the given control, or null if
-    * time losses cannot be calculated for the competitor or have not yet been
-    * calculated.
-    * @sb-param {Number} controlIndex - Index of the control.
-    * @sb-return {?Number} Time loss in seconds, or null.
-    */
-    Competitor.prototype.getTimeLossAt = function (controlIndex) {
-        return (controlIndex === 0 || this.timeLosses === null) ? null : this.timeLosses[controlIndex - 1];
-    };
-
-    /**
-    * Returns all of the competitor's cumulative time splits.
-    * @sb-return {Array} The cumulative split times in seconds for the competitor.
-    */
-    Competitor.prototype.getAllCumulativeTimes = function () {
-        return this.cumTimes;
-    };
-
-    /**
-    * Returns all of the competitor's cumulative time splits.
-    * @sb-return {Array} The cumulative split times in seconds for the competitor.
-    */
-    Competitor.prototype.getAllOriginalCumulativeTimes = function () {
-        return this.originalCumTimes;
-    };
-
-    /**
-    * Returns whether this competitor is missing a start time.
-    *
-    * The competitor is missing its start time if it doesn't have a start time
-    * and it also has at least one split.  (A competitor that has no start time
-    * and no splits either didn't start the race.)
-    *
-    * @sb-return {boolean} True if the competitor doesn't have a start time, false
-    *     if they do, or if they have no other splits.
-    */
-    Competitor.prototype.lacksStartTime = function () {
-        return this.startTime === null && this.splitTimes.some(isNotNull);
-    };
-
-    /**
-    * Sets the split and cumulative-split ranks for this competitor.
-    * @sb-param {Array} splitRanks - Array of split ranks for this competitor.
-    * @sb-param {Array} cumRanks - Array of cumulative-split ranks for this competitor.
-    */
-    Competitor.prototype.setSplitAndCumulativeRanks = function (splitRanks, cumRanks) {
-        this.splitRanks = splitRanks;
-        this.cumRanks = cumRanks;
-    };
-
-    /**
-    * Return this competitor's cumulative times after being adjusted by a 'reference' competitor.
-    * @sb-param {Array} referenceCumTimes - The reference cumulative-split-time data to adjust by.
-    * @sb-return {Array} The array of adjusted data.
-    */
-    Competitor.prototype.getCumTimesAdjustedToReference = function (referenceCumTimes) {
-        if (referenceCumTimes.length !== this.cumTimes.length) {
-            // tslint:disable-next-line:max-line-length
-            throwInvalidData('Cannot adjust competitor times because the numbers of times are different (' + this.cumTimes.length + ' and ' + referenceCumTimes.length + ')');
-        } else if (referenceCumTimes.indexOf(null) > -1) {
-            throwInvalidData("Cannot adjust competitor times because a null value is in the reference data");
-        }
-
-        const adjustedTimes = this.cumTimes.map(function (time, idx) { return subtractIfNotNull(time, referenceCumTimes[idx]); });
-        return adjustedTimes;
-    };
-
-    /**
-    * Returns the cumulative times of this competitor with the start time added on.
-    * @sb-param {Array} referenceCumTimes - The reference cumulative-split-time data to adjust by.
-    * @sb-return {Array} The array of adjusted data.
-    */
-    Competitor.prototype.getCumTimesAdjustedToReferenceWithStartAdded = function (referenceCumTimes) {
-        const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
-        const startTime = this.startTime;
-        return adjustedTimes.map(function (adjTime) { return addIfNotNull(adjTime, startTime); });
-    };
-
-    /**
-    * Returns an array of percentages that this competitor's splits were behind
-    * those of a reference competitor.
-    * @sb-param {Array} referenceCumTimes - The reference cumulative split times
-    * @sb-return {Array} The array of percentages.
-    */
-    Competitor.prototype.getSplitPercentsBehindReferenceCumTimes = function (referenceCumTimes) {
-        if (referenceCumTimes.length !== this.cumTimes.length) {
-            // tslint:disable-next-line:max-line-length
-            throwInvalidData('Cannot determine percentages-behind because the numbers of times are different (' + this.cumTimes.length + ' and ' + referenceCumTimes.length + ')');
-        } else if (referenceCumTimes.indexOf(null) > -1) {
-            throwInvalidData("Cannot determine percentages-behind because a null value is in the reference data");
-        }
-
-        const percentsBehind = [0];
-        this.splitTimes.forEach(function (splitTime, index) {
-            if (splitTime === null) {
-                percentsBehind.push(null);
-            } else {
-                const referenceSplit = referenceCumTimes[index + 1] - referenceCumTimes[index];
-                if (referenceSplit > 0) {
-                    percentsBehind.push(100 * (splitTime - referenceSplit) / referenceSplit);
-                } else {
-                    percentsBehind.push(null);
-                }
-            }
-        });
-
-        return percentsBehind;
-    };
-
-    /**
-    * Determines the time losses for this competitor.
-    * @sb-param {Array} fastestSplitTimes - Array of fastest split times.
-    */
-    Competitor.prototype.determineTimeLosses = function (fastestSplitTimes) {
-        if (this.completed()) {
-            if (fastestSplitTimes.length !== this.splitTimes.length) {
-                // tslint:disable-next-line:max-line-length
-                throwInvalidData('Cannot determine time loss of competitor with ' + this.splitTimes.length + ' split times using ' + fastestSplitTimes.length + ' fastest splits');
-            } else if (fastestSplitTimes.some(isNaNStrict)) {
-                throwInvalidData("Cannot determine time loss of competitor when there is a NaN value in the fastest splits");
-            }
-
-            if (fastestSplitTimes.some(function (split) { return split === 0; })) {
-                // Someone registered a zero split on this course.  In this
-                // situation the time losses don't really make sense.
-                this.timeLosses = this.splitTimes.map(function () { return NaN; });
-            } else if (this.splitTimes.some(isNaNStrict)) {
-                // Competitor has some dubious times.  Unfortunately this
-                // means we cannot sensibly calculate the time losses.
-                this.timeLosses = this.splitTimes.map(function () { return NaN; });
-            } else {
-                // We use the same algorithm for calculating time loss as the
-                // original, with a simplification: we calculate split ratios
-                // (split[i] / fastest[i]) rather than time loss rates
-                // (split[i] - fastest[i])/fastest[i].  A control's split ratio
-                // is its time loss rate plus 1.  Not subtracting one at the start
-                // means that we then don't have to add it back on at the end.
-
-                const splitRatios = this.splitTimes.map(function (splitTime, index) {
-                    return splitTime / fastestSplitTimes[index];
-                });
-
-                splitRatios.sort(d3.ascending);
-
-                let medianSplitRatio;
-                if (splitRatios.length % 2 === 1) {
-                    medianSplitRatio = splitRatios[(splitRatios.length - 1) / 2];
-                } else {
-                    const midpt = splitRatios.length / 2;
-                    medianSplitRatio = (splitRatios[midpt - 1] + splitRatios[midpt]) / 2;
-                }
-
-                this.timeLosses = this.splitTimes.map(function (splitTime, index) {
-                    return Math.round(splitTime - fastestSplitTimes[index] * medianSplitRatio);
-                });
-            }
-        }
-    };
-
-    /**
-    * Returns whether this competitor 'crosses' another.  Two competitors are
-    * considered to have crossed if their chart lines on the Race Graph cross.
-    * @sb-param {Competitor} other - The competitor to compare against.
-    * @sb-return {Boolean} true if the competitors cross, false if they don't.
-    */
-    Competitor.prototype.crosses = function (other) {
-        if (other.cumTimes.length !== this.cumTimes.length) {
-            throwInvalidData("Two competitors with different numbers of controls cannot cross");
-        }
-
-        // We determine whether two competitors cross by keeping track of
-        // whether this competitor is ahead of other at any point, and whether
-        // this competitor is behind the other one.  If both, the competitors
-        // cross.
-        let beforeOther = false;
-        let afterOther = false;
-
-        for (let controlIdx = 0; controlIdx < this.cumTimes.length; controlIdx += 1) {
-            if (this.cumTimes[controlIdx] !== null && other.cumTimes[controlIdx] !== null) {
-                const thisTotalTime = this.startTime + this.cumTimes[controlIdx];
-                const otherTotalTime = other.startTime + other.cumTimes[controlIdx];
-                if (thisTotalTime < otherTotalTime) {
-                    beforeOther = true;
-                } else if (thisTotalTime > otherTotalTime) {
-                    afterOther = true;
-                }
-            }
-        }
-
-        return beforeOther && afterOther;
-    };
-
-    /**
-    * Returns an array of objects that record the indexes around which times in
-    * the given array are NaN.
-    * @sb-param {Array} times - Array of time values.
-    * @sb-return {Array} Array of objects that record indexes around dubious times.
-    */
-    function getIndexesAroundDubiousTimes(times) {
-        const dubiousTimeInfo = [];
-        let startIndex = 1;
-        while (startIndex + 1 < times.length) {
-            if (isNaNStrict(times[startIndex])) {
-                let endIndex = startIndex;
-                while (endIndex + 1 < times.length && isNaNStrict(times[endIndex + 1])) {
-                    endIndex += 1;
-                }
-
-                if (endIndex + 1 < times.length && times[startIndex - 1] !== null && times[endIndex + 1] !== null) {
-                    dubiousTimeInfo.push({ start: startIndex - 1, end: endIndex + 1 });
-                }
-
-                startIndex = endIndex + 1;
-
-            } else {
-                startIndex += 1;
-            }
-        }
-
-        return dubiousTimeInfo;
-    }
-
-    /**
-    * Returns an array of objects that list the controls around those that have
-    * dubious cumulative times.
-    * @sb-return {Array} Array of objects that detail the start and end indexes
-    *     around dubious cumulative times.
-    */
-    Competitor.prototype.getControlIndexesAroundDubiousCumulativeTimes = function () {
-        return getIndexesAroundDubiousTimes(this.cumTimes);
-    };
-
-    /**
-    * Returns an array of objects that list the controls around those that have
-    * dubious cumulative times.
-    * @sb-return {Array} Array of objects that detail the start and end indexes
-    *     around dubious cumulative times.
-    */
-    Competitor.prototype.getControlIndexesAroundDubiousSplitTimes = function () {
-        return getIndexesAroundDubiousTimes([0].concat(this.splitTimes));
-    };
-
-    SplitsBrowser.Model.Competitor = Competitor;
-})();
-
-(function () {
-    "use strict";
-
-    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-
-    /**
-     * Object that represents a collection of competitor data for a class.
-     * @constructor.
-     * @sb-param {String} name - Name of the class.
-     * @sb-param {Number} numControls - Number of controls.
-     * @sb-param {Array} competitors - Array of Competitor objects.
-     */
-    function CourseClass(name, numControls, competitors) {
-        this.name = name;
-        this.numControls = numControls;
-        this.competitors = competitors;
-        this.course = null;
-        this.hasDubiousData = false;
-        this.competitors.forEach(function (comp) {
-            comp.setClassName(name);
-        });
-    }
-
-    /**
-    * Records that this course-class has competitor data that SplitsBrowser has
-    * deduced as dubious.
-    */
-    CourseClass.prototype.recordHasDubiousData = function () {
-        this.hasDubiousData = true;
-    };
-
-    /**
-    * Determines the time losses for the competitors in this course-class.
-    */
-    CourseClass.prototype.determineTimeLosses = function () {
-        const fastestSplitTimes = d3.range(1, this.numControls + 2).map(function (controlIdx) {
-            const splitRec = this.getFastestSplitTo(controlIdx);
-            return (splitRec === null) ? null : splitRec.split;
-        }, this);
-
-        this.competitors.forEach(function (comp) {
-            comp.determineTimeLosses(fastestSplitTimes);
-        });
-    };
-
-    /**
-    * Returns whether this course-class is empty, i.e. has no competitors.
-    * @sb-return {boolean} True if this course-class has no competitors, false if it
-    *     has at least one competitor.
-    */
-    CourseClass.prototype.isEmpty = function () {
-        return (this.competitors.length === 0);
-    };
-
-    /**
-    * Sets the course that this course-class belongs to.
-    * @sb-param {SplitsBrowser.Model.Course} course - The course this class belongs to.
-    */
-    CourseClass.prototype.setCourse = function (course) {
-        this.course = course;
-    };
-
-    /**
-    * Returns the fastest split time recorded by competitors in this class.  If
-    * no fastest split time is recorded (e.g. because all competitors
-    * mispunched that control, or the class is empty), null is returned.
-    * @sb-param {Number} controlIdx - The index of the control to return the
-    *      fastest split to.
-    * @sb-return {?Object} Object containing the name and fastest split, or
-    *      null if no split times for that control were recorded.
-    */
-    CourseClass.prototype.getFastestSplitTo = function (controlIdx) {
-        if (typeof controlIdx !== "number" || controlIdx < 1 || controlIdx > this.numControls + 1) {
-            throwInvalidData("Cannot return splits to leg '" + controlIdx + "' in a course with " + this.numControls + " control(s)");
-        }
-
-        let fastestSplit = null;
-        let fastestCompetitor = null;
-        this.competitors.forEach(function (comp) {
-            const compSplit = comp.getSplitTimeTo(controlIdx);
-            if (isNotNullNorNaN(compSplit)) {
-                if (fastestSplit === null || compSplit < fastestSplit) {
-                    fastestSplit = compSplit;
-                    fastestCompetitor = comp;
-                }
-            }
-        });
-
-        // @ts-ignore  fastestCompetitor must be set of fastest splt was found
-        return (fastestSplit === null) ? null : { split: fastestSplit, name: fastestCompetitor.name };
-    };
-
-    /**
-    * Returns all competitors that visited the control in the given time
-    * interval.
-    * @sb-param {Number} controlNum - The number of the control, with 0 being the
-    *     start, and this.numControls + 1 being the finish.
-    * @sb-param {Number} intervalStart - The start time of the interval, as
-    *     seconds past midnight.
-    * @sb-param {Number} intervalEnd - The end time of the interval, as seconds
-    *     past midnight.
-    * @sb-return {Array} Array of objects listing the name and start time of each
-    *     competitor visiting the control within the given time interval.
-    */
-    CourseClass.prototype.getCompetitorsAtControlInTimeRange = function (controlNum, intervalStart, intervalEnd) {
-        if (typeof controlNum !== "number" || isNaN(controlNum) || controlNum < 0 || controlNum > this.numControls + 1) {
-            throwInvalidData("Control number must be a number between 0 and " + this.numControls + " inclusive");
-        }
-
-        const matchingCompetitors = [];
-        this.competitors.forEach(function (comp) {
-            const cumTime = comp.getCumulativeTimeTo(controlNum);
-            if (cumTime !== null && comp.startTime !== null) {
-                const actualTimeAtControl = cumTime + comp.startTime;
-                if (intervalStart <= actualTimeAtControl && actualTimeAtControl <= intervalEnd) {
-                    matchingCompetitors.push({ name: comp.name, time: actualTimeAtControl });
-                }
-            }
-        });
-
-        return matchingCompetitors;
-    };
-
-    SplitsBrowser.Model.CourseClass = CourseClass;
-})();
-
-(function () {
-    "use strict";
-
-    const isNotNull = SplitsBrowser.isNotNull;
-    const isNaNStrict = SplitsBrowser.isNaNStrict;
-    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-    const compareCompetitors = SplitsBrowser.Model.compareCompetitors;
-
-    /**
-    * Utility function to merge the lists of all competitors in a number of
-    * classes.  All classes must contain the same number of controls.
-    * @sb-param {Array} classes - Array of CourseClass objects.
-    * @sb-return {Array} Merged array of competitors.
-    */
-    function mergeCompetitors(classes) {
-        if (classes.length === 0) {
-            return [];
-        }
-
-        const allCompetitors = [];
-        const expectedControlCount = classes[0].numControls;
-        classes.forEach(function (courseClass) {
-            if (courseClass.numControls !== expectedControlCount) {
-                throwInvalidData("Cannot merge classes with " + expectedControlCount + " and " + courseClass.numControls + " controls");
-            }
-
-            courseClass.competitors.forEach(function (comp) {
-                if (!comp.isNonStarter) {
-                    allCompetitors.push(comp);
-                }
-            });
-        });
-
-        allCompetitors.sort(compareCompetitors);
-        return allCompetitors;
-    }
-
-    /**
-    * Given an array of numbers, return a list of the corresponding ranks of those
-    * numbers.
-    * @sb-param {Array} sourceData - Array of number values.
-    * @sb-returns Array of corresponding ranks.
-    */
-    function getRanks(sourceData) {
-        // First, sort the source data, removing nulls.
-        const sortedData = sourceData.filter(isNotNullNorNaN);
-        sortedData.sort(d3.ascending);
-
-        // Now construct a map that maps from source value to rank.
-        // DKR was  var rankMap = new d3.map();
-        const rankMap = d3.map();
-        sortedData.forEach(function (value, index) {
-            if (!rankMap.has(value)) {
-                rankMap.set(value, index + 1);
-            }
-        });
-
-        // Finally, build and return the list of ranks.
-        const ranks = sourceData.map(function (value) {
-            return isNotNullNorNaN(value) ? rankMap.get(value) : value;
-        });
-
-        return ranks;
-    }
-
-    /**
-    * An object that represents the currently-selected classes.
-    * @constructor
-    * @sb-param {Array} classes - Array of currently-selected classes.
-    */
-    function CourseClassSet(classes) {
-        this.allCompetitors = mergeCompetitors(classes);
-        this.classes = classes;
-        this.numControls = (classes.length > 0) ? classes[0].numControls : null;
-        this.computeRanks();
-    }
-
-    /**
-    * Returns whether this course-class set is empty, i.e. whether it has no
-    * competitors at all.
-    * @sb-return {boolean} True if the course-class set is empty, false if it is not
-    *     empty.
-    */
-    CourseClassSet.prototype.isEmpty = function () {
-        return this.allCompetitors.length === 0;
-    };
-
-    /**
-    * Returns the course used by all of the classes that make up this set.  If
-    * there are no classes, null is returned instead.
-    * @sb-return {?SplitsBrowser.Model.Course} The course used by all classes.
-    */
-    CourseClassSet.prototype.getCourse = function () {
-        return (this.classes.length > 0) ? this.classes[0].course : null;
-    };
-
-    /**
-    * Returns the name of the 'primary' class, i.e. that that has been
-    * chosen in the drop-down list.  If there are no classes, null is returned
-    * instead.
-    * @sb-return {?String} Name of the primary class.
-    */
-    CourseClassSet.prototype.getPrimaryClassName = function () {
-        return (this.classes.length > 0) ? this.classes[0].name : null;
-    };
-
-    /**
-    * Returns the number of classes that this course-class set is made up of.
-    * @sb-return {Number} The number of classes that this course-class set is
-    *     made up of.
-    */
-    CourseClassSet.prototype.getNumClasses = function () {
-        return this.classes.length;
-    };
-
-    /**
-    * Returns whether any of the classes within this set have data that
-    * SplitsBrowser can identify as dubious.
-    * @sb-return {boolean} True if any of the classes within this set contain
-    *     dubious data, false if none of them do.
-    */
-    CourseClassSet.prototype.hasDubiousData = function () {
-        return this.classes.some(function (courseClass) { return courseClass.hasDubiousData; });
-    };
-
-    /**
-    * Return a list of objects that describe when the given array of times has
-    * null or NaN values.  This does not include trailing null or NaN values.
-    * @sb-param {Array} times - Array of times, which may include NaNs and nulls.
-    * @sb-param {boolean} includeEnd - Whether to include a blank range that ends
-    *    at the end of the array.
-    * @sb-return {Array} Array of objects that describes when the given array has
-    *    ranges of null and/or NaN values.
-    */
-    function getBlankRanges(times, includeEnd) {
-        const blankRangeInfo = [];
-        let startIndex = 1;
-        while (startIndex + 1 < times.length) {
-            if (isNotNullNorNaN(times[startIndex])) {
-                startIndex += 1;
-            } else {
-                let endIndex = startIndex;
-                while (endIndex + 1 < times.length && !isNotNullNorNaN(times[endIndex + 1])) {
-                    endIndex += 1;
-                }
-
-                if (endIndex + 1 < times.length || includeEnd) {
-                    blankRangeInfo.push({ start: startIndex - 1, end: endIndex + 1 });
-                }
-
-                startIndex = endIndex + 1;
-            }
-        }
-
-        return blankRangeInfo;
-    }
-
-    /**
-    * Fill in any NaN values in the given list of cumulative times by doing
-    * a linear interpolation on the missing values.
-    * @sb-param {Array} cumTimes - Array of cumulative times.
-    * @sb-return {Array} Array of cumulative times with NaNs replaced.
-    */
-    function fillBlankRangesInCumulativeTimes(cumTimes) {
-        cumTimes = cumTimes.slice(0);
-        const blankRanges = getBlankRanges(cumTimes, false);
-        for (let rangeIndex = 0; rangeIndex < blankRanges.length; rangeIndex += 1) {
-            const range = blankRanges[rangeIndex];
-            const timeBefore = cumTimes[range.start];
-            const timeAfter = cumTimes[range.end];
-            const avgTimePerControl = (timeAfter - timeBefore) / (range.end - range.start);
-            for (let index = range.start + 1; index < range.end; index += 1) {
-                cumTimes[index] = timeBefore + (index - range.start) * avgTimePerControl;
-            }
-        }
-
-        let lastNaNTimeIndex = cumTimes.length;
-        while (lastNaNTimeIndex >= 0 && isNaNStrict(cumTimes[lastNaNTimeIndex - 1])) {
-            lastNaNTimeIndex -= 1;
-        }
-
-        if (lastNaNTimeIndex > 0) {
-            for (let timeIndex = lastNaNTimeIndex; timeIndex < cumTimes.length; timeIndex += 1) {
-                cumTimes[timeIndex] = cumTimes[timeIndex - 1] + ((timeIndex === cumTimes.length - 1) ? 60 : 180);
-            }
-        }
-
-        return cumTimes;
-    }
-
-    /**
-    * Returns an array of the cumulative times of the winner of the set of
-    * classes.
-    * @sb-return {Array} Array of the winner's cumulative times.
-    */
-    CourseClassSet.prototype.getWinnerCumTimes = function () {
-        if (this.allCompetitors.length === 0) {
-            return null;
-        }
-
-        const firstCompetitor = this.allCompetitors[0];
-        return (firstCompetitor.completed()) ? fillBlankRangesInCumulativeTimes(firstCompetitor.cumTimes) : null;
-    };
-
-    /**
-    * Return the imaginary competitor who recorded the fastest time on each leg
-    * of the class.
-    * If at least one control has no competitors recording a time for it, null
-    * is returned.  If there are no classes at all, null is returned.
-    * @sb-returns {?Array} Cumulative splits of the imaginary competitor with
-    *           fastest time, if any.
-    */
-    CourseClassSet.prototype.getFastestCumTimes = function () {
-        return this.getFastestCumTimesPlusPercentage(0);
-    };
-
-    /**
-    * Return the imaginary competitor who recorded the fastest time on each leg
-    * of the given classes, with a given percentage of their time added.
-    * If at least one control has no competitors recording a time for it, null
-    * is returned.  If there are no classes at all, null is returned.
-    * @sb-param {Number} percent - The percentage of time to add.
-    * @sb-returns {?Array} Cumulative splits of the imaginary competitor with
-    *           fastest time, if any, after adding a percentage.
-    */
-    CourseClassSet.prototype.getFastestCumTimesPlusPercentage = function (percent) {
-        if (this.numControls === null) {
-            return null;
-        }
-
-        const ratio = 1 + percent / 100;
-
-        const fastestSplits = new Array(this.numControls + 1);
-        fastestSplits[0] = 0;
-
-        for (let controlIdx = 1; controlIdx <= this.numControls + 1; controlIdx += 1) {
-            let fastestForThisControl = null;
-            for (let competitorIdx = 0; competitorIdx < this.allCompetitors.length; competitorIdx += 1) {
-                const thisTime = this.allCompetitors[competitorIdx].getSplitTimeTo(controlIdx);
-                if (isNotNullNorNaN(thisTime) && (fastestForThisControl === null || thisTime < fastestForThisControl)) {
-                    fastestForThisControl = thisTime;
-                }
-            }
-
-            fastestSplits[controlIdx] = fastestForThisControl;
-        }
-
-        if (!fastestSplits.every(isNotNull)) {
-            // We don't have fastest splits for every control, so there was one
-            // control that either nobody punched or everybody had a dubious
-            // split for.
-
-            // Find the blank-ranges of the fastest times.  Include the end
-            // of the range in case there are no cumulative times at the last
-            // control but there is to the finish.
-            const fastestBlankRanges = getBlankRanges(fastestSplits, true);
-
-            // Find all blank-ranges of competitors.
-            const allCompetitorBlankRanges = [];
-            this.allCompetitors.forEach(function (competitor) {
-                const competitorBlankRanges = getBlankRanges(competitor.getAllCumulativeTimes(), false);
-                competitorBlankRanges.forEach(function (range) {
-                    allCompetitorBlankRanges.push({
-                        start: range.start,
-                        end: range.end,
-                        size: range.end - range.start,
-                        overallSplit: competitor.getCumulativeTimeTo(range.end) - competitor.getCumulativeTimeTo(range.start)
-                    });
-                });
-            });
-
-            // Now, for each blank range of the fastest times, find the
-            // size of the smallest competitor blank range that covers it,
-            // and then the fastest split among those competitors.
-            fastestBlankRanges.forEach(function (fastestRange) {
-                const coveringCompetitorRanges = allCompetitorBlankRanges.filter(function (compRange) {
-                    return compRange.start <= fastestRange.start && fastestRange.end <= compRange.end + 1;
-                });
-
-                let minSize = null;
-                let minOverallSplit = null;
-                coveringCompetitorRanges.forEach(function (coveringRange) {
-                    if (minSize === null || coveringRange.size < minSize) {
-                        minSize = coveringRange.size;
-                        minOverallSplit = null;
-                    }
-
-                    if (minOverallSplit === null || coveringRange.overallSplit < minOverallSplit) {
-                        minOverallSplit = coveringRange.overallSplit;
-                    }
-                });
-
-                // Assume that the fastest competitor across the range had
-                // equal splits for all controls on the range.  This won't
-                // always make sense but it's the best we can do.
-                if (minSize !== null && minOverallSplit !== null) {
-                    for (let index = fastestRange.start + 1; index < fastestRange.end; index += 1) {
-                        fastestSplits[index] = minOverallSplit / minSize;
-                    }
-                }
-            });
-        }
-
-        if (!fastestSplits.every(isNotNull)) {
-            // Could happen if the competitors are created from split times and
-            // the splits are not complete, and also if nobody punches the
-            // final few controls.  Set any remaining missing splits to 3
-            // minutes for intermediate controls and 1 minute for the finish.
-            for (let index = 0; index < fastestSplits.length; index += 1) {
-                if (fastestSplits[index] === null) {
-                    fastestSplits[index] = (index === fastestSplits.length - 1) ? 60 : 180;
-                }
-            }
-        }
-
-        const fastestCumTimes = new Array(this.numControls + 1);
-        fastestSplits.forEach(function (fastestSplit, index) {
-            fastestCumTimes[index] = (index === 0) ? 0 : fastestCumTimes[index - 1] + fastestSplit * ratio;
-        });
-
-        return fastestCumTimes;
-    };
-
-    /**
-    * Returns the cumulative times for the competitor with the given index,
-    * with any runs of blanks filled in.
-    * @sb-param {Number} competitorIndex - The index of the competitor.
-    * @sb-return {Array} Array of cumulative times.
-    */
-    CourseClassSet.prototype.getCumulativeTimesForCompetitor = function (competitorIndex) {
-        return fillBlankRangesInCumulativeTimes(this.allCompetitors[competitorIndex].getAllCumulativeTimes());
-    };
-
-    /**
-    * Compute the ranks of each competitor within their class.
-    */
-    CourseClassSet.prototype.computeRanks = function () {
-        if (this.allCompetitors.length === 0) {
-            // Nothing to compute.
-            return;
-        }
-
-        const splitRanksByCompetitor = [];
-        const cumRanksByCompetitor = [];
-
-        this.allCompetitors.forEach(function () {
-            splitRanksByCompetitor.push([]);
-            cumRanksByCompetitor.push([]);
-        });
-
-        d3.range(1, this.numControls + 2).forEach(function (control) {
-            const splitsByCompetitor = this.allCompetitors.map(function (comp) { return comp.getSplitTimeTo(control); });
-            const splitRanksForThisControl = getRanks(splitsByCompetitor);
-            this.allCompetitors.forEach(function (_comp, idx) { splitRanksByCompetitor[idx].push(splitRanksForThisControl[idx]); });
-        }, this);
-
-        d3.range(1, this.numControls + 2).forEach(function (control) {
-            // We want to null out all subsequent cumulative ranks after a
-            // competitor mispunches.
-            const cumSplitsByCompetitor = this.allCompetitors.map(function (comp, idx) {
-                // -1 for previous control, another -1 because the cumulative
-                // time to control N is cumRanksByCompetitor[idx][N - 1].
-                if (control > 1 && cumRanksByCompetitor[idx][control - 1 - 1] === null) {
-                    // This competitor has no cumulative rank for the previous
-                    // control, so either they mispunched it or mispunched a
-                    // previous one.  Give them a null time here, so that they
-                    // end up with another null cumulative rank.
-                    return null;
-                } else {
-                    return comp.getCumulativeTimeTo(control);
-                }
-            });
-            const cumRanksForThisControl = getRanks(cumSplitsByCompetitor);
-            this.allCompetitors.forEach(function (_comp, idx) { cumRanksByCompetitor[idx].push(cumRanksForThisControl[idx]); });
-        }, this);
-
-        this.allCompetitors.forEach(function (comp, idx) {
-            comp.setSplitAndCumulativeRanks(splitRanksByCompetitor[idx], cumRanksByCompetitor[idx]);
-        });
-    };
-
-    /**
-    * Returns the best few splits to a given control.
-    *
-    * The number of splits returned may actually be fewer than that asked for,
-    * if there are fewer than that number of people on the class or who punch
-    * the control.
-    *
-    * The results are returned in an array of 2-element arrays, with each child
-    * array containing the split time and the name.  The array is returned in
-    * ascending order of split time.
-    *
-    * @sb-param {Number} numSplits - Maximum number of split times to return.
-    * @sb-param {Number} controlIdx - Index of the control.
-    * @sb-return {Array} Array of the fastest splits to the given control.
-    */
-    CourseClassSet.prototype.getFastestSplitsTo = function (numSplits, controlIdx) {
-        if (typeof numSplits !== "number" || numSplits <= 0) {
-            throwInvalidData("The number of splits must be a positive integer");
-        } else if (typeof controlIdx !== "number" || controlIdx <= 0 || controlIdx > this.numControls + 1) {
-            throwInvalidData("Control " + controlIdx + " out of range");
-        } else {
-            // Compare competitors by split time at this control, and, if those
-            // are equal, total time.
-            const comparator = function (compA, compB) {
-                const compASplit = compA.getSplitTimeTo(controlIdx);
-                const compBSplit = compB.getSplitTimeTo(controlIdx);
-                return (compASplit === compBSplit) ? d3.ascending(compA.totalTime, compB.totalTime) : d3.ascending(compASplit, compBSplit);
-            };
-
-            const competitors = this.allCompetitors.filter(function (comp) {
-                return comp.completed() && !isNaNStrict(comp.getSplitTimeTo(controlIdx));
-            });
-            competitors.sort(comparator);
-            const results = [];
-            for (let i = 0; i < competitors.length && i < numSplits; i += 1) {
-                results.push({ name: competitors[i].name, split: competitors[i].getSplitTimeTo(controlIdx) });
-            }
-
-            return results;
-        }
-    };
-
-    /**
-    * Return data from the current classes in a form suitable for plotting in a chart.
-    * @sb-param {Array} referenceCumTimes - 'Reference' cumulative time data, such
-    *            as that of the winner, or the fastest time.
-    * @sb-param {Array} currentIndexes - Array of indexes that indicate which
-    *           competitors from the overall list are plotted.
-    * @sb-param {Object} chartType - The type of chart to draw.
-    * @sb-returns {Object} Array of data.
-    */
-    CourseClassSet.prototype.getChartData = function (referenceCumTimes, currentIndexes, chartType) {
-        if (typeof referenceCumTimes === "undefined") {
-            throw new TypeError("referenceCumTimes undefined or missing");
-        } else if (typeof currentIndexes === "undefined") {
-            throw new TypeError("currentIndexes undefined or missing");
-        } else if (typeof chartType === "undefined") {
-            throw new TypeError("chartType undefined or missing");
-        }
-
-        const competitorData = this.allCompetitors.map(function (comp) { return chartType.dataSelector(comp, referenceCumTimes); });
-        const selectedCompetitorData = currentIndexes.map(function (index) { return competitorData[index]; });
-
-        const xMin = d3.min(referenceCumTimes);
-        const xMax = d3.max(referenceCumTimes);
-        let yMin;
-        let yMax;
-        if (currentIndexes.length === 0) {
-            // No competitors selected.
-            if (this.isEmpty()) {
-                // No competitors at all.  Make up some values.
-                yMin = 0;
-                yMax = 60;
-            } else {
-                // Set yMin and yMax to the boundary values of the first competitor.
-                const firstCompetitorTimes = competitorData[0];
-                yMin = d3.min(firstCompetitorTimes);
-                yMax = d3.max(firstCompetitorTimes);
-            }
-        } else {
-            yMin = d3.min(selectedCompetitorData.map(function (values) { return d3.min(values); }));
-            yMax = d3.max(selectedCompetitorData.map(function (values) { return d3.max(values); }));
-        }
-
-        if (yMax === yMin) {
-            // yMin and yMax will be used to scale a y-axis, so we'd better
-            // make sure that they're not equal.
-            yMax = yMin + 1;
-        }
-
-        const controlIndexAdjust = (chartType.skipStart) ? 1 : 0;
-        const dubiousTimesInfo = currentIndexes.map(function (competitorIndex) {
-            const indexPairs = chartType.indexesAroundDubiousTimesFunc(this.allCompetitors[competitorIndex]);
-            return indexPairs.filter(function (indexPair) { return indexPair.start >= controlIndexAdjust; })
-                .map(function (indexPair) {
-                    return {
-                        start: indexPair.start - controlIndexAdjust, end: indexPair.end - controlIndexAdjust
-                    };
-                });
-        }, this);
-
-        const cumulativeTimesByControl = d3.transpose(selectedCompetitorData);
-        const xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
-        const zippedData = d3.zip(xData, cumulativeTimesByControl);
-        const competitorNames = currentIndexes.map(function (index) { return this.allCompetitors[index].name; }, this);
-        return {
-            dataColumns: zippedData.map(function (data) { return { x: data[0], ys: data[1] }; }),
-            competitorNames: competitorNames,
-            numControls: this.numControls,
-            xExtent: [xMin, xMax],
-            yExtent: [yMin, yMax],
-            dubiousTimesInfo: dubiousTimesInfo
-        };
-    };
-
-    SplitsBrowser.Model.CourseClassSet = CourseClassSet;
-})();
-
-(function () {
-    "use strict";
-
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-
-    /**
-    * A collection of 'classes', all runners within which ran the same physical
-    * course.
-    *
-    * Course length and climb are both optional and can both be null.
-    * @constructor
-    * @sb-param {String} name - The name of the course.
-    * @sb-param {Array} classes - Array of CourseClass objects comprising the course.
-    * @sb-param {?Number} length - Length of the course, in kilometres.
-    * @sb-param {?Number} climb - The course climb, in metres.
-    * @sb-param {?Array} controls - Array of codes of the controls that make
-    *     up this course.  This may be null if no such information is provided.
-    */
-    // tslint:disable-next-line:no-shadowed-variable
-    const Course: any = function Course(name, classes, length, climb, controls) {
-        this.name = name;
-        this.classes = classes;
-        this.length = length;
-        this.climb = climb;
-        this.controls = controls;
-    }
-
-    /** 'Magic' control code that represents the start. */
-    Course.START = "__START__";
-
-    /** 'Magic' control code that represents the finish. */
-    Course.FINISH = "__FINISH__";
-
-    const START = Course.START;
-    const FINISH = Course.FINISH;
-
-    /**
-    * Returns an array of the 'other' classes on this course.
-    * @sb-param {SplitsBrowser.Model.CourseClass} courseClass - A course-class
-    *    that should be on this course.
-    * @sb-return {Array} Array of other course-classes.
-    */
-    Course.prototype.getOtherClasses = function (courseClass) {
-        const otherClasses = this.classes.filter(function (cls) { return cls !== courseClass; });
-        if (otherClasses.length === this.classes.length) {
-            // Given class not found.
-            throwInvalidData("Course.getOtherClasses: given class is not in this course");
-        } else {
-            return otherClasses;
-        }
-    };
-
-    /**
-    * Returns the number of course-classes that use this course.
-    * @sb-return {Number} Number of course-classes that use this course.
-    */
-    Course.prototype.getNumClasses = function () {
-        return this.classes.length;
-    };
-
-    /**
-    * Returns whether this course has control code data.
-    * @sb-return {boolean} true if this course has control codes, false if it does
-    *     not.
-    */
-    Course.prototype.hasControls = function () {
-        return (this.controls !== null);
-    };
-
-    /**
-    * Returns the code of the control at the given number.
-    *
-    * The start is control number 0 and the finish has number one more than the
-    * number of controls.  Numbers outside this range are invalid and cause an
-    * exception to be thrown.
-    *
-    * The codes for the start and finish are given by the constants
-    * SplitsBrowser.Model.Course.START and SplitsBrowser.Model.Course.FINISH.
-    *
-    * @sb-param {Number} controlNum - The number of the control.
-    * @sb-return {?String} The code of the control, or one of the aforementioned
-    *     constants for the start or finish.
-    */
-    Course.prototype.getControlCode = function (controlNum) {
-        if (controlNum === 0) {
-            // The start.
-            return START;
-        } else if (1 <= controlNum && controlNum <= this.controls.length) {
-            return this.controls[controlNum - 1];
-        } else if (controlNum === this.controls.length + 1) {
-            // The finish.
-            return FINISH;
-        } else {
-            throwInvalidData("Cannot get control code of control " + controlNum + " because it is out of range");
-        }
-    };
-
-    /**
-    * Returns whether this course uses the given leg.
-    *
-    * If this course lacks leg information, it is assumed not to contain any
-    * legs and so will return false for every leg.
-    *
-    * @sb-param {String} startCode - Code for the control at the start of the leg,
-    *     or null for the start.
-    * @sb-param {String} endCode - Code for the control at the end of the leg, or
-    *     null for the finish.
-    * @sb-return {boolean} Whether this course uses the given leg.
-    */
-    Course.prototype.usesLeg = function (startCode, endCode) {
-        return this.getLegNumber(startCode, endCode) >= 0;
-    };
-
-    /**
-    * Returns the number of a leg in this course, given the start and end
-    * control codes.
-    *
-    * The number of a leg is the number of the end control (so the leg from
-    * control 3 to control 4 is leg number 4.)  The number of the finish
-    * control is one more than the number of controls.
-    *
-    * A negative number is returned if this course does not contain this leg.
-    *
-    * @sb-param {String} startCode - Code for the control at the start of the leg,
-    *     or null for the start.
-    * @sb-param {String} endCode - Code for the control at the end of the leg, or
-    *     null for the finish.
-    * @sb-return {Number} The control number of the leg in this course, or a
-    *     negative number if the leg is not part of this course.
-    */
-    Course.prototype.getLegNumber = function (startCode, endCode) {
-        if (this.controls === null) {
-            // No controls, so no, it doesn't contain the leg specified.
-            return -1;
-        }
-
-        if (startCode === START && endCode === FINISH) {
-            // No controls - straight from the start to the finish.
-            // This leg is only present, and is leg 1, if there are no
-            // controls.
-            return (this.controls.length === 0) ? 1 : -1;
-        } else if (startCode === START) {
-            // From the start to control 1.
-            return (this.controls.length > 0 && this.controls[0] === endCode) ? 1 : -1;
-        } else if (endCode === FINISH) {
-            return (this.controls.length > 0 && this.controls[this.controls.length - 1] === startCode) ? (this.controls.length + 1) : -1;
-        } else {
-            for (let controlIdx = 1; controlIdx < this.controls.length; controlIdx += 1) {
-                if (this.controls[controlIdx - 1] === startCode && this.controls[controlIdx] === endCode) {
-                    return controlIdx + 1;
-                }
-            }
-
-            // If we get here, the given leg is not part of this course.
-            return -1;
-        }
-    };
-
-    /**
-    * Returns the fastest splits recorded for a given leg of the course.
-    *
-    * Note that this method should only be called if the course is known to use
-    * the given leg.
-    *
-    * @sb-param {String} startCode - Code for the control at the start of the leg,
-    *     or SplitsBrowser.Model.Course.START for the start.
-    * @sb-param {String} endCode - Code for the control at the end of the leg, or
-    *     SplitsBrowser.Model.Course.FINISH for the finish.
-    * @sb-return {Array} Array of fastest splits for each course-class using this
-    *      course.
-    */
-    Course.prototype.getFastestSplitsForLeg = function (startCode, endCode) {
-        if (this.legs === null) {
-            throwInvalidData("Cannot determine fastest splits for a leg because leg information is not available");
-        }
-
-        const legNumber = this.getLegNumber(startCode, endCode);
-        if (legNumber < 0) {
-            const legStr = ((startCode === START) ? "start" : startCode) + " to " + ((endCode === FINISH) ? "end" : endCode);
-            throwInvalidData("Leg from " + legStr + " not found in course " + this.name);
-        }
-
-        const controlNum = legNumber;
-        const fastestSplits = [];
-        this.classes.forEach(function (courseClass) {
-            const classFastest = courseClass.getFastestSplitTo(controlNum);
-            if (classFastest !== null) {
-                fastestSplits.push({ name: classFastest.name, className: courseClass.name, split: classFastest.split });
-            }
-        });
-
-        return fastestSplits;
-    };
-
-    /**
-    * Returns a list of all competitors on this course that visit the control
-    * with the given code in the time interval given.
-    *
-    * Specify SplitsBrowser.Model.Course.START for the start and
-    * SplitsBrowser.Model.Course.FINISH for the finish.
-    *
-    * If the given control is not on this course, an empty list is returned.
-    *
-    * @sb-param {String} controlCode - Control code of the required control.
-    * @sb-param {Number} intervalStart - The start of the interval, as seconds
-    *     past midnight.
-    * @sb-param {Number} intervalEnd - The end of the interval, as seconds past
-    *     midnight.
-    * @sb-return  {Array} Array of all competitors visiting the given control
-    *     within the given time interval.
-    */
-    Course.prototype.getCompetitorsAtControlInTimeRange = function (controlCode, intervalStart, intervalEnd) {
-        if (this.controls === null) {
-            // No controls means don't return any competitors.
-            return [];
-        } else if (controlCode === START) {
-            return this.getCompetitorsAtControlNumInTimeRange(0, intervalStart, intervalEnd);
-        } else if (controlCode === FINISH) {
-            return this.getCompetitorsAtControlNumInTimeRange(this.controls.length + 1, intervalStart, intervalEnd);
-        } else {
-            const controlIdx = this.controls.indexOf(controlCode);
-            if (controlIdx >= 0) {
-                return this.getCompetitorsAtControlNumInTimeRange(controlIdx + 1, intervalStart, intervalEnd);
-            } else {
-                // Control not in this course.
-                return [];
-            }
-        }
-    };
-
-    /**
-    * Returns a list of all competitors on this course that visit the control
-    * with the given number in the time interval given.
-    *
-    * @sb-param {Number} controlNum - The number of the control (0 = start).
-    * @sb-param {Number} intervalStart - The start of the interval, as seconds
-    *     past midnight.
-    * @sb-param {Number} intervalEnd - The end of the interval, as seconds past
-    *     midnight.
-    * @sb-return  {Array} Array of all competitors visiting the given control
-    *     within the given time interval.
-    */
-    Course.prototype.getCompetitorsAtControlNumInTimeRange = function (controlNum, intervalStart, intervalEnd) {
-        const matchingCompetitors = [];
-        this.classes.forEach(function (courseClass) {
-            courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach(function (comp) {
-                matchingCompetitors.push({ name: comp.name, time: comp.time, className: courseClass.name });
-            });
-        });
-
-        return matchingCompetitors;
-    };
-
-    /**
-    * Returns whether the course has the given control.
-    * @sb-param {String} controlCode - The code of the control.
-    * @sb-return {boolean} True if the course has the control, false if the
-    *     course doesn't, or doesn't have any controls at all.
-    */
-    Course.prototype.hasControl = function (controlCode) {
-        return this.controls !== null && this.controls.indexOf(controlCode) > -1;
-    };
-
-    /**
-    * Returns the control code(s) of the control(s) after the one with the
-    * given code.
-    *
-    * Controls can appear multiple times in a course.  If a control appears
-    * multiple times, there will be multiple next controls.  As a result
-    * @sb-param {String} controlCode - The code of the control.
-    * @sb-return {Array} The code of the next control
-    */
-    Course.prototype.getNextControls = function (controlCode) {
-        if (this.controls === null) {
-            throwInvalidData("Course has no controls");
-        } else if (controlCode === FINISH) {
-            throwInvalidData("Cannot fetch next control after the finish");
-        } else if (controlCode === START) {
-            return [(this.controls.length === 0) ? FINISH : this.controls[0]];
-        } else {
-            let lastControlIdx = -1;
-            const nextControls = [];
-            do {
-                const controlIdx = this.controls.indexOf(controlCode, lastControlIdx + 1);
-                if (controlIdx === -1) {
-                    break;
-                } else if (controlIdx === this.controls.length - 1) {
-                    nextControls.push(FINISH);
-                } else {
-                    nextControls.push(this.controls[controlIdx + 1]);
-                }
-
-                lastControlIdx = controlIdx;
-            } while (true); // Loop exits when broken.
-
-            if (nextControls.length === 0) {
-                throwInvalidData("Control '" + controlCode + "' not found on course " + this.name);
-            } else {
-                return nextControls;
-            }
-        }
-    };
-
-    SplitsBrowser.Model.Course = Course;
-})();
-
-(function () {
-    "use strict";
-
-    const Course = SplitsBrowser.Model.Course;
-
-    /**
-    * Contains all of the data for an event.
-    * @sb-param {Array} classes - Array of CourseClass objects representing all of
-    *     the classes of competitors.
-    * @sb-param {Array} courses - Array of Course objects representing all of the
-    *     courses of the event.
-    * @sb-param {Array} warnings - Array of strings containing warning messages
-    *     encountered when reading in the event dara.
-    */
-    function Event(classes, courses, warnings) {
-        this.classes = classes;
-        this.courses = courses;
-        this.warnings = warnings;
-    }
-
-    /**
-    * Determines time losses for each competitor in each class.
-    *
-    * This method should be called after reading in the event data but before
-    * attempting to plot it.
-    */
-    Event.prototype.determineTimeLosses = function () {
-        this.classes.forEach(function (courseClass) {
-            courseClass.determineTimeLosses();
-        });
-    };
-
-    /**
-    * Returns whether the event data needs any repairing.
-    *
-    * The event data needs repairing if any competitors are missing their
-    * 'repaired' cumulative times.
-    *
-    * @sb-return {boolean} True if the event data needs repairing, false
-    *     otherwise.
-    */
-    Event.prototype.needsRepair = function () {
-        return this.classes.some(function (courseClass) {
-            return courseClass.competitors.some(function (competitor) {
-                return (competitor.getAllCumulativeTimes() === null);
-            });
-        });
-    };
-
-    /**
-    * Returns the fastest splits for each class on a given leg.
-    *
-    * The fastest splits are returned as an array of objects, where each object
-    * lists the competitors name, the class, and the split time in seconds.
-    *
-    * @sb-param {String} startCode - Code for the control at the start of the leg,
-    *     or null for the start.
-    * @sb-param {String} endCode - Code for the control at the end of the leg, or
-    *     null for the finish.
-    * @sb-return {Array} Array of objects containing fastest splits for that leg.
-    */
-    Event.prototype.getFastestSplitsForLeg = function (startCode, endCode) {
-        let fastestSplits = [];
-        this.courses.forEach(function (course) {
-            if (course.usesLeg(startCode, endCode)) {
-                fastestSplits = fastestSplits.concat(course.getFastestSplitsForLeg(startCode, endCode));
-            }
-        });
-
-        fastestSplits.sort(function (a, b) { return d3.ascending(a.split, b.split); });
-
-        return fastestSplits;
-    };
-
-    /**
-    * Returns a list of competitors that visit the control with the given code
-    * within the given time interval.
-    *
-    * The fastest splits are returned as an array of objects, where each object
-    * lists the competitors name, the class, and the split time in seconds.
-    *
-    * @sb-param {String} controlCode - Code for the control.
-    * @sb-param {Number} intervalStart - Start of the time interval, in seconds
-    *     since midnight.
-    * @sb-param {?Number} intervalEnd - End of the time interval, in seconds, or
-    *     null for the finish.
-    * @sb-return {Array} Array of objects containing fastest splits for that leg.
-    */
-    Event.prototype.getCompetitorsAtControlInTimeRange = function (controlCode, intervalStart, intervalEnd) {
-        const competitors = [];
-        this.courses.forEach(function (course) {
-            course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach(function (comp) {
-                competitors.push(comp);
-            });
-        });
-
-        competitors.sort(function (a, b) { return d3.ascending(a.time, b.time); });
-
-        return competitors;
-    };
-
-    /**
-    * Returns the list of controls that follow after a given control.
-    * @sb-param {String} controlCode - The code for the control.
-    * @sb-return {Array} Array of objects for each course using that control,
-    *    with each object listing course name and next control.
-    */
-    Event.prototype.getNextControlsAfter = function (controlCode) {
-        let courses = this.courses;
-        if (controlCode !== Course.START) {
-            courses = courses.filter(function (course) { return course.hasControl(controlCode); });
-        }
-
-        return courses.map(function (course) { return { course: course, nextControls: course.getNextControls(controlCode) }; });
-    };
-
-    SplitsBrowser.Model.Event = Event;
-})();
-
-(function () {
-
-    /**
-    * Converts a number of seconds into the corresponding number of minutes.
-    * This conversion is as simple as dividing by 60.
-    * @sb-param {Number} seconds - The number of seconds to convert.
-    * @sb-return {Number} The corresponding number of minutes.
-    */
-    function secondsToMinutes(seconds) {
-        return (seconds === null) ? null : seconds / 60;
-    }
-
-    /**
-    * Returns indexes around the given competitor's dubious cumulative times.
-    * @sb-param {Competitor} competitor - The competitor to get the indexes for.
-    * @sb-return {Array} Array of objects containing indexes around dubious
-    *     cumulative times.
-    */
-    function getIndexesAroundDubiousCumulativeTimes(competitor) {
-        return competitor.getControlIndexesAroundDubiousCumulativeTimes();
-    }
-
-    /**
-    * Returns indexes around the given competitor's dubious split times.
-    * @sb-param {Competitor} competitor - The competitor to get the indexes for.
-    * @sb-return {Array} Array of objects containing indexes around dubious split
-    *     times.
-    */
-    function getIndexesAroundDubiousSplitTimes(competitor) {
-        return competitor.getControlIndexesAroundDubiousSplitTimes();
-    }
-
-    SplitsBrowser.Model.ChartTypes = {
-        SplitsGraph: {
-            nameKey: "SplitsGraphChartType",
-            dataSelector: function (comp, referenceCumTimes) {
-                return comp.getCumTimesAdjustedToReference(referenceCumTimes).map(secondsToMinutes);
-            },
-            skipStart: false,
-            yAxisLabelKey: "SplitsGraphYAxisLabel",
-            isRaceGraph: false,
-            isResultsTable: false,
-            minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: getIndexesAroundDubiousCumulativeTimes
-        },
-        RaceGraph: {
-            nameKey: "RaceGraphChartType",
-            dataSelector: function (comp, referenceCumTimes) {
-                return comp.getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes).map(secondsToMinutes);
-            },
-            skipStart: false,
-            yAxisLabelKey: "RaceGraphYAxisLabel",
-            isRaceGraph: true,
-            isResultsTable: false,
-            minViewableControl: 0,
-            indexesAroundDubiousTimesFunc: getIndexesAroundDubiousCumulativeTimes
-        },
-        PositionAfterLeg: {
-            nameKey: "PositionAfterLegChartType",
-            dataSelector: function (comp) { return comp.cumRanks; },
-            skipStart: true,
-            yAxisLabelKey: "PositionYAxisLabel",
-            isRaceGraph: false,
-            isResultsTable: false,
-            minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: getIndexesAroundDubiousCumulativeTimes
-        },
-        SplitPosition: {
-            nameKey: "SplitPositionChartType",
-            dataSelector: function (comp) { return comp.splitRanks; },
-            skipStart: true,
-            yAxisLabelKey: "PositionYAxisLabel",
-            isRaceGraph: false,
-            isResultsTable: false,
-            minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: getIndexesAroundDubiousSplitTimes
-        },
-        PercentBehind: {
-            nameKey: "PercentBehindChartType",
-            dataSelector: function (comp, referenceCumTimes) { return comp.getSplitPercentsBehindReferenceCumTimes(referenceCumTimes); },
-            skipStart: false,
-            yAxisLabelKey: "PercentBehindYAxisLabel",
-            isRaceGraph: false,
-            isResultsTable: false,
-            minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: getIndexesAroundDubiousSplitTimes
-        },
-        ResultsTable: {
-            nameKey: "ResultsTableChartType",
-            dataSelector: null,
-            skipStart: false,
-            yAxisLabelKey: null,
-            isRaceGraph: false,
-            isResultsTable: true,
-            minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: null
-        }
-    };
-})();
-
-(function () {
-    "use strict";
-
-    const NUMBER_TYPE = typeof 0;
-
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-
-    /**
-    * Represents the currently-selected competitors, and offers a callback
-    * mechanism for when the selection changes.
-    * @constructor
-    * @sb-param {Number} count - The number of competitors that can be chosen.
-    */
-    function CompetitorSelection(count) {
-        if (typeof count !== NUMBER_TYPE) {
-            throwInvalidData("Competitor count must be a number");
-        } else if (count < 0) {
-            throwInvalidData("Competitor count must be a non-negative number");
-        }
-
-        this.count = count;
-        this.currentIndexes = [];
-        this.changeHandlers = [];
-    }
-
-    /**
-    * Returns whether the competitor at the given index is selected.
-    * @sb-param {Number} index - The index of the competitor.
-    * @sb-returns {boolean} True if the competitor is selected, false if not.
-    */
-    CompetitorSelection.prototype.isSelected = function (index) {
-        return this.currentIndexes.indexOf(index) > -1;
-    };
-
-    /**
-    * Returns whether the selection consists of exactly one competitor.
-    * @sb-returns {boolean} True if precisely one competitor is selected, false if
-    *     either no competitors, or two or more competitors, are selected.
-    */
-    CompetitorSelection.prototype.isSingleRunnerSelected = function () {
-        return this.currentIndexes.length === 1;
-    };
-
-    /**
-    * Returns the index of the single selected competitor.
-    *
-    * If no competitors, or more than two competitors, are selected, null is
-    * returned
-    *
-    * @sb-return {Number|null} Index of the single selected competitor, or null.
-    */
-    CompetitorSelection.prototype.getSingleRunnerIndex = function () {
-        return (this.isSingleRunnerSelected()) ? this.currentIndexes[0] : null;
-    };
-
-    /**
-    * Given that a single runner is selected, select also all of the runners
-    * that 'cross' this runner and are also marked as visible.
-    * @sb-param {Array} competitorDetails - Array of competitor details to
-    *     check within.
-    */
-    CompetitorSelection.prototype.selectCrossingRunners = function (competitorDetails) {
-        if (this.isSingleRunnerSelected()) {
-            const refCompetitor = competitorDetails[this.currentIndexes[0]].competitor;
-
-            competitorDetails.forEach(function (compDetails, idx) {
-                if (compDetails.visible && compDetails.competitor.crosses(refCompetitor)) {
-                    this.currentIndexes.push(idx);
-                }
-            }, this);
-
-            this.currentIndexes.sort(d3.ascending);
-            this.fireChangeHandlers();
-        }
-    };
-
-    /**
-    * Fires all of the change handlers currently registered.
-    */
-    CompetitorSelection.prototype.fireChangeHandlers = function () {
-        // Call slice(0) to return a copy of the list.
-        this.changeHandlers.forEach(function (handler) { handler(this.currentIndexes.slice(0)); }, this);
-    };
-
-    /**
-    * Select all of the competitors.
-    */
-    CompetitorSelection.prototype.selectAll = function () {
-        this.currentIndexes = d3.range(this.count);
-        this.fireChangeHandlers();
-    };
-
-    /**
-    * Select none of the competitors.
-    */
-    CompetitorSelection.prototype.selectNone = function () {
-        this.currentIndexes = [];
-        this.fireChangeHandlers();
-    };
-
-    /**
-    * Returns an array of all currently-selected competitor indexes.
-    * @sb-return {Array} Array of selected indexes.
-    */
-    CompetitorSelection.prototype.getSelectedIndexes = function () {
-        return this.currentIndexes.slice(0);
-    };
-
-    /**
-    * Set the selected competitors to those in the given array.
-    * @sb-param {Array} selectedIndex - Array of indexes of selected competitors.
-    */
-    CompetitorSelection.prototype.setSelectedIndexes = function (selectedIndexes) {
-        if (selectedIndexes.every(function (index) { return 0 <= index && index < this.count; }, this)) {
-            this.currentIndexes = selectedIndexes;
-            this.fireChangeHandlers();
-        }
-    };
-
-    /**
-    * Register a handler to be called whenever the list of indexes changes.
-    *
-    * When a change is made, this function will be called, with the array of
-    * indexes being the only argument.  The array of indexes passed will be a
-    * copy of that stored internally, so the handler is free to store this
-    * array and/or modify it.
-    *
-    * If the handler has already been registered, nothing happens.
-    *
-    * @sb-param {Function} handler - The handler to register.
-    */
-    CompetitorSelection.prototype.registerChangeHandler = function (handler) {
-        if (this.changeHandlers.indexOf(handler) === -1) {
-            this.changeHandlers.push(handler);
-        }
-    };
-
-    /**
-    * Unregister a handler from being called when the list of indexes changes.
-    *
-    * If the handler given was never registered, nothing happens.
-    *
-    * @sb-param {Function} handler - The handler to register.
-    */
-    CompetitorSelection.prototype.deregisterChangeHandler = function (handler) {
-        const index = this.changeHandlers.indexOf(handler);
-        if (index > -1) {
-            this.changeHandlers.splice(index, 1);
-        }
-    };
-
-    /**
-    * Toggles whether the competitor at the given index is selected.
-    * @sb-param {Number} index - The index of the competitor.
-    */
-    CompetitorSelection.prototype.toggle = function (index) {
-        if (typeof index === NUMBER_TYPE) {
-            if (0 <= index && index < this.count) {
-                const position = this.currentIndexes.indexOf(index);
-                if (position === -1) {
-                    this.currentIndexes.push(index);
-                    this.currentIndexes.sort(d3.ascending);
-                } else {
-                    this.currentIndexes.splice(position, 1);
-                }
-
-                this.fireChangeHandlers();
-            } else {
-                throwInvalidData("Index '" + index + "' is out of range");
-            }
-        } else {
-            throwInvalidData("Index is not a number");
-        }
-    };
-
-    /**
-    * Selects a number of competitors, firing the change handlers once at the
-    * end if any indexes were added.
-    * @sb-param {Array} indexes - Array of indexes of competitors to select.
-    */
-    CompetitorSelection.prototype.bulkSelect = function (indexes) {
-        if (indexes.some(function (index) {
-            return (typeof index !== NUMBER_TYPE || index < 0 || index >= this.count);
-        }, this)) {
-            throwInvalidData("Indexes not all numeric and in range");
-        }
-
-        // Remove from the set of indexes given any that are already selected.
-        const currentIndexSet = d3.set(this.currentIndexes);
-        indexes = indexes.filter(function (index) { return !currentIndexSet.has(index); });
-
-        if (indexes.length > 0) {
-            this.currentIndexes = this.currentIndexes.concat(indexes);
-            this.currentIndexes.sort(d3.ascending);
-            this.fireChangeHandlers();
-        }
-    };
-
-    /**
-    * Deselects a number of competitors, firing the change handlers once at the
-    * end if any indexes were removed.
-    * @sb-param {Array} indexes - Array of indexes of competitors to deselect.
-    */
-    CompetitorSelection.prototype.bulkDeselect = function (indexes) {
-        if (indexes.some(function (index) {
-            return (typeof index !== NUMBER_TYPE || index < 0 || index >= this.count);
-        }, this)) {
-            throwInvalidData("Indexes not all numeric and in range");
-        }
-
-        // Remove from the set of indexes given any that are not already selected.
-        const currentIndexSet = d3.set(this.currentIndexes);
-        let anyRemoved = false;
-        for (let i = 0; i < indexes.length; i += 1) {
-            if (currentIndexSet.has(indexes[i])) {
-                currentIndexSet.remove(indexes[i]);
-                anyRemoved = true;
-            }
-        }
-
-        if (anyRemoved) {
-            this.currentIndexes = currentIndexSet.values().map(function (index) { return parseInt(index, 10); });
-            this.currentIndexes.sort(d3.ascending);
-            this.fireChangeHandlers();
-        }
-    };
-
-    /**
-    * Migrates the selected competitors from one list to another.
-    *
-    * After the migration, any competitors in the old list that were selected
-    * and are also in the new competitors list remain selected.
-    *
-    * Note that this method does NOT fire change handlers when it runs.  This
-    * is typically used during a change of class, when the application may be
-    * making other changes.
-    *
-    * @sb-param {Array} oldCompetitors - Array of Competitor objects for the old
-    *      selection.  The length of this must match the current count of
-    *      competitors.
-    * @sb-param {Array} newCompetitors - Array of Competitor objects for the new
-    *      selection.  This array must not be empty.
-    */
-    CompetitorSelection.prototype.migrate = function (oldCompetitors, newCompetitors) {
-        if (!$.isArray(oldCompetitors)) {
-            throwInvalidData("CompetitorSelection.migrate: oldCompetitors not an array");
-        } else if (!$.isArray(newCompetitors)) {
-            throwInvalidData("CompetitorSelection.migrate: newCompetitors not an array");
-        } else if (oldCompetitors.length !== this.count) {
-            throwInvalidData("CompetitorSelection.migrate: oldCompetitors list must have the same length as the current count");
-        } else if (newCompetitors.length === 0 && this.currentIndexes.length > 0) {
-            throwInvalidData("CompetitorSelection.migrate: newCompetitors list must not be empty if current list has competitors selected");
-        }
-
-        const selectedCompetitors = this.currentIndexes.map(function (index) { return oldCompetitors[index]; });
-
-        this.count = newCompetitors.length;
-        this.currentIndexes = [];
-        newCompetitors.forEach(function (comp, idx) {
-            if (selectedCompetitors.indexOf(comp) >= 0) {
-                this.currentIndexes.push(idx);
-            }
-        }, this);
-    };
-
-    SplitsBrowser.Model.CompetitorSelection = CompetitorSelection;
-})();
-
-
-(function () {
-    "use strict";
-
-    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
 
     // Maximum number of minutes added to finish splits to ensure that all
     // competitors have sensible finish splits.
@@ -2520,6 +262,7 @@ SplitsBrowser.Messages = {} as any;
     const Repairer = function () {
         this.madeAnyChanges = false;
     };
+
 
     /**
      * Returns the positions at which the first pair of non-ascending cumulative
@@ -2533,9 +276,9 @@ SplitsBrowser.Messages = {} as any;
      * @sb-return {?Object} Object containing indexes of non-ascending entries, or
      *     null if none found.
      */
-    function getFirstNonAscendingIndexes(cumTimes) {
+    function getFirstNonAscendingIndexes(cumTimes: Array<sbTime>): FirstNonAssendingIndices | null {
         if (cumTimes.length === 0 || cumTimes[0] !== 0) {
-            throwInvalidData("cumulative times array does not start with a zero cumulative time");
+            throw new InvalidData("cumulative times array does not start with a zero cumulative time");
         }
 
         let lastNumericTimeIndex = 0;
@@ -2562,7 +305,7 @@ SplitsBrowser.Messages = {} as any;
     * previous cumulative time.
     * @sb-param {Array} cumTimes - Array of cumulative times.
     */
-    Repairer.prototype.removeCumulativeTimesEqualToPrevious = function (cumTimes) {
+    Repairer.prototype.removeCumulativeTimesEqualToPrevious = function (cumTimes: Array<number>) {
         let lastCumTime = cumTimes[0];
         for (let index = 1; index + 1 < cumTimes.length; index += 1) {
             if (cumTimes[index] !== null && cumTimes[index] === lastCumTime) {
@@ -2586,7 +329,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Array} Array of cumulaive times with perhaps some cumulative
     *     times taken out.
     */
-    Repairer.prototype.removeCumulativeTimesCausingNegativeSplits = function (cumTimes) {
+    Repairer.prototype.removeCumulativeTimesCausingNegativeSplits = function (cumTimes: Array<sbTime>): Array<sbTime> {
 
         let nonAscIndexes = getFirstNonAscendingIndexes(cumTimes);
         while (nonAscIndexes !== null && nonAscIndexes.second + 1 < cumTimes.length) {
@@ -2657,7 +400,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Array} cumTimes - The cumulative times to perhaps remove the
     *     finish split from.
     */
-    Repairer.prototype.removeFinishTimeIfAbsurd = function (cumTimes) {
+    Repairer.prototype.removeFinishTimeIfAbsurd = function (cumTimes: Array<sbTime>): void {
         const finishTime = cumTimes[cumTimes.length - 1];
         const lastControlTime = cumTimes[cumTimes.length - 2];
         if (isNotNullNorNaN(finishTime) &&
@@ -2675,7 +418,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Competitor} competitor - Competitor whose cumulative times we
     *     wish to repair.
     */
-    Repairer.prototype.repairCompetitor = function (competitor) {
+    Repairer.prototype.repairCompetitor = function (competitor: Competitor): void {
         let cumTimes = competitor.originalCumTimes.slice(0);
 
         this.removeCumulativeTimesEqualToPrevious(cumTimes);
@@ -2694,7 +437,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {CourseClass} courseClass - The class whose data we wish to
     *     repair.
     */
-    Repairer.prototype.repairCourseClass = function (courseClass) {
+    Repairer.prototype.repairCourseClass = function (courseClass: CourseClass): void {
         this.madeAnyChanges = false;
         courseClass.competitors.forEach(function (competitor) {
             this.repairCompetitor(competitor);
@@ -2707,21 +450,21 @@ SplitsBrowser.Messages = {} as any;
 
     /**
     * Attempt to carry out repairs to the data in an event.
-    * @sb-param {Event} eventData - The event data to repair.
+    * @sb-param {Results} eventData - The event data to repair.
     */
-    Repairer.prototype.repairEventData = function (eventData) {
-        eventData.classes.forEach(function (courseClass) {
+    Repairer.prototype.repairEventData = function (resultsData: Results): void {
+        resultsData.classes.forEach(function (courseClass) {
             this.repairCourseClass(courseClass);
         }, this);
     };
 
     /**
     * Attempt to carry out repairs to the data in an event.
-    * @sb-param {Event} eventData - The event data to repair.
+    * @sb-param {Results} eventData - The event data to repair.
     */
-    function repairEventData(eventData) {
+    function repairEventData(resultsData: Results): void {
         const repairer = new Repairer();
-        repairer.repairEventData(eventData);
+        repairer.repairEventData(resultsData);
     }
 
     /**
@@ -2729,11 +472,11 @@ SplitsBrowser.Messages = {} as any;
     *
     * This is used if the input data has been read in a format that requires
     * the data to be checked, but the user has opted not to perform any such
-    * reparations and wishes to view the
+    * reparations and wishes to view the raw data
     * @sb-param {Event} eventData - The event data to repair.
     */
-    function transferCompetitorData(eventData) {
-        eventData.classes.forEach(function (courseClass) {
+    function transferCompetitorData(resultsData: Results): void {
+        resultsData.classes.forEach(function (courseClass) {
             courseClass.competitors.forEach(function (competitor) {
                 competitor.setRepairedCumulativeTimes(competitor.getAllOriginalCumulativeTimes());
             });
@@ -2746,3217 +489,23 @@ SplitsBrowser.Messages = {} as any;
     };
 })();
 
-(function () {
-    "use strict";
 
-    const isTrue = SplitsBrowser.isTrue;
-    const isNotNull = SplitsBrowser.isNotNull;
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    const parseTime = SplitsBrowser.parseTime;
-    const Competitor = SplitsBrowser.Model.Competitor;
-    const compareCompetitors = SplitsBrowser.Model.compareCompetitors;
-    const CourseClass = SplitsBrowser.Model.CourseClass;
-    const Course = SplitsBrowser.Model.Course;
-    const Event = SplitsBrowser.Model.Event;
+// old file cvs-reader.js
 
-    /**
-    * Parse a row of competitor data.
-    * @sb-param {Number} index - Index of the competitor line.
-    * @sb-param {string} line - The line of competitor data read from a CSV file.
-    * @sb-param {Number} controlCount - The number of controls (not including the finish).
-    * @sb-param {string} className - The name of the class.
-    * @sb-param {Array} warnings - Array of warnings to add any warnings found to.
-    * @sb-return {Object} Competitor object representing the competitor data read in.
-    */
-    function parseCompetitors(index, line, controlCount, className, warnings) {
-        // Expect forename, surname, club, start time then (controlCount + 1) split times in the form MM:SS.
-        const parts = line.split(",");
+// file oe-reader.js
 
-        while (parts.length > controlCount + 5 && parts[3].match(/[^0-9.,:-]/)) {
-            // As this line is too long and the 'start time' cell has something
-            // that appears not to be a start time, assume that the club name
-            // has a comma in it.
-            parts[2] += "," + parts[3];
-            parts.splice(3, 1);
-        }
+// file html-reader.js
 
-        const originalPartCount = parts.length;
-        const forename = parts.shift() || "";
-        const surname = parts.shift() || "";
-        const name = (forename + " " + surname).trim() || "<name unknown>";
-        if (originalPartCount === controlCount + 5) {
-            const club = parts.shift();
-            const startTimeStr = parts.shift();
-            let startTime = parseTime(startTimeStr);
-            if (startTime === 0) {
-                startTime = null;
-            } else if (!startTimeStr.match(/^\d+:\d\d:\d\d$/)) {
-                // Start time given in hours and minutes instead of hours,
-                // minutes and seconds.
-                startTime *= 60;
-            }
+// file alternative-csv-reader.js
 
-            const cumTimes = [0];
-            let lastCumTimeRecorded = 0;
-            parts.map(function (part) {
-                const splitTime = parseTime(part);
-                if (splitTime !== null && splitTime > 0) {
-                    lastCumTimeRecorded += splitTime;
-                    cumTimes.push(lastCumTimeRecorded);
-                } else {
-                    cumTimes.push(null);
-                }
-            });
 
-            const competitor = Competitor.fromCumTimes(index + 1, name, club, startTime, cumTimes);
-            if (lastCumTimeRecorded === 0) {
-                competitor.setNonStarter();
-            }
-            return competitor;
-        } else {
-            const difference = originalPartCount - (controlCount + 5);
-            const error = (difference < 0) ? (-difference) + " too few" : difference + " too many";
-            warnings.push("Competitor '" + name + "' appears to have the wrong number of split times - " + error +
-                " (row " + (index + 1) + " of class '" + className + "')");
-            return null;
-        }
-    }
+// file iof-xml-reader.js'
 
-    /**
-    * Parse CSV data for a class.
-    * @sb-param {string} courseClass - The string containing data for that class.
-    * @sb-param {Array} warnings - Array of warnings to add any warnings found to.
-    * @sb-return {SplitsBrowser.Model.CourseClass} Parsed class data.
-    */
-    function parseCourseClass(courseClass, warnings) {
-        const lines = courseClass.split(/\r?\n/).filter(isTrue);
-        if (lines.length === 0) {
-            throwInvalidData("parseCourseClass got an empty list of lines");
-        }
 
-        const firstLineParts = lines.shift().split(",");
-        if (firstLineParts.length === 2) {
-            const className = firstLineParts.shift();
-            const controlCountStr = firstLineParts.shift();
-            const controlCount = parseInt(controlCountStr, 10);
-            if (isNaN(controlCount)) {
-                throwInvalidData("Could not read control count: '" + controlCountStr + "'");
-            } else if (controlCount < 0 && lines.length > 0) {
-                // Only complain about a negative control count if there are
-                // any competitors.  Event 7632 ends with a line 'NOCLAS,-1' -
-                // we may as well ignore this.
-                throwInvalidData("Expected a non-negative control count, got " + controlCount + " instead");
-            } else {
-                const competitors = lines.map(function (line, index) {
-                    return parseCompetitors(index, line, controlCount, className, warnings);
-                })
-                    .filter(isNotNull);
+// file input.js
 
-                competitors.sort(compareCompetitors);
-                return new CourseClass(className, controlCount, competitors);
-            }
-        } else {
-            const err = "Expected first line to have two parts (class name and number of controls), got " +
-                               firstLineParts.length + " part(s) instead";
-            throwWrongFileFormat(err);
-        }
-    }
 
-    /**
-    * Parse CSV data for an entire event.
-    * @sb-param {string} eventData - String containing the entire event data.
-    * @sb-return {SplitsBrowser.Model.Event} All event data read in.
-    */
-    function parseEventData(eventData) {
-
-        if (/<html/i.test(eventData)) {
-            throwWrongFileFormat("Cannot parse this file as CSV as it appears to be HTML");
-        }
-
-        eventData = normaliseLineEndings(eventData);
-
-        // Remove trailing commas.
-        eventData = eventData.replace(/,+\n/g, "\n").replace(/,+$/, "");
-
-        const classSections = eventData.split(/\n\n/).map(function (s) { return s.trim(); }).filter(isTrue);
-        const warnings = [];
-
-        let classes = classSections.map(function (section) { return parseCourseClass(section, warnings); });
-
-        classes = classes.filter(function (courseClass) { return !courseClass.isEmpty(); });
-
-        if (classes.length === 0) {
-            throwInvalidData("No competitor data was found");
-        }
-
-        // Nulls are for the course length, climb and controls, which aren't in
-        // the source data files, so we can't do anything about them.
-        const courses = classes.map(function (cls) { return new Course(cls.name, [cls], null, null, null); });
-
-        for (let i = 0; i < classes.length; i += 1) {
-            classes[i].setCourse(courses[i]);
-        }
-
-        return new Event(classes, courses, warnings);
-    }
-
-    SplitsBrowser.Input.CSV = { parseEventData: parseEventData };
-})();
-
-
-(function () {
-    "use strict";
-
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    const isNaNStrict = SplitsBrowser.isNaNStrict;
-    const parseCourseLength = SplitsBrowser.parseCourseLength;
-    const parseCourseClimb = SplitsBrowser.parseCourseClimb;
-    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    const parseTime = SplitsBrowser.parseTime;
-    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    const CourseClass = SplitsBrowser.Model.CourseClass;
-    const Course = SplitsBrowser.Model.Course;
-    const Event = SplitsBrowser.Model.Event;
-
-    const DELIMITERS = [";", ",", "\t", "\\"];
-
-    // Indexes of the various columns relative to the column for control-1.
-
-    const COLUMN_INDEXES: any = new Object();
-
-    [44, 46, 60].forEach(function (columnOffset) {
-        COLUMN_INDEXES[columnOffset] = {
-            course: columnOffset - 7,
-            distance: columnOffset - 6,
-            climb: columnOffset - 5,
-            controlCount: columnOffset - 4,
-            placing: columnOffset - 3,
-            startPunch: columnOffset - 2,
-            finish: columnOffset - 1,
-            control1: columnOffset
-        };
-    });
-
-    [44, 46].forEach(function (columnOffset) {
-        COLUMN_INDEXES[columnOffset].nonCompetitive = columnOffset - 38;
-        COLUMN_INDEXES[columnOffset].startTime = columnOffset - 37;
-        COLUMN_INDEXES[columnOffset].time = columnOffset - 35;
-        COLUMN_INDEXES[columnOffset].classifier = columnOffset - 34;
-        COLUMN_INDEXES[columnOffset].club = columnOffset - 31;
-        COLUMN_INDEXES[columnOffset].className = columnOffset - 28;
-    });
-
-    COLUMN_INDEXES[44].combinedName = 3;
-    COLUMN_INDEXES[44].yearOfBirth = 4;
-
-    COLUMN_INDEXES[46].forename = 4;
-    COLUMN_INDEXES[46].surname = 3;
-    COLUMN_INDEXES[46].yearOfBirth = 5;
-    COLUMN_INDEXES[46].gender = 6;
-
-    COLUMN_INDEXES[60].forename = 6;
-    COLUMN_INDEXES[60].surname = 5;
-    COLUMN_INDEXES[60].yearOfBirth = 7;
-    COLUMN_INDEXES[60].gender = 8;
-    COLUMN_INDEXES[60].combinedName = 3;
-    COLUMN_INDEXES[60].nonCompetitive = 10;
-    COLUMN_INDEXES[60].startTime = 11;
-    COLUMN_INDEXES[60].time = 13;
-    COLUMN_INDEXES[60].classifier = 14;
-    COLUMN_INDEXES[60].club = 20;
-    COLUMN_INDEXES[60].className = 26;
-    COLUMN_INDEXES[60].classNameFallback = COLUMN_INDEXES[60].course;
-    COLUMN_INDEXES[60].clubFallback = 18;
-
-    // Minimum control offset.
-    const MIN_CONTROLS_OFFSET = 37;
-
-    /**
-    * Remove any leading and trailing double-quotes from the given string.
-    * @sb-param {String} value - The value to trim quotes from.
-    * @sb-return {String} The string with any leading and trailing quotes removed.
-    */
-    function dequote(value) {
-        if (value[0] === '"' && value[value.length - 1] === '"') {
-            value = value.substring(1, value.length - 1).replace(/""/g, '"').trim();
-        }
-
-        return value;
-    }
-
-    /**
-    * Constructs an OE-format data reader.
-    *
-    * NOTE: The reader constructed can only be used to read data in once.
-    * @constructor
-    * @sb-param {String} data - The OE data to read in.
-    */
-    function Reader(data) {
-        this.data = normaliseLineEndings(data);
-
-        // Map that associates classes to all of the competitors running on
-        // that class.
-        this.classes = <any>d3.map();
-
-        // Map that associates course names to length and climb values.
-        this.courseDetails = <any>d3.map();
-
-        // Set of all pairs of classes and courses.
-        // (While it is common that one course may have multiple classes, it
-        // seems also that one class can be made up of multiple courses, e.g.
-        // M21E at BOC 2013.)
-        this.classCoursePairs = [];
-
-        // The indexes of the columns that we read data from.
-        this.columnIndexes = null;
-
-        // Warnings about competitors that cannot be read in.
-        this.warnings = [];
-    }
-
-    /**
-    * Identifies the delimiter character that delimits the columns of data.
-    * @sb-return {String} The delimiter character identified.
-    */
-    Reader.prototype.identifyDelimiter = function () {
-        if (this.lines.length <= 1) {
-            throwWrongFileFormat("No data found to read");
-        }
-
-        const firstDataLine = this.lines[1];
-        for (let i = 0; i < DELIMITERS.length; i += 1) {
-            const delimiter = DELIMITERS[i];
-            if (firstDataLine.split(delimiter).length > MIN_CONTROLS_OFFSET) {
-                return delimiter;
-            }
-        }
-
-        throwWrongFileFormat("Data appears not to be in the OE CSV format");
-    };
-
-    /**
-    * Identifies which variation on the OE CSV format we are parsing.
-    *
-    * At present, the only variations supported are 44-column, 46-column and
-    * 60-column.  In all cases, the numbers count the columns before the
-    * controls data.
-    *
-    * @sb-param {String} delimiter - The character used to delimit the columns of
-    *     data.
-    */
-    Reader.prototype.identifyFormatVariation = function (delimiter) {
-
-        const firstLine = this.lines[1].split(delimiter);
-
-        const controlCodeRegexp = /^[A-Za-z0-9]+$/;
-        for (const columnOffset in COLUMN_INDEXES) {
-            if (COLUMN_INDEXES.hasOwnProperty(columnOffset)) {
-                // Convert columnOffset to a number.  It will presently be a
-                // string because it is an object property.
-                const columnOffsetNum = parseInt(columnOffset, 10);
-
-                // We want there to be a control code at columnOffset, with
-                // both preceding columns either blank or containing a valid
-                // time.
-                if (columnOffsetNum < firstLine.length &&
-                    controlCodeRegexp.test(firstLine[columnOffset]) &&
-                    (firstLine[columnOffsetNum - 2].trim() === "" || parseTime(firstLine[columnOffsetNum - 2]) !== null) &&
-                    (firstLine[columnOffsetNum - 1].trim() === "" || parseTime(firstLine[columnOffsetNum - 1]) !== null)) {
-
-                    // Now check the control count exists.  If not, we've
-                    // probably got a triple-column CSV file instead.
-                    const controlCountColumnIndex = COLUMN_INDEXES[columnOffset].controlCount;
-                    if (firstLine[controlCountColumnIndex].trim() !== "") {
-                        this.columnIndexes = COLUMN_INDEXES[columnOffsetNum];
-                        return;
-                    }
-                }
-            }
-        }
-
-        throwWrongFileFormat("Did not find control 1 at any of the supported indexes");
-    };
-
-    /**
-    * Returns the name of the class in the given row.
-    * @sb-param {Array} row - Array of row data.
-    * @sb-return {String} Class name.
-    */
-    Reader.prototype.getClassName = function (row) {
-        let className = row[this.columnIndexes.className];
-        if (className === "" && this.columnIndexes.hasOwnProperty("classNameFallback")) {
-            // 'Nameless' variation: no class names.
-            className = row[this.columnIndexes.classNameFallback];
-        }
-        return className;
-    };
-
-    /**
-    * Reads the start-time in the given row.  The start punch time will
-    * be used if it is available, otherwise the start time.
-    * @sb-param {Array} row - Array of row data.
-    * @sb-return {?Number} Parsed start time, or null for none.
-    */
-    Reader.prototype.getStartTime = function (row) {
-        let startTimeStr = row[this.columnIndexes.startPunch];
-        if (startTimeStr === "") {
-            startTimeStr = row[this.columnIndexes.startTime];
-        }
-
-        return parseTime(startTimeStr);
-    };
-
-    /**
-    * Returns the number of controls to expect on the given line.
-    * @sb-param {Array} row - Array of row data items.
-    * @sb-param {Number} lineNumber - The line number of the line.
-    * @sb-return {Number?} The number of controls, or null if the count could not be read.
-    */
-    Reader.prototype.getNumControls = function (row, lineNumber) {
-        const className = this.getClassName(row);
-        let name;
-        if (className.trim() === "") {
-            name = this.getName(row) || "<name unknown>";
-            this.warnings.push("Could not find a class for competitor '" + name + "' (line " + lineNumber + ")");
-            return null;
-        } else if (this.classes.has(className)) {
-            return this.classes.get(className).numControls;
-        } else {
-            const numControls = parseInt(row[this.columnIndexes.controlCount], 10);
-            if (isFinite(numControls)) {
-                return numControls;
-            } else {
-                name = this.getName(row) || "<name unknown>";
-                const err = "Could not read the control count '" +
-                              row[this.columnIndexes.controlCount] + "' for competitor '" + name + "' from line " + lineNumber;
-                this.warnings.push(err);
-                return null;
-            }
-        }
-    };
-
-    /**
-    * Reads the cumulative times out of a row of competitor data.
-    * @sb-param {Array} row - Array of row data items.
-    * @sb-param {Number} lineNumber - Line number of the row within the source data.
-    * @sb-param {Number} numControls - The number of controls to read.
-    * @sb-return {Array} Array of cumulative times.
-    */
-    Reader.prototype.readCumulativeTimes = function (row, lineNumber, numControls) {
-
-        const cumTimes = [0];
-
-        for (let controlIdx = 0; controlIdx < numControls; controlIdx += 1) {
-            const cellIndex = this.columnIndexes.control1 + 1 + 2 * controlIdx;
-            const cumTimeStr = (cellIndex < row.length) ? row[cellIndex] : null;
-            const cumTime = (cumTimeStr === null) ? null : parseTime(cumTimeStr);
-            cumTimes.push(cumTime);
-        }
-
-        let totalTime = parseTime(row[this.columnIndexes.time]);
-        if (totalTime === null) {
-            // 'Nameless' variation: total time missing, so calculate from
-            // start and finish times.
-            const startTime = this.getStartTime(row);
-            const finishTime = parseTime(row[this.columnIndexes.finish]);
-            if (startTime !== null && finishTime !== null) {
-                totalTime = finishTime - startTime;
-            }
-        }
-
-        cumTimes.push(totalTime);
-
-        return cumTimes;
-    };
-
-    /**
-    * Checks to see whether the given row contains a new class, and if so,
-    * creates it.
-    * @sb-param {Array} row - Array of row data items.
-    * @sb-param {Number} numControls - The number of controls to read.
-    */
-    Reader.prototype.createClassIfNecessary = function (row, numControls) {
-        const className = this.getClassName(row);
-        if (!this.classes.has(className)) {
-            this.classes.set(className, { numControls: numControls, competitors: [] });
-        }
-    };
-
-    /**
-    * Checks to see whether the given row contains a new course, and if so,
-    * creates it.
-    * @sb-param {Array} row - Array of row data items.
-    * @sb-param {Number} numControls - The number of controls to read.
-    */
-    Reader.prototype.createCourseIfNecessary = function (row, numControls) {
-        const courseName = row[this.columnIndexes.course];
-        if (!this.courseDetails.has(courseName)) {
-            const controlNums = d3.range(0, numControls).map(function (controlIdx) {
-                return row[this.columnIndexes.control1 + 2 * controlIdx];
-            }, this);
-            this.courseDetails.set(courseName, {
-                length: parseCourseLength(row[this.columnIndexes.distance]),
-                climb: parseCourseClimb(row[this.columnIndexes.climb]),
-                controls: controlNums
-            });
-        }
-    };
-
-    /**
-    * Checks to see whether the given row contains a class-course pairing that
-    * we haven't seen so far, and adds one if not.
-    * @sb-param {Array} row - Array of row data items.
-    */
-    Reader.prototype.createClassCoursePairIfNecessary = function (row) {
-        const className = this.getClassName(row);
-        const courseName = row[this.columnIndexes.course];
-
-        if (!this.classCoursePairs.some(function (pair) { return pair[0] === className && pair[1] === courseName; })) {
-            this.classCoursePairs.push([className, courseName]);
-        }
-    };
-
-    /**
-    * Reads the name of the competitor from the row.
-    * @sb-param {Array} row - Array of row data items.
-    * @sb-return {String} The name of the competitor.
-    */
-    Reader.prototype.getName = function (row) {
-        let name = "";
-
-        if (this.columnIndexes.hasOwnProperty("forename") && this.columnIndexes.hasOwnProperty("surname")) {
-            const forename = row[this.columnIndexes.forename];
-            const surname = row[this.columnIndexes.surname];
-            name = (forename + " " + surname).trim();
-        }
-
-        if (name === "" && this.columnIndexes.hasOwnProperty("combinedName")) {
-            // 'Nameless' or 44-column variation.
-            name = row[this.columnIndexes.combinedName];
-        }
-
-        return name;
-    };
-
-    /**
-    * Reads in the competitor-specific data from the given row and adds it to
-    * the event data read so far.
-    * @sb-param {Array} row - Row of items read from a line of the input data.
-    * @sb-param {Array} cumTimes - Array of cumulative times for the competitor.
-    */
-    Reader.prototype.addCompetitor = function (row, cumTimes) {
-
-        const className = this.getClassName(row);
-        const placing = row[this.columnIndexes.placing];
-        let club = row[this.columnIndexes.club];
-        if (club === "" && this.columnIndexes.hasOwnProperty("clubFallback")) {
-            // Nameless variation: no club name, just number...
-            club = row[this.columnIndexes.clubFallback];
-        }
-
-        const startTime = this.getStartTime(row);
-
-        let name = this.getName(row);
-        const isPlacingNonNumeric = (placing !== "" && isNaNStrict(parseInt(placing, 10)));
-        if (isPlacingNonNumeric && name.substring(name.length - placing.length) === placing) {
-            name = name.substring(0, name.length - placing.length).trim();
-        }
-
-        const order = this.classes.get(className).competitors.length + 1;
-        const competitor = fromOriginalCumTimes(order, name, club, startTime, cumTimes);
-        if ((row[this.columnIndexes.nonCompetitive] === "1" || isPlacingNonNumeric) && competitor.completed()) {
-            // Competitor either marked as non-competitive, or has completed
-            // the course but has a non-numeric placing.  In the latter case,
-            // assume that they are non-competitive.
-            competitor.setNonCompetitive();
-        }
-
-        const classifier = row[this.columnIndexes.classifier];
-        if (classifier !== "" && classifier !== "0") {
-            if (classifier === "1") {
-                competitor.setNonStarter();
-            } else if (classifier === "2") {
-                competitor.setNonFinisher();
-            } else if (classifier === "4") {
-                competitor.disqualify();
-            } else if (classifier === "5") {
-                competitor.setOverMaxTime();
-            }
-        } else if (!competitor.hasAnyTimes()) {
-            competitor.setNonStarter();
-        }
-
-        const yearOfBirthStr = row[this.columnIndexes.yearOfBirth];
-        if (yearOfBirthStr !== "") {
-            const yearOfBirth = parseInt(yearOfBirthStr, 10);
-            if (!isNaNStrict(yearOfBirth)) {
-                competitor.setYearOfBirth(yearOfBirth);
-            }
-        }
-
-        if (this.columnIndexes.hasOwnProperty("gender")) {
-            const gender = row[this.columnIndexes.gender];
-            if (gender === "M" || gender === "F") {
-                competitor.setGender(gender);
-            }
-        }
-
-        this.classes.get(className).competitors.push(competitor);
-    };
-
-    /**
-    * Parses the given line and adds it to the event data accumulated so far.
-    * @sb-param {String} line - The line to parse.
-    * @sb-param {Number} lineNumber - The number of the line (used in error
-    *     messages).
-    * @sb-param {String} delimiter - The character used to delimit the columns of
-    *     data.
-    */
-    Reader.prototype.readLine = function (line, lineNumber, delimiter) {
-
-        if (line.trim() === "") {
-            // Skip this blank line.
-            return;
-        }
-
-        const row = line.split(delimiter).map(function (s) { return s.trim(); }).map(dequote);
-
-        // Check the row is long enough to have all the data besides the
-        // controls data.
-        if (row.length < MIN_CONTROLS_OFFSET) {
-            throwInvalidData("Too few items on line " + lineNumber + " of the input file: expected at least " + MIN_CONTROLS_OFFSET + ", got " + row.length);
-        }
-
-        const numControls = this.getNumControls(row, lineNumber);
-        if (numControls !== null) {
-            const cumTimes = this.readCumulativeTimes(row, lineNumber, numControls);
-
-            this.createClassIfNecessary(row, numControls);
-            this.createCourseIfNecessary(row, numControls);
-            this.createClassCoursePairIfNecessary(row);
-
-            this.addCompetitor(row, cumTimes);
-        }
-    };
-
-    /**
-    * Creates maps that describe the many-to-many join between the class names
-    * and course names.
-    * @sb-return {Object} Object that contains two maps describing the
-    *     many-to-many join.
-    */
-    Reader.prototype.getMapsBetweenClassesAndCourses = function () {
-
-        const classesToCourses = d3.map<any>();
-        const coursesToClasses = d3.map<any>();
-
-        this.classCoursePairs.forEach(function (pair) {
-            const className = pair[0];
-            const courseName = pair[1];
-
-            if (classesToCourses.has(className)) {
-                classesToCourses.get(className).push(courseName);
-            } else {
-                classesToCourses.set(className, [courseName]);
-            }
-
-            if (coursesToClasses.has(courseName)) {
-                coursesToClasses.get(courseName).push(className);
-            } else {
-                coursesToClasses.set(courseName, [className]);
-            }
-        });
-
-        return { classesToCourses: classesToCourses, coursesToClasses: coursesToClasses };
-    };
-
-    /**
-    * Creates and return a list of CourseClass objects from all of the data read.
-    * @sb-return {Array} Array of CourseClass objects.
-    */
-    Reader.prototype.createClasses = function () {
-        const classNames = this.classes.keys();
-        classNames.sort();
-        return classNames.map(function (className) {
-            const courseClass = this.classes.get(className);
-            return new CourseClass(className, courseClass.numControls, courseClass.competitors);
-        }, this);
-    };
-
-    /**
-    * Find all of the courses and classes that are related to the given course.
-    *
-    * It's not always as simple as one course having multiple classes, as there
-    * can be multiple courses for one single class, and even multiple courses
-    * among multiple classes (e.g. M20E, M18E on courses 3, 3B at BOC 2013.)
-    * Essentially, we have a many-to-many join, and we want to pull out of that
-    * all of the classes and courses linked to the one course with the given
-    * name.
-    *
-    * (For the graph theorists among you, imagine the bipartite graph with
-    * classes on one side and courses on the other.  We want to find the
-    * connected subgraph that this course belongs to.)
-    *
-    * @sb-param {String} initCourseName - The name of the initial course.
-    * @sb-param {Object} manyToManyMaps - Object that contains the two maps that
-    *     map between class names and course names.
-    * @sb-param {d3.set} doneCourseNames - Set of all course names that have been
-    *     'done', i.e. included in a Course object that has been returned from
-    *     a call to this method.
-    * @sb-param {d3.map} classesMap - Map that maps class names to CourseClass
-    *     objects.
-    * @sb-return {SplitsBrowser.Model.Course} - The created Course object.
-    */
-    Reader.prototype.createCourseFromLinkedClassesAndCourses = function (initCourseName, manyToManyMaps, doneCourseNames, classesMap) {
-
-        const courseNamesToDo = [initCourseName];
-        const classNamesToDo = [];
-        const relatedCourseNames = [];
-        const relatedClassNames = [];
-
-        let courseName;
-        let className;
-
-        while (courseNamesToDo.length > 0 || classNamesToDo.length > 0) {
-            while (courseNamesToDo.length > 0) {
-                courseName = courseNamesToDo.shift();
-                const classNames = manyToManyMaps.coursesToClasses.get(courseName);
-                for (let clsIdx = 0; clsIdx < classNames.length; clsIdx += 1) {
-                    className = classNames[clsIdx];
-                    if (classNamesToDo.indexOf(className) < 0 && relatedClassNames.indexOf(className) < 0) {
-                        classNamesToDo.push(className);
-                    }
-                }
-
-                relatedCourseNames.push(courseName);
-            }
-
-            while (classNamesToDo.length > 0) {
-                className = classNamesToDo.shift();
-                const courseNames = manyToManyMaps.classesToCourses.get(className);
-                for (let crsIdx = 0; crsIdx < courseNames.length; crsIdx += 1) {
-                    courseName = courseNames[crsIdx];
-                    if (courseNamesToDo.indexOf(courseName) < 0 && relatedCourseNames.indexOf(courseName) < 0) {
-                        courseNamesToDo.push(courseName);
-                    }
-                }
-
-                relatedClassNames.push(className);
-            }
-        }
-
-        // Mark all of the courses that we handled here as done.
-        relatedCourseNames.forEach(function (courseName1) {
-            doneCourseNames.add(courseName1);
-        });
-
-        const classesForThisCourse = relatedClassNames.map(function (className1) { return classesMap.get(className1); });
-        const details = this.courseDetails.get(initCourseName);
-        const course = new Course(initCourseName, classesForThisCourse, details.length, details.climb, details.controls);
-
-        classesForThisCourse.forEach(function (courseClass) {
-            courseClass.setCourse(course);
-        });
-
-        return course;
-    };
-
-    /**
-    * Sort through the data read in and create Course objects representing each
-    * course in the event.
-    * @sb-param {Array} classes - Array of CourseClass objects read.
-    * @sb-return {Array} Array of course objects.
-    */
-    Reader.prototype.determineCourses = function (classes) {
-
-        const manyToManyMaps = this.getMapsBetweenClassesAndCourses();
-
-        // As we work our way through the courses and classes, we may find one
-        // class made up from multiple courses (e.g. in BOC2013, class M21E
-        // uses course 1A and 1B).  In this set we collect up all of the
-        // courses that we have now processed, so that if we later come across
-        // one we've already dealt with, we can ignore it.
-        const doneCourseNames = d3.set();
-
-        const classesMap = d3.map();
-        classes.forEach(function (courseClass) {
-            classesMap.set(courseClass.name, courseClass);
-        });
-
-        // List of all Course objects created so far.
-        const courses = [];
-        manyToManyMaps.coursesToClasses.keys().forEach(function (courseName) {
-            if (!doneCourseNames.has(courseName)) {
-                const course = this.createCourseFromLinkedClassesAndCourses(courseName, manyToManyMaps, doneCourseNames, classesMap);
-                courses.push(course);
-            }
-        }, this);
-
-        return courses;
-    };
-
-    /**
-    * Parses the read-in data and returns it.
-    * @sb-return {SplitsBrowser.Model.Event} Event-data read.
-    */
-    Reader.prototype.parseEventData = function () {
-
-        this.warnings = [];
-
-        this.lines = this.data.split(/\n/);
-
-        const delimiter = this.identifyDelimiter();
-
-        this.identifyFormatVariation(delimiter);
-
-        // Discard the header row.
-        this.lines.shift();
-
-        this.lines.forEach(function (line, lineIndex) {
-            this.readLine(line, lineIndex + 1, delimiter);
-        }, this);
-
-        const classes = this.createClasses();
-        if (classes.length === 0 && this.warnings.length > 0) {
-            // A warning was generated for every single competitor in the file.
-            // This file is quite probably not an OE-CSV file.
-            throwWrongFileFormat("This file may have looked vaguely like an OE CSV file but no data could be read out of it");
-        }
-
-        const courses = this.determineCourses(classes);
-        return new Event(classes, courses, this.warnings);
-    };
-
-    SplitsBrowser.Input.OE = {} as any;
-
-    /**
-    * Parse OE data read from a semicolon-separated data string.
-    * @sb-param {String} data - The input data string read.
-    * @sb-return {SplitsBrowser.Model.Event} All event data read.
-    */
-    SplitsBrowser.Input.OE.parseEventData = function (data) {
-        const reader = new Reader(data);
-        return reader.parseEventData();
-    };
-})();
-
-(function () {
-    "use strict";
-
-    const isNotNull = SplitsBrowser.isNotNull;
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    const parseCourseLength = SplitsBrowser.parseCourseLength;
-    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    const parseTime = SplitsBrowser.parseTime;
-    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    const CourseClass = SplitsBrowser.Model.CourseClass;
-    const Course = SplitsBrowser.Model.Course;
-    const Event = SplitsBrowser.Model.Event;
-
-    // Regexps to help with parsing.
-    const HTML_TAG_STRIP_REGEXP = /<[^>]+>/g;
-    const DISTANCE_FIND_REGEXP = /([0-9.,]+)\s*(?:Km|km)/;
-    const CLIMB_FIND_REGEXP = /(\d+)\s*(?:Cm|Hm|hm|m)/;
-
-    /**
-    * Returns whether the given string is nonempty.
-    * @sb-param {String} string - The string to check.
-    * @sb-return True if the string is neither null nor empty, false if it is null
-    *     or empty.
-    */
-    function isNonEmpty(string) {
-        return string !== null && string !== "";
-    }
-
-    /**
-    * Returns whether the given string contains a number.  The string is
-    * considered to contain a number if, after stripping whitespace, the string
-    * is not empty and calling isFinite on it returns true.
-    * @sb-param {String} string - The string to test.
-    * @sb-return True if the string contains a number, false if not.
-    */
-    function hasNumber(string) {
-        string = string.trim();
-        // isFinite is not enough on its own: isFinite("") is true.
-        return string !== "" && isFinite(string);
-    }
-
-    /**
-    * Splits a line by whitespace.
-    * @sb-param {String} line - The line to split.
-    * @sb-return {Array} Array of whitespace-separated strings.
-    */
-    function splitByWhitespace(line) {
-        return line.split(/\s+/g).filter(isNonEmpty);
-    }
-
-    /**
-    * Strips all HTML tags from a string and returns the remaining string.
-    * @sb-param {String} text - The HTML string to strip tags from.
-    * @sb-return {String} The input string with HTML tags removed.
-    */
-    function stripHtml(text) {
-        return text.replace(HTML_TAG_STRIP_REGEXP, "");
-    }
-
-    /**
-    * Returns all matches of the given regexp within the given text,
-    * after being stripped of HTML.
-    *
-    * Note that it is recommended to pass this function a new regular
-    * expression each time, rather than using a precompiled regexp.
-    *
-    * @sb-param {RegExp} regexp - The regular expression to find all matches of.
-    * @sb-param {String} text - The text to search for matches within.
-    * @sb-return {Array} Array of strings representing the HTML-stripped regexp
-    *     matches.
-    */
-    function getHtmlStrippedRegexMatches(regexp, text) {
-        const matches = [];
-        let match;
-        while (true) {
-            match = regexp.exec(text);
-            if (match === null) {
-                break;
-            } else {
-                matches.push(stripHtml(match[1]));
-            }
-        }
-
-        return matches;
-    }
-
-    /**
-    * Returns the contents of all <font> ... </font> elements within the given
-    * text.  The contents of the <font> elements are stripped of all other HTML
-    * tags.
-    * @sb-param {String} text - The HTML string containing the <font> elements.
-    * @sb-return {Array} Array of strings of text inside <font> elements.
-    */
-    function getFontBits(text) {
-        return getHtmlStrippedRegexMatches(/<font[^>]*>(.*?)<\/font>/g, text);
-    }
-
-    /**
-    * Returns the contents of all <td> ... </td> elements within the given
-    * text.  The contents of the <td> elements are stripped of all other HTML
-    * tags.
-    * @sb-param {String} text - The HTML string containing the <td> elements.
-    * @sb-return {Array} Array of strings of text inside <td> elements.
-    */
-    function getTableDataBits(text) {
-        return getHtmlStrippedRegexMatches(/<td[^>]*>(.*?)<\/td>/g, text).map(function (s) { return s.trim(); });
-    }
-
-    /**
-    * Returns the contents of all <td> ... </td> elements within the given
-    * text.  The contents of the <td> elements are stripped of all other HTML
-    * tags.  Empty matches are removed.
-    * @sb-param {String} text - The HTML string containing the <td> elements.
-    * @sb-return {Array} Array of strings of text inside <td> elements.
-    */
-    function getNonEmptyTableDataBits(text) {
-        return getTableDataBits(text).filter(function (bit) { return bit !== ""; });
-    }
-
-    /**
-    * Returns the contents of all <th> ... </th> elements within the given
-    * text.  The contents of the <th> elements are stripped of all other HTML
-    * tags.  Empty matches are removed.
-    * @sb-param {String} text - The HTML string containing the <td> elements.
-    * @sb-return {Array} Array of strings of text inside <td> elements.
-    */
-    function getNonEmptyTableHeaderBits(text) {
-        const matches = getHtmlStrippedRegexMatches(/<th[^>]*>(.*?)<\/th>/g, text);
-        return matches.filter(function (bit) { return bit !== ""; });
-    }
-
-    /**
-    * Attempts to read a course distance from the given string.
-    * @sb-param {String} text - The text string to read a course distance from.
-    * @sb-return {?Number} - The parsed course distance, or null if no
-    *     distance could be parsed.
-    */
-    function tryReadDistance(text) {
-        const distanceMatch = DISTANCE_FIND_REGEXP.exec(text);
-        if (distanceMatch === null) {
-            return null;
-        } else {
-            return parseCourseLength(distanceMatch[1]);
-        }
-    }
-
-    /**
-    * Attempts to read a course climb from the given string.
-    * @sb-param {String} text - The text string to read a course climb from.
-    * @sb-return {?Number} - The parsed course climb, or null if no climb
-    *     could be parsed.
-    */
-    function tryReadClimb(text) {
-        const climbMatch = CLIMB_FIND_REGEXP.exec(text);
-        if (climbMatch === null) {
-            return null;
-        } else {
-            return parseInt(climbMatch[1], 10);
-        }
-    }
-
-    /**
-    * Reads control codes from an array of strings.  Each code should be of the
-    * form num(code), with the exception of the finish, which, if it appears,
-    * should contain no parentheses and must be the last.  The finish is
-    * returned as null.
-    * @sb-param {Array} labels - Array of string labels.
-    * @sb-return {Array} Array of control codes, with null indicating the finish.
-    */
-    function readControlCodes(labels) {
-        const controlCodes = [];
-        for (let labelIdx = 0; labelIdx < labels.length; labelIdx += 1) {
-            const label = labels[labelIdx];
-            const parenPos = label.indexOf("(");
-            if (parenPos > -1 && label[label.length - 1] === ")") {
-                const controlCode = label.substring(parenPos + 1, label.length - 1);
-                controlCodes.push(controlCode);
-            } else if (labelIdx + 1 === labels.length) {
-                controlCodes.push(null);
-            } else {
-                throwInvalidData("Unrecognised control header label: '" + label + "'");
-            }
-        }
-
-        return controlCodes;
-    }
-
-    /**
-    * Removes from the given arrays of cumulative and split times any 'extra'
-    * controls.
-    *
-    * An 'extra' control is a control that a competitor punches without it
-    * being a control on their course.  Extra controls are indicated by the
-    * split 'time' beginning with an asterisk.
-    *
-    * This method does not return anything, instead it mutates the arrays
-    * given.
-    *
-    * @sb-param {Array} cumTimes - Array of cumulative times.
-    * @sb-param {Array} splitTimes - Array of split times.
-    */
-    function removeExtraControls(cumTimes, splitTimes) {
-        while (splitTimes.length > 0 && splitTimes[splitTimes.length - 1][0] === "*") {
-            splitTimes.splice(splitTimes.length - 1, 1);
-            cumTimes.splice(cumTimes.length - 1, 1);
-        }
-    }
-
-    /**
-    * Represents the result of parsing lines of competitor data.  This can
-    * represent intermediate data as well as complete data.
-    * @constructor
-    * @sb-param {String} name - The name of the competitor.
-    * @sb-param {String} club - The name of the competitor's club.
-    * @sb-param {String} className - The class of the competitor.
-    * @sb-param {?Number} totalTime - The total time taken by the competitor, or
-    *     null for no total time.
-    * @sb-param {Array} cumTimes - Array of cumulative split times.
-    * @sb-param {boolean} competitive - Whether the competitor's run is competitive.
-    */
-    function CompetitorParseRecord(name, club, className, totalTime, cumTimes, competitive) {
-        this.name = name;
-        this.club = club;
-        this.className = className;
-        this.totalTime = totalTime;
-        this.cumTimes = cumTimes;
-        this.competitive = competitive;
-    }
-
-    /**
-    * Returns whether this competitor record is a 'continuation' record.
-    * A continuation record is one that has no name, club, class name or total
-    * time.  Instead it represents the data read from lines of data other than
-    * the first two.
-    * @sb-return {boolean} True if the record is a continuation record, false if not.
-    */
-    CompetitorParseRecord.prototype.isContinuation = function () {
-        return (this.name === "" && this.club === "" && this.className === null && this.totalTime === "" && !this.competitive);
-    };
-
-    /**
-    * Appends the cumulative split times in another CompetitorParseRecord to
-    * this one.  The one given must be a 'continuation' record.
-    * @sb-param {CompetitorParseRecord} other - The record whose cumulative times
-    *     we wish to append.
-    */
-    CompetitorParseRecord.prototype.append = function (other) {
-        if (other.isContinuation()) {
-            this.cumTimes = this.cumTimes.concat(other.cumTimes);
-        } else {
-            throw new Error("Can only append a continuation CompetitorParseRecord");
-        }
-    };
-
-    /**
-    * Creates a Competitor object from this CompetitorParseRecord object.
-    * @sb-param {Number} order - The number of this competitor within their class
-    *     (1=first, 2=second, ...).
-    * @sb-return {Competitor} Converted competitor object.
-    */
-    CompetitorParseRecord.prototype.toCompetitor = function (order) {
-        // Prepend a zero cumulative time.
-        const cumTimes = [0].concat(this.cumTimes);
-
-        // The null is for the start time.
-        const competitor = fromOriginalCumTimes(order, this.name, this.club, null, cumTimes);
-        if (competitor.completed() && !this.competitive) {
-            competitor.setNonCompetitive();
-        }
-
-        if (!competitor.hasAnyTimes()) {
-            competitor.setNonStarter();
-        }
-
-        return competitor;
-    };
-
-    /*
-    * There are three types of HTML format supported by this parser: one that is
-    * based on pre-formatted text, one that is based around a single HTML table,
-    * and one that uses many HTML tables.  The overall strategy when parsing
-    * any format is largely the same, but the exact details vary.
-    *
-    * A 'Recognizer' is used to handle the finer details of the format parsing.
-    * A recognizer should contain methods 'isTextOfThisFormat',
-    * 'preprocess', 'canIgnoreThisLine', 'isCourseHeaderLine',
-    * 'parseCourseHeaderLine', 'parseControlsLine' and 'parseCompetitor'.
-    * See the documentation on the objects below for more information about
-    * what these methods do.
-    */
-
-    /**
-    * A Recognizer that handles the 'older' HTML format based on preformatted
-    * text.
-    * @constructor
-    */
-    const OldHtmlFormatRecognizer = function () {
-        // There exists variations of the format depending on what the second
-        // <font> ... </font> element on each row contains.  It can be blank,
-        // contain a number (start number, perhaps?) or something else.
-        // If blank or containing a number, the competitor's name is in column
-        // 2 and there are four preceding columns.  Otherwise the competitor's
-        // name is in column 1 and there are three preceding columns.
-        this.precedingColumnCount = null;
-    };
-
-    /**
-    * Returns whether this recognizer is likely to recognize the given HTML
-    * text and possibly be able to parse it.  If this method returns true, the
-    * parser will use this recognizer to attempt to parse the HTML.  If it
-    * returns false, the parser will not use this recognizer.  Other methods on
-    * this object can therefore assume that this method has returned true.
-    *
-    * As this recognizer is for recognizing preformatted text which also uses a
-    * lot of &lt;font&gt; elements, it simply checks for the presence of
-    * HTML &lt;pre&gt; and &lt;font&gt; elements.
-    *
-    * @sb-param {String} text - The entire input text read in.
-    * @sb-return {boolean} True if the text contains any pre-formatted HTML, false
-    *     otherwise
-    */
-    OldHtmlFormatRecognizer.prototype.isTextOfThisFormat = function (text) {
-        return (text.indexOf("<pre>") >= 0 && text.indexOf("<font") >= 0);
-    };
-
-    /**
-    * Performs some pre-processing on the text before it is read in.
-    *
-    * This object strips everything up to and including the opening
-    * &lt;pre&gt; tag, and everything from the closing &lt;/pre&gt; tag
-    * to the end of the text.
-    *
-    * @sb-param {String} text - The HTML text to preprocess.
-    * @sb-return {String} The preprocessed text.
-    */
-    OldHtmlFormatRecognizer.prototype.preprocess = function (text) {
-        const prePos = text.indexOf("<pre>");
-        if (prePos === -1) {
-            throw new Error("Cannot find opening pre tag");
-        }
-
-        let lineEndPos = text.indexOf("\n", prePos);
-        text = text.substring(lineEndPos + 1);
-
-        // Replace blank lines.
-        text = text.replace(/\n{2,}/g, "\n");
-
-        const closePrePos = text.lastIndexOf("</pre>");
-        if (closePrePos === -1) {
-            throwInvalidData("Found opening <pre> but no closing </pre>");
-        }
-
-        lineEndPos = text.lastIndexOf("\n", closePrePos);
-        text = text.substring(0, lineEndPos);
-        return text.trim();
-    };
-
-    /**
-    * Returns whether the HTML parser can ignore the given line altogether.
-    *
-    * The parser will call this method with every line read in, apart from
-    * the second line of each pair of competitor data rows.  These are always
-    * assumed to be in pairs.
-    *
-    * This recognizer ignores only blank lines.
-    *
-    * @sb-param {String} line - The line to check.
-    * @sb-return {boolean} True if the line should be ignored, false if not.
-    */
-    OldHtmlFormatRecognizer.prototype.canIgnoreThisLine = function (line) {
-        return line === "";
-    };
-
-    /**
-    * Returns whether the given line is the first line of a course.
-    *
-    * If so, it means the parser has finished processing the previous course
-    * (if any), and can start a new course.
-    *
-    * This recognizer treats a line with exactly two
-    * &lt;font&gt;...&lt;/font&gt; elements as a course header line, and
-    * anything else not.
-    *
-    * @sb-param {String} line - The line to check.
-    * @sb-return {boolean} True if this is the first line of a course, false
-    *     otherwise.
-    */
-    OldHtmlFormatRecognizer.prototype.isCourseHeaderLine = function (line) {
-        return (getFontBits(line).length === 2);
-    };
-
-    /**
-    * Parse a course header line and return the course name, distance and
-    * climb.
-    *
-    * This method can assume that the line given is a course header line.
-    *
-    * @sb-param {String} line - The line to parse course details from.
-    * @sb-return {Object} Object containing the parsed course details.
-    */
-    OldHtmlFormatRecognizer.prototype.parseCourseHeaderLine = function (line) {
-        const bits = getFontBits(line);
-        if (bits.length !== 2) {
-            throw new Error("Course header line should have two parts");
-        }
-
-        const nameAndControls = bits[0];
-        const distanceAndClimb = bits[1];
-
-        const openParenPos = nameAndControls.indexOf("(");
-        const courseName = (openParenPos > -1) ? nameAndControls.substring(0, openParenPos) : nameAndControls;
-
-        const distance = tryReadDistance(distanceAndClimb);
-        const climb = tryReadClimb(distanceAndClimb);
-
-        return {
-            name: courseName.trim(),
-            distance: distance,
-            climb: climb
-        };
-    };
-
-    /**
-    * Parse control codes from the given line and return a list of them.
-    *
-    * This method can assume that the previous line was the course header or a
-    * previous control line.  It should also return null for the finish, which
-    * should have no code.  The finish is assumed to he the last.
-    *
-    * @sb-param {String} line - The line to parse control codes from.
-    * @sb-return {Array} Array of control codes.
-    */
-    OldHtmlFormatRecognizer.prototype.parseControlsLine = function (line) {
-        const lastFontPos = line.lastIndexOf("</font>");
-        const controlsText = (lastFontPos === -1) ? line : line.substring(lastFontPos + "</font>".length);
-
-        const controlLabels = splitByWhitespace(controlsText.trim());
-        return readControlCodes(controlLabels);
-    };
-
-    /**
-    * Read either cumulative or split times from the given line of competitor
-    * data.
-    * (This method is not used by the parser, only elsewhere in the recognizer.)
-    * @sb-param {String} line - The line to read the times from.
-    * @sb-return {Array} Array of times.
-    */
-    OldHtmlFormatRecognizer.prototype.readCompetitorSplitDataLine = function (line) {
-        for (let i = 0; i < this.precedingColumnCount; i += 1) {
-            const closeFontPos = line.indexOf("</font>");
-            line = line.substring(closeFontPos + "</font>".length);
-        }
-
-        const times = splitByWhitespace(stripHtml(line));
-        return times;
-    };
-
-    /**
-    * Parse two lines of competitor data into a CompetitorParseRecord object
-    * containing the data.
-    * @sb-param {String} firstLine - The first line of competitor data.
-    * @sb-param {String} secondLine - The second line of competitor data.
-    * @sb-return {CompetitorParseRecord} The parsed competitor.
-    */
-    OldHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLine, secondLine) {
-        const firstLineBits = getFontBits(firstLine);
-        const secondLineBits = getFontBits(secondLine);
-
-        if (this.precedingColumnCount === null) {
-            // If column 1 is blank or a number, we have four preceding
-            // columns.  Otherwise we have three.
-            const column1 = firstLineBits[1].trim();
-            this.precedingColumnCount = (column1.match(/^\d*$/)) ? 4 : 3;
-        }
-
-        const competitive = hasNumber(firstLineBits[0]);
-        const name = firstLineBits[this.precedingColumnCount - 2].trim();
-        const totalTime = firstLineBits[this.precedingColumnCount - 1].trim();
-        const club = secondLineBits[this.precedingColumnCount - 2].trim();
-
-        let cumulativeTimes = this.readCompetitorSplitDataLine(firstLine);
-        const splitTimes = this.readCompetitorSplitDataLine(secondLine);
-        cumulativeTimes = cumulativeTimes.map(parseTime);
-
-        removeExtraControls(cumulativeTimes, splitTimes);
-
-        let className = null;
-        if (name !== null && name !== "") {
-            let lastCloseFontPos = -1;
-            for (let i = 0; i < this.precedingColumnCount; i += 1) {
-                lastCloseFontPos = firstLine.indexOf("</font>", lastCloseFontPos + 1);
-            }
-
-            const firstLineUpToLastPreceding = firstLine.substring(0, lastCloseFontPos + "</font>".length);
-            const firstLineMinusFonts = firstLineUpToLastPreceding.replace(/<font[^>]*>(.*?)<\/font>/g, "");
-            const lineParts = splitByWhitespace(firstLineMinusFonts);
-            if (lineParts.length > 0) {
-                className = lineParts[0];
-            }
-        }
-
-        return new CompetitorParseRecord(name, club, className, totalTime, cumulativeTimes, competitive);
-    };
-
-    /**
-    * Constructs a recognizer for formatting the 'newer' format of HTML
-    * event results data.
-    *
-    * Data in this format is given within a number of HTML tables, three per
-    * course.
-    * @constructor
-    */
-    const NewHtmlFormatRecognizer = function () {
-        this.timesOffset = null;
-    };
-
-    /**
-    * Returns whether this recognizer is likely to recognize the given HTML
-    * text and possibly be able to parse it.  If this method returns true, the
-    * parser will use this recognizer to attempt to parse the HTML.  If it
-    * returns false, the parser will not use this recognizer.  Other methods on
-    * this object can therefore assume that this method has returned true.
-    *
-    * As this recognizer is for recognizing HTML formatted in tables, it
-    * returns whether the number of HTML &lt;table&gt; tags is at least five.
-    * Each course uses three tables, and there are two HTML tables before the
-    * courses.
-    *
-    * @sb-param {String} text - The entire input text read in.
-    * @sb-return {boolean} True if the text contains at least five HTML table
-    *     tags.
-    */
-    NewHtmlFormatRecognizer.prototype.isTextOfThisFormat = function (text) {
-        let tablePos = -1;
-        for (let i = 0; i < 5; i += 1) {
-            tablePos = text.indexOf("<table", tablePos + 1);
-            if (tablePos === -1) {
-                // Didn't find another table.
-                return false;
-            }
-        }
-
-        return true;
-    };
-
-    /**
-    * Performs some pre-processing on the text before it is read in.
-    *
-    * This recognizer performs a fair amount of pre-processing, to remove
-    * parts of the file we don't care about, and to reshape what there is left
-    * so that it is in a more suitable form to be parsed.
-    *
-    * @sb-param {String} text - The HTML text to preprocess.
-    * @sb-return {String} The preprocessed text.
-    */
-    NewHtmlFormatRecognizer.prototype.preprocess = function (text) {
-        // Remove the first table and end of the <div> it is contained in.
-        const tableEndPos = text.indexOf("</table>");
-        if (tableEndPos === -1) {
-            throwInvalidData("Could not find any closing </table> tags");
-        }
-
-        text = text.substring(tableEndPos + "</table>".length);
-
-        const closeDivPos = text.indexOf("</div>");
-        const openTablePos = text.indexOf("<table");
-        if (closeDivPos > -1 && closeDivPos < openTablePos) {
-            text = text.substring(closeDivPos + "</div>".length);
-        }
-
-        // Rejig the line endings so that each row of competitor data is on its
-        // own line, with table and table-row tags starting on new lines,
-        // and closing table and table-row tags at the end of lines.
-        text = text.replace(/>\n+</g, "><").replace(/><tr>/g, ">\n<tr>").replace(/<\/tr></g, "</tr>\n<")
-            .replace(/><table/g, ">\n<table").replace(/<\/table></g, "</table>\n<");
-
-        // Remove all <col> elements.
-        text = text.replace(/<\/col[^>]*>/g, "");
-
-        // Remove all rows that contain only a single non-breaking space.
-        // In the file I have, the &nbsp; entities are missing their
-        // semicolons.  However, this could well be fixed in the future.
-        text = text.replace(/<tr[^>]*><td[^>]*>(?:<nobr>)?&nbsp;?(?:<\/nobr>)?<\/td><\/tr>/g, "");
-
-        // Remove any anchor elements used for navigation...
-        text = text.replace(/<a id="[^"]*"><\/a>/g, "");
-
-        // ... and the navigation div.  Use [\s\S] to match everything
-        // including newlines - JavaScript regexps have no /s modifier.
-        text = text.replace(/<div id="navigation">[\s\S]*?<\/div>/g, "");
-
-        // Finally, remove the trailing </body> and </html> elements.
-        text = text.replace("</body></html>", "");
-
-        return text.trim();
-    };
-
-    /**
-    * Returns whether the HTML parser can ignore the given line altogether.
-    *
-    * The parser will call this method with every line read in, apart from
-    * the second line of each pair of competitor data rows.  These are always
-    * assumed to be in pairs.  This recognizer takes advantage of this to scan
-    * the course header tables to see if class names are included.
-    *
-    * This recognizer ignores blank lines. It also ignores any that contain
-    * opening or closing HTML table tags.  This is not a problem because the
-    * preprocessing has ensured that the table data is not in the same line.
-    *
-    * @sb-param {String} line - The line to check.
-    * @sb-return {boolean} True if the line should be ignored, false if not.
-    */
-    NewHtmlFormatRecognizer.prototype.canIgnoreThisLine = function (line) {
-        if (line.indexOf("<th>") > -1) {
-            const bits = getNonEmptyTableHeaderBits(line);
-            this.timesOffset = bits.length;
-            return true;
-        } else {
-            return (line === "" || line.indexOf("<table") > -1 || line.indexOf("</table>") > -1);
-        }
-    };
-
-
-    /**
-    * Returns whether the given line is the first line of a course.
-    *
-    * If so, it means the parser has finished processing the previous course
-    * (if any), and can start a new course.
-    *
-    * This recognizer treats a line that contains a table-data cell with ID
-    * "header" as the first line of a course.
-    *
-    * @sb-param {String} line - The line to check.
-    * @sb-return {boolean} True if this is the first line of a course, false
-    *     otherwise.
-    */
-    NewHtmlFormatRecognizer.prototype.isCourseHeaderLine = function (line) {
-        return line.indexOf('<td id="header"') > -1;
-    };
-
-    /**
-    * Parse a course header line and return the course name, distance and
-    * climb.
-    *
-    * This method can assume that the line given is a course header line.
-    *
-    * @sb-param {String} line - The line to parse course details from.
-    * @sb-return {Object} Object containing the parsed course details.
-    */
-    NewHtmlFormatRecognizer.prototype.parseCourseHeaderLine = function (line) {
-        const dataBits = getNonEmptyTableDataBits(line);
-        if (dataBits.length === 0) {
-            throwInvalidData("No parts found in course header line");
-        }
-
-        let name = dataBits[0];
-        const openParenPos = name.indexOf("(");
-        if (openParenPos > -1) {
-            name = name.substring(0, openParenPos);
-        }
-
-        name = name.trim();
-
-        let distance = null;
-        let climb = null;
-
-        for (let bitIndex = 1; bitIndex < dataBits.length; bitIndex += 1) {
-            if (distance === null) {
-                distance = tryReadDistance(dataBits[bitIndex]);
-            }
-
-            if (climb === null) {
-                climb = tryReadClimb(dataBits[bitIndex]);
-            }
-        }
-
-        return { name: name, distance: distance, climb: climb };
-    };
-
-    /**
-    * Parse control codes from the given line and return a list of them.
-    *
-    * This method can assume that the previous line was the course header or a
-    * previous control line.  It should also return null for the finish, which
-    * should have no code.  The finish is assumed to he the last.
-    *
-    * @sb-param {String} line - The line to parse control codes from.
-    * @sb-return {Array} Array of control codes.
-    */
-    NewHtmlFormatRecognizer.prototype.parseControlsLine = function (line) {
-        const bits = getNonEmptyTableDataBits(line);
-        return readControlCodes(bits);
-    };
-
-    /**
-    * Read either cumulative or split times from the given line of competitor
-    * data.
-    * (This method is not used by the parser, only elsewhere in the recognizer.)
-    * @sb-param {String} line - The line to read the times from.
-    * @sb-return {Array} Array of times.
-    */
-    NewHtmlFormatRecognizer.prototype.readCompetitorSplitDataLine = function (line) {
-        const bits = getTableDataBits(line);
-
-        const startPos = this.timesOffset;
-
-        // Discard the empty bits at the end.
-        let endPos = bits.length;
-        while (endPos > 0 && bits[endPos - 1] === "") {
-            endPos -= 1;
-        }
-
-        return bits.slice(startPos, endPos).filter(isNonEmpty);
-    };
-
-    /**
-    * Parse two lines of competitor data into a CompetitorParseRecord object
-    * containing the data.
-    * @sb-param {String} firstLine - The first line of competitor data.
-    * @sb-param {String} secondLine - The second line of competitor data.
-    * @sb-return {CompetitorParseRecord} The parsed competitor.
-    */
-    NewHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLine, secondLine) {
-        const firstLineBits = getTableDataBits(firstLine);
-        const secondLineBits = getTableDataBits(secondLine);
-
-        const competitive = hasNumber(firstLineBits[0]);
-        const nameOffset = (this.timesOffset === 3) ? 1 : 2;
-        const name = firstLineBits[nameOffset];
-        const totalTime = firstLineBits[this.timesOffset - 1];
-        const club = secondLineBits[nameOffset];
-
-        const className = (this.timesOffset === 5 && name !== "") ? firstLineBits[3] : null;
-
-        let cumulativeTimes = this.readCompetitorSplitDataLine(firstLine);
-        const splitTimes = this.readCompetitorSplitDataLine(secondLine);
-        cumulativeTimes = cumulativeTimes.map(parseTime);
-
-        removeExtraControls(cumulativeTimes, splitTimes);
-
-        const nonZeroCumTimeCount = cumulativeTimes.filter(isNotNull).length;
-
-        if (nonZeroCumTimeCount !== splitTimes.length) {
-            throwInvalidData("Cumulative and split times do not have the same length: " + nonZeroCumTimeCount + " cumulative times, " + splitTimes.length + " split times");
-        }
-
-        return new CompetitorParseRecord(name, club, className, totalTime, cumulativeTimes, competitive);
-    };
-
-    /**
-    * Constructs a recognizer for formatting an HTML format supposedly from
-    * 'OEvent'.
-    *
-    * Data in this format is contained within a single HTML table, with another
-    * table before it containing various (ignored) header information.
-    * @constructor
-    */
-    const OEventTabularHtmlFormatRecognizer = function () {
-        this.usesClasses = false;
-    };
-
-    /**
-    * Returns whether this recognizer is likely to recognize the given HTML
-    * text and possibly be able to parse it.  If this method returns true, the
-    * parser will use this recognizer to attempt to parse the HTML.  If it
-    * returns false, the parser will not use this recognizer.  Other methods on
-    * this object can therefore assume that this method has returned true.
-    *
-    * As this recognizer is for recognizing HTML formatted in precisely two
-    * tables, it returns whether the number of HTML &lt;table&gt; tags is
-    * two.  If fewer than two tables are found, or more than two, this method
-    * returns false.
-    *
-    * @sb-param {String} text - The entire input text read in.
-    * @sb-return {boolean} True if the text contains precisely two HTML table
-    *     tags.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.isTextOfThisFormat = function (text) {
-        const table1Pos = text.indexOf("<table");
-        if (table1Pos >= 0) {
-            const table2Pos = text.indexOf("<table", table1Pos + 1);
-            if (table2Pos >= 0) {
-                const table3Pos = text.indexOf("<table", table2Pos + 1);
-                if (table3Pos < 0) {
-                    // Format characterised by precisely two tables.
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    };
-
-    /**
-    * Performs some pre-processing on the text before it is read in.
-    *
-    * This recognizer performs a fair amount of pre-processing, to remove
-    * parts of the file we don't care about, and to reshape what there is left
-    * so that it is in a more suitable form to be parsed.
-    *
-    * @sb-param {String} text - The HTML text to preprocess.
-    * @sb-return {String} The preprocessed text.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.preprocess = function (text) {
-        // Remove the first table.
-        const tableEndPos = text.indexOf("</table>");
-        if (tableEndPos === -1) {
-            throwInvalidData("Could not find any closing </table> tags");
-        }
-
-        if (text.indexOf('<td colspan="25">') >= 0) {
-            // The table has 25 columns with classes and 24 without.
-            this.usesClasses = true;
-        }
-
-        text = text.substring(tableEndPos + "</table>".length);
-
-        // Remove all rows that contain only a single non-breaking space.
-        text = text.replace(/<tr[^>]*><td colspan=[^>]*>&nbsp;<\/td><\/tr>/g, "");
-
-        // Replace blank lines.
-        text = text.replace(/\n{2,}/g, "\n");
-
-        // Finally, remove the trailing </body> and </html> elements.
-        text = text.replace("</body>", "").replace("</html>", "");
-
-        return text.trim();
-    };
-
-    /**
-    * Returns whether the HTML parser can ignore the given line altogether.
-    *
-    * The parser will call this method with every line read in, apart from
-    * the second line of each pair of competitor data rows.  These are always
-    * assumed to be in pairs.
-    *
-    * This recognizer ignores blank lines. It also ignores any that contain
-    * opening or closing HTML table tags or horizontal-rule tags.
-    *
-    * @sb-param {String} line - The line to check.
-    * @sb-return {boolean} True if the line should be ignored, false if not.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.canIgnoreThisLine = function (line) {
-        return (line === "" || line.indexOf("<table") > -1 || line.indexOf("</table>") > -1 || line.indexOf("<hr>") > -1);
-    };
-
-    /**
-    * Returns whether the given line is the first line of a course.
-    *
-    * If so, it means the parser has finished processing the previous course
-    * (if any), and can start a new course.
-    *
-    * This recognizer treats a line that contains a table-row cell with class
-    * "clubName" as the first line of a course.
-    *
-    * @sb-param {String} line - The line to check.
-    * @sb-return {boolean} True if this is the first line of a course, false
-    *     otherwise.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.isCourseHeaderLine = function (line) {
-        return line.indexOf('<tr class="clubName"') > -1;
-    };
-
-    /**
-    * Parse a course header line and return the course name, distance and
-    * climb.
-    *
-    * This method can assume that the line given is a course header line.
-    *
-    * @sb-param {String} line - The line to parse course details from.
-    * @sb-return {Object} Object containing the parsed course details.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.parseCourseHeaderLine = function (line) {
-        const dataBits = getNonEmptyTableDataBits(line);
-        if (dataBits.length === 0) {
-            throwInvalidData("No parts found in course header line");
-        }
-
-        const part = dataBits[0];
-
-        let name, distance, climb;
-        const match = /^(.*?)\s+\((\d+)m,\s*(\d+)m\)$/.exec(part);
-        if (match === null) {
-            // Assume just course name.
-            name = part;
-            distance = null;
-            climb = null;
-        } else {
-            name = match[1];
-            distance = parseInt(match[2], 10) / 1000;
-            climb = parseInt(match[3], 10);
-        }
-
-        return { name: name.trim(), distance: distance, climb: climb };
-    };
-
-    /**
-    * Parse control codes from the given line and return a list of them.
-    *
-    * This method can assume that the previous line was the course header or a
-    * previous control line.  It should also return null for the finish, which
-    * should have no code.  The finish is assumed to he the last.
-    *
-    * @sb-param {String} line - The line to parse control codes from.
-    * @sb-return {Array} Array of control codes.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.parseControlsLine = function (line) {
-        const bits = getNonEmptyTableDataBits(line);
-        return bits.map(function (bit) {
-            const dashPos = bit.indexOf("-");
-            return (dashPos === -1) ? null : bit.substring(dashPos + 1);
-        });
-    };
-
-    /**
-    * Read either cumulative or split times from the given line of competitor
-    * data.
-    * (This method is not used by the parser, only elsewhere in the recognizer.)
-    * @sb-param {Array} bits - Array of all contents of table elements.
-    * @sb-return {Array} Array of times.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.readCompetitorSplitDataLine = function (bits) {
-
-        const startPos = (this.usesClasses) ? 5 : 4;
-
-        // Discard the empty bits at the end.
-        let endPos = bits.length;
-        while (endPos > 0 && bits[endPos - 1] === "") {
-            endPos -= 1;
-        }
-
-        // Alternate cells contain ranks, which we're not interested in.
-        const timeBits = [];
-        for (let index = startPos; index < endPos; index += 2) {
-            const bit = bits[index];
-            if (isNonEmpty(bit)) {
-                timeBits.push(bit);
-            }
-        }
-
-        return timeBits;
-    };
-
-    /**
-    * Parse two lines of competitor data into a CompetitorParseRecord object
-    * containing the data.
-    * @sb-param {String} firstLine - The first line of competitor data.
-    * @sb-param {String} secondLine - The second line of competitor data.
-    * @sb-return {CompetitorParseRecord} The parsed competitor.
-    */
-    OEventTabularHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLine, secondLine) {
-        const firstLineBits = getTableDataBits(firstLine);
-        const secondLineBits = getTableDataBits(secondLine);
-
-        const competitive = hasNumber(firstLineBits[0]);
-        const name = firstLineBits[2];
-        const totalTime = firstLineBits[(this.usesClasses) ? 4 : 3];
-        const className = (this.usesClasses && name !== "") ? firstLineBits[3] : null;
-        const club = secondLineBits[2];
-
-        // If there is any cumulative time with a blank corresponding split
-        // time, use a placeholder value for the split time.  Typically this
-        // happens when a competitor has punched one control but not the
-        // previous.
-        for (let index = ((this.usesClasses) ? 5 : 4); index < firstLineBits.length && index < secondLineBits.length; index += 2) {
-            if (firstLineBits[index] !== "" && secondLineBits[index] === "") {
-                secondLineBits[index] = "----";
-            }
-        }
-
-        let cumulativeTimes = this.readCompetitorSplitDataLine(firstLineBits);
-        const splitTimes = this.readCompetitorSplitDataLine(secondLineBits);
-        cumulativeTimes = cumulativeTimes.map(parseTime);
-
-        removeExtraControls(cumulativeTimes, splitTimes);
-
-        if (cumulativeTimes.length !== splitTimes.length) {
-            throwInvalidData("Cumulative and split times do not have the same length: " + cumulativeTimes.length + " cumulative times, " + splitTimes.length + " split times");
-        }
-
-        return new CompetitorParseRecord(name, club, className, totalTime, cumulativeTimes, competitive);
-    };
-
-    /**
-    * Represents the partial result of parsing a course.
-    * @constructor
-    * @sb-param {String} name - The name of the course.
-    * @sb-param {?Number} distance - The distance of the course in kilometres,
-    *     if known, else null.
-    * @sb-param {?Number} climb - The climb of the course in metres, if known,
-    *     else null.
-    */
-    function CourseParseRecord(name, distance, climb) {
-        this.name = name;
-        this.distance = distance;
-        this.climb = climb;
-        this.controls = [];
-        this.competitors = [];
-    }
-
-    /**
-    * Adds the given list of control codes to those built up so far.
-    * @sb-param {Array} controls - Array of control codes read.
-    */
-    CourseParseRecord.prototype.addControls = function (controls) {
-        this.controls = this.controls.concat(controls);
-    };
-
-    /**
-    * Returns whether the course has all of the controls it needs.
-    * The course has all its controls if its last control is the finish, which
-    * is indicated by a null control code.
-    * @sb-return {boolean} True if the course has all of its controls, including
-    *     the finish, false otherwise.
-    */
-    CourseParseRecord.prototype.hasAllControls = function () {
-        return this.controls.length > 0 && this.controls[this.controls.length - 1] === null;
-    };
-
-    /**
-    * Adds a competitor record to the collection held by this course.
-    * @sb-param {CompetitorParseRecord} competitor - The competitor to add.
-    */
-    CourseParseRecord.prototype.addCompetitor = function (competitor) {
-        if (!competitor.competitive && competitor.cumTimes.length === this.controls.length - 1) {
-            // Odd quirk of the format: mispunchers may have their finish split
-            // missing, i.e. not even '-----'.  If it looks like this has
-            // happened, fill the gap by adding a missing time for the finish.
-            competitor.cumTimes.push(null);
-        }
-
-        if (parseTime(competitor.totalTime) === null && competitor.cumTimes.length === 0) {
-            while (competitor.cumTimes.length < this.controls.length) {
-                competitor.cumTimes.push(null);
-            }
-        }
-
-        if (competitor.cumTimes.length === this.controls.length) {
-            this.competitors.push(competitor);
-        } else {
-            throwInvalidData("Competitor '" + competitor.name + "' should have " + this.controls.length + " cumulative times, but has " + competitor.cumTimes.length + " times");
-        }
-    };
-
-    /**
-    * A parser that is capable of parsing event data in a given HTML format.
-    * @constructor
-    * @sb-param {Object} recognizer - The recognizer to use to parse the HTML.
-    */
-    function HtmlFormatParser(recognizer) {
-        this.recognizer = recognizer;
-        this.courses = [];
-        this.currentCourse = null;
-        this.lines = null;
-        this.linePos = -1;
-        this.currentCompetitor = null;
-    }
-
-    /**
-    * Attempts to read the next unread line from the data given.  If the end of
-    * the data has been read, null will be returned.
-    * @sb-return {?String} The line read, or null if the end of the data has
-    *     been reached.
-    */
-    HtmlFormatParser.prototype.tryGetLine = function () {
-        if (this.linePos + 1 < this.lines.length) {
-            this.linePos += 1;
-            return this.lines[this.linePos];
-        } else {
-            return null;
-        }
-    };
-
-    /**
-    * Adds the current competitor being constructed to the current course, and
-    * clear the current competitor.
-    *
-    * If there is no current competitor, nothing happens.
-    */
-    HtmlFormatParser.prototype.addCurrentCompetitorIfNecessary = function () {
-        if (this.currentCompetitor !== null) {
-            this.currentCourse.addCompetitor(this.currentCompetitor);
-            this.currentCompetitor = null;
-        }
-    };
-
-    /**
-    * Adds the current competitor being constructed to the current course, and
-    * the current course being constructed to the list of all courses.
-    *
-    * If there is no current competitor nor no current course, nothing happens.
-    */
-    HtmlFormatParser.prototype.addCurrentCompetitorAndCourseIfNecessary = function () {
-        this.addCurrentCompetitorIfNecessary();
-        if (this.currentCourse !== null) {
-            this.courses.push(this.currentCourse);
-        }
-    };
-
-    /**
-    * Reads in data for one competitor from two lines of the input data.
-    *
-    * The first of the two lines will be given; the second will be read.
-    * @sb-param {String} firstLine - The first of the two lines to read the
-    *     competitor data from.
-    */
-    HtmlFormatParser.prototype.readCompetitorLines = function (firstLine) {
-        const secondLine = this.tryGetLine();
-        if (secondLine === null) {
-            throwInvalidData("Hit end of input data unexpectedly while parsing competitor: first line was '" + firstLine + "'");
-        }
-
-        const competitorRecord = this.recognizer.parseCompetitor(firstLine, secondLine);
-        if (competitorRecord.isContinuation()) {
-            if (this.currentCompetitor === null) {
-                throwInvalidData("First row of competitor data has no name nor time");
-            } else {
-                this.currentCompetitor.append(competitorRecord);
-            }
-        } else {
-            this.addCurrentCompetitorIfNecessary();
-            this.currentCompetitor = competitorRecord;
-        }
-    };
-
-    /**
-    * Returns whether the classes are unique within courses.  If so, they can
-    * be used to subdivide courses.  If not, CourseClasses and Courses must be
-    * the same.
-    * @sb-return {boolean} True if no two competitors in the same class are on
-    *     different classes, false otherwise.
-    */
-    HtmlFormatParser.prototype.areClassesUniqueWithinCourses = function () {
-        const classesToCoursesMap = d3.map();
-        for (let courseIndex = 0; courseIndex < this.courses.length; courseIndex += 1) {
-            const course = this.courses[courseIndex];
-            for (let competitorIndex = 0; competitorIndex < course.competitors.length; competitorIndex += 1) {
-                const competitor = course.competitors[competitorIndex];
-                if (classesToCoursesMap.has(competitor.className)) {
-                    if (classesToCoursesMap.get(competitor.className) !== course.name) {
-                        return false;
-                    }
-                } else {
-                    classesToCoursesMap.set(competitor.className, course.name);
-                }
-            }
-        }
-
-        return true;
-    };
-
-    /**
-    * Reads through all of the intermediate parse-record data and creates an
-    * Event object with all of the courses and classes.
-    * @sb-return {Event} Event object containing all of the data.
-    */
-    HtmlFormatParser.prototype.createOverallEventObject = function () {
-        // There is a complication here regarding classes.  Sometimes, classes
-        // are repeated within multiple courses.  In this case, ignore the
-        // classes given and create a CourseClass for each set.
-        const classesUniqueWithinCourses = this.areClassesUniqueWithinCourses();
-
-        const newCourses = [];
-        const classes = [];
-
-        const competitorsHaveClasses = this.courses.every(function (course) {
-            return course.competitors.every(function (competitor) { return isNotNull(competitor.className); });
-        });
-
-        this.courses.forEach(function (course) {
-            // Firstly, sort competitors by class.
-            const classToCompetitorsMap = <any>d3.map();
-            course.competitors.forEach(function (competitor) {
-                const className = (competitorsHaveClasses && classesUniqueWithinCourses) ? competitor.className : course.name;
-                if (classToCompetitorsMap.has(className)) {
-                    classToCompetitorsMap.get(className).push(competitor);
-                } else {
-                    classToCompetitorsMap.set(className, [competitor]);
-                }
-            });
-
-            const classesForThisCourse = [];
-
-            classToCompetitorsMap.keys().forEach(function (className) {
-                const numControls = course.controls.length - 1;
-                const oldCompetitors = classToCompetitorsMap.get(className);
-                const newCompetitors = oldCompetitors.map(function (competitor, index) {
-                    return competitor.toCompetitor(index + 1);
-                });
-
-                const courseClass = new CourseClass(className, numControls, newCompetitors);
-                classesForThisCourse.push(courseClass);
-                classes.push(courseClass);
-            }, this);
-
-            const newCourse = new Course(course.name, classesForThisCourse, course.distance, course.climb, course.controls.slice(0, course.controls.length - 1));
-            newCourses.push(newCourse);
-            classesForThisCourse.forEach(function (courseClass) {
-                courseClass.setCourse(newCourse);
-            });
-        }, this);
-
-        // Empty array is for warnings, which aren't supported by the HTML
-        // format parsers.
-        return new Event(classes, newCourses, []);
-    };
-
-    /**
-    * Parses the given HTML text containing results data into an Event object.
-    * @sb-param {String} text - The HTML text to parse.
-    * @sb-return {Event} Event object containing all the parsed data.
-    */
-    HtmlFormatParser.prototype.parse = function (text) {
-        this.lines = text.split("\n");
-        while (true) {
-            const line = this.tryGetLine();
-            if (line === null) {
-                break;
-            } else if (this.recognizer.canIgnoreThisLine(line)) {
-                // Do nothing - recognizer says we can ignore this line.
-            } else if (this.recognizer.isCourseHeaderLine(line)) {
-                this.addCurrentCompetitorAndCourseIfNecessary();
-                const courseObj = this.recognizer.parseCourseHeaderLine(line);
-                this.currentCourse = new CourseParseRecord(courseObj.name, courseObj.distance, courseObj.climb);
-            } else if (this.currentCourse === null) {
-                // Do nothing - still not found the start of the first course.
-            } else if (this.currentCourse.hasAllControls()) {
-                // Course has all of its controls; read competitor data.
-                this.readCompetitorLines(line);
-            } else {
-                const controls = this.recognizer.parseControlsLine(line);
-                this.currentCourse.addControls(controls);
-            }
-        }
-
-        this.addCurrentCompetitorAndCourseIfNecessary();
-
-        if (this.courses.length === 0) {
-            throwInvalidData("No competitor data was found");
-        }
-
-        const eventData = this.createOverallEventObject();
-        return eventData;
-    };
-
-    const RECOGNIZER_CLASSES = [OldHtmlFormatRecognizer, NewHtmlFormatRecognizer, OEventTabularHtmlFormatRecognizer];
-
-    SplitsBrowser.Input.Html = {};
-
-    /**
-    * Attempts to parse data as one of the supported HTML formats.
-    *
-    * If the data appears not to be HTML data, a WrongFileFormat exception
-    * is thrown.  If the data appears to be HTML data but is invalid in some
-    * way, an InvalidData exception is thrown.
-    *
-    * @sb-param {String} data - The string containing event data.
-    * @sb-return {Event} The parsed event.
-    */
-    SplitsBrowser.Input.Html.parseEventData = function (data) {
-        data = normaliseLineEndings(data);
-        for (let recognizerIndex = 0; recognizerIndex < RECOGNIZER_CLASSES.length; recognizerIndex += 1) {
-            const RecognizerClass = RECOGNIZER_CLASSES[recognizerIndex];
-            const recognizer = new RecognizerClass();
-            if (recognizer.isTextOfThisFormat(data)) {
-                data = recognizer.preprocess(data);
-                const parser = new HtmlFormatParser(recognizer);
-                const parsedEvent = parser.parse(data);
-                return parsedEvent;
-            }
-        }
-
-        // If we get here, the format wasn't recognized.
-        throwWrongFileFormat("No HTML recognizers recognised this as HTML they could parse");
-    };
-})();
-
-
-(function () {
-    "use strict";
-
-    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    const normaliseLineEndings = SplitsBrowser.normaliseLineEndings;
-    const parseTime = SplitsBrowser.parseTime;
-    const parseCourseLength = SplitsBrowser.parseCourseLength;
-    const parseCourseClimb = SplitsBrowser.parseCourseClimb;
-    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    const CourseClass = SplitsBrowser.Model.CourseClass;
-    const Course = SplitsBrowser.Model.Course;
-    const Event = SplitsBrowser.Model.Event;
-
-    // This reader reads in alternative CSV formats, where each row defines a
-    // separate competitor, and includes course details such as name, controls
-    // and possibly distance and climb.
-
-    // There is presently one variation supported:
-    // * one, distinguished by having three columns per control: control code,
-    //   cumulative time and 'points'.  (Points is never used.)  Generally,
-    //   these formats are quite sparse; many columns (e.g. club, placing,
-    //   start time) are blank or are omitted altogether.
-
-    const TRIPLE_COLUMN_FORMAT = {
-        // Control data starts in column AM (index 38).
-        controlsOffset: 38,
-        // Number of columns per control.
-        step: 3,
-        // Column indexes of various data
-        name: 3,
-        club: 5,
-        courseName: 7,
-        startTime: 8,
-        length: null,
-        climb: null,
-        placing: null,
-        finishTime: null,
-        allowMultipleCompetitorNames: true
-    };
-
-    // Supported delimiters.
-    const DELIMITERS = [",", ";"];
-
-    // All control codes except perhaps the finish are alphanumeric.
-    const controlCodeRegexp = /^[A-Za-z0-9]+$/;
-
-
-    /**
-    * Trim trailing empty-string entries from the given array.
-    * The given array is mutated.
-    * @sb-param {Array} array - The array of string values.
-    */
-    function trimTrailingEmptyCells(array) {
-        let index = array.length - 1;
-        while (index >= 0 && array[index] === "") {
-            index -= 1;
-        }
-
-        array.splice(index + 1, array.length - index - 1);
-    }
-
-    /**
-    * Object used to read data from an alternative CSV file.
-    * @constructor
-    * @sb-param {Object} format - Object that describes the data format to read.
-    */
-    function Reader(format) {
-        this.format = format;
-        this.classes = d3.map();
-        this.delimiter = null;
-        this.warnings = [];
-
-        // Return the offset within the control data that should be used when
-        // looking for control codes.  This will be 0 if the format specifies a
-        // finish time, and the format step if the format has no finish time.
-        // (In this case, the finish time is with the control data, but we
-        // don't wish to read any control code specified nor validate it.)
-        this.controlsTerminationOffset = (format.finishTime === null) ? format.step : 0;
-    }
-
-    /**
-    * Determine the delimiter used to delimit data.
-    * @sb-param {String} firstDataLine - The first data line of the file.
-    * @sb-return {?String} The delimiter separating the data, or null if no
-    *    suitable delimiter was found.
-    */
-    Reader.prototype.determineDelimiter = function (firstDataLine) {
-        for (let index = 0; index < DELIMITERS.length; index += 1) {
-            const delimiter = DELIMITERS[index];
-            const lineParts = firstDataLine.split(delimiter);
-            trimTrailingEmptyCells(lineParts);
-            if (lineParts.length > this.format.controlsOffset) {
-                return delimiter;
-            }
-        }
-
-        return null;
-    };
-
-    /**
-    * Some lines of some formats can have multiple delimited competitors, which
-    * will move the following columns out of their normal place.  Identify any
-    * such situations and merge them together.
-    * @sb-param {Array} row - The row of data read from the file.
-    */
-    Reader.prototype.adjustLinePartsForMultipleCompetitors = function (row) {
-        if (this.format.allowMultipleCompetitorNames) {
-            while (row.length > this.format.name + 1 && row[this.format.name + 1].match(/^\s\S/)) {
-                row[this.format.name] += "," + row[this.format.name + 1];
-                row.splice(this.format.name + 1, 1);
-            }
-        }
-    };
-
-    /**
-    * Check the first line of data read in to verify that all of the control
-    * codes specified are alphanumeric.
-    * @sb-param {String} firstLine - The first line of data from the file (not
-    *     the header line).
-    */
-    Reader.prototype.checkControlCodesAlphaNumeric = function (firstLine) {
-        const lineParts = firstLine.split(this.delimiter);
-        trimTrailingEmptyCells(lineParts);
-        this.adjustLinePartsForMultipleCompetitors(lineParts, this.format);
-
-        for (let index = this.format.controlsOffset; index + this.controlsTerminationOffset < lineParts.length; index += this.format.step) {
-            if (!controlCodeRegexp.test(lineParts[index])) {
-                throwWrongFileFormat("Data appears not to be in an alternative CSV format - data in cell " + index + " of the first row ('" + lineParts[index] + "') is not an number");
-            }
-        }
-    };
-
-    /**
-    * Adds the competitor to the course with the given name.
-    * @sb-param {Competitor} competitor - The competitor object read from the row.
-    * @sb-param {String} courseName - The name of the course.
-    * @sb-param {Array} row - Array of string parts making up the row of data read.
-    */
-    Reader.prototype.addCompetitorToCourse = function (competitor, courseName, row) {
-        if (this.classes.has(courseName)) {
-            const cls = this.classes.get(courseName);
-            const cumTimes = competitor.getAllOriginalCumulativeTimes();
-            // Subtract one from the list of cumulative times for the
-            // cumulative time at the start (always 0), and add one on to
-            // the count of controls in the class to cater for the finish.
-            if (cumTimes.length - 1 !== (cls.controls.length + 1)) {
-                this.warnings.push("Competitor '" + competitor.name + "' has the wrong number of splits for course '" + courseName + "': " +
-                    "expected " + (cls.controls.length + 1) + ", actual " + (cumTimes.length - 1));
-            } else {
-                cls.competitors.push(competitor);
-            }
-        } else {
-            // New course/class.
-
-            // Determine the list of controls, ignoring the finish.
-            const controls = [];
-            for (let controlIndex = this.format.controlsOffset; controlIndex + this.controlsTerminationOffset < row.length; controlIndex += this.format.step) {
-                controls.push(row[controlIndex]);
-            }
-
-            const courseLength = (this.format.length === null) ? null : parseCourseLength(row[this.format.length]);
-            const courseClimb = (this.format.climb === null) ? null : parseCourseClimb(row[this.format.climb]);
-
-            this.classes.set(courseName, { length: courseLength, climb: courseClimb, controls: controls, competitors: [competitor] });
-        }
-    };
-
-    /**
-    * Read a row of data from a line of the file.
-    * @sb-param {String} line - The line of data read from the file.
-    */
-    Reader.prototype.readDataRow = function (line) {
-        const row = line.split(this.delimiter);
-        trimTrailingEmptyCells(row);
-        this.adjustLinePartsForMultipleCompetitors(row);
-
-        if (row.length < this.format.controlsOffset) {
-            // Probably a blank line.  Ignore it.
-            return;
-        }
-
-        while ((row.length - this.format.controlsOffset) % this.format.step !== 0) {
-            // Competitor might be missing cumulative time to last control.
-            row.push("");
-        }
-
-        const competitorName = row[this.format.name];
-        const club = row[this.format.club];
-        const courseName = row[this.format.courseName];
-        const startTime = parseTime(row[this.format.startTime]);
-
-        const cumTimes = [0];
-        for (let cumTimeIndex = this.format.controlsOffset + 1; cumTimeIndex < row.length; cumTimeIndex += this.format.step) {
-            cumTimes.push(parseTime(row[cumTimeIndex]));
-        }
-
-        if (this.format.finishTime !== null) {
-            const finishTime = parseTime(row[this.format.finishTime]);
-            const totalTime = (startTime === null || finishTime === null) ? null : (finishTime - startTime);
-            cumTimes.push(totalTime);
-        }
-
-        if (cumTimes.length === 1) {
-            // Only cumulative time is the zero.
-            if (competitorName !== "") {
-                this.warnings.push(
-                    "Competitor '" + competitorName + "' on course '" + (courseName === "" ? "(unnamed)" : courseName) + "' has no times recorded");
-            }
-
-            return;
-        }
-
-        const order = (this.classes.has(courseName)) ? this.classes.get(courseName).competitors.length + 1 : 1;
-
-        const competitor = fromOriginalCumTimes(order, competitorName, club, startTime, cumTimes);
-        if (this.format.placing !== null && competitor.completed()) {
-            const placing = row[this.format.placing];
-            if (!placing.match(/^\d*$/)) {
-                competitor.setNonCompetitive();
-            }
-        }
-
-        if (!competitor.hasAnyTimes()) {
-            competitor.setNonStarter();
-        }
-
-        this.addCompetitorToCourse(competitor, courseName, row);
-    };
-
-    /**
-    * Given an array of objects containing information about each of the
-    * course-classes in the data, create CourseClass and Course objects,
-    * grouping classes by the list of controls
-    * @sb-return {Object} Object that contains the courses and classes.
-    */
-    Reader.prototype.createClassesAndCourses = function () {
-        const courseClasses = [];
-
-        // Group the classes by the list of controls.  Two classes using the
-        // same list of controls can be assumed to be using the same course.
-        const coursesByControlsLists = <any>d3.map();
-
-        this.classes.entries().forEach(function (keyValuePair) {
-            const className = keyValuePair.key;
-            const cls = keyValuePair.value;
-            const courseClass = new CourseClass(className, cls.controls.length, cls.competitors);
-            courseClasses.push(courseClass);
-
-            const controlsList = cls.controls.join(",");
-            if (coursesByControlsLists.has(controlsList)) {
-                coursesByControlsLists.get(controlsList).classes.push(courseClass);
-            } else {
-                coursesByControlsLists.set(
-                    controlsList, { name: className, classes: [courseClass], length: cls.length, climb: cls.climb, controls: cls.controls });
-            }
-        });
-
-        const courses = [];
-        coursesByControlsLists.values().forEach(function (courseObject) {
-            const course = new Course(courseObject.name, courseObject.classes, courseObject.length, courseObject.climb, courseObject.controls);
-            courseObject.classes.forEach(function (courseClass) { courseClass.setCourse(course); });
-            courses.push(course);
-        });
-
-        return { classes: courseClasses, courses: courses };
-    };
-
-    /**
-    * Parse alternative CSV data for an entire event.
-    * @sb-param {String} eventData - String containing the entire event data.
-    * @sb-return {SplitsBrowser.Model.Event} All event data read in.
-    */
-    Reader.prototype.parseEventData = function (eventData) {
-        this.warnings = [];
-        eventData = normaliseLineEndings(eventData);
-
-        const lines = eventData.split(/\n/);
-
-        if (lines.length < 2) {
-            throwWrongFileFormat("Data appears not to be in an alternative CSV format - too few lines");
-        }
-
-        const firstDataLine = lines[1];
-
-        this.delimiter = this.determineDelimiter(firstDataLine);
-        if (this.delimiter === null) {
-            throwWrongFileFormat("Data appears not to be in an alternative CSV format - first data line has fewer than " + this.format.controlsOffset + " parts when separated by any recognised delimiter");
-        }
-
-        this.checkControlCodesAlphaNumeric(firstDataLine);
-
-        for (let rowIndex = 1; rowIndex < lines.length; rowIndex += 1) {
-            this.readDataRow(lines[rowIndex]);
-        }
-
-        const classesAndCourses = this.createClassesAndCourses();
-        return new Event(classesAndCourses.classes, classesAndCourses.courses, this.warnings);
-    };
-
-    SplitsBrowser.Input.AlternativeCSV = {
-        parseTripleColumnEventData: function (eventData) {
-            const reader = new Reader(TRIPLE_COLUMN_FORMAT);
-            return reader.parseEventData(eventData);
-        }
-    };
-})();
-
-(function () {
-    "use strict";
-
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
-    const throwWrongFileFormat = SplitsBrowser.throwWrongFileFormat;
-    const isNaNStrict = SplitsBrowser.isNaNStrict;
-    const parseTime = SplitsBrowser.parseTime;
-    const fromOriginalCumTimes = SplitsBrowser.Model.Competitor.fromOriginalCumTimes;
-    const CourseClass = SplitsBrowser.Model.CourseClass;
-    const Course = SplitsBrowser.Model.Course;
-    const Event = SplitsBrowser.Model.Event;
-
-    // Number of feet in a kilometre.
-    const FEET_PER_KILOMETRE = 3280;
-
-    /**
-    * Returns whether the given value is undefined.
-    * @sb-param {any} value - The value to check.
-    * @sb-return {boolean} True if the value is undefined, false otherwise.
-    */
-    function isUndefined(value) {
-        return typeof value === "undefined";
-    }
-
-    /**
-    * Parses the given XML string and returns the parsed XML.
-    * @sb-param {String} xmlString - The XML string to parse.
-    * @sb-return {XMLDocument} The parsed XML document.
-    */
-    function parseXml(xmlString) {
-        let xml;
-        try {
-            xml = $.parseXML(xmlString);
-        } catch (e) {
-            throwInvalidData("XML data not well-formed");
-        }
-
-        if ($("> *", $(xml)).length === 0) {
-            // PhantomJS doesn't always fail parsing invalid XML; we may be
-            // left with 'xml' just containing the DOCTYPE and no root element.
-            throwInvalidData("XML data not well-formed: " + xmlString);
-        }
-
-        return xml;
-    }
-
-    /**
-    * Parses and returns a competitor name from the given XML element.
-    *
-    * The XML element should have name 'PersonName' for v2.0.3 or 'Name' for
-    * v3.0.  It should contain 'Given' and 'Family' child elements from which
-    * the name will be formed.
-    *
-    * @sb-param {jQuery.selection} nameElement - jQuery selection containing the
-    *     PersonName or Name element.
-    * @sb-return {String} Name read from the element.
-    */
-    function readCompetitorName(nameElement) {
-
-        const forename = $("> Given", nameElement).text();
-        const surname = $("> Family", nameElement).text();
-
-        if (forename === "") {
-            return surname;
-        } else if (surname === "") {
-            return forename;
-        } else {
-            return forename + " " + surname;
-        }
-    }
-
-    // Regexp that matches the year in an ISO-8601 date.
-    // Both XML formats use ISO-8601 (YYYY-MM-DD) dates, so parsing is
-    // fortunately straightforward.
-    const yearRegexp = /^\d{4}/;
-
-    // Object that contains various functions for parsing bits of data from
-    // IOF v2.0.3 XML event data.
-    const Version2Reader = {} as any;
-
-    /**
-    * Returns whether the given event data is likely to be results data of the
-    * version 2.0.3 format.
-    *
-    * This function is called before the XML is parsed and so can provide a
-    * quick way to discount files that are not of the v2.0.3 format.  Further
-    * functions of this reader are only called if this method returns true.
-    *
-    * @sb-param {String} data - The event data.
-    * @sb-return {boolean} True if the data is likely to be v2.0.3-format data,
-    *     false if not.
-    */
-    Version2Reader.isOfThisVersion = function (data) {
-        return data.indexOf("IOFdata.dtd") >= 0;
-    };
-
-    /**
-    * Makes a more thorough check that the parsed XML data is likely to be of
-    * the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
-    * @sb-param {jQuery.selection} rootElement - The root element.
-    */
-    Version2Reader.checkVersion = function (rootElement) {
-        const iofVersionElement = $("> IOFVersion", rootElement);
-        if (iofVersionElement.length === 0) {
-            throwWrongFileFormat("Could not find IOFVersion element");
-        } else {
-            const version = iofVersionElement.attr("version");
-            if (isUndefined(version)) {
-                throwWrongFileFormat("Version attribute missing from IOFVersion element");
-            } else if (version !== "2.0.3") {
-                throwWrongFileFormat("Found unrecognised IOF XML data format '" + version + "'");
-            }
-        }
-
-        const status = rootElement.attr("status");
-        if (!isUndefined(status) && status.toLowerCase() !== "complete") {
-            throwInvalidData("Only complete IOF data supported; snapshot and delta are not supported");
-        }
-    };
-
-    /**
-    * Reads the class name from a ClassResult element.
-    * @sb-param {jQuery.selection} classResultElement - ClassResult element
-    *     containing the course details.
-    * @sb-return {String} Class name.
-    */
-    Version2Reader.readClassName = function (classResultElement) {
-        return $("> ClassShortName", classResultElement).text();
-    };
-
-    /**
-    * Reads the course details from the given ClassResult element.
-    * @sb-param {jQuery.selection} classResultElement - ClassResult element
-    *     containing the course details.
-    * @sb-param {Array} warnings - Array that accumulates warning messages.
-    * @sb-return {Object} Course details: id, name, length, climb and numberOfControls
-    */
-    Version2Reader.readCourseFromClass = function (classResultElement, warnings) {
-        // Although the IOF v2 format appears to support courses, they
-        // haven't been specified in any of the files I've seen.
-        // So instead grab course details from the class and the first
-        // competitor.
-        const courseName = $("> ClassShortName", classResultElement).text();
-
-        const firstResult = $("> PersonResult > Result", classResultElement).first();
-        let length = null;
-
-        if (firstResult.length > 0) {
-            const lengthElement = $("> CourseLength", firstResult);
-            const lengthStr = lengthElement.text();
-
-            // Course lengths in IOF v2 are a pain, as you have to handle three
-            // units.
-            if (lengthStr.length > 0) {
-                length = parseFloat(lengthStr);
-                if (isFinite(length)) {
-                    const unit = lengthElement.attr("unit");
-                    if (isUndefined(unit) || unit === "m") {
-                        length /= 1000;
-                    } else if (unit === "km") {
-                        // Length already in kilometres, do nothing further.
-                    } else if (unit === "ft") {
-                        length /= FEET_PER_KILOMETRE;
-                    } else {
-                        warnings.push("Course '" + courseName + "' gives its length in a unit '" + unit + "', but this unit was not recognised");
-                        length = null;
-                    }
-                } else {
-                    warnings.push("Course '" + courseName + "' specifies a course length that was not understood: '" + lengthStr + "'");
-                    length = null;
-                }
-            }
-        }
-
-        // Climb does not appear in the per-competitor results, and there is
-        // no NumberOfControls.
-        return { id: null, name: courseName, length: length, climb: null, numberOfControls: null };
-    };
-
-    /**
-    * Returns the XML element that contains a competitor's name.  This element
-    * should contain child elements with names 'Given' and 'Family'.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     PersonResult element.
-    * @sb-return {jQuery.selection} jQuery selection containing any child
-    *     'PersonName' element.
-    */
-    Version2Reader.getCompetitorNameElement = function (element) {
-        return $("> Person > PersonName", element);
-    };
-
-    /**
-    * Returns the name of the competitor's club.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     PersonResult element.
-    * @sb-return {String} Competitor's club name.
-    */
-    Version2Reader.readClubName = function (element) {
-        return $("> Club > ShortName", element).text();
-    };
-
-    /**
-    * Returns the competitor's date of birth, as a string.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     PersonResult element.
-    * @sb-return {String} The competitors date of birth, as a string.
-    */
-    Version2Reader.readDateOfBirth = function (element) {
-        return $("> Person > BirthDate > Date", element).text();
-    };
-
-    /**
-    * Reads a competitor's start time from the given Result element.
-    * @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-    *     Result element.
-    * @sb-return {?Number} Competitor's start time in seconds since midnight, or
-    *     null if not found.
-    */
-    Version2Reader.readStartTime = function (resultElement) {
-        const startTimeStr = $("> StartTime > Clock", resultElement).text();
-        const startTime = (startTimeStr === "") ? null : parseTime(startTimeStr);
-        return startTime;
-    };
-
-    /**
-    * Reads a competitor's total time from the given Result element.
-    * @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-    *     Result element.
-    * @sb-return {?Number} - The competitor's total time in seconds, or
-    *     null if a valid time was not found.
-    */
-    Version2Reader.readTotalTime = function (resultElement) {
-        const totalTimeStr = $("> Time", resultElement).text();
-        const totalTime = (totalTimeStr === "") ? null : parseTime(totalTimeStr);
-        return totalTime;
-    };
-
-    /**
-    * Returns the status of the competitor with the given result.
-    * @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-    *     Result element.
-    * @sb-return {String} Status of the competitor.
-    */
-    Version2Reader.getStatus = function (resultElement) {
-        const statusElement = $("> CompetitorStatus", resultElement);
-        return (statusElement.length === 1) ? statusElement.attr("value") : "";
-    };
-
-    Version2Reader.StatusNonCompetitive = "NotCompeting";
-    Version2Reader.StatusNonStarter = "DidNotStart";
-    Version2Reader.StatusNonFinisher = "DidNotFinish";
-    Version2Reader.StatusDisqualified = "Disqualified";
-    Version2Reader.StatusOverMaxTime = "OverTime";
-
-    /**
-    * Unconditionally returns false - IOF XML version 2.0.3 appears not to
-    * support additional controls.
-    * @sb-return {boolean} false.
-    */
-    Version2Reader.isAdditional = function () {
-        return false;
-    };
-
-    /**
-    * Reads a control code and split time from a SplitTime element.
-    * @sb-param {jQuery.selection} splitTimeElement - jQuery selection containing
-    *     a SplitTime element.
-    * @sb-return {Object} Object containing code and time.
-    */
-    Version2Reader.readSplitTime = function (splitTimeElement) {
-        // IOF v2 allows ControlCode or Control elements.
-        let code = $("> ControlCode", splitTimeElement).text();
-        if (code === "") {
-            code = $("> Control > ControlCode", splitTimeElement).text();
-        }
-
-        if (code === "") {
-            throwInvalidData("Control code missing for control");
-        }
-
-        const timeStr = $("> Time", splitTimeElement).text();
-        const time = (timeStr === "") ? null : parseTime(timeStr);
-        return { code: code, time: time };
-    };
-
-    // Regexp to match ISO-8601 dates.
-    // Ignores timezone info - always display times as local time.
-    // We don't assume there are separator characters, and we also don't assume
-    // that the seconds will be specified.
-    const ISO_8601_RE = /^\d\d\d\d-?\d\d-?\d\dT?(\d\d):?(\d\d)(?::?(\d\d))?/;
-
-    // Object that contains various functions for parsing bits of data from
-    // IOF v3.0 XML event data.
-    const Version3Reader = {} as any;
-
-    /**
-    * Returns whether the given event data is likely to be results data of the
-    * version 3.0 format.
-    *
-    * This function is called before the XML is parsed and so can provide a
-    * quick way to discount files that are not of the v3.0 format.  Further
-    * functions of this reader are only called if this method returns true.
-    *
-    * @sb-param {String} data - The event data.
-    * @sb-return {boolean} True if the data is likely to be v3.0-format data,
-    *     false if not.
-    */
-    Version3Reader.isOfThisVersion = function (data) {
-        return data.indexOf("http://www.orienteering.org/datastandard/3.0") >= 0;
-    };
-
-    /**
-    * Makes a more thorough check that the parsed XML data is likely to be of
-    * the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
-    * @sb-param {jQuery.selection} rootElement - The root element.
-    */
-    Version3Reader.checkVersion = function (rootElement) {
-        const iofVersion = rootElement.attr("iofVersion");
-        if (isUndefined(iofVersion)) {
-            throwWrongFileFormat("Could not find IOF version number");
-        } else if (iofVersion !== "3.0") {
-            throwWrongFileFormat("Found unrecognised IOF XML data format '" + iofVersion + "'");
-        }
-
-        const status = rootElement.attr("status");
-        if (!isUndefined(status) && status.toLowerCase() !== "complete") {
-            throwInvalidData("Only complete IOF data supported; snapshot and delta are not supported");
-        }
-    };
-
-    /**
-    * Reads the class name from a ClassResult element.
-    * @sb-param {jQuery.selection} classResultElement - ClassResult element
-    *     containing the course details.
-    * @sb-return {String} Class name.
-    */
-    Version3Reader.readClassName = function (classResultElement) {
-        return $("> Class > Name", classResultElement).text();
-    };
-
-    /**
-    * Reads the course details from the given ClassResult element.
-    * @sb-param {jQuery.selection} classResultElement - ClassResult element
-    *     containing the course details.
-    * @sb-param {Array} warnings - Array that accumulates warning messages.
-    * @sb-return {Object} Course details: id, name, length, climb and number of
-    *     controls.
-    */
-    Version3Reader.readCourseFromClass = function (classResultElement, warnings) {
-        const courseElement = $("> Course", classResultElement);
-        const id = $("> Id", courseElement).text() || null;
-        const name = $("> Name", courseElement).text();
-        const lengthStr = $("> Length", courseElement).text();
-        let length;
-        if (lengthStr === "") {
-            length = null;
-        } else {
-            length = parseInt(lengthStr, 10);
-            if (isNaNStrict(length)) {
-                warnings.push("Course '" + name + "' specifies a course length that was not understood: '" + lengthStr + "'");
-                length = null;
-            } else {
-                // Convert from metres to kilometres.
-                length /= 1000;
-            }
-        }
-
-        const numberOfControlsStr = $("> NumberOfControls", courseElement).text();
-        let numberOfControls = parseInt(numberOfControlsStr, 10);
-        if (isNaNStrict(numberOfControls)) {
-            numberOfControls = null;
-        }
-
-        const climbStr = $("> Climb", courseElement).text();
-        let climb = parseInt(climbStr, 10);
-        if (isNaNStrict(climb)) {
-            climb = null;
-        }
-
-        return { id: id, name: name, length: length, climb: climb, numberOfControls: numberOfControls };
-    };
-
-    /**
-    * Returns the XML element that contains a competitor's name.  This element
-    * should contain child elements with names 'Given' and 'Family'.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     PersonResult element.
-    * @sb-return {jQuery.selection} jQuery selection containing any child 'Name'
-    *     element.
-    */
-    Version3Reader.getCompetitorNameElement = function (element) {
-        return $("> Person > Name", element);
-    };
-
-    /**
-    * Returns the name of the competitor's club.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     PersonResult element.
-    * @sb-return {String} Competitor's club name.
-    */
-    Version3Reader.readClubName = function (element) {
-        return $("> Organisation > ShortName", element).text();
-    };
-
-    /**
-    * Returns the competitor's date of birth, as a string.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     PersonResult element.
-    * @sb-return {String} The competitor's date of birth, as a string.
-    */
-    Version3Reader.readDateOfBirth = function (element) {
-        const birthDate = $("> Person > BirthDate", element).text();
-        const regexResult = yearRegexp.exec(birthDate);
-        return (regexResult === null) ? null : parseInt(regexResult[0], 10);
-    };
-
-    /**
-    * Reads a competitor's start time from the given Result element.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     Result element.
-    * @sb-return {?Number} Competitor's start time, in seconds since midnight,
-    *     or null if not known.
-    */
-    Version3Reader.readStartTime = function (resultElement) {
-        const startTimeStr = $("> StartTime", resultElement).text();
-        const result = ISO_8601_RE.exec(startTimeStr);
-        if (result === null) {
-            return null;
-        } else {
-            const hours = parseInt(result[1], 10);
-            const minutes = parseInt(result[2], 10);
-            const seconds = (isUndefined(result[3])) ? 0 : parseInt(result[3], 10);
-            return hours * 60 * 60 + minutes * 60 + seconds;
-        }
-    };
-
-    /**
-    * Reads a time, in seconds, from a string.  If the time was not valid,
-    * null is returned.
-    * @sb-param {String} timeStr - The time string to read.
-    * @sb-return {?Number} The parsed time, in seconds, or null if it could not
-    *     be read.
-    */
-    Version3Reader.readTime = function (timeStr) {
-        // IOF v3 allows fractional seconds, so we use parseFloat instead
-        // of parseInt.
-        const time = parseFloat(timeStr);
-        return (isFinite(time)) ? time : null;
-    };
-
-    /**
-    * Read a competitor's total time from the given Time element.
-    * @sb-param {jQuery.selection} element - jQuery selection containing a
-    *     Result element.
-    * @sb-return {?Number} Competitor's total time, in seconds, or null if a time
-    *     was not found or was invalid.
-    */
-    Version3Reader.readTotalTime = function (resultElement) {
-        const totalTimeStr = $("> Time", resultElement).text();
-        return Version3Reader.readTime(totalTimeStr);
-    };
-
-    /**
-    * Returns the status of the competitor with the given result.
-    * @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-    *     Result element.
-    * @sb-return {String} Status of the competitor.
-    */
-    Version3Reader.getStatus = function (resultElement) {
-        return $("> Status", resultElement).text();
-    };
-
-    Version3Reader.StatusNonCompetitive = "NotCompeting";
-    Version3Reader.StatusNonStarter = "DidNotStart";
-    Version3Reader.StatusNonFinisher = "DidNotFinish";
-    Version3Reader.StatusDisqualified = "Disqualified";
-    Version3Reader.StatusOverMaxTime = "OverTime";
-
-    /**
-    * Returns whether the given split-time element is for an additional
-    * control, and hence should be ignored.
-    * @sb-param {jQuery.selection} splitTimeElement - jQuery selection containing
-    *     a SplitTime element.
-    * @sb-return {boolean} True if the control is additional, false if not.
-    */
-    Version3Reader.isAdditional = function (splitTimeElement) {
-        return (splitTimeElement.attr('status') === "Additional");
-    };
-
-    /**
-    * Reads a control code and split time from a SplitTime element.
-    * @sb-param {jQuery.selection} splitTimeElement - jQuery selection containing
-    *     a SplitTime element.
-    * @sb-return {Object} Object containing code and time.
-    */
-    Version3Reader.readSplitTime = function (splitTimeElement) {
-        const code = $("> ControlCode", splitTimeElement).text();
-        if (code === "") {
-            throwInvalidData("Control code missing for control");
-        }
-
-        let time;
-        if (splitTimeElement.attr("status") === "Missing") {
-            // Missed controls have their time omitted.
-            time = null;
-        } else {
-            const timeStr = $("> Time", splitTimeElement).text();
-            time = (timeStr === "") ? null : Version3Reader.readTime(timeStr);
-        }
-
-        return { code: code, time: time };
-    };
-
-    const ALL_READERS = [Version2Reader, Version3Reader];
-
-    /**
-    * Check that the XML document passed is in a suitable format for parsing.
-    *
-    * If any problems arise, this function will throw an exception.  If the
-    * data is valid, the function will return normally.
-    * @sb-param {XMLDocument} xml - The parsed XML document.
-    * @sb-param {Object} reader - XML reader used to assist with format-specific
-    *     XML reading.
-    */
-    function validateData(xml, reader) {
-        const rootElement = $("> *", xml);
-        const rootElementNodeName = rootElement.prop("tagName");
-
-        if (rootElementNodeName !== "ResultList") {
-            throwWrongFileFormat("Root element of XML document does not have expected name 'ResultList', got '" + rootElementNodeName + "'");
-        }
-
-        reader.checkVersion(rootElement);
-    }
-
-    /**
-    * Parses data for a single competitor.
-    * @sb-param {XMLElement} element - XML PersonResult element.
-    * @sb-param {Number} number - The competitor number (1 for first in the array
-    *     of those read so far, 2 for the second, ...)
-    * @sb-param {Object} reader - XML reader used to assist with format-specific
-    *     XML reading.
-    * @sb-param {Array} warnings - Array that accumulates warning messages.
-    * @sb-return {Object?} Object containing the competitor data, or null if no
-    *     competitor could be read.
-    */
-    function parseCompetitor(element, number, reader, warnings) {
-        const jqElement = $(element);
-
-        const nameElement = reader.getCompetitorNameElement(jqElement);
-        const name = readCompetitorName(nameElement);
-
-        if (name === "") {
-            warnings.push("Could not find a name for a competitor");
-            return null;
-        }
-
-        const club = reader.readClubName(jqElement);
-
-        const dateOfBirth = reader.readDateOfBirth(jqElement);
-        const regexResult = yearRegexp.exec(dateOfBirth);
-        const yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
-
-        const gender = $("> Person", jqElement).attr("sex");
-
-        const resultElement = $("Result", jqElement);
-        if (resultElement.length === 0) {
-            warnings.push("Could not find any result information for competitor '" + name + "'");
-            return null;
-        }
-
-        const startTime = reader.readStartTime(resultElement);
-
-        const totalTime = reader.readTotalTime(resultElement);
-
-        const splitTimes = $("> SplitTime", resultElement).toArray();
-        const splitData = splitTimes.filter(function (splitTime) { return !reader.isAdditional($(splitTime)); })
-            .map(function (splitTime) { return reader.readSplitTime($(splitTime)); });
-
-        const controls = splitData.map(function (datum) { return datum.code; });
-        const cumTimes = splitData.map(function (datum) { return datum.time; });
-
-        cumTimes.unshift(0); // Prepend a zero time for the start.
-        cumTimes.push(totalTime);
-
-        const competitor = fromOriginalCumTimes(number, name, club, startTime, cumTimes);
-
-        if (yearOfBirth !== null) {
-            competitor.setYearOfBirth(yearOfBirth);
-        }
-
-        if (gender === "M" || gender === "F") {
-            competitor.setGender(gender);
-        }
-
-        const status = reader.getStatus(resultElement);
-        if (status === reader.StatusNonCompetitive) {
-            competitor.setNonCompetitive();
-        } else if (status === reader.StatusNonStarter) {
-            competitor.setNonStarter();
-        } else if (status === reader.StatusNonFinisher) {
-            competitor.setNonFinisher();
-        } else if (status === reader.StatusDisqualified) {
-            competitor.disqualify();
-        } else if (status === reader.StatusOverMaxTime) {
-            competitor.setOverMaxTime();
-        }
-
-        return {
-            competitor: competitor,
-            controls: controls
-        };
-    }
-
-    /**
-    * Parses data for a single class.
-    * @sb-param {XMLElement} element - XML ClassResult element
-    * @sb-param {Object} reader - XML reader used to assist with format-specific
-    *     XML reading.
-    * @sb-param {Array} warnings - Array to accumulate any warning messages within.
-    * @sb-return {Object} Object containing parsed data.
-    */
-    function parseClassData(element, reader, warnings) {
-        const jqElement = $(element);
-        const cls = { name: null, competitors: [], controls: [], course: null };
-
-        cls.course = reader.readCourseFromClass(jqElement, warnings);
-
-        let className = reader.readClassName(jqElement);
-
-        if (className === "") {
-            className = "<unnamed class>";
-        }
-
-        cls.name = className;
-
-        const personResults = $("> PersonResult", jqElement);
-        if (personResults.length === 0) {
-            warnings.push("Class '" + className + "' has no competitors");
-            return null;
-        }
-
-        for (let index = 0; index < personResults.length; index += 1) {
-            const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings);
-            if (competitorAndControls !== null) {
-                const competitor = competitorAndControls.competitor;
-                const controls = competitorAndControls.controls;
-                if (cls.competitors.length === 0) {
-                    // First competitor.  Record the list of controls.
-                    cls.controls = controls;
-
-                    // Set the number of controls on the course if we didn't read
-                    // it from the XML.  Assume the first competitor's number of
-                    // controls is correct.
-                    if (cls.course.numberOfControls === null) {
-                        cls.course.numberOfControls = cls.controls.length;
-                    }
-                }
-
-                // Subtract 2 for the start and finish cumulative times.
-                const actualControlCount = competitor.getAllOriginalCumulativeTimes().length - 2;
-                let warning = null;
-                if (actualControlCount !== cls.course.numberOfControls) {
-                    warning = "Competitor '" + competitor.name + "' in class '" + className + "' has an unexpected number of controls: expected " + cls.course.numberOfControls + ", actual " + actualControlCount;
-                } else {
-                    for (let controlIndex = 0; controlIndex < actualControlCount; controlIndex += 1) {
-                        if (cls.controls[controlIndex] !== controls[controlIndex]) {
-                            warning = "Competitor '" + competitor.name + "' has an unexpected control code at control " + (controlIndex + 1) +
-                                ": expected '" + cls.controls[controlIndex] + "', actual '" + controls[controlIndex] + "'";
-                            break;
-                        }
-                    }
-                }
-
-                if (warning === null) {
-                    cls.competitors.push(competitor);
-                } else {
-                    warnings.push(warning);
-                }
-            }
-        }
-
-        if (cls.course.id === null && cls.controls.length > 0) {
-            // No course ID given, so join the controls together with commas
-            // and use that instead.  Course IDs are only used internally by
-            // this reader in order to merge classes, and the comma-separated
-            // list of controls ought to work as a substitute identifier in
-            // lieu of an 'official' course ID.
-            //
-            // This is intended mainly for IOF XML v2.0.3 files in particular
-            // as they tend not to have course IDs.  However, this can also be
-            // used with IOF XML v3.0 files that happen not to have course IDs.
-            //
-            // Idea thanks to 'dfgeorge' (David George?)
-            cls.course.id = cls.controls.join(",");
-        }
-
-        return cls;
-    }
-
-    /**
-    * Determine which XML reader to use to parse the given event data.
-    * @sb-param {String} data - The event data.
-    * @sb-return {Object} XML reader used to read version-specific information.
-    */
-    function determineReader(data) {
-        for (let index = 0; index < ALL_READERS.length; index += 1) {
-            const reader = ALL_READERS[index];
-            if (reader.isOfThisVersion(data)) {
-                return reader;
-            }
-        }
-
-        throwWrongFileFormat("Data apparently not of any recognised IOF XML format");
-    }
-
-    /**
-    * Parses IOF XML data in either the 2.0.3 format or the 3.0 format and
-    * returns the data.
-    * @sb-param {String} data - String to parse as XML.
-    * @sb-return {Event} Parsed event object.
-    */
-    function parseEventData(data) {
-
-        const reader = determineReader(data);
-
-        const xml = parseXml(data);
-
-        validateData(xml, reader);
-
-        const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
-
-        if (classResultElements.length === 0) {
-            throwInvalidData("No class result elements found");
-        }
-
-        const classes = [];
-
-        // Array of all 'temporary' courses, intermediate objects that contain
-        // course data but not yet in a suitable form to return.
-        const tempCourses = [];
-
-        // d3 map that maps course IDs plus comma-separated lists of controls
-        // to the temporary course with that ID and controls.
-        // (We expect that all classes with the same course ID have consistent
-        // controls, but we don't assume that.)
-        const coursesMap = <any>d3.map();
-
-        const warnings = [];
-
-        classResultElements.forEach(function (classResultElement) {
-            const parsedClass = parseClassData(classResultElement, reader, warnings);
-            if (parsedClass === null) {
-                // Class could not be parsed.
-                return;
-            }
-
-            const courseClass = new CourseClass(parsedClass.name, parsedClass.controls.length, parsedClass.competitors);
-            classes.push(courseClass);
-
-            // Add to each temporary course object a list of all classes.
-            const tempCourse = parsedClass.course;
-            const courseKey = tempCourse.id + "," + parsedClass.controls.join(",");
-
-            if (tempCourse.id !== null && coursesMap.has(courseKey)) {
-                // We've come across this course before, so just add a class to
-                // it.
-                coursesMap.get(courseKey).classes.push(courseClass);
-            } else {
-                // New course.  Add some further details from the class.
-                tempCourse.classes = [courseClass];
-                tempCourse.controls = parsedClass.controls;
-                tempCourses.push(tempCourse);
-                if (tempCourse.id !== null) {
-                    coursesMap.set(courseKey, tempCourse);
-                }
-            }
-        });
-
-        // Now build up the array of courses.
-        const courses = tempCourses.map(function (tempCourse) {
-            const course = new Course(tempCourse.name, tempCourse.classes, tempCourse.length, tempCourse.climb, tempCourse.controls);
-            tempCourse.classes.forEach(function (courseClass) { courseClass.setCourse(course); });
-            return course;
-        });
-
-        return new Event(classes, courses, warnings);
-    }
-
-    SplitsBrowser.Input.IOFXml = { parseEventData: parseEventData };
-})();
-
-(function () {
-    "use strict";
-
-    // All the parsers for parsing event data that are known about.
-    const PARSERS = [
-        SplitsBrowser.Input.CSV.parseEventData,
-        SplitsBrowser.Input.OE.parseEventData,
-        SplitsBrowser.Input.Html.parseEventData,
-        SplitsBrowser.Input.AlternativeCSV.parseTripleColumnEventData,
-        SplitsBrowser.Input.IOFXml.parseEventData
-    ];
-
-    /**
-    * Attempts to parse the given event data, which may be of any of the
-    * supported formats, or may be invalid.  This function returns the results
-    * as an Event object if successful, or null in the event of failure.
-    * @sb-param {String} data - The data read.
-    * @sb-return {Event} Event data read in, or null for failure.
-    */
-    SplitsBrowser.Input.parseEventData = function (data) {
-        for (let i = 0; i < PARSERS.length; i += 1) {
-            const parser = PARSERS[i];
-            try {
-                return parser(data);
-            } catch (e) {
-                if (e.name !== "WrongFileFormat") {
-                    throw e;
-                }
-            }
-        }
-
-        // If we get here, none of the parsers succeeded.
-        return null;
-    };
-})();
-
+// file competitor-list.js
 (function () {
     "use strict";
 
@@ -5983,7 +532,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {HTMLElement} parent - Parent element to add this list to.
     * @sb-param {Function} alerter - Function to call to issue an alert message.
     */
-    const CompetitorList = function (parent, alerter) {
+    const CompetitorList = function (parent: HTMLElement, alerter) {
         this.parent = parent;
         this.alerter = alerter;
         this.handler = null;
@@ -6013,7 +562,7 @@ SplitsBrowser.Messages = {} as any;
 
         this.noneButton = this.buttonsPanel.append("button")
             .attr("id", "selectNoCompetitors")
-            .style("width", '50%')
+            .style("width", "50%")
             .on("click", function () { outerThis.selectNoneFiltered(); });
 
         // Wire up double-click event with jQuery for easier testing.
@@ -6297,7 +846,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Number} index - Index of the competitor within the list.
     * @sb-return True if the competitor is selected, false if not.
     */
-    CompetitorList.prototype.isSelected = function (index) {
+    CompetitorList.prototype.isSelected = function (index: number): boolean {
         return this.competitorSelection !== null && this.competitorSelection.isSelected(index);
     };
 
@@ -6328,7 +877,7 @@ SplitsBrowser.Messages = {} as any;
     * hide the Crossing Runners button.
     * @sb-param {Object} chartType - The chart type selected.
     */
-    CompetitorList.prototype.setChartType = function (chartType) {
+    CompetitorList.prototype.setChartType = function (chartType: ChartType) {
         this.crossingRunnersButton.style("display", (chartType.isRaceGraph) ? "block" : "none");
     };
 
@@ -6347,7 +896,7 @@ SplitsBrowser.Messages = {} as any;
     * Toggle the selectedness of a competitor.
     * @sb-param {Number} index - The index of the competitor.
     */
-    CompetitorList.prototype.toggleCompetitor = function (index) {
+    CompetitorList.prototype.toggleCompetitor = function (index: number) {
         this.competitorSelection.toggle(index);
     };
 
@@ -6364,7 +913,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {String} name - The name to normalise.
     * @sb-return {String} The normalised names.
     */
-    function normaliseName(name) {
+    function normaliseName(name: string): string {
         return name.toLowerCase().replace(/\W/g, "");
     }
 
@@ -6374,7 +923,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {boolean} multipleClasses - Whether the list of competitors is
     *      made up from those in multiple classes.
     */
-    CompetitorList.prototype.setCompetitorList = function (competitors, multipleClasses) {
+    CompetitorList.prototype.setCompetitorList = function (competitors: Array<Competitor>, multipleClasses: boolean) {
         this.allCompetitors = competitors;
         this.allCompetitorDetails = this.allCompetitors.map(function (comp) {
             return { competitor: comp, normedName: normaliseName(comp.name), visible: true };
@@ -6429,7 +978,7 @@ SplitsBrowser.Messages = {} as any;
     * Sets the competitor selection object.
     * @sb-param {SplitsBrowser.Controls.CompetitorSelection} selection - Competitor selection.
     */
-    CompetitorList.prototype.setSelection = function (selection) {
+    CompetitorList.prototype.setSelection = function (selection: CompetitorSelection) {
         if (this.competitorSelection !== null) {
             this.competitorSelection.deregisterChangeHandler(this.handler);
         }
@@ -6498,7 +1047,7 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.CompetitorList = CompetitorList;
 })();
 
-
+// file language-selector.js
 (function () {
     "use strict";
 
@@ -6596,11 +1145,10 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.LanguageSelector = LanguageSelector;
 })();
 
-
+// file class-selector.js
 (function () {
     "use strict";
 
-    const throwInvalidData = SplitsBrowser.throwInvalidData;
     const getMessage = SplitsBrowser.getMessage;
 
     /**
@@ -6700,7 +1248,7 @@ SplitsBrowser.Messages = {} as any;
             let options;
             if (classes.length === 0) {
                 this.dropDown.disabled = true;
-                options = [getMessage('NoClassesLoadedPlaceholder')];
+                options = [getMessage("NoClassesLoadedPlaceholder")];
             } else {
                 this.dropDown.disabled = false;
                 options = classes.map(function (courseClass) { return courseClass.name; });
@@ -6717,7 +1265,7 @@ SplitsBrowser.Messages = {} as any;
 
             this.updateOtherClasses(d3.set());
         } else {
-            throwInvalidData("ClassSelector.setClasses: classes is not an array");
+            throw new InvalidData("ClassSelector.setClasses: classes is not an array");
         }
     };
 
@@ -6887,7 +1435,7 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.ClassSelector = ClassSelector;
 })();
 
-
+// file comparison-selector.js
 (function () {
     "use strict";
 
@@ -7169,7 +1717,7 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.ComparisonSelector = ComparisonSelector;
 })();
 
-
+// file statistics-selector.js
 (function () {
     "use strict";
 
@@ -7321,7 +1869,7 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.StatisticsSelector = StatisticsSelector;
 })();
 
-
+// file chart-type-selector.js
 (function () {
     "use strict";
 
@@ -7332,7 +1880,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {HTMLElement} parent - The parent element to add the control to.
     * @sb-param {Array} chartTypes - Array of types of chart to list.
     */
-    function ChartTypeSelector(parent, chartTypes) {
+    function ChartTypeSelector(parent: HTMLElement, chartTypes: Array<ChartType>) {
         this.changeHandlers = [];
         this.chartTypes = chartTypes;
         this.raceGraphDisabledNotifier = null;
@@ -7439,7 +1987,7 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.ChartTypeSelector = ChartTypeSelector;
 })();
 
-
+// file original-data-selector.js
 (function () {
     "use strict";
 
@@ -7568,6 +2116,7 @@ SplitsBrowser.Messages = {} as any;
 
 })();
 
+// file chart-popup-data.js
 (function () {
     "use strict";
 
@@ -7578,36 +2127,34 @@ SplitsBrowser.Messages = {} as any;
     // at a control on the race graph.
     const RACE_GRAPH_COMPETITOR_WINDOW = 240;
 
-    const formatTime = SplitsBrowser.formatTime;
+    const formatTime = TimeUtilities.formatTime;
     const getMessage = SplitsBrowser.getMessage;
     const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-
-    const Course = SplitsBrowser.Model.Course;
 
     const ChartPopupData: any = {} as any;
 
     /**
     * Returns the fastest splits to a control.
-    * @sb-param {SplitsBrowser.Model.CourseClassSet} courseClassSet - The
+    * @sb-param {CourseClassSet} courseClassSet - The
     *     course-class set containing the splits data.
     * @sb-param {Number} controlIndex - The index of the control.
     * @sb-return {Object} Fastest-split data.
     */
-    ChartPopupData.getFastestSplitsPopupData = function (courseClassSet, controlIndex) {
-        let data = courseClassSet.getFastestSplitsTo(MAX_FASTEST_SPLITS, controlIndex);
-        data = data.map(function (comp) {
+    ChartPopupData.getFastestSplitsPopupData = function (courseClassSet: CourseClassSet, controlIndex: number) {
+        const data = courseClassSet.getFastestSplitsTo(MAX_FASTEST_SPLITS, controlIndex);
+        const ret = data.map(function (comp) {
             return { time: comp.split, name: comp.name, highlight: false };
         });
 
-        return { title: getMessage("SelectedClassesPopupHeader"), data: data, placeholder: getMessage("SelectedClassesPopupPlaceholder") };
+        return { title: getMessage("SelectedClassesPopupHeader"), data: ret, placeholder: getMessage("SelectedClassesPopupPlaceholder") };
     };
 
     /**
     * Returns the fastest splits for the currently-shown leg.  The list
     * returned contains the fastest splits for the current leg for each class.
-    * @sb-param {SplitsBrowser.Model.CourseClassSet} courseClassSet - The course-class set
+    * @sb-param {CourseClassSet} courseClassSet - The course-class set
     *     containing the splits data.
-    * @sb-param {SplitsBrowser.Model.EventData} eventData - Data for the entire
+    * @sb-param {EventData} eventData - Data for the entire
     *     event.
     * @sb-param {Number} controlIndex - The index of the control.
     * @sb-return {Object} Object that contains the title for the popup and the
@@ -7633,19 +2180,19 @@ SplitsBrowser.Messages = {} as any;
     /**
     * Returns an object containing an array of the competitors visiting a
     * control at a given time.
-    * @sb-param {SplitsBrowser.Model.CourseClassSet} courseClassSet - The course-class set
+    * @sb-param {.CourseClassSet} courseClassSet - The course-class set
     *     containing the splits data.
-    * @sb-param {SplitsBrowser.Model.EventData} eventData - Data for the entire
+    * @sb-param {EventData} eventData - Data for the entire
     *     event.
     * @sb-param {Number} controlIndex - The index of the control.
     * @sb-param {Number} time - The current time, in units of seconds past midnight.
     * @sb-return {Object} Object containing competitor data.
     */
-    ChartPopupData.getCompetitorsVisitingCurrentControlPopupData = function (courseClassSet, eventData, controlIndex, time) {
+    ChartPopupData.getCompetitorsVisitingCurrentControlPopupData = function (courseClassSet: CourseClassSet, resutsData: Results, controlIndex: number, time: number) {
         const controlCode = courseClassSet.getCourse().getControlCode(controlIndex);
         const intervalStart = Math.round(time) - RACE_GRAPH_COMPETITOR_WINDOW / 2;
         const intervalEnd = Math.round(time) + RACE_GRAPH_COMPETITOR_WINDOW / 2;
-        const competitors = eventData.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd);
+        const competitors = resutsData.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd);
 
         const primaryClass = courseClassSet.getPrimaryClassName();
         const competitorData = competitors.map(function (row) { return { name: row.name, className: row.className, time: row.time, highlight: (row.className === primaryClass) }; });
@@ -7716,14 +2263,14 @@ SplitsBrowser.Messages = {} as any;
 
     /**
     * Returns next-control data to show on the chart popup.
-    * @sb-param {SplitsBrowser.Model.Course} course - The course containing the
+    * @sb-param {Course} course - The course containing the
     *     controls data.
-    * @sb-param {SplitsBrowser.Model.EventData} eventData - Data for the entire
+    * @sb-param {EventData} eventData - Data for the entire
     *     event.
     * @sb-param {Number} controlIndex - The index of the control.
     * @sb-return {Object} Next-control data.
     */
-    ChartPopupData.getNextControlData = function (course, eventData, controlIndex) {
+    ChartPopupData.getNextControlData = function (course: Course, eventData: Results, controlIndex: number) {
         const controlIdx = Math.min(controlIndex, course.controls.length);
         const controlCode = course.getControlCode(controlIdx);
         const nextControls = eventData.getNextControlsAfter(controlCode);
@@ -7735,10 +2282,11 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Model.ChartPopupData = ChartPopupData;
 })();
 
+// file chart-popup.js
 (function () {
     "use strict";
 
-    const formatTime = SplitsBrowser.formatTime;
+    const formatTime = TimeUtilities.formatTime;
 
     /**
     * Creates a ChartPopup control.
@@ -7829,7 +2377,7 @@ SplitsBrowser.Messages = {} as any;
         rows.classed("highlighted", function (row) { return row.highlight; });
 
         rows.selectAll("td").remove();
-        rows.append("td").text(function (row) { return formatTime(row.time); });
+        rows.append("td").text(function (row) { return TimeUtilities.formatTime(row.time); });
         if (includeClassNames) {
             rows.append("td").text(function (row) { return row.className; });
         }
@@ -7916,6 +2464,7 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.ChartPopup = ChartPopup;
 })();
 
+// file chart.js
 (function () {
     "use strict";
 
@@ -7960,10 +2509,8 @@ SplitsBrowser.Messages = {} as any;
     ];
 
     // 'Imports'.
-    const formatTime = SplitsBrowser.formatTime;
+    const formatTime = TimeUtilities.formatTime;
     const getMessage = SplitsBrowser.getMessage;
-    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
-    const isNaNStrict = SplitsBrowser.isNaNStrict;
 
     const ChartPopupData = SplitsBrowser.Model.ChartPopupData;
     const ChartPopup = SplitsBrowser.Controls.ChartPopup;
@@ -7978,14 +2525,14 @@ SplitsBrowser.Messages = {} as any;
     function formatTimeAndRank(time, rank) {
         let rankStr;
         if (rank === null) {
-            rankStr = '-';
+            rankStr = "-";
         } else if (isNaNStrict(rank)) {
-            rankStr = '?';
+            rankStr = "?";
         } else {
             rankStr = rank.toString();
         }
 
-        return SPACER + formatTime(time) + ' (' + rankStr + ')';
+        return SPACER + formatTime(time) + " (" + rankStr + ")";
     }
 
     /**
@@ -7995,8 +2542,8 @@ SplitsBrowser.Messages = {} as any;
     *      empty string to indicate no suffix).
     * @sb-return Competitor name and suffix, formatted.
     */
-    function formatNameAndSuffix(name, suffix) {
-        return (suffix === '') ? name : name + ' (' + suffix + ')';
+    function formatNameAndSuffix(nam: string, suffix: string): string {
+        return (suffix === "") ? name : name + " (" + suffix + ")";
     }
 
     /**
@@ -8006,21 +2553,21 @@ SplitsBrowser.Messages = {} as any;
     * empty string is returned.
     * @sb-return {String} Suffix to use with the given competitor.
     */
-    function getSuffix(competitor) {
+    function getSuffix(competitor: Competitor): string {
         // Non-starters are not catered for here, as this is intended to only
         // be used on the chart and non-starters shouldn't appear on the chart.
         if (competitor.completed() && competitor.isNonCompetitive) {
-            return getMessage('NonCompetitiveShort');
+            return getMessage("NonCompetitiveShort");
         } else if (competitor.isNonFinisher) {
-            return getMessage('DidNotFinishShort');
+            return getMessage("DidNotFinishShort");
         } else if (competitor.isDisqualified) {
-            return getMessage('DisqualifiedShort');
+            return getMessage("DisqualifiedShort");
         } else if (competitor.isOverMaxTime) {
-            return getMessage('OverMaxTimeShort');
+            return getMessage("OverMaxTimeShort");
         } else if (competitor.completed()) {
-            return '';
+            return "";
         } else {
-            return getMessage('MispunchedShort');
+            return getMessage("MispunchedShort");
         }
     }
 
@@ -8029,7 +2576,7 @@ SplitsBrowser.Messages = {} as any;
     * @constructor
     * @sb-param {HTMLElement} parent - The parent object to create the element within.
     */
-    function Chart(parent) {
+    function Chart(parent: HTMLElement) {
         this.parent = parent;
 
         this.xScale = null;
@@ -8072,10 +2619,10 @@ SplitsBrowser.Messages = {} as any;
 
         this.currentChartTime = null;
 
-        this.svg = d3.select(this.parent).append('svg')
-            .attr('id', CHART_SVG_ID);
+        this.svg = d3.select(this.parent).append("svg")
+            .attr("id", CHART_SVG_ID);
 
-        this.svgGroup = this.svg.append('g');
+        this.svgGroup = this.svg.append("g");
         this.setLeftMargin(MARGIN.left);
 
         const outerThis = this;
@@ -8093,10 +2640,10 @@ SplitsBrowser.Messages = {} as any;
         $(this.svg.node()).contextmenu(function (e) { e.preventDefault(); });
 
         // Add an invisible text element used for determining text size.
-        this.textSizeElement = this.svg.append('text').attr('fill', 'transparent')
-            .attr('id', TEXT_SIZE_ELEMENT_ID);
+        this.textSizeElement = this.svg.append("text").attr("fill", "transparent")
+            .attr("id", TEXT_SIZE_ELEMENT_ID);
 
-        const handlers = { 'mousemove': mousemoveHandler, 'mousedown': mousedownHandler, 'mouseup': mouseupHandler };
+        const handlers = { "mousemove": mousemoveHandler, "mousedown": mousedownHandler, "mouseup": mouseupHandler };
         this.popup = new ChartPopup(parent, handlers);
 
         $(document).mouseup(function () { outerThis.popup.hide(); });
@@ -8106,9 +2653,9 @@ SplitsBrowser.Messages = {} as any;
     * Sets the left margin of the chart.
     * @sb-param {Number} leftMargin - The left margin of the chart.
     */
-    Chart.prototype.setLeftMargin = function (leftMargin) {
+    Chart.prototype.setLeftMargin = function (leftMargin: number) {
         this.currentLeftMargin = leftMargin;
-        this.svgGroup.attr('transform', 'translate(' + this.currentLeftMargin + ',' + MARGIN.top + ')');
+        this.svgGroup.attr("transform", "translate(" + this.currentLeftMargin + "," + MARGIN.top + ")");
     };
 
     /**
@@ -8128,7 +2675,7 @@ SplitsBrowser.Messages = {} as any;
     * Returns the fastest splits to the current control.
     * @sb-return {Array} Array of fastest-split data.
     */
-    Chart.prototype.getFastestSplitsPopupData = function () {
+    Chart.prototype.getFastestSplitsPopupData = function (): Array<any> {
         return ChartPopupData.getFastestSplitsPopupData(this.courseClassSet, this.currentControlIndex);
     };
 
@@ -8308,16 +2855,16 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Number} controlIndex - The index of the control at which to draw the
     *                                control line.
     */
-    Chart.prototype.drawControlLine = function (controlIndex) {
+    Chart.prototype.drawControlLine = function (controlIndex: number) {
         this.currentControlIndex = controlIndex;
         this.updateCompetitorStatistics();
         const xPosn = this.xScale(this.referenceCumTimes[controlIndex]);
-        this.controlLine = this.svgGroup.append('line')
-            .attr('x1', xPosn)
-            .attr('y1', 0)
-            .attr('x2', xPosn)
-            .attr('y2', this.contentHeight)
-            .attr('class', 'controlLine')
+        this.controlLine = this.svgGroup.append("line")
+            .attr("x1", xPosn)
+            .attr("y1", 0)
+            .attr("x2", xPosn)
+            .attr("y2", this.contentHeight)
+            .attr("class", "controlLine")
             .node();
     };
 
@@ -8401,7 +2948,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Array} Array of times in seconds that the given competitors are
     *     behind the fastest time.
     */
-    Chart.prototype.getTimesBehindFastest = function (controlIndex, indexes) {
+    Chart.prototype.getTimesBehindFastest = function (controlIndex: number, indexes: Array<number>) {
         const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
         const fastestSplit = this.fastestCumTimes[controlIndex] - this.fastestCumTimes[controlIndex - 1];
         const timesBehind = selectedCompetitors.map(function (comp) { const compSplit = comp.getSplitTimeTo(controlIndex); return (compSplit === null) ? null : compSplit - fastestSplit; });
@@ -8416,7 +2963,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Array} Array of times in seconds that the given competitors are
     *     deemed to have lost at the given control.
     */
-    Chart.prototype.getTimeLosses = function (controlIndex, indexes) {
+    Chart.prototype.getTimeLosses = function (controlIndex: number, indexes: Array<number>) {
         const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
         const timeLosses = selectedCompetitors.map(function (comp) { return comp.getTimeLossAt(controlIndex); });
         return timeLosses;
@@ -8425,7 +2972,7 @@ SplitsBrowser.Messages = {} as any;
     /**
     * Updates the statistics text shown after the competitors.
     */
-    Chart.prototype.updateCompetitorStatistics = function () {
+    Chart.prototype.updateCompetitorStatistics = function (): void {
         const selectedCompetitors = this.selectedIndexesOrderedByLastYValue.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
         let labelTexts = selectedCompetitors.map(function (comp) { return formatNameAndSuffix(comp.name, getSuffix(comp)); });
 
@@ -8447,13 +2994,13 @@ SplitsBrowser.Messages = {} as any;
             if (this.visibleStatistics.BehindFastest) {
                 const timesBehind = this.getTimesBehindFastest(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
                 labelTexts = d3.zip(labelTexts, timesBehind)
-                    .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1]); });
+                    .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1] as number); });
             }
 
             if (this.visibleStatistics.TimeLoss) {
                 const timeLosses = this.getTimeLosses(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
                 labelTexts = d3.zip(labelTexts, timeLosses)
-                    .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1]); });
+                    .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1] as number); });
             }
         }
 
@@ -8463,7 +3010,7 @@ SplitsBrowser.Messages = {} as any;
         }
 
         // This data is already joined to the labels; just update the text.
-        d3.selectAll('text.competitorLabel').text(function (data: any) { return data.label; });
+        d3.selectAll("text.competitorLabel").text(function (data: any) { return data.label; });
     };
 
     /**
@@ -8477,7 +3024,7 @@ SplitsBrowser.Messages = {} as any;
     Chart.prototype.getTickFormatter = function () {
         const outerThis = this;
         return function (value, idx) {
-            return (idx === 0) ? getMessage('StartNameShort') : ((idx === outerThis.numControls + 1) ? getMessage('FinishNameShort') : idx.toString());
+            return (idx === 0) ? getMessage("StartNameShort") : ((idx === outerThis.numControls + 1) ? getMessage("FinishNameShort") : idx.toString());
         };
     };
 
@@ -8486,7 +3033,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {string} text - The piece of text to measure the width of.
     * @sb-returns {Number} The width of the piece of text, in pixels.
     */
-    Chart.prototype.getTextWidth = function (text) {
+    Chart.prototype.getTextWidth = function (text: string): number {
         return this.textSizeElement.text(text).node().getBBox().width;
     };
 
@@ -8566,7 +3113,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
     */
     Chart.prototype.getMaxSplitTimeAndRankTextWidth = function () {
-        return this.getMaxTimeAndRankTextWidth('getSplitTimeTo', 'getSplitRankTo');
+        return this.getMaxTimeAndRankTextWidth("getSplitTimeTo", "getSplitRankTo");
     };
 
     /**
@@ -8576,7 +3123,7 @@ SplitsBrowser.Messages = {} as any;
     *                   pixels.
     */
     Chart.prototype.getMaxCumulativeTimeAndRankTextWidth = function () {
-        return this.getMaxTimeAndRankTextWidth('getCumulativeTimeTo', 'getCumulativeRankTo');
+        return this.getMaxTimeAndRankTextWidth("getCumulativeTimeTo", "getCumulativeRankTo");
     };
 
     /**
@@ -8647,7 +3194,7 @@ SplitsBrowser.Messages = {} as any;
     Chart.prototype.determineMaxStartTimeLabelWidth = function (chartData) {
         let maxWidth;
         if (chartData.competitorNames.length > 0) {
-            maxWidth = d3.max(chartData.competitorNames.map(function (name) { return this.getTextWidth('00:00:00 ' + name); }, this));
+            maxWidth = d3.max(chartData.competitorNames.map(function (name) { return this.getTextWidth("00:00:00 " + name); }, this));
         } else {
             maxWidth = 0;
         }
@@ -8669,7 +3216,7 @@ SplitsBrowser.Messages = {} as any;
     * Draw the background rectangles that indicate sections of the course
     * between controls.
     */
-    Chart.prototype.drawBackgroundRectangles = function () {
+    Chart.prototype.drawBackgroundRectangles = function (): void {
 
         // We can't guarantee that the reference cumulative times are in
         // ascending order, but we need such a list of times in order to draw
@@ -8689,18 +3236,18 @@ SplitsBrowser.Messages = {} as any;
 
         const outerThis = this;
 
-        let rects = this.svgGroup.selectAll('rect')
+        let rects = this.svgGroup.selectAll("rect")
             .data(d3.range(refCumTimesSorted.length - 1));
 
-        rects.enter().append('rect');
+        rects.enter().append("rect");
 
-        rects = this.svgGroup.selectAll('rect')
+        rects = this.svgGroup.selectAll("rect")
             .data(d3.range(refCumTimesSorted.length - 1));
-        rects.attr('x', function (i) { return outerThis.xScale(refCumTimesSorted[i]); })
-            .attr('y', 0)
-            .attr('width', function (i) { return outerThis.xScale(refCumTimesSorted[i + 1]) - outerThis.xScale(refCumTimesSorted[i]); })
-            .attr('height', this.contentHeight)
-            .attr('class', function (i) { return (i % 2 === 0) ? 'background1' : 'background2'; });
+        rects.attr("x", function (i) { return outerThis.xScale(refCumTimesSorted[i]); })
+            .attr("y", 0)
+            .attr("width", function (i) { return outerThis.xScale(refCumTimesSorted[i + 1]) - outerThis.xScale(refCumTimesSorted[i]); })
+            .attr("height", this.contentHeight)
+            .attr("class", function (i) { return (i % 2 === 0) ? "background1" : "background2"; });
 
         rects.exit().remove();
     };
@@ -8735,7 +3282,7 @@ SplitsBrowser.Messages = {} as any;
                 return function (time) {
                     const yarray: Array<number> = startTimes.map(function (startTime) { return Math.abs(yScale(startTime) - yScale(time)); });
                     const nearestOffset = d3.min(yarray);
-                    return (nearestOffset >= MIN_COMPETITOR_TICK_MARK_DISTANCE) ? formatTime(Math.round(time * 60)) : '';
+                    return (nearestOffset >= MIN_COMPETITOR_TICK_MARK_DISTANCE) ? formatTime(Math.round(time * 60)) : "";
                 };
             }
         } else {
@@ -8749,7 +3296,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {String} yAxisLabel - The label to use for the Y-axis.
     * @sb-param {object} chartData - The chart data to use.
     */
-    Chart.prototype.drawAxes = function (yAxisLabel, chartData) {
+    Chart.prototype.drawAxes = function (yAxisLabel: number, chartData) {
 
         const tickFormatter = this.determineYAxisTickFormatter(chartData);
 
@@ -8765,34 +3312,34 @@ SplitsBrowser.Messages = {} as any;
         const lowerXAxis = d3.axisBottom(d3.scaleLinear())
             .scale(this.xScaleMinutes);
 
-        this.svgGroup.selectAll('g.axis').remove();
+        this.svgGroup.selectAll("g.axis").remove();
 
-        this.svgGroup.append('g')
-            .attr('class', 'x axis')
+        this.svgGroup.append("g")
+            .attr("class", "x axis")
             .call(xAxis);
 
-        this.svgGroup.append('g')
-            .attr('class', 'y axis')
+        this.svgGroup.append("g")
+            .attr("class", "y axis")
             .call(yAxis)
-            .append('text')
-            .attr('transform', 'rotate(-90)')
-            .attr('x', -(this.contentHeight - 6))
-            .attr('y', 6)
-            .attr('dy', '.71em')
-            .style('text-anchor', 'start')
-            .style('fill', 'black')
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -(this.contentHeight - 6))
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "start")
+            .style("fill", "black")
             .text(yAxisLabel);
 
-        this.svgGroup.append('g')
-            .attr('class', 'x axis')
-            .attr('transform', 'translate(0,' + this.contentHeight + ')')
+        this.svgGroup.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + this.contentHeight + ")")
             .call(lowerXAxis)
-            .append('text')
-            .attr('x', 60)
-            .attr('y', -5)
-            .style('text-anchor', 'start')
-            .style('fill', 'black')
-            .text(getMessage('LowerXAxisChartLabel'));
+            .append("text")
+            .attr("x", 60)
+            .attr("y", -5)
+            .style("text-anchor", "start")
+            .style("fill", "black")
+            .text(getMessage("LowerXAxisChartLabel"));
     };
 
     /**
@@ -8819,35 +3366,35 @@ SplitsBrowser.Messages = {} as any;
             }
         };
 
-        this.svgGroup.selectAll('path.graphLine').remove();
+        this.svgGroup.selectAll("path.graphLine").remove();
 
-        this.svgGroup.selectAll('line.aroundDubiousTimes').remove();
+        this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
 
         d3.range(this.numLines).forEach(function (selCompIdx) {
             const strokeColour = colours[this.selectedIndexes[selCompIdx] % colours.length];
             const highlighter = function () { outerThis.highlight(outerThis.selectedIndexes[selCompIdx]); };
             const unhighlighter = function () { outerThis.unhighlight(); };
 
-            this.svgGroup.append('path')
-                .attr('d', lineFunctionGenerator(selCompIdx)(chartData.dataColumns))
-                .attr('stroke', strokeColour)
-                .attr('class', 'graphLine competitor' + this.selectedIndexes[selCompIdx])
-                .on('mouseenter', highlighter)
-                .on('mouseleave', unhighlighter)
-                .append('title')
+            this.svgGroup.append("path")
+                .attr("d", lineFunctionGenerator(selCompIdx)(chartData.dataColumns))
+                .attr("stroke", strokeColour)
+                .attr("class", "graphLine competitor" + this.selectedIndexes[selCompIdx])
+                .on("mouseenter", highlighter)
+                .on("mouseleave", unhighlighter)
+                .append("title")
                 .text(chartData.competitorNames[selCompIdx]);
 
             chartData.dubiousTimesInfo[selCompIdx].forEach(function (dubiousTimeInfo) {
-                this.svgGroup.append('line')
-                    .attr('x1', this.xScale(chartData.dataColumns[dubiousTimeInfo.start].x))
-                    .attr('y1', this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[selCompIdx]))
-                    .attr('x2', this.xScale(chartData.dataColumns[dubiousTimeInfo.end].x))
-                    .attr('y2', this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[selCompIdx]))
-                    .attr('stroke', strokeColour)
-                    .attr('class', 'aroundDubiousTimes competitor' + this.selectedIndexes[selCompIdx])
-                    .on('mouseenter', highlighter)
-                    .on('mouseleave', unhighlighter)
-                    .append('title')
+                this.svgGroup.append("line")
+                    .attr("x1", this.xScale(chartData.dataColumns[dubiousTimeInfo.start].x))
+                    .attr("y1", this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[selCompIdx]))
+                    .attr("x2", this.xScale(chartData.dataColumns[dubiousTimeInfo.end].x))
+                    .attr("y2", this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[selCompIdx]))
+                    .attr("stroke", strokeColour)
+                    .attr("class", "aroundDubiousTimes competitor" + this.selectedIndexes[selCompIdx])
+                    .on("mouseenter", highlighter)
+                    .on("mouseleave", unhighlighter)
+                    .append("title")
                     .text(chartData.competitorNames[selCompIdx]);
             }, this);
         }, this);
@@ -8857,23 +3404,23 @@ SplitsBrowser.Messages = {} as any;
     * Highlights the competitor with the given index.
     * @sb-param {Number} competitorIdx - The index of the competitor to highlight.
     */
-    Chart.prototype.highlight = function (competitorIdx) {
-        this.svg.selectAll('path.graphLine.competitor' + competitorIdx).classed('selected', true);
-        this.svg.selectAll('line.competitorLegendLine.competitor' + competitorIdx).classed('selected', true);
-        this.svg.selectAll('text.competitorLabel.competitor' + competitorIdx).classed('selected', true);
-        this.svg.selectAll('text.startLabel.competitor' + competitorIdx).classed('selected', true);
-        this.svg.selectAll('line.aroundDubiousTimes.competitor' + competitorIdx).classed('selected', true);
+    Chart.prototype.highlight = function (competitorIdx: number): void {
+        this.svg.selectAll("path.graphLine.competitor" + competitorIdx).classed("selected", true);
+        this.svg.selectAll("line.competitorLegendLine.competitor" + competitorIdx).classed("selected", true);
+        this.svg.selectAll("text.competitorLabel.competitor" + competitorIdx).classed("selected", true);
+        this.svg.selectAll("text.startLabel.competitor" + competitorIdx).classed("selected", true);
+        this.svg.selectAll("line.aroundDubiousTimes.competitor" + competitorIdx).classed("selected", true);
     };
 
     /**
     * Removes any competitor-specific higlighting.
     */
-    Chart.prototype.unhighlight = function () {
-        this.svg.selectAll('path.graphLine.selected').classed('selected', false);
-        this.svg.selectAll('line.competitorLegendLine.selected').classed('selected', false);
-        this.svg.selectAll('text.competitorLabel.selected').classed('selected', false);
-        this.svg.selectAll('text.startLabel.selected').classed('selected', false);
-        this.svg.selectAll('line.aroundDubiousTimes.selected').classed('selected', false);
+    Chart.prototype.unhighlight = function (): void {
+        this.svg.selectAll("path.graphLine.selected").classed("selected", false);
+        this.svg.selectAll("line.competitorLegendLine.selected").classed("selected", false);
+        this.svg.selectAll("text.competitorLabel.selected").classed("selected", false);
+        this.svg.selectAll("text.startLabel.selected").classed("selected", false);
+        this.svg.selectAll("line.aroundDubiousTimes.selected").classed("selected", false);
     };
 
     /**
@@ -8884,18 +3431,18 @@ SplitsBrowser.Messages = {} as any;
         const startColumn = chartData.dataColumns[0];
         const outerThis = this;
 
-        let startLabels = this.svgGroup.selectAll('text.startLabel').data(this.selectedIndexes);
+        let startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
 
-        startLabels.enter().append('text')
-            .classed('startLabel', true);
+        startLabels.enter().append("text")
+            .classed("startLabel", true);
 
-        startLabels = this.svgGroup.selectAll('text.startLabel').data(this.selectedIndexes);
-        startLabels.attr('x', -7)
-            .attr('y', function (_compIndex, selCompIndex) { return outerThis.yScale(startColumn.ys[selCompIndex]) + outerThis.getTextHeight(chartData.competitorNames[selCompIndex]) / 4; })
-            .attr('class', function (compIndex) { return 'startLabel competitor' + compIndex; })
-            .on('mouseenter', function (compIndex) { outerThis.highlight(compIndex); })
-            .on('mouseleave', function () { outerThis.unhighlight(); })
-            .text(function (_compIndex, selCompIndex) { return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + ' ' + chartData.competitorNames[selCompIndex]; });
+        startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
+        startLabels.attr("x", -7)
+            .attr("y", function (_compIndex, selCompIndex) { return outerThis.yScale(startColumn.ys[selCompIndex]) + outerThis.getTextHeight(chartData.competitorNames[selCompIndex]) / 4; })
+            .attr("class", function (compIndex) { return "startLabel competitor" + compIndex; })
+            .on("mouseenter", function (compIndex) { outerThis.highlight(compIndex); })
+            .on("mouseleave", function () { outerThis.unhighlight(); })
+            .text(function (_compIndex, selCompIndex) { return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + " " + chartData.competitorNames[selCompIndex]; });
 
         startLabels.exit().remove();
     };
@@ -8903,15 +3450,15 @@ SplitsBrowser.Messages = {} as any;
     /**
     * Removes all of the competitor start-time labels from the chart.
     */
-    Chart.prototype.removeCompetitorStartTimeLabels = function () {
-        this.svgGroup.selectAll('text.startLabel').remove();
+    Chart.prototype.removeCompetitorStartTimeLabels = function (): void {
+        this.svgGroup.selectAll("text.startLabel").remove();
     };
 
     /**
     * Adjust the locations of the legend labels downwards so that two labels
     * do not overlap.
     */
-    Chart.prototype.adjustCompetitorLegendLabelsDownwardsIfNecessary = function () {
+    Chart.prototype.adjustCompetitorLegendLabelsDownwardsIfNecessary = function (): void {
         for (let i = 1; i < this.numLines; i += 1) {
             const prevComp = this.currentCompetitorData[i - 1];
             const thisComp = this.currentCompetitorData[i];
@@ -8931,7 +3478,7 @@ SplitsBrowser.Messages = {} as any;
     *
     * @sb-param {Number} minLastY - The minimum Y-coordinate of the lowest label.
     */
-    Chart.prototype.adjustCompetitorLegendLabelsUpwardsIfNecessary = function (minLastY) {
+    Chart.prototype.adjustCompetitorLegendLabelsUpwardsIfNecessary = function (minLastY: number): void {
         if (this.numLines > 0 && this.currentCompetitorData[this.numLines - 1].y > this.contentHeight) {
             // The list of competitors runs off the bottom.
             // Put the last competitor at the bottom, or at its minimum
@@ -8955,7 +3502,7 @@ SplitsBrowser.Messages = {} as any;
     * Draw legend labels to the right of the chart.
     * @sb-param {object} chartData - The chart data that contains the final time offsets.
     */
-    Chart.prototype.drawCompetitorLegendLabels = function (chartData) {
+    Chart.prototype.drawCompetitorLegendLabels = function (chartData): void {
 
         let minLastY = 0;
         if (chartData.dataColumns.length === 0) {
@@ -8999,31 +3546,31 @@ SplitsBrowser.Messages = {} as any;
 
         this.adjustCompetitorLegendLabelsUpwardsIfNecessary(minLastY);
 
-        let legendLines = this.svgGroup.selectAll('line.competitorLegendLine').data(this.currentCompetitorData);
-        legendLines.enter().append('line').classed('competitorLegendLine', true);
+        let legendLines = this.svgGroup.selectAll("line.competitorLegendLine").data(this.currentCompetitorData);
+        legendLines.enter().append("line").classed("competitorLegendLine", true);
 
         const outerThis = this;
-        legendLines = this.svgGroup.selectAll('line.competitorLegendLine').data(this.currentCompetitorData);
-        legendLines.attr('x1', this.contentWidth + 1)
-            .attr('y1', function (data) { return data.y; })
-            .attr('x2', this.contentWidth + LEGEND_LINE_WIDTH + 1)
-            .attr('y2', function (data) { return data.y; })
-            .attr('stroke', function (data) { return data.colour; })
-            .attr('class', function (data) { return 'competitorLegendLine competitor' + data.index; })
-            .on('mouseenter', function (data) { outerThis.highlight(data.index); })
-            .on('mouseleave', function () { outerThis.unhighlight(); });
+        legendLines = this.svgGroup.selectAll("line.competitorLegendLine").data(this.currentCompetitorData);
+        legendLines.attr("x1", this.contentWidth + 1)
+            .attr("y1", function (data) { return data.y; })
+            .attr("x2", this.contentWidth + LEGEND_LINE_WIDTH + 1)
+            .attr("y2", function (data) { return data.y; })
+            .attr("stroke", function (data) { return data.colour; })
+            .attr("class", function (data) { return "competitorLegendLine competitor" + data.index; })
+            .on("mouseenter", function (data) { outerThis.highlight(data.index); })
+            .on("mouseleave", function () { outerThis.unhighlight(); });
 
         legendLines.exit().remove();
 
-        let labels = this.svgGroup.selectAll('text.competitorLabel').data(this.currentCompetitorData);
-        labels.enter().append('text').classed('competitorLabel', true);
+        let labels = this.svgGroup.selectAll("text.competitorLabel").data(this.currentCompetitorData);
+        labels.enter().append("text").classed("competitorLabel", true);
 
-        labels = this.svgGroup.selectAll('text.competitorLabel').data(this.currentCompetitorData);
-        labels.attr('x', this.contentWidth + LEGEND_LINE_WIDTH + 2)
-            .attr('y', function (data) { return data.y + data.textHeight / 4; })
-            .attr('class', function (data) { return 'competitorLabel competitor' + data.index; })
-            .on('mouseenter', function (data) { outerThis.highlight(data.index); })
-            .on('mouseleave', function () { outerThis.unhighlight(); })
+        labels = this.svgGroup.selectAll("text.competitorLabel").data(this.currentCompetitorData);
+        labels.attr("x", this.contentWidth + LEGEND_LINE_WIDTH + 2)
+            .attr("y", function (data) { return data.y + data.textHeight / 4; })
+            .attr("class", function (data) { return "competitorLabel competitor" + data.index; })
+            .on("mouseenter", function (data) { outerThis.highlight(data.index); })
+            .on("mouseleave", function () { outerThis.unhighlight(); })
             .text(function (data) { return data.label; });
 
         labels.exit().remove();
@@ -9039,7 +3586,7 @@ SplitsBrowser.Messages = {} as any;
     * If you find part of the chart is missing sometimes, chances are you've
     * omitted a necessary call to this method.
     */
-    Chart.prototype.adjustContentSize = function () {
+    Chart.prototype.adjustContentSize = function (): void {
         // Extra length added to the maximum start-time label width to
         // include the lengths of the Y-axis ticks.
         const EXTRA_MARGIN = 8;
@@ -9054,7 +3601,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Number} overallWidth - Overall width
     * @sb-param {Number} overallHeight - Overall height
     */
-    Chart.prototype.setSize = function (overallWidth, overallHeight) {
+    Chart.prototype.setSize = function (overallWidth: number, overallHeight: number) {
         this.overallWidth = overallWidth;
         this.overallHeight = overallHeight;
         $(this.svg.node()).width(overallWidth).height(overallHeight);
@@ -9065,7 +3612,7 @@ SplitsBrowser.Messages = {} as any;
     * Clears the graph by removing all controls from it.
     */
     Chart.prototype.clearGraph = function () {
-        this.svgGroup.selectAll('*').remove();
+        this.svgGroup.selectAll("*").remove();
     };
 
     /**
@@ -9076,7 +3623,7 @@ SplitsBrowser.Messages = {} as any;
     * This sorted list is used by the chart to find which control the cursor
     * is closest to.
     */
-    Chart.prototype.sortReferenceCumTimes = function () {
+    Chart.prototype.sortReferenceCumTimes = function (): void {
         // Put together a map that maps cumulative times to the first split to
         // register that time.
         const cumTimesToControlIndex = d3.map();
@@ -9103,8 +3650,8 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {object} data - Object that contains various chart data.  This
     *     must contain the following properties:
     *     * chartData {Object} - the data to plot on the chart
-    *     * eventData {SplitsBrowser.Model.Event} - the overall Event object.
-    *     * courseClassSet {SplitsBrowser.Model.Event} - the course-class set.
+    *     * eventData {Event} - the overall Event object.
+    *     * courseClassSet {Event} - the course-class set.
     *     * referenceCumTimes {Array} - Array of cumulative split times of the
     *       'reference'.
     *     * fastestCumTimes {Array} - Array of cumulative times of the
@@ -9116,7 +3663,7 @@ SplitsBrowser.Messages = {} as any;
     *                                    certain statistics are visible.
     * @sb-param {Object} chartType - The type of chart being drawn.
     */
-    Chart.prototype.drawChart = function (data, selectedIndexes, visibleStatistics, chartType) {
+    Chart.prototype.drawChart = function (data, selectedIndexes: Array<number>, visibleStatistics: Array<boolean>, chartType: ChartType) {
         const chartData = data.chartData;
         this.numControls = chartData.numControls;
         this.numLines = chartData.competitorNames.length;
@@ -9151,17 +3698,14 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.Controls.Chart = Chart;
 })();
 
-
+// file results-table.js
 (function () {
-    'use strict';
+    "use strict";
 
-    const formatTime = SplitsBrowser.formatTime;
-    const compareCompetitors = SplitsBrowser.Model.compareCompetitors;
     const getMessage = SplitsBrowser.getMessage;
     const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-    const isNotNullNorNaN = SplitsBrowser.isNotNullNorNaN;
 
-    const NON_BREAKING_SPACE_CHAR = '\u00a0';
+    const NON_BREAKING_SPACE_CHAR = "\u00a0";
 
     // Maximum precision to show a results-table entry using.
     const MAX_PERMITTED_PRECISION = 2;
@@ -9183,21 +3727,21 @@ SplitsBrowser.Messages = {} as any;
     /**
     * Build the results table.
     */
-    ResultsTable.prototype.buildTable = function () {
-        this.div = d3.select(this.parent).append('div')
-            .attr('id', 'resultsTableContainer');
+    ResultsTable.prototype.buildTable = function (): void {
+        this.div = d3.select(this.parent).append("div")
+            .attr("id", "resultsTableContainer");
 
-        this.headerSpan = this.div.append('div')
-            .append('span')
-            .classed('resultsTableHeader', true);
+        this.headerSpan = this.div.append("div")
+            .append("span")
+            .classed("resultsTableHeader", true);
 
-        this.table = this.div.append('table')
-            .classed('resultsTable', true);
+        this.table = this.div.append("table")
+            .classed("resultsTable", true);
 
-        this.table.append('thead')
-            .append('tr');
+        this.table.append("thead")
+            .append("tr");
 
-        this.table.append('tbody');
+        this.table.append("tbody");
     };
 
     /**
@@ -9211,7 +3755,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Array} competitors - Array of Competitor objects.
     * @sb-return {Number} Maximum precision to use.
     */
-    function determinePrecision(competitors) {
+    function determinePrecision(competitors: Array<Competitor>): number {
         let maxPrecision = 0;
         let maxPrecisionFactor = 1;
         competitors.forEach(function (competitor) {
@@ -9237,19 +3781,19 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Competitor} competitor The competitor to get the status of.
     * @sb-return {String} Time or status for the given competitor.
     */
-    function getTimeOrStatus(competitor) {
+    function getTimeOrStatus(competitor: Competitor): string {
         if (competitor.isNonStarter) {
-            return getMessage('DidNotStartShort');
+            return getMessage("DidNotStartShort");
         } else if (competitor.isNonFinisher) {
-            return getMessage('DidNotFinishShort');
+            return getMessage("DidNotFinishShort");
         } else if (competitor.isDisqualified) {
-            return getMessage('DisqualifiedShort');
+            return getMessage("DisqualifiedShort");
         } else if (competitor.isOverMaxTime) {
-            return getMessage('OverMaxTimeShort');
+            return getMessage("OverMaxTimeShort");
         } else if (competitor.completed()) {
-            return formatTime(competitor.totalTime);
+            return TimeUtilities.formatTime(competitor.totalTime);
         } else {
-            return getMessage('MispunchedShort');
+            return getMessage("MispunchedShort");
         }
     }
 
@@ -9260,34 +3804,34 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {String} The HTML value escaped.
     */
     function escapeHtml(value) {
-        return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
     }
 
     /**
     * Populates the contents of the table with the course-class data.
     */
     ResultsTable.prototype.populateTable = function () {
-        let headerText = this.courseClass.name + ', ';
+        let headerText = this.courseClass.name + ", ";
         if (this.courseClass.numControls === 1) {
-            headerText += getMessage('ResultsTableHeaderSingleControl');
+            headerText += getMessage("ResultsTableHeaderSingleControl");
         } else {
-            headerText += getMessageWithFormatting('ResultsTableHeaderMultipleControls', { '$$NUM$$': this.courseClass.numControls });
+            headerText += getMessageWithFormatting("ResultsTableHeaderMultipleControls", { "$$NUM$$": this.courseClass.numControls });
         }
 
         const course = this.courseClass.course;
         if (course.length !== null) {
-            headerText += ', ' + getMessageWithFormatting('ResultsTableHeaderCourseLength', { '$$DISTANCE$$': course.length.toFixed(1) });
+            headerText += ", " + getMessageWithFormatting("ResultsTableHeaderCourseLength", { "$$DISTANCE$$": course.length.toFixed(1) });
         }
         if (course.climb !== null) {
-            headerText += ', ' + getMessageWithFormatting('ResultsTableHeaderClimb', { '$$CLIMB$$': course.climb });
+            headerText += ", " + getMessageWithFormatting("ResultsTableHeaderClimb", { "$$CLIMB$$": course.climb });
         }
 
         this.headerSpan.text(headerText);
 
         let headerCellData = [
-            getMessage('ResultsTableHeaderControlNumber'),
-            getMessage('ResultsTableHeaderName'),
-            getMessage('ResultsTableHeaderTime')
+            getMessage("ResultsTableHeaderControlNumber"),
+            getMessage("ResultsTableHeaderName"),
+            getMessage("ResultsTableHeaderTime")
         ];
 
         const controls = this.courseClass.course.controls;
@@ -9295,20 +3839,20 @@ SplitsBrowser.Messages = {} as any;
             headerCellData = headerCellData.concat(d3.range(1, this.courseClass.numControls + 1));
         } else {
             headerCellData = headerCellData.concat(controls.map(function (control, index) {
-                return (index + 1) + NON_BREAKING_SPACE_CHAR + '(' + control + ')';
+                return (index + 1) + NON_BREAKING_SPACE_CHAR + "(" + control + ")";
             }));
         }
 
-        headerCellData.push(getMessage('FinishName'));
+        headerCellData.push(getMessage("FinishName"));
 
-        let headerCells = this.table.select('thead tr')
-            .selectAll('th')
+        let headerCells = this.table.select("thead tr")
+            .selectAll("th")
             .data(headerCellData);
 
-        headerCells.enter().append('th');
+        headerCells.enter().append("th");
         headerCells.exit().remove();
-        headerCells = this.table.select('thead tr')
-            .selectAll('th')
+        headerCells = this.table.select("thead tr")
+            .selectAll("th")
             .data(headerCellData);
 
         headerCells.text(function (header) { return header; });
@@ -9320,32 +3864,32 @@ SplitsBrowser.Messages = {} as any;
         // If truthy, cssClass is assumed to be HTML-safe and not require
         // escaping.
         function addCell(topLine, bottomLine, cssClass, cumFastest, splitFastest, cumDubious, splitDubious) {
-            htmlBits.push('<td');
+            htmlBits.push("<td");
             if (cssClass) {
-                htmlBits.push(' class="' + cssClass + '"');
+                htmlBits.push(" class=\"" + cssClass + "\"");
             }
 
-            htmlBits.push('><span');
-            let className = (((cumFastest) ? 'fastest' : '') + ' ' + ((cumDubious) ? 'dubious' : '')).trim();
-            if (className !== '') {
-                htmlBits.push(' class="' + className + '"');
+            htmlBits.push("><span");
+            let className = (((cumFastest) ? "fastest" : "") + " " + ((cumDubious) ? "dubious" : "")).trim();
+            if (className !== "") {
+                htmlBits.push(" class=\"" + className + "\"");
             }
 
-            htmlBits.push('>');
+            htmlBits.push(">");
             htmlBits.push(escapeHtml(topLine));
-            htmlBits.push('</span><br><span');
-            className = (((splitFastest) ? 'fastest' : '') + ' ' + ((splitDubious) ? 'dubious' : '')).trim();
-            if (className !== '') {
-                htmlBits.push(' class="' + className + '"');
+            htmlBits.push("</span><br><span");
+            className = (((splitFastest) ? "fastest" : "") + " " + ((splitDubious) ? "dubious" : "")).trim();
+            if (className !== "") {
+                htmlBits.push(" class=\"" + className + "\"");
             }
 
-            htmlBits.push('>');
+            htmlBits.push(">");
             htmlBits.push(escapeHtml(bottomLine));
-            htmlBits.push('</span></td>\n');
+            htmlBits.push("</span></td>\n");
         }
 
         const competitors = this.courseClass.competitors.slice(0);
-        competitors.sort(compareCompetitors);
+        competitors.sort(Competitor.compareCompetitors);
 
         let nonCompCount = 0;
         let rank = 0;
@@ -9353,46 +3897,46 @@ SplitsBrowser.Messages = {} as any;
         const precision = determinePrecision(competitors);
 
         competitors.forEach(function (competitor, index) {
-            htmlBits.push('<tr><td>');
+            htmlBits.push("<tr><td>");
 
             if (competitor.isNonCompetitive) {
-                htmlBits.push(escapeHtml(getMessage('NonCompetitiveShort')));
+                htmlBits.push(escapeHtml(getMessage("NonCompetitiveShort")));
                 nonCompCount += 1;
             } else if (competitor.completed()) {
                 if (index === 0 || competitors[index - 1].totalTime !== competitor.totalTime) {
                     rank = index + 1 - nonCompCount;
                 }
 
-                htmlBits.push('' + rank);
+                htmlBits.push("" + rank);
             }
 
-            htmlBits.push('</td>');
+            htmlBits.push("</td>");
 
             addCell(competitor.name, competitor.club, false, false, false, false, false);
-            addCell(getTimeOrStatus(competitor), NON_BREAKING_SPACE_CHAR, 'time', false, false, false, false);
+            addCell(getTimeOrStatus(competitor), NON_BREAKING_SPACE_CHAR, "time", false, false, false, false);
 
             d3.range(1, this.courseClass.numControls + 2).forEach(function (controlNum) {
-                const formattedCumTime = formatTime(competitor.getOriginalCumulativeTimeTo(controlNum), precision);
-                const formattedSplitTime = formatTime(competitor.getOriginalSplitTimeTo(controlNum), precision);
+                const formattedCumTime = TimeUtilities.formatTime(competitor.getOriginalCumulativeTimeTo(controlNum), precision);
+                const formattedSplitTime = TimeUtilities.formatTime(competitor.getOriginalSplitTimeTo(controlNum), precision);
                 const isCumTimeFastest = (competitor.getCumulativeRankTo(controlNum) === 1);
                 const isSplitTimeFastest = (competitor.getSplitRankTo(controlNum) === 1);
                 const isCumDubious = competitor.isCumulativeTimeDubious(controlNum);
                 const isSplitDubious = competitor.isSplitTimeDubious(controlNum);
-                addCell(formattedCumTime, formattedSplitTime, 'time', isCumTimeFastest, isSplitTimeFastest, isCumDubious, isSplitDubious);
+                addCell(formattedCumTime, formattedSplitTime, "time", isCumTimeFastest, isSplitTimeFastest, isCumDubious, isSplitDubious);
             });
 
-            htmlBits.push('</tr>\n');
+            htmlBits.push("</tr>\n");
 
         }, this);
 
-        this.table.select('tbody').node().innerHTML = htmlBits.join('');
+        this.table.select("tbody").node().innerHTML = htmlBits.join("");
     };
 
     /**
     * Sets the class whose data is displayed.
-    * @sb-param {SplitsBrowser.Model.CourseClass} courseClass - The class displayed.
+    * @sb-param {CourseClass} courseClass - The class displayed.
     */
-    ResultsTable.prototype.setClass = function (courseClass) {
+    ResultsTable.prototype.setClass = function (courseClass: CourseClass) {
         this.courseClass = courseClass;
         if (this.courseClass !== null) {
             this.populateTable();
@@ -9402,32 +3946,32 @@ SplitsBrowser.Messages = {} as any;
     /**
     * Shows the table of results.
     */
-    ResultsTable.prototype.show = function () {
-        this.div.style('display', null);
+    ResultsTable.prototype.show = function (): void {
+        this.div.style("display", null);
     };
 
     /**
     * Hides the table of results.
     */
-    ResultsTable.prototype.hide = function () {
-        this.div.style('display', 'none');
+    ResultsTable.prototype.hide = function (): void {
+        this.div.style("display", "none");
     };
 
     /**
     * Retranslates the results table following a change of selected language.
     */
-    ResultsTable.prototype.retranslate = function () {
+    ResultsTable.prototype.retranslate = function (): void {
         this.populateTable();
     };
 
     SplitsBrowser.Controls.ResultsTable = ResultsTable;
 })();
 
+// file query-string.js
 (function () {
-    'use strict';
+    "use strict";
 
-    const ChartTypes = SplitsBrowser.Model.ChartTypes;
-    const CourseClassSet = SplitsBrowser.Model.CourseClassSet;
+    const ChartTypes = ChartTypeClass.chartTypes;
 
     /**
     * Remove all matches of the given regular expression from the given string.
@@ -9436,8 +3980,8 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {RegExp} regexp - The regular expression to use to remove text.
     * @sb-return {String} The given query-string with all regexp matches removed.
     */
-    function removeAll(queryString, regexp) {
-        return queryString.replace(new RegExp(regexp.source, 'g'), '');
+    function removeAll(queryString: string, regexp: RegExp): string {
+        return queryString.replace(new RegExp(regexp.source, "g"), "");
     }
 
     const CLASS_NAME_REGEXP = /(?:^|&|\?)class=([^&]+)/;
@@ -9451,7 +3995,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {CourseClassSet|null} - Array of selected CourseClass objects, or null
     *     if none were found.
     */
-    function readSelectedClasses(queryString, eventData) {
+    function readSelectedClasses(queryString: string, eventData: Results) {
         const classNameMatch = CLASS_NAME_REGEXP.exec(queryString);
         if (classNameMatch === null) {
             // No class name specified in the URL.
@@ -9462,7 +4006,7 @@ SplitsBrowser.Messages = {} as any;
                 classesByName.set(eventData.classes[index].name, eventData.classes[index]);
             }
 
-            let classNames = decodeURIComponent(classNameMatch[1]).split(';');
+            let classNames = decodeURIComponent(classNameMatch[1]).split(";");
             classNames = d3.set(classNames).values();
             let selectedClasses = classNames.filter(function (className) { return classesByName.has(className); })
                 .map(function (className) { return classesByName.get(className); });
@@ -9488,10 +4032,10 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Array} classIndexes - Array of indexes of selected classes.
     * @sb-return {String} The query-string with the selected classes formatted in.
     */
-    function formatSelectedClasses(queryString, eventData, classIndexes) {
+    function formatSelectedClasses(queryString: string, eventData, classIndexes: Array<number>): string {
         queryString = removeAll(queryString, CLASS_NAME_REGEXP);
         const classNames = classIndexes.map(function (index) { return eventData.classes[index].name; });
-        return queryString + '&class=' + encodeURIComponent(classNames.join(';'));
+        return queryString + "&class=" + encodeURIComponent(classNames.join(";"));
     }
 
     const CHART_TYPE_REGEXP = /(?:^|&|\?)chartType=([^&]+)/;
@@ -9502,7 +4046,7 @@ SplitsBrowser.Messages = {} as any;
     *     from.
     * @sb-return {Object|null} Selected chart type, or null if not recognised.
     */
-    function readChartType(queryString) {
+    function readChartType(queryString: string) {
         const chartTypeMatch = CHART_TYPE_REGEXP.exec(queryString);
         if (chartTypeMatch === null) {
             return null;
@@ -9522,11 +4066,11 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Object} chartType - The chart type
     * @sb-return {String} The query-string with the chart-type formatted in.
     */
-    function formatChartType(queryString, chartType) {
+    function formatChartType(queryString: string, chartType: ChartType): string {
         queryString = removeAll(queryString, CHART_TYPE_REGEXP);
         for (const chartTypeName in ChartTypes) {
             if (ChartTypes.hasOwnProperty(chartTypeName) && ChartTypes[chartTypeName] === chartType) {
-                return queryString + '&chartType=' + encodeURIComponent(chartTypeName);
+                return queryString + "&chartType=" + encodeURIComponent(chartTypeName);
             }
         }
 
@@ -9536,7 +4080,7 @@ SplitsBrowser.Messages = {} as any;
 
     const COMPARE_WITH_REGEXP = /(?:^|&|\?)compareWith=([^&]+)/;
 
-    const BUILTIN_COMPARISON_TYPES = ['Winner', 'FastestTime', 'FastestTimePlus5', 'FastestTimePlus25', 'FastestTimePlus50', 'FastestTimePlus100'];
+    const BUILTIN_COMPARISON_TYPES = ["Winner", "FastestTime", "FastestTimePlus5", "FastestTimePlus25", "FastestTimePlus50", "FastestTimePlus100"];
 
     /**
     * Reads what to compare against.
@@ -9547,7 +4091,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Object|null} Selected comparison type, or null if not
     *     recognised.
     */
-    function readComparison(queryString, courseClassSet) {
+    function readComparison(queryString: string, courseClassSet: CourseClassSet) {
         const comparisonMatch = COMPARE_WITH_REGEXP.exec(queryString);
         if (comparisonMatch === null) {
             return null;
@@ -9591,7 +4135,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Number} index - Index of the comparison type.
     * @sb-param {String} The formatted query-string.
     */
-    function formatComparison(queryString, index, runner) {
+    function formatComparison(queryString: string, index: number, runner) {
         queryString = removeAll(queryString, COMPARE_WITH_REGEXP);
         let comparison = null;
         if (typeof index === typeof 0 && 0 <= index && index < BUILTIN_COMPARISON_TYPES.length) {
@@ -9603,7 +4147,7 @@ SplitsBrowser.Messages = {} as any;
         if (comparison === null) {
             return queryString;
         } else {
-            return queryString + '&compareWith=' + encodeURIComponent(comparison);
+            return queryString + "&compareWith=" + encodeURIComponent(comparison);
         }
     }
 
@@ -9618,7 +4162,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Array|null} Array of selected competitor indexes, or null if
     *     none found.
     */
-    function readSelectedCompetitors(queryString, courseClassSet) {
+    function readSelectedCompetitors(queryString: string, courseClassSet: CourseClassSet) {
         if (courseClassSet === null) {
             return null;
         } else {
@@ -9626,8 +4170,8 @@ SplitsBrowser.Messages = {} as any;
             if (selectedCompetitorsMatch === null) {
                 return null;
             } else {
-                let competitorNames = decodeURIComponent(selectedCompetitorsMatch[1]).split(';');
-                if (competitorNames.indexOf('*') >= 0) {
+                let competitorNames = decodeURIComponent(selectedCompetitorsMatch[1]).split(";");
+                if (competitorNames.indexOf("*") >= 0) {
                     // All competitors selected.
                     return d3.range(0, courseClassSet.allCompetitors.length);
                 }
@@ -9665,16 +4209,16 @@ SplitsBrowser.Messages = {} as any;
         } else if (selectedCompetitors.length === courseClassSet.allCompetitors.length) {
             // Assume all selected competitors are different, so all must be
             // selected.
-            return queryString + '&selected=*';
+            return queryString + "&selected=*";
         } else {
-            const competitorNames = selectedCompetitors.map(function (comp) { return comp.name; }).join(';');
-            return queryString + '&selected=' + encodeURIComponent(competitorNames);
+            const competitorNames = selectedCompetitors.map(function (comp) { return comp.name; }).join(";");
+            return queryString + "&selected=" + encodeURIComponent(competitorNames);
         }
     }
 
     const SELECTED_STATISTICS_REGEXP = /(?:^|&|\?)stats=([^&]*)/;
 
-    const ALL_STATS_NAMES = ['TotalTime', 'SplitTime', 'BehindFastest', 'TimeLoss'];
+    const ALL_STATS_NAMES = ["TotalTime", "SplitTime", "BehindFastest", "TimeLoss"];
 
     /**
     * Reads the selected statistics from the query string.
@@ -9688,7 +4232,7 @@ SplitsBrowser.Messages = {} as any;
         if (statsMatch === null) {
             return null;
         } else {
-            const statsNames = decodeURIComponent(statsMatch[1]).split(';');
+            const statsNames = decodeURIComponent(statsMatch[1]).split(";");
             const stats: any = {} as any;
             ALL_STATS_NAMES.forEach(function (statsName) { stats[statsName] = false; });
 
@@ -9696,7 +4240,7 @@ SplitsBrowser.Messages = {} as any;
                 const name = statsNames[index];
                 if (stats.hasOwnProperty(name)) {
                     stats[name] = true;
-                } else if (name !== '') {
+                } else if (name !== "") {
                     // Ignore unrecognised non-empty statistic name.
                     return null;
                 }
@@ -9715,7 +4259,7 @@ SplitsBrowser.Messages = {} as any;
     function formatSelectedStatistics(queryString, stats) {
         queryString = removeAll(queryString, SELECTED_STATISTICS_REGEXP);
         const statsNames = ALL_STATS_NAMES.filter(function (name) { return stats.hasOwnProperty(name) && stats[name]; });
-        return queryString + '&stats=' + encodeURIComponent(statsNames.join(';'));
+        return queryString + "&stats=" + encodeURIComponent(statsNames.join(";"));
     }
 
     const SHOW_ORIGINAL_REGEXP = /(?:^|&|\?)showOriginal=([^&]*)/;
@@ -9732,7 +4276,7 @@ SplitsBrowser.Messages = {} as any;
     */
     function readShowOriginal(queryString) {
         const showOriginalMatch = SHOW_ORIGINAL_REGEXP.exec(queryString);
-        return (showOriginalMatch !== null && showOriginalMatch[1] === '1');
+        return (showOriginalMatch !== null && showOriginalMatch[1] === "1");
     }
 
     /**
@@ -9744,7 +4288,7 @@ SplitsBrowser.Messages = {} as any;
     */
     function formatShowOriginal(queryString, showOriginal) {
         queryString = removeAll(queryString, SHOW_ORIGINAL_REGEXP);
-        return (showOriginal) ? queryString + '&showOriginal=1' : queryString;
+        return (showOriginal) ? queryString + "&showOriginal=1" : queryString;
     }
 
     const FILTER_TEXT_REGEXP = /(?:^|&|\?)filterText=([^&]*)/;
@@ -9760,7 +4304,7 @@ SplitsBrowser.Messages = {} as any;
     function readFilterText(queryString) {
         const filterTextMatch = FILTER_TEXT_REGEXP.exec(queryString);
         if (filterTextMatch === null) {
-            return '';
+            return "";
         } else {
             return decodeURIComponent(filterTextMatch[1]);
         }
@@ -9774,7 +4318,7 @@ SplitsBrowser.Messages = {} as any;
     */
     function formatFilterText(queryString, filterText) {
         queryString = removeAll(queryString, FILTER_TEXT_REGEXP);
-        return (filterText === '') ? queryString : queryString + '&filterText=' + encodeURIComponent(filterText);
+        return (filterText === "") ? queryString : queryString + "&filterText=" + encodeURIComponent(filterText);
     }
 
     /**
@@ -9806,7 +4350,7 @@ SplitsBrowser.Messages = {} as any;
     * whatever web application is hosting SplitsBrowser.
     *
     * @sb-param {String} queryString - The original query-string.
-    * @sb-param {Event} eventData - The event data.
+    * @sb-param {OEvent} eventData - The event data.
     * @sb-param {CourseClassSet} courseClassSet - The current course-class set.
     * @sb-param {Object} data - Object containing the data to format into the
     *     query-string.
@@ -9820,7 +4364,7 @@ SplitsBrowser.Messages = {} as any;
         queryString = formatSelectedStatistics(queryString, data.stats);
         queryString = formatShowOriginal(queryString, data.showOriginal);
         queryString = formatFilterText(queryString, data.filterText);
-        queryString = queryString.replace(/^\??&/, '');
+        queryString = queryString.replace(/^\??&/, "");
         return queryString;
     }
 
@@ -9828,12 +4372,13 @@ SplitsBrowser.Messages = {} as any;
     SplitsBrowser.formatQueryString = formatQueryString;
 })();
 
+// file warning-viewer.js
 (function () {
-    'use strict';
+    "use strict";
 
     const getMessage = SplitsBrowser.getMessage;
 
-    const CONTAINER_DIV_ID = 'warningViewerContainer';
+    const CONTAINER_DIV_ID = "warningViewerContainer";
 
     /**
     * Constructs a new WarningViewer object.
@@ -9845,30 +4390,30 @@ SplitsBrowser.Messages = {} as any;
         this.parent = parent;
         this.warnings = [];
 
-        this.containerDiv = parent.append('div')
-            .classed('topRowStart', true)
-            .attr('id', CONTAINER_DIV_ID)
-            .style('display', 'none');
+        this.containerDiv = parent.append("div")
+            .classed("topRowStart", true)
+            .attr("id", CONTAINER_DIV_ID)
+            .style("display", "none");
 
-        this.containerDiv.append('div').classed('topRowStartSpacer', true);
+        this.containerDiv.append("div").classed("topRowStartSpacer", true);
 
         this.warningTriangle = this.createWarningTriangle(this.containerDiv);
 
-        this.warningList = parent.append('div')
-            .classed('warningList', true)
-            .classed('transient', true)
-            .style('position', 'absolute')
-            .style('display', 'none');
+        this.warningList = parent.append("div")
+            .classed("warningList", true)
+            .classed("transient", true)
+            .style("position", "absolute")
+            .style("display", "none");
 
         // Ensure that a click outside of the warning list or the selector
         // box closes it.
         // Taken from http://stackoverflow.com/questions/1403615 and adjusted.
         const outerThis = this;
         $(document).click(function (e) {
-            if (outerThis.warningList.style('display') !== 'none') {
-                const container = $('div#warningTriangleContainer,div.warningList');
+            if (outerThis.warningList.style("display") !== "none") {
+                const container = $("div#warningTriangleContainer,div.warningList");
                 if (!container.is(e.target) && container.has(e.target).length === 0) {
-                    outerThis.warningList.style('display', 'none');
+                    outerThis.warningList.style("display", "none");
                 }
             }
         });
@@ -9881,7 +4426,7 @@ SplitsBrowser.Messages = {} as any;
     * following a change of selected language.
     */
     WarningViewer.prototype.setMessages = function () {
-        this.containerDiv.attr('title', getMessage('WarningsTooltip'));
+        this.containerDiv.attr("title", getMessage("WarningsTooltip"));
     };
 
     /**
@@ -9889,29 +4434,29 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Object} d3 selection containing the warning triangle.
     */
     WarningViewer.prototype.createWarningTriangle = function () {
-        const svgContainer = this.containerDiv.append('div')
-            .attr('id', 'warningTriangleContainer');
-        const svg = svgContainer.append('svg');
+        const svgContainer = this.containerDiv.append("div")
+            .attr("id", "warningTriangleContainer");
+        const svg = svgContainer.append("svg");
 
-        svg.style('width', '21px')
-            .style('height', '19px')
-            .style('margin-bottom', '-3px');
+        svg.style("width", "21px")
+            .style("height", "19px")
+            .style("margin-bottom", "-3px");
 
-        svg.append('polygon')
-            .attr('points', '1,18 10,0 19,18')
-            .style('stroke', 'black')
-            .style('stroke-width', '1.5px')
-            .style('fill', '#ffd426');
+        svg.append("polygon")
+            .attr("points", "1,18 10,0 19,18")
+            .style("stroke", "black")
+            .style("stroke-width", "1.5px")
+            .style("fill", "#ffd426");
 
-        svg.append('text')
-            .attr('x', 10)
-            .attr('y', 16)
-            .attr('text-anchor', 'middle')
-            .style('font-size', '14px')
-            .text('!');
+        svg.append("text")
+            .attr("x", 10)
+            .attr("y", 16)
+            .attr("text-anchor", "middle")
+            .style("font-size", "14px")
+            .text("!");
 
         const outerThis = this;
-        svgContainer.on('click', function () { outerThis.showHideErrorList(); });
+        svgContainer.on("click", function () { outerThis.showHideErrorList(); });
 
         return svg;
     };
@@ -9921,41 +4466,49 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {Array} warnings - Array of warning messages.
     */
     WarningViewer.prototype.setWarnings = function (warnings) {
-        let errorsSelection = this.warningList.selectAll('div')
+        let errorsSelection = this.warningList.selectAll("div")
             .data(warnings);
 
-        errorsSelection.enter().append('div')
-            .classed('warning', true);
+        errorsSelection.enter().append("div")
+            .classed("warning", true);
 
-        errorsSelection = this.warningList.selectAll('div')
+        errorsSelection = this.warningList.selectAll("div")
             .data(warnings);
 
         errorsSelection.text(function (errorMessage) { return errorMessage; });
         errorsSelection.exit().remove();
-        this.containerDiv.style('display', (warnings && warnings.length > 0) ? 'block' : 'none');
+        this.containerDiv.style("display", (warnings && warnings.length > 0) ? "block" : "none");
     };
 
     /**
     * Shows or hides the list of warnings.
     */
     WarningViewer.prototype.showHideErrorList = function () {
-        if (this.warningList.style('display') === 'none') {
+        if (this.warningList.style("display") === "none") {
             const offset = $(this.warningTriangle.node()).offset();
             const height = $(this.warningTriangle.node()).outerHeight();
             const width = $(this.warningList.node()).outerWidth();
-            this.warningList.style('left', Math.max(offset.left - width / 2, 0) + 'px')
-                .style('top', (offset.top + height + 5) + 'px')
-                .style('display', 'block');
+            this.warningList.style("left", Math.max(offset.left - width / 2, 0) + "px")
+                .style("top", (offset.top + height + 5) + "px")
+                .style("display", "block");
         } else {
-            this.warningList.style('display', 'none');
+            this.warningList.style("display", "none");
         }
     };
 
     SplitsBrowser.Controls.WarningViewer = WarningViewer;
 })();
 
+
+// file viewer.js
+export interface SplitsbrowserOptions {
+    topBar?: string;
+    containerElement?: string;
+    defaultLanguage?: string;
+}
+
 (function () {
-    'use strict';
+    "use strict";
     // Delay in milliseconds between a resize event being triggered and the
     // page responding to it.
     // (Resize events tend to come more than one at a time; if a resize event
@@ -9971,11 +4524,8 @@ SplitsBrowser.Messages = {} as any;
     const initialiseMessages = SplitsBrowser.initialiseMessages;
 
     const Model = SplitsBrowser.Model;
-    const CompetitorSelection = Model.CompetitorSelection;
-    const CourseClassSet = Model.CourseClassSet;
-    const ChartTypes = Model.ChartTypes;
+    const ChartTypes = ChartTypeClass.chartTypes;
 
-    const parseEventData = SplitsBrowser.Input.parseEventData;
     const repairEventData = SplitsBrowser.DataRepair.repairEventData;
     const transferCompetitorData = SplitsBrowser.DataRepair.transferCompetitorData;
     const parseQueryString = SplitsBrowser.parseQueryString;
@@ -9998,13 +4548,13 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Boolean} true if D3 version 4 is present, false if no D3 was found
     *     or a version of D3 older version 4 was found.
     */
-    function checkD3Version4() {
+    function checkD3Version4(): boolean {
         // DKR d3 imported rather than on the window object
         if (!d3) {
-            alert('D3 was not found.  SplitsBrowser requires D3 version 4 or later.');
+            alert("D3 was not found.  SplitsBrowser requires D3 version 4 or later.");
             return false;
         } else if (parseFloat(d3.version) < 4) {
-            alert('D3 version ' + d3.version + ' was found.  SplitsBrowser requires D3 version 4 or later.');
+            alert("D3 version " + d3.version + " was found.  SplitsBrowser requires D3 version 4 or later.");
             return false;
         } else {
             return true;
@@ -10017,7 +4567,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {?Object} options - Optional object containing various options
     *     to SplitsBrowser.
     */
-    function Viewer(options) {
+    function Viewer(options: SplitsbrowserOptions) {
         this.options = options;
 
         this.eventData = null;
@@ -10067,7 +4617,7 @@ SplitsBrowser.Messages = {} as any;
     * chosen as the start times are missing.
     */
     function alertRaceGraphDisabledAsStartTimesMissing() {
-        alert(getMessage('RaceGraphDisabledAsStartTimesMissing'));
+        alert(getMessage("RaceGraphDisabledAsStartTimesMissing"));
     }
 
     /**
@@ -10081,7 +4631,7 @@ SplitsBrowser.Messages = {} as any;
 
     /**
     * Sets the classes that the viewer can view.
-    * @sb-param {SplitsBrowser.Model.Event} eventData - All event data loaded.
+    * @sb-param {Event} eventData - All event data loaded.
     */
     Viewer.prototype.setEvent = function (eventData) {
         this.eventData = eventData;
@@ -10097,37 +4647,37 @@ SplitsBrowser.Messages = {} as any;
     * Draws the logo in the top panel.
     */
     Viewer.prototype.drawLogo = function () {
-        this.logoSvg = this.topPanel.append('svg')
-            .classed('topRowStart', true);
+        this.logoSvg = this.topPanel.append("svg")
+            .classed("topRowStart", true);
 
-        this.logoSvg.style('width', '19px')
-            .style('height', '19px')
-            .style('margin-bottom', '-3px');
+        this.logoSvg.style("width", "19px")
+            .style("height", "19px")
+            .style("margin-bottom", "-3px");
 
-        this.logoSvg.append('rect')
-            .attr('x', '0')
-            .attr('y', '0')
-            .attr('width', '19')
-            .attr('height', '19')
-            .attr('fill', 'white');
+        this.logoSvg.append("rect")
+            .attr("x", "0")
+            .attr("y", "0")
+            .attr("width", "19")
+            .attr("height", "19")
+            .attr("fill", "white");
 
-        this.logoSvg.append('polygon')
-            .attr('points', '0,19 19,0 19,19')
-            .attr('fill', 'red');
+        this.logoSvg.append("polygon")
+            .attr("points", "0,19 19,0 19,19")
+            .attr("fill", "red");
 
-        this.logoSvg.append('polyline')
-            .attr('points', '0.5,0.5 0.5,18.5 18.5,18.5 18.5,0.5 0.5,0.5 0.5,18.5')
-            .attr('stroke', 'black')
-            .attr('fill', 'none');
+        this.logoSvg.append("polyline")
+            .attr("points", "0.5,0.5 0.5,18.5 18.5,18.5 18.5,0.5 0.5,0.5 0.5,18.5")
+            .attr("stroke", "black")
+            .attr("fill", "none");
 
-        this.logoSvg.append('polyline')
-            .attr('points', '1,12 5,8 8,14 17,11')
-            .attr('fill', 'none')
-            .attr('stroke', 'blue')
-            .attr('stroke-width', '2');
+        this.logoSvg.append("polyline")
+            .attr("points", "1,12 5,8 8,14 17,11")
+            .attr("fill", "none")
+            .attr("stroke", "blue")
+            .attr("stroke-width", "2");
 
-        this.logoSvg.selectAll('*')
-            .append('title');
+        this.logoSvg.selectAll("*")
+            .append("title");
 
         this.setLogoMessages();
     };
@@ -10137,15 +4687,15 @@ SplitsBrowser.Messages = {} as any;
     * selected language.
     */
     Viewer.prototype.setLogoMessages = function () {
-        this.logoSvg.selectAll('title')
-            .text(getMessageWithFormatting('ApplicationVersion', { '$$VERSION$$': Version }));
+        this.logoSvg.selectAll("title")
+            .text(getMessageWithFormatting("ApplicationVersion", { "$$VERSION$$": Version }));
     };
 
     /**
     * Adds a spacer between controls on the top row.
     */
     Viewer.prototype.addSpacer = function () {
-        this.topPanel.append('div').classed('topRowStartSpacer', true);
+        this.topPanel.append("div").classed("topRowStartSpacer", true);
     };
 
     /**
@@ -10198,10 +4748,10 @@ SplitsBrowser.Messages = {} as any;
     * settings.
     */
     Viewer.prototype.addDirectLink = function () {
-        this.directLink = this.topPanel.append('a')
-            .classed('topRowStart', true)
-            .attr('id', 'directLinkAnchor')
-            .attr('href', document.location.href);
+        this.directLink = this.topPanel.append("a")
+            .classed("topRowStart", true)
+            .attr("id", "directLinkAnchor")
+            .attr("href", document.location.href);
         this.setDirectLinkMessages();
     };
 
@@ -10217,8 +4767,8 @@ SplitsBrowser.Messages = {} as any;
     * change in selected language.
     */
     Viewer.prototype.setDirectLinkMessages = function () {
-        this.directLink.attr('title', tryGetMessage('DirectLinkToolTip', ''))
-            .text(getMessage('DirectLink'));
+        this.directLink.attr("title", tryGetMessage("DirectLinkToolTip", ""))
+            .text(getMessage("DirectLink"));
     };
 
     /**
@@ -10238,7 +4788,7 @@ SplitsBrowser.Messages = {} as any;
         const oldQueryString = document.location.search;
         const newQueryString = formatQueryString(oldQueryString, this.eventData, this.courseClassSet, data);
         const oldHref = document.location.href;
-        this.directLink.attr('href', oldHref.substring(0, oldHref.length - oldQueryString.length) + '?' + newQueryString.replace(/^\?+/, ''));
+        this.directLink.attr("href", oldHref.substring(0, oldHref.length - oldQueryString.length) + "?" + newQueryString.replace(/^\?+/, ""));
     };
 
     /**
@@ -10251,23 +4801,23 @@ SplitsBrowser.Messages = {} as any;
     /**
     * Construct the UI inside the HTML body.
     */
-    Viewer.prototype.buildUi = function (options) {
+    Viewer.prototype.buildUi = function (options: SplitsbrowserOptions) {
         let body: any;
         // DKR Attach the D3 output to a div with ID of SB container
         if (options && options.containerElement) {
             body = d3.select(options.containerElement);
         } else {
-            body = d3.select('body');
+            body = d3.select("body");
         }
 
-        body.style('overflow', 'hidden');
+        body.style("overflow", "hidden");
 
-        this.container = body.append('div')
-            .attr('id', 'sbContainer');
+        this.container = body.append("div")
+            .attr("id", "sbContainer");
         //     this.container == d3.select('.sb');
         //  this.container.append("Hi Dave");
 
-        this.topPanel = this.container.append('div');
+        this.topPanel = this.container.append("div");
 
         this.drawLogo();
         this.addLanguageSelector();
@@ -10286,10 +4836,10 @@ SplitsBrowser.Messages = {} as any;
 
         // Add an empty div to clear the floating divs and ensure that the
         // top panel 'contains' all of its children.
-        this.topPanel.append('div')
-            .style('clear', 'both');
+        this.topPanel.append("div")
+            .style("clear", "both");
 
-        this.mainPanel = this.container.append('div');
+        this.mainPanel = this.container.append("div");
 
         this.addCompetitorList();
         this.chart = new Chart(this.mainPanel.node());
@@ -10304,8 +4854,8 @@ SplitsBrowser.Messages = {} as any;
         // Disable text selection anywhere other than text inputs.
         // This is mainly for the benefit of IE9, which doesn't support any
         // -*-user-select CSS style.
-        $('input:text').bind('selectstart', function (evt) { evt.stopPropagation(); });
-        $(this.container.node()).bind('selectstart', function () { return false; });
+        $("input:text").bind("selectstart", function (evt) { evt.stopPropagation(); });
+        $(this.container.node()).bind("selectstart", function () { return false; });
 
         // Hide 'transient' elements such as the list of other classes in the
         // class selector or warning list when the Escape key is pressed.
@@ -10356,7 +4906,7 @@ SplitsBrowser.Messages = {} as any;
     * Hides all transient elements that happen to be open.
     */
     Viewer.prototype.hideTransientElements = function () {
-        d3.selectAll('.transient').style('display', 'none');
+        d3.selectAll(".transient").style("display", "none");
     };
 
     /**
@@ -10366,7 +4916,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Number} Total horizontal margin.
     */
     Viewer.prototype.getHorizontalMargin = function () {
-        const body = $('app-graph');
+        const body = $("app-graph");
         const container = $(this.container.node());
         return (body.outerWidth(true) - body.width()) + (container.outerWidth() - container.width());
     };
@@ -10378,7 +4928,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-return {Number} Total vertical margin.
     */
     Viewer.prototype.getVerticalMargin = function () {
-        const body = $('app-graph');
+        const body = $("app-graph");
         const container = $(this.container.node());
         return (body.outerHeight(true) - body.height()) + (container.outerHeight() - container.height());
     };
@@ -10427,8 +4977,8 @@ SplitsBrowser.Messages = {} as any;
 
         this.chart.setSize(chartWidth, chartHeight);
     };
-
     /**
+
     * Draw the chart using the current data.
     */
     Viewer.prototype.drawChart = function () {
@@ -10585,20 +5135,20 @@ SplitsBrowser.Messages = {} as any;
     */
     Viewer.prototype.selectChartType = function (chartType) {
         if (chartType.isResultsTable) {
-            this.mainPanel.style('display', 'none');
+            this.mainPanel.style("display", "none");
 
             // Remove any fixed width and height on the container, as well as
             // overflow:hidden on the body, as we need the window to be able
             // to scroll if the results table is too wide or too tall and also
             // adjust size if one or both scrollbars appear.
-            this.container.style('width', null).style('height', null);
-            d3.select('body').style('overflow', null);
+            this.container.style("width", null).style("height", null);
+            d3.select("body").style("overflow", null);
 
             this.resultsTable.show();
         } else {
             this.resultsTable.hide();
-            d3.select('body').style('overflow', 'hidden');
-            this.mainPanel.style('display', null);
+            d3.select("body").style("overflow", "hidden");
+            this.mainPanel.style("display", null);
             this.setChartSize();
         }
 
@@ -10640,7 +5190,7 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {boolean} showOriginalData - True to show original data, false to
     *     show repaired data.
     */
-    Viewer.prototype.showOriginalOrRepairedData = function (showOriginalData) {
+    Viewer.prototype.showOriginalOrRepairedData = function (showOriginalData: boolean) {
         this.selectOriginalOrRepairedData(showOriginalData);
         this.drawChart();
         this.updateDirectLink();
@@ -10700,7 +5250,7 @@ SplitsBrowser.Messages = {} as any;
             this.selectOriginalOrRepairedData(true);
         }
 
-        if (parsedQueryString.filterText !== '') {
+        if (parsedQueryString.filterText !== "") {
             this.competitorList.setFilterText(parsedQueryString.filterText);
         }
     };
@@ -10720,15 +5270,15 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {String} key - The key of the message to show.
     * @sb-param {Object} params - Object mapping parameter names to values.
     */
-    function showLoadFailureMessage(key, params) {
-        const errorDiv = d3.select('body')
-            .append('div')
-            .classed('sbErrors', true);
+    function showLoadFailureMessage(key: string, params) {
+        const errorDiv = d3.select("body")
+            .append("div")
+            .classed("sbErrors", true);
 
-        errorDiv.append('h1')
-            .text(getMessage('LoadFailedHeader'));
+        errorDiv.append("h1")
+            .text(getMessage("LoadFailedHeader"));
 
-        errorDiv.append('p')
+        errorDiv.append("p")
             .text(getMessageWithFormatting(key, params));
     }
 
@@ -10741,7 +5291,7 @@ SplitsBrowser.Messages = {} as any;
     *     This element can be specified by a CSS selector for the element, or
     *     the HTML element itself, although this behaviour is deprecated.
     */
-    SplitsBrowser.readEvent = function (data, options) {
+    SplitsBrowser.readEvent = function (data: string, options: SplitsbrowserOptions) {
         if (!checkD3Version4()) {
             return;
         }
@@ -10750,8 +5300,8 @@ SplitsBrowser.Messages = {} as any;
         try {
             eventData = parseEventData(data);
         } catch (e) {
-            if (e.name === 'InvalidData') {
-                showLoadFailureMessage('LoadFailedInvalidData', { '$$MESSAGE$$': e.message });
+            if (e.name === "InvalidData") {
+                showLoadFailureMessage("LoadFailedInvalidData", { "$$MESSAGE$$": e.message });
                 return;
             } else {
                 throw e;
@@ -10759,13 +5309,13 @@ SplitsBrowser.Messages = {} as any;
         }
 
         if (eventData === null) {
-            showLoadFailureMessage('LoadFailedUnrecognisedData', new Object);
+            showLoadFailureMessage("LoadFailedUnrecognisedData", new Object);
         } else {
             if (eventData.needsRepair()) {
                 repairEventData(eventData);
             }
 
-            if (typeof options === 'string') {
+            if (typeof options === "string") {
                 // Deprecated; support the top-bar specified only as a
                 // string.
                 options = { topBar: options };
@@ -10807,11 +5357,11 @@ SplitsBrowser.Messages = {} as any;
     *     This element can be specified by a CSS selector for the element, or
     *     the HTML element itself, although this behaviour is deprecated.
     */
-    function readEventData(data, status, options) {
-        if (status === 'success') {
+    function readEventData(data: string, status: string, options: SplitsbrowserOptions): void {
+        if (status === "success") {
             SplitsBrowser.readEvent(data, options);
         } else {
-            showLoadFailureMessage('LoadFailedStatusNotSuccess', { '$$STATUS$$': status });
+            showLoadFailureMessage("LoadFailedStatusNotSuccess", { "$$STATUS$$": status });
         }
     }
 
@@ -10821,8 +5371,8 @@ SplitsBrowser.Messages = {} as any;
     * @sb-param {String} textStatus - The text status of the request.
     * @sb-param {String} errorThrown - The error message returned from the server.
     */
-    function readEventDataError(jqXHR, textStatus, errorThrown) {
-        showLoadFailureMessage('LoadFailedReadError', { '$$ERROR$$': errorThrown });
+    function readEventDataError(jqXHR, textStatus: string, errorThrown: string): void {
+        showLoadFailureMessage("LoadFailedReadError", { "$$ERROR$$": errorThrown });
     }
 
     /**
@@ -10834,7 +5384,8 @@ SplitsBrowser.Messages = {} as any;
     *     This element can be specified by a CSS selector for the element, or
     *     the HTML element itself, although this behaviour is deprecated.
     */
-    SplitsBrowser.loadEvent = function (eventUrl, options) {
+    SplitsBrowser.loadEvent = function (eventUrl: string,
+        options: SplitsbrowserOptions) {
         if (!checkD3Version4()) {
             return;
         }
@@ -10842,9 +5393,9 @@ SplitsBrowser.Messages = {} as any;
         // Load the event data
         $.ajax({
             url: eventUrl,
-            data: '',
+            data: "",
             success: function (data, status) { readEventData(data, status, options); },
-            dataType: 'text',
+            dataType: "text",
             error: readEventDataError
         });
     };
@@ -10852,147 +5403,147 @@ SplitsBrowser.Messages = {} as any;
 
 SplitsBrowser.Messages.en_gb = {
 
-    ApplicationVersion: 'SplitsBrowser - Version $$VERSION$$',
-    Language: 'English',
+    ApplicationVersion: "SplitsBrowser - Version $$VERSION$$",
+    Language: "English",
 
-    MispunchedShort: 'mp',
-    NonCompetitiveShort: 'n/c',
+    MispunchedShort: "mp",
+    NonCompetitiveShort: "n/c",
 
-    StartName: 'Start',
-    ControlName: 'Control $$CODE$$',
-    FinishName: 'Finish',
+    StartName: "Start",
+    ControlName: "Control $$CODE$$",
+    FinishName: "Finish",
 
     // The start and finish, as they appear at the top of the chart.
-    StartNameShort: 'S',
-    FinishNameShort: 'F',
+    StartNameShort: "S",
+    FinishNameShort: "F",
 
     // Button labels.
-    SelectAllCompetitors: 'All',
-    SelectNoCompetitors: 'None',
-    SelectCrossingRunners: 'Crossing runners',
+    SelectAllCompetitors: "All",
+    SelectNoCompetitors: "None",
+    SelectCrossingRunners: "Crossing runners",
 
-    LowerXAxisChartLabel: 'Time (min)',
+    LowerXAxisChartLabel: "Time (min)",
 
     // Chart type names and Y-axis labels.
-    SplitsGraphChartType: 'Splits graph',
-    SplitsGraphYAxisLabel: 'Time (min)',
-    RaceGraphChartType: 'Race graph',
-    RaceGraphYAxisLabel: 'Time',
-    PositionAfterLegChartType: 'Position after leg',
-    SplitPositionChartType: 'Split position',
-    PositionYAxisLabel: 'Position', // Shared between position-after-leg and split-position.
-    PercentBehindChartType: 'Percent behind',
-    PercentBehindYAxisLabel: 'Percent behind',
-    ResultsTableChartType: 'Results table',
+    SplitsGraphChartType: "Splits graph",
+    SplitsGraphYAxisLabel: "Time (min)",
+    RaceGraphChartType: "Race graph",
+    RaceGraphYAxisLabel: "Time",
+    PositionAfterLegChartType: "Position after leg",
+    SplitPositionChartType: "Split position",
+    PositionYAxisLabel: "Position", // Shared between position-after-leg and split-position.
+    PercentBehindChartType: "Percent behind",
+    PercentBehindYAxisLabel: "Percent behind",
+    ResultsTableChartType: "Results table",
 
-    ChartTypeSelectorLabel: 'View: ',
+    ChartTypeSelectorLabel: "View: ",
 
-    ClassSelectorLabel: 'Class: ',
-    AdditionalClassSelectorLabel: 'and',
-    NoClassesLoadedPlaceholder: '[No classes loaded]',
+    ClassSelectorLabel: "Class: ",
+    AdditionalClassSelectorLabel: "and",
+    NoClassesLoadedPlaceholder: "[No classes loaded]",
 
     // Placeholder text shown when additional classes are available to be
     // selected but none have been selected.
-    NoAdditionalClassesSelectedPlaceholder: '<select>',
+    NoAdditionalClassesSelectedPlaceholder: "<select>",
 
-    ComparisonSelectorLabel: 'Compare with ',
-    CompareWithWinner: 'Winner',
-    CompareWithFastestTime: 'Fastest time',
-    CompareWithFastestTimePlusPercentage: 'Fastest time + $$PERCENT$$%',
-    CompareWithAnyRunner: 'Any runner...',
-    CompareWithAnyRunnerLabel: 'Runner: ',
+    ComparisonSelectorLabel: "Compare with ",
+    CompareWithWinner: "Winner",
+    CompareWithFastestTime: "Fastest time",
+    CompareWithFastestTimePlusPercentage: "Fastest time + $$PERCENT$$%",
+    CompareWithAnyRunner: "Any runner...",
+    CompareWithAnyRunnerLabel: "Runner: ",
     // Warning message shown to the user when a comparison option cannot be
     // chosen because the course has no winner.
-    CannotCompareAsNoWinner: 'Cannot compare against \'$$OPTION$$\' because no competitors in this class complete the course.',
+    CannotCompareAsNoWinner: "Cannot compare against '$$OPTION$$' because no competitors in this class complete the course.",
 
     // Label of checkbox that shows the original data as opposed to the
     // 'repaired' data.  This only appears if data that needs repair has been
     // loaded.
-    ShowOriginalData: 'Show original data',
+    ShowOriginalData: "Show original data",
 
     // Tooltip of 'Show original' checkbox.  This appears when SplitsBrowser
     // deduces that some of the cumulatives times in the data shown are
     // unrealistic.
-    ShowOriginalDataTooltip: 'SplitsBrowser has removed some of the times from the data in the selected class(es), believing these times to be unrealistic.  ' +
-        'Use this checkbox to control whether the amended or original data is plotted.',
+    ShowOriginalDataTooltip: "SplitsBrowser has removed some of the times from the data in the selected class(es), believing these times to be unrealistic.  " +
+        "Use this checkbox to control whether the amended or original data is plotted.",
 
-    StatisticsTotalTime: 'Total time',
-    StatisticsSplitTime: 'Split time',
-    StatisticsBehindFastest: 'Behind fastest',
-    StatisticsTimeLoss: 'Time loss',
+    StatisticsTotalTime: "Total time",
+    StatisticsSplitTime: "Split time",
+    StatisticsBehindFastest: "Behind fastest",
+    StatisticsTimeLoss: "Time loss",
 
-    ResultsTableHeaderSingleControl: '1 control',
-    ResultsTableHeaderMultipleControls: '$$NUM$$ controls',
-    ResultsTableHeaderCourseLength: '$$DISTANCE$$km',
-    ResultsTableHeaderClimb: '$$CLIMB$$m',
+    ResultsTableHeaderSingleControl: "1 control",
+    ResultsTableHeaderMultipleControls: "$$NUM$$ controls",
+    ResultsTableHeaderCourseLength: "$$DISTANCE$$km",
+    ResultsTableHeaderClimb: "$$CLIMB$$m",
 
-    ResultsTableHeaderControlNumber: '#',
-    ResultsTableHeaderName: 'Name',
-    ResultsTableHeaderTime: 'Time',
+    ResultsTableHeaderControlNumber: "#",
+    ResultsTableHeaderName: "Name",
+    ResultsTableHeaderTime: "Time",
 
     // Alert message shown when you click 'Crossing runners' but there are no
     // crossing runners to show.
-    RaceGraphNoCrossingRunners: '$$NAME$$ has no crossing runners.',
-    RaceGraphDisabledAsStartTimesMissing: 'The Race Graph cannot be shown because the start times of the competitors are missing.',
+    RaceGraphNoCrossingRunners: "$$NAME$$ has no crossing runners.",
+    RaceGraphDisabledAsStartTimesMissing: "The Race Graph cannot be shown because the start times of the competitors are missing.",
 
-    LoadFailedHeader: 'SplitsBrowser \u2013 Error',
-    LoadFailedInvalidData: 'Sorry, it wasn\'t possible to read in the results data, as the data appears to be invalid: \'$$MESSAGE$$\'.',
-    LoadFailedUnrecognisedData: 'Sorry, it wasn\'t possible to read in the results data.  The data doesn\'t appear to be in any recognised format.',
-    LoadFailedStatusNotSuccess: 'Sorry, it wasn\'t possible to read in the results data.  The status of the request was \'$$STATUS$$\'.',
-    LoadFailedReadError: 'Sorry, it wasn\'t possible to load the results data.  The error message returned from the server was \'$$ERROR$$\'.',
+    LoadFailedHeader: "SplitsBrowser \u2013 Error",
+    LoadFailedInvalidData: "Sorry, it wasn't possible to read in the results data, as the data appears to be invalid: '$$MESSAGE$$'.",
+    LoadFailedUnrecognisedData: "Sorry, it wasn't possible to read in the results data.  The data doesn't appear to be in any recognised format.",
+    LoadFailedStatusNotSuccess: "Sorry, it wasn't possible to read in the results data.  The status of the request was '$$STATUS$$'.",
+    LoadFailedReadError: "Sorry, it wasn't possible to load the results data.  The error message returned from the server was '$$ERROR$$'.",
 
     // Chart popups.
 
-    SelectedClassesPopupHeader: 'Selected classes',
+    SelectedClassesPopupHeader: "Selected classes",
 
     // Placeholder text shown when the Selected classes dialog is empty,
     // because no competitors registered a split for the control, or those
     // that did only registered a dubious split.
-    SelectedClassesPopupPlaceholder: 'No competitors',
+    SelectedClassesPopupPlaceholder: "No competitors",
 
     // Header for the 'Fastest leg time' popup dialog.
-    FastestLegTimePopupHeader: 'Fastest leg-time $$START$$ to $$END$$',
+    FastestLegTimePopupHeader: "Fastest leg-time $$START$$ to $$END$$",
 
     // Header for the nearby-competitors dialog on the race graph.
-    NearbyCompetitorsPopupHeader: '$$START$$ - $$END$$: $$CONTROL$$',
+    NearbyCompetitorsPopupHeader: "$$START$$ - $$END$$: $$CONTROL$$",
 
     // Placeholder text shown in the nearby-competitors dialog on the race
     // graph when there aren't any competitors visiting the control within the
     // +/- 2 minute window.
-    NoNearbyCompetitors: 'No competitors',
+    NoNearbyCompetitors: "No competitors",
 
     // Link that appears at the top and opens SplitsBrowser with the settings
     // (selected classes, competitors, comparison, chart type, etc.) that are
     // currently shown.
-    DirectLink: 'Link',
-    DirectLinkToolTip: 'Links to a URL that opens SplitsBrowser with the current settings',
+    DirectLink: "Link",
+    DirectLinkToolTip: "Links to a URL that opens SplitsBrowser with the current settings",
 
     // The placeholder text shown in the competitor-list filter box when no
     // text has been entered into this box.
-    CompetitorListFilter: 'Filter',
+    CompetitorListFilter: "Filter",
 
     // Labels that appear beside a competitor on the Results Table to indicate
     // that they did not start, did not finish, or were disqualified.
-    DidNotStartShort: 'dns',
-    DidNotFinishShort: 'dnf',
-    DisqualifiedShort: 'dsq',
+    DidNotStartShort: "dns",
+    DidNotFinishShort: "dnf",
+    DisqualifiedShort: "dsq",
 
     // Placeholder message shown inside the competitor list if all competitors
     // in the class did not start.
-    NoCompetitorsStarted: 'No competitors started',
+    NoCompetitorsStarted: "No competitors started",
 
     // Label of the language-selector control.
-    LanguageSelectorLabel: 'Language:',
+    LanguageSelectorLabel: "Language:",
 
     // Label that appears beside a competitor on the Results Table to indicate
     // that they were over the maximum time.
-    OverMaxTimeShort: 'over max time',
+    OverMaxTimeShort: "over max time",
 
     // Alert message shown when you click 'Crossing runners' but there are no
     // crossing runners to show and also a filter is active.
-    RaceGraphNoCrossingRunnersFiltered: '$$NAME$$ has no crossing runners among the filtered competitors.',
+    RaceGraphNoCrossingRunnersFiltered: "$$NAME$$ has no crossing runners among the filtered competitors.",
 
     // Tooltip of the warning-triangle shown along the top if warnings were
     // issued reading in the file.
-    WarningsTooltip: 'It was not possible to read all of the data for this event.  One or more competitors or classes may have been omitted.  Click for more details.'
+    WarningsTooltip: "It was not possible to read all of the data for this event.  One or more competitors or classes may have been omitted.  Click for more details."
 };
