@@ -50,7 +50,7 @@ export class ChartTypeClass {
         },
         SplitPosition: {
             nameKey: "SplitPositionChartType",
-            dataSelector: function (comp) { return comp.splitRanks; },
+            dataSelector:  (comp) => { return comp.splitRanks; },
             skipStart: true,
             yAxisLabelKey: "PositionYAxisLabel",
             isRaceGraph: false,

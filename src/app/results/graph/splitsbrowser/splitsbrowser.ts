@@ -2173,7 +2173,7 @@ import { FastestSplitsPopupData, SplitsPopupData } from "./splitspopupdata";
     *      empty string to indicate no suffix).
     * @sb-return Competitor name and suffix, formatted.
     */
-    function formatNameAndSuffix(nam: string, suffix: string): string {
+    function formatNameAndSuffix(name: string, suffix: string): string {
         return (suffix === "") ? name : name + " (" + suffix + ")";
     }
 
