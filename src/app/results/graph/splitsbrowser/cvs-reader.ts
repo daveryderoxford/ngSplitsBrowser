@@ -51,7 +51,7 @@ function parseCompetitors(index: number,
 
         const cumTimes = [0];
         let lastCumTimeRecorded = 0;
-        parts.map(function (part) {
+        parts.map( (part) => {
             const splitTime = parseTime(part);
             if (splitTime !== null && splitTime > 0) {
                 lastCumTimeRecorded += splitTime;
@@ -100,7 +100,7 @@ function parseCourseClass(courseClass: string, warnings: Array<string>) {
             // we may as well ignore this.
             throw new InvalidData("Expected a non-negative control count, got " + controlCount + " instead");
         } else {
-            const competitors = lines.map(function (line, index) {
+            const competitors = lines.map( (line, index) => {
                 return parseCompetitors(index, line, controlCount, className, warnings);
             })
                 .filter(isNotNull);
@@ -131,12 +131,12 @@ export function parseCSVventData(data: string): Results {
     // Remove trailing commas.
     data = data.replace(/,+\n/g, "\n").replace(/,+$/, "");
 
-    const classSections = data.split(/\n\n/).map(function (s) { return s.trim(); }).filter(isTrue);
+    const classSections = data.split(/\n\n/).map( (s) => { return s.trim(); }).filter(isTrue);
     const warnings = [] as Array<string>;
 
-    let classes = classSections.map(function (section) { return parseCourseClass(section, warnings); });
+    let classes = classSections.map( (section) => { return parseCourseClass(section, warnings); });
 
-    classes = classes.filter(function (courseClass) { return !courseClass.isEmpty(); });
+    classes = classes.filter( (courseClass) => { return !courseClass.isEmpty(); });
 
     if (classes.length === 0) {
         throw new InvalidData("No competitor data was found");
@@ -144,7 +144,7 @@ export function parseCSVventData(data: string): Results {
 
     // Nulls are for the course length, climb and controls, which aren't in
     // the source data files, so we can't do anything about them.
-    const courses = classes.map(function (cls) { return new Course(cls.name, [cls], null, null, null); });
+    const courses = classes.map( (cls) => { return new Course(cls.name, [cls], null, null, null); });
 
     for (let i = 0; i < classes.length; i += 1) {
         classes[i].setCourse(courses[i]);

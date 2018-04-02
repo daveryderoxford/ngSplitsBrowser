@@ -44,7 +44,7 @@ export function parseIOFXMLEventData(data: string): Results {
 
     const warnings = [];
 
-    classResultElements.forEach(function (classResultElement) {
+    classResultElements.forEach( (classResultElement) => {
         const parsedClass = parseClassData(classResultElement, reader, warnings);
         if (parsedClass === null) {
             // Class could not be parsed.
@@ -74,9 +74,9 @@ export function parseIOFXMLEventData(data: string): Results {
     });
 
     // Now build up the array of courses.
-    const courses = tempCourses.map(function (tempCourse) {
+    const courses = tempCourses.map( (tempCourse) => {
         const course = new Course(tempCourse.name, tempCourse.classes, tempCourse.length, tempCourse.climb, tempCourse.controls);
-        tempCourse.classes.forEach(function (courseClass) { courseClass.setCourse(course); });
+        tempCourse.classes.forEach( (courseClass) => { courseClass.setCourse(course); });
         return course;
     });
 
@@ -654,11 +654,11 @@ function parseCompetitor(element, number, reader, warnings) {
     const totalTime = reader.readTotalTime(resultElement);
 
     const splitTimes = $("> SplitTime", resultElement).toArray();
-    const splitData = splitTimes.filter(function (splitTime) { return !reader.isAdditional($(splitTime)); })
-        .map(function (splitTime) { return reader.readSplitTime($(splitTime)); });
+    const splitData = splitTimes.filter( (splitTime) => { return !reader.isAdditional($(splitTime)); })
+        .map( (splitTime) => { return reader.readSplitTime($(splitTime)); });
 
-    const controls = splitData.map(function (datum) { return datum.code; });
-    const cumTimes = splitData.map(function (datum) { return datum.time; });
+    const controls = splitData.map( (datum) => { return datum.code; });
+    const cumTimes = splitData.map( (datum) => { return datum.time; });
 
     cumTimes.unshift(0); // Prepend a zero time for the start.
     cumTimes.push(totalTime);

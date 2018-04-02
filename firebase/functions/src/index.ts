@@ -25,12 +25,12 @@ interface Club {
 }
 ///////////////////
 
-import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin'
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin"
 
 admin.initializeApp(functions.config().firebase);
 
-exports.eventIndices = functions.database.ref('/events/{key}').onWrite(async event => {
+exports.eventIndices = functions.database.ref("/events/{key}").onWrite(async event => {
 
   const written = event.data.val() as OEvent;
   const previous: OEvent = event.data.previous.val();
@@ -47,7 +47,7 @@ exports.eventIndices = functions.database.ref('/events/{key}').onWrite(async eve
 
 });
 
-exports.eventClubReferencesUpdate = functions.database.ref('/events/{key}').onUpdate(async event => {
+exports.eventClubReferencesUpdate = functions.database.ref("/events/{key}").onUpdate(async event => {
   const written: OEvent = event.data.val();
   const previous: OEvent = event.data.previous.val();
 
@@ -58,18 +58,18 @@ exports.eventClubReferencesUpdate = functions.database.ref('/events/{key}').onUp
   }
 });
 
-exports.eventClubReferencesDelete = functions.database.ref('/events/{key}').onDelete(async event => {
+exports.eventClubReferencesDelete = functions.database.ref("/events/{key}").onDelete(async event => {
   await removeClubReference(event.data.previous.val());
 })
 
-exports.eventClubReferencesCreate = functions.database.ref('/events/{key}').onCreate(async event => {
+exports.eventClubReferencesCreate = functions.database.ref("/events/{key}").onCreate(async event => {
   await addClubReference(event.data.val());
 });
 
 async function addClubReference(event: OEvent): Promise<void> {
   const clubRef = getClubRef(event);
 
-  const clubSnapshot: admin.database.DataSnapshot = await clubRef.once('value');
+  const clubSnapshot: admin.database.DataSnapshot = await clubRef.once("value");
   let club = clubSnapshot.val();
 
   if (!club) {
@@ -78,23 +78,23 @@ async function addClubReference(event: OEvent): Promise<void> {
       nationality: event.nationality,
       numEvents: 0
     }
-    console.log('Creating new club ' + club.name + '  ' + club.nationality);
+    console.log("Creating new club " + club.name + "  " + club.nationality);
   }
   club.numEvents = club.numEvents + 1;
 
   await clubRef.set(club);
 
-  console.log('Added club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents);
+  console.log("Added club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents);
 
 }
 
 async function removeClubReference(event): Promise<void> {
   const clubRef = getClubRef(event);
-  const clubSnapshot = await clubRef.once('value') as admin.database.DataSnapshot;
+  const clubSnapshot = await clubRef.once("value") as admin.database.DataSnapshot;
   const club: Club = clubSnapshot.val();
 
   if (!club) {
-    console.log('Removing reference club not found');
+    console.log("Removing reference club not found");
     return
   }
 
@@ -105,18 +105,18 @@ async function removeClubReference(event): Promise<void> {
     await clubRef.set(club);
   }
 
-  console.log('Removed club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents);
+  console.log("Removed club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents);
 }
 
 function getClubRef(event: OEvent): admin.database.Reference {
   let key = padRight(event.club.toLowerCase(), 10) + event.nationality;
   key = encodeAsFirebaseKey(key);
-  const ref = admin.database().ref('clubs/' + key);
+  const ref = admin.database().ref("clubs/" + key);
   return (ref);
 }
 
 function decreasingTimeIndex(dateStr: string): string {
-  const d1 = new Date('2050-01-01 00:00:00').getTime() / 1000;
+  const d1 = new Date("2050-01-01 00:00:00").getTime() / 1000;
   const d2 = new Date(dateStr).getTime() / 1000;
   const minusDate = d1 - d2;
 
@@ -126,18 +126,18 @@ function decreasingTimeIndex(dateStr: string): string {
 
 function padRight(str: string, length: number): string {
   while (str.length < length) {
-    str = str + '-';
+    str = str + "-";
   }
   return str;
 }
 
 function encodeAsFirebaseKey(string) {
-  return string.replace(/\%/g, '%25')
-    .replace(/\./g, '%2E')
-    .replace(/\#/g, '%23')
-    .replace(/\$/g, '%24')
-    .replace(/\//g, '%2F')
-    .replace(/\[/g, '%5B')
-    .replace(/\]/g, '%5D');
+  return string.replace(/\%/g, "%25")
+    .replace(/\./g, "%2E")
+    .replace(/\#/g, "%23")
+    .replace(/\$/g, "%24")
+    .replace(/\//g, "%2F")
+    .replace(/\[/g, "%5B")
+    .replace(/\]/g, "%5D");
 };
 

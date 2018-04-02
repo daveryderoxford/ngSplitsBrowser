@@ -19,7 +19,7 @@ const parseTime = TimeUtilities.parseTime;
 // Indexes of the various columns relative to the column for control-1.
 const COLUMN_INDEXES: any = new Object();
 
-[44, 46, 60].forEach(function (columnOffset) {
+[44, 46, 60].forEach( (columnOffset) => {
     COLUMN_INDEXES[columnOffset] = {
         course: columnOffset - 7,
         distance: columnOffset - 6,
@@ -32,7 +32,7 @@ const COLUMN_INDEXES: any = new Object();
     };
 });
 
-[44, 46].forEach(function (columnOffset) {
+[44, 46].forEach( (columnOffset) => {
     COLUMN_INDEXES[columnOffset].nonCompetitive = columnOffset - 38;
     COLUMN_INDEXES[columnOffset].startTime = columnOffset - 37;
     COLUMN_INDEXES[columnOffset].time = columnOffset - 35;
@@ -110,7 +110,7 @@ class OEReader {
         // Discard the header row.
         this.lines.shift();
 
-        this.lines.forEach(function (line, lineIndex) {
+        this.lines.forEach( (line, lineIndex) => {
             this.readLine(line, lineIndex + 1, delimiter);
         }, this);
 
@@ -321,7 +321,7 @@ class OEReader {
     private createCourseIfNecessary(row: Array<string>, numControls: number) {
         const courseName = row[this.columnIndexes.course];
         if (!this.courseDetails.has(courseName)) {
-            const controlNums = d3.range(0, numControls).map(function (controlIdx) {
+            const controlNums = d3.range(0, numControls).map( (controlIdx) => {
                 return row[this.columnIndexes.control1 + 2 * controlIdx];
             }, this);
             this.courseDetails.set(courseName, {
@@ -341,7 +341,7 @@ class OEReader {
         const className = this.getClassName(row);
         const courseName = row[this.columnIndexes.course];
 
-        if (!this.classCoursePairs.some(function (pair) { return pair[0] === className && pair[1] === courseName; })) {
+        if (!this.classCoursePairs.some( (pair) => { return pair[0] === className && pair[1] === courseName; })) {
             this.classCoursePairs.push([className, courseName]);
         }
     };
@@ -456,7 +456,8 @@ class OEReader {
             return;
         }
 
-        const row = line.split(delimiter).map(function (s) { return s.trim(); }).map(this.dequote);
+        const row = line.split(delimiter).map( (s) => { return s.trim(); })
+                                         .map( this.dequote );
 
         // Check the row is long enough to have all the data besides the
         // controls data.
@@ -488,7 +489,7 @@ class OEReader {
         const classesToCourses = <any>d3.map();
         const coursesToClasses = <any>d3.map();
 
-        this.classCoursePairs.forEach(function (pair) {
+        this.classCoursePairs.forEach( (pair) => {
             const className = pair[0];
             const courseName = pair[1];
 
@@ -515,7 +516,7 @@ class OEReader {
     private createClasses() {
         const classNames = this.classes.keys();
         classNames.sort();
-        return classNames.map(function (className) {
+        return classNames.map( (className) => {
             const courseClass = this.classes.get(className);
             return new CourseClass(className, courseClass.numControls, courseClass.competitors);
         }, this);
@@ -584,15 +585,17 @@ class OEReader {
         }
 
         // Mark all of the courses that we handled here as done.
-        relatedCourseNames.forEach(function (courseName1) {
+        relatedCourseNames.forEach( (courseName1) => {
             doneCourseNames.add(courseName1);
         });
 
-        const classesForThisCourse = relatedClassNames.map(function (className1) { return classesMap.get(className1); });
+        const classesForThisCourse = relatedClassNames.map( (className1) => {
+                    return classesMap.get(className1);
+                 });
         const details = this.courseDetails.get(initCourseName);
         const course = new Course(initCourseName, classesForThisCourse, details.length, details.climb, details.controls);
 
-        classesForThisCourse.forEach(function (courseClass) {
+        classesForThisCourse.forEach( (courseClass) => {
             courseClass.setCourse(course);
         });
 
@@ -617,13 +620,13 @@ class OEReader {
         const doneCourseNames = d3.set();
 
         const classesMap = d3.map();
-        classes.forEach(function (courseClass) {
+        classes.forEach( (courseClass) => {
             classesMap.set(courseClass.name, courseClass);
         });
 
         // List of all Course objects created so far.
         const courses = [];
-        manyToManyMaps.coursesToClasses.keys().forEach(function (courseName) {
+        manyToManyMaps.coursesToClasses.keys().forEach( (courseName) => {
             if (!doneCourseNames.has(courseName)) {
                 const course = this.createCourseFromLinkedClassesAndCourses(courseName, manyToManyMaps, doneCourseNames, classesMap);
                 courses.push(course);

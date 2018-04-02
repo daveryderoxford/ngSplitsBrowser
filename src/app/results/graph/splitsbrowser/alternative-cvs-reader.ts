@@ -246,7 +246,7 @@ private trimTrailingEmptyCells(array: Array<string>) {
         // same list of controls can be assumed to be using the same course.
         const coursesByControlsLists = <any>d3.map();
 
-        this.classes.entries().forEach(function (keyValuePair) {
+        this.classes.entries().forEach( (keyValuePair) => {
             const className = keyValuePair.key;
             const cls = keyValuePair.value;
             const courseClass = new CourseClass(className, cls.controls.length, cls.competitors);
@@ -269,9 +269,9 @@ private trimTrailingEmptyCells(array: Array<string>) {
         });
 
         const courses = [];
-        coursesByControlsLists.values().forEach(function (courseObject) {
+        coursesByControlsLists.values().forEach( (courseObject) => {
             const course = new Course(courseObject.name, courseObject.classes, courseObject.length, courseObject.climb, courseObject.controls);
-            courseObject.classes.forEach(function (courseClass) { courseClass.setCourse(course); });
+            courseObject.classes.forEach( (courseClass) => { courseClass.setCourse(course); });
             courses.push(course);
         });
 

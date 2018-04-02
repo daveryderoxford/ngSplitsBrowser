@@ -473,7 +473,7 @@ export class Competitor {
             throw new InvalidData("Cannot adjust competitor times because a null value is in the reference data");
         }
 
-        const adjustedTimes = this.cumTimes.map(function (time, idx) { return subtractIfNotNull(time, referenceCumTimes[idx]); });
+        const adjustedTimes = this.cumTimes.map( (time, idx) => { return subtractIfNotNull(time, referenceCumTimes[idx]); });
         return adjustedTimes;
     };
 
@@ -485,7 +485,7 @@ export class Competitor {
     public getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes: Array<sbTime>): Array<sbTime> {
         const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
         const startTime = this.startTime;
-        return adjustedTimes.map(function (adjTime) { return addIfNotNull(adjTime, startTime); });
+        return adjustedTimes.map( (adjTime) => { return addIfNotNull(adjTime, startTime); });
     };
 
     /**
@@ -503,7 +503,7 @@ export class Competitor {
         }
 
         const percentsBehind = [0];
-        this.splitTimes.forEach(function (splitTime, index) {
+        this.splitTimes.forEach( (splitTime, index) => {
             if (splitTime === null) {
                 percentsBehind.push(null);
             } else {
@@ -532,14 +532,14 @@ export class Competitor {
                 throw new InvalidData("Cannot determine time loss of competitor when there is a NaN value in the fastest splits");
             }
 
-            if (fastestSplitTimes.some(function (split) { return split === 0; })) {
+            if (fastestSplitTimes.some( (split) => { return split === 0; })) {
                 // Someone registered a zero split on this course.  In this
                 // situation the time losses don't really make sense.
-                this.timeLosses = this.splitTimes.map(function () { return NaN; });
+                this.timeLosses = this.splitTimes.map( () => { return NaN; });
             } else if (this.splitTimes.some(isNaNStrict)) {
                 // Competitor has some dubious times.  Unfortunately this
                 // means we cannot sensibly calculate the time losses.
-                this.timeLosses = this.splitTimes.map(function () { return NaN; });
+                this.timeLosses = this.splitTimes.map( () => { return NaN; });
             } else {
                 // We use the same algorithm for calculating time loss as the
                 // original, with a simplification: we calculate split ratios
@@ -548,7 +548,7 @@ export class Competitor {
                 // is its time loss rate plus 1.  Not subtracting one at the start
                 // means that we then don't have to add it back on at the end.
 
-                const splitRatios = this.splitTimes.map(function (splitTime, index) {
+                const splitRatios = this.splitTimes.map( (splitTime, index) => {
                     return splitTime / fastestSplitTimes[index];
                 });
 
@@ -562,7 +562,7 @@ export class Competitor {
                     medianSplitRatio = (splitRatios[midpt - 1] + splitRatios[midpt]) / 2;
                 }
 
-                this.timeLosses = this.splitTimes.map(function (splitTime, index) {
+                this.timeLosses = this.splitTimes.map( (splitTime, index) => {
                     return Math.round(splitTime - fastestSplitTimes[index] * medianSplitRatio);
                 });
             }

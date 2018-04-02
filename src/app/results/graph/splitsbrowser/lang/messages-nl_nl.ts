@@ -21,7 +21,7 @@
 
 // tslint:disable:max-line-length
 
-SplitsBrowser.Messages.nl_nl = {
+export const nl_nl = {
 
     ApplicationVersion: "SplitsBrowser - Versie $$VERSION$$",
     Language: "Nederlands",
@@ -85,7 +85,7 @@ SplitsBrowser.Messages.nl_nl = {
     // deduces that some of the cumulatives times in the data shown are
     // unrealistic.
     ShowOriginalDataTooltip: "SplitsBrowser heeft sommige tijden verwijderd uit de gegevens van de geselecteerde route omdat de tijden als ongeloofwaardig worden beschouwd.  " +
-        "Gebruik deze checkbox om te controleren of er originele of gewijzigde gegevens worden gebruikt.",
+    "Gebruik deze checkbox om te controleren of er originele of gewijzigde gegevens worden gebruikt.",
 
     StatisticsTotalTime: "Totale tijd",
     StatisticsSplitTime: "Split tijd",

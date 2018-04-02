@@ -19,9 +19,9 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
- // tslint:disable:max-line-length
+// tslint:disable:max-line-length
 
-SplitsBrowser.Messages.sl_si = {
+export const sl_si = {
 
     ApplicationVersion: "SplitsBrowser - Verzija $$VERSION$$",
     Language: "Slovenščina",
@@ -85,7 +85,7 @@ SplitsBrowser.Messages.sl_si = {
     // deduces that some of the cumulatives times in the data shown are
     // unrealistic.
     ShowOriginalDataTooltip: "SplitsBrowser je odstranil nekaj podatkov za izbrano(e) kategorijo(e), saj je ocenil, da niso realni. " +
-                             "Uporabi ta checkbox za izris bodisi popravljenih bodisi originalnih podatkov.",
+    "Uporabi ta checkbox za izris bodisi popravljenih bodisi originalnih podatkov.",
 
     StatisticsTotalTime: "Skupni čas",
     StatisticsSplitTime: "Vmesni čas",

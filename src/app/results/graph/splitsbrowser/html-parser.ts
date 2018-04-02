@@ -101,7 +101,7 @@ function getFontBits(text) {
 * @sb-return {Array} Array of strings of text inside <td> elements.
 */
 function getTableDataBits(text) {
-    return getHtmlStrippedRegexMatches(/<td[^>]*>(.*?)<\/td>/g, text).map(function (s) { return s.trim(); });
+    return getHtmlStrippedRegexMatches(/<td[^>]*>(.*?)<\/td>/g, text).map( (s) => { return s.trim(); });
 }
 
 /**
@@ -112,7 +112,7 @@ function getTableDataBits(text) {
 * @sb-return {Array} Array of strings of text inside <td> elements.
 */
 function getNonEmptyTableDataBits(text) {
-    return getTableDataBits(text).filter(function (bit) { return bit !== ""; });
+    return getTableDataBits(text).filter( (bit) => { return bit !== ""; });
 }
 
 /**
@@ -124,7 +124,7 @@ function getNonEmptyTableDataBits(text) {
 */
 function getNonEmptyTableHeaderBits(text) {
     const matches = getHtmlStrippedRegexMatches(/<th[^>]*>(.*?)<\/th>/g, text);
-    return matches.filter(function (bit) { return bit !== ""; });
+    return matches.filter( (bit) => { return bit !== ""; });
 }
 
 /**

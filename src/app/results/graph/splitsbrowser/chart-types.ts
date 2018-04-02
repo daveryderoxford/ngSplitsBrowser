@@ -1,3 +1,5 @@
+import { Competitor, DubiousTimeInfo } from "app/results/graph/splitsbrowser/competitor";
+
 export interface ChartType {
     nameKey: string;
     dataSelector: any;
@@ -14,7 +16,7 @@ export class ChartTypeClass {
     public static chartTypes = {
         SplitsGraph: {
             nameKey: "SplitsGraphChartType",
-            dataSelector: function (comp, referenceCumTimes) {
+            dataSelector: (comp, referenceCumTimes) => {
                 return comp.getCumTimesAdjustedToReference(referenceCumTimes).map(ChartTypeClass.secondsToMinutes);
             },
             skipStart: false,
@@ -22,11 +24,11 @@ export class ChartTypeClass {
             isRaceGraph: false,
             isResultsTable: false,
             minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: ChartTypeClass.getIndexesAroundDubiousCumulativeTimes
+            indexesAroundDubiousTimesFunc: (comp) => ChartTypeClass.getIndexesAroundDubiousCumulativeTimes(comp)
         },
         RaceGraph: {
             nameKey: "RaceGraphChartType",
-            dataSelector: function (comp, referenceCumTimes) {
+            dataSelector: (comp, referenceCumTimes) => {
                 return comp.getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes).map(ChartTypeClass.secondsToMinutes);
             },
             skipStart: false,
@@ -34,17 +36,17 @@ export class ChartTypeClass {
             isRaceGraph: true,
             isResultsTable: false,
             minViewableControl: 0,
-            indexesAroundDubiousTimesFunc: ChartTypeClass.getIndexesAroundDubiousCumulativeTimes
+            indexesAroundDubiousTimesFunc: (comp) => ChartTypeClass.getIndexesAroundDubiousCumulativeTimes(comp)
         },
         PositionAfterLeg: {
             nameKey: "PositionAfterLegChartType",
-            dataSelector: function (comp) { return comp.cumRanks; },
+            dataSelector: (comp) => { return comp.cumRanks; },
             skipStart: true,
             yAxisLabelKey: "PositionYAxisLabel",
             isRaceGraph: false,
             isResultsTable: false,
             minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: ChartTypeClass.getIndexesAroundDubiousCumulativeTimes
+            indexesAroundDubiousTimesFunc: (comp) => ChartTypeClass.getIndexesAroundDubiousCumulativeTimes(comp)
         },
         SplitPosition: {
             nameKey: "SplitPositionChartType",
@@ -54,17 +56,17 @@ export class ChartTypeClass {
             isRaceGraph: false,
             isResultsTable: false,
             minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: ChartTypeClass.getIndexesAroundDubiousSplitTimes
+            indexesAroundDubiousTimesFunc: (comp) => ChartTypeClass.getIndexesAroundDubiousSplitTimes(comp)
         },
         PercentBehind: {
             nameKey: "PercentBehindChartType",
-            dataSelector: function (comp, referenceCumTimes) { return comp.getSplitPercentsBehindReferenceCumTimes(referenceCumTimes); },
+            dataSelector: (comp, referenceCumTimes) => { return comp.getSplitPercentsBehindReferenceCumTimes(referenceCumTimes); },
             skipStart: false,
             yAxisLabelKey: "PercentBehindYAxisLabel",
             isRaceGraph: false,
             isResultsTable: false,
             minViewableControl: 1,
-            indexesAroundDubiousTimesFunc: ChartTypeClass.getIndexesAroundDubiousSplitTimes
+            indexesAroundDubiousTimesFunc: (comp) => ChartTypeClass.getIndexesAroundDubiousSplitTimes(comp)
         },
         ResultsTable: {
             nameKey: "ResultsTableChartType",
@@ -77,12 +79,13 @@ export class ChartTypeClass {
             indexesAroundDubiousTimesFunc: null
         }
     };
+
     /**
-* Converts a number of seconds into the corresponding number of minutes.
-* This conversion is as simple as dividing by 60.
-* @sb-param {Number} seconds - The number of seconds to convert.
-* @sb-return {Number} The corresponding number of minutes.
-*/
+    * Converts a number of seconds into the corresponding number of minutes.
+    * This conversion is as simple as dividing by 60.
+    * @sb-param {Number} seconds - The number of seconds to convert.
+    * @sb-return {Number} The corresponding number of minutes.
+    */
     private static secondsToMinutes(seconds: number | null): number | null {
         return (seconds === null) ? null : seconds / 60;
     }
@@ -93,7 +96,7 @@ export class ChartTypeClass {
     * @sb-return {Array} Array of objects containing indexes around dubious
     *     cumulative times.
     */
-    private static getIndexesAroundDubiousCumulativeTimes(competitor) {
+    private static getIndexesAroundDubiousCumulativeTimes(competitor: Competitor): Array<DubiousTimeInfo> {
         return competitor.getControlIndexesAroundDubiousCumulativeTimes();
     }
 
@@ -103,7 +106,7 @@ export class ChartTypeClass {
     * @sb-return {Array} Array of objects containing indexes around dubious split
     *     times.
     */
-    private static getIndexesAroundDubiousSplitTimes(competitor) {
+    private static getIndexesAroundDubiousSplitTimes(competitor: Competitor): Array<DubiousTimeInfo> {
         return competitor.getControlIndexesAroundDubiousSplitTimes();
     }
 }

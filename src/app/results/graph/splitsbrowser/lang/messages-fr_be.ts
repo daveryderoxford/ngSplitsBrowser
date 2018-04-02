@@ -20,7 +20,7 @@
  */
 // tslint:disable:max-line-length
 
-SplitsBrowser.Messages.fr_be = {
+export const fr_be = {
 
     ApplicationVersion: "SplitsBrowser - Version $$VERSION$$",
     Language: "Français",
@@ -84,7 +84,7 @@ SplitsBrowser.Messages.fr_be = {
     // deduces that some of the cumulatives times in the data shown are
     // unrealistic.
     ShowOriginalDataTooltip: "SplitsBrowser a retiré certains temps des données du parcours sélectionné, les estimant non réalistes. " +
-        "Utilisez la case à cocher pour afficher les données originales ou modifiées.",
+    "Utilisez la case à cocher pour afficher les données originales ou modifiées.",
 
     StatisticsTotalTime: "Temps total",
     StatisticsSplitTime: "Temps intermédiaire",

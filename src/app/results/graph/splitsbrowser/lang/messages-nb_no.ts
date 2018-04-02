@@ -19,7 +19,7 @@
  */
 // tslint:disable:max-line-length
 
-SplitsBrowser.Messages.nb_no = {
+export const nb_no = {
 
     ApplicationVersion: "SplitsBrowser - Versjon $$VERSION$$",
     Language: "Norwegian",
@@ -83,7 +83,7 @@ SplitsBrowser.Messages.nb_no = {
     // deduces that some of the cumulatives times in the data shown are
     // unrealistic.
     ShowOriginalDataTooltip: "SplitsBrowser har fjernet noen av tidene fra dataen i de(n) valgte klassen(e), ettersom disse ser ut til å være urealistiske.  " +
-        "Bruk denne avkryssningsboksen til å kontrollere om  det er den endrede eller den originale dataen som plottes.",
+    "Bruk denne avkryssningsboksen til å kontrollere om  det er den endrede eller den originale dataen som plottes.",
 
     StatisticsTotalTime: "Totaltid",
     StatisticsSplitTime: "Strekktid",

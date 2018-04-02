@@ -40,7 +40,7 @@ export class Course {
     * @sb-return {Array} Array of other course-classes.
     */
     public getOtherClasses(courseClass: CourseClass): Array<CourseClass> {
-        const otherClasses = this.classes.filter(function (cls) { return cls !== courseClass; });
+        const otherClasses = this.classes.filter( (cls) => { return cls !== courseClass; });
         if (otherClasses.length === this.classes.length) {
             // Given class not found.
             throw new InvalidData("Course.getOtherClasses: given class is not in this course");
@@ -178,7 +178,7 @@ export class Course {
 
         const controlNum = legNumber;
         const fastestSplits = [];
-        this.classes.forEach(function (courseClass) {
+        this.classes.forEach( (courseClass) => {
             const classFastest = courseClass.getFastestSplitTo(controlNum);
             if (classFastest !== null) {
                 fastestSplits.push({ name: classFastest.name, className: courseClass.name, split: classFastest.split });
@@ -238,8 +238,8 @@ export class Course {
     */
     public getCompetitorsAtControlNumInTimeRange(controlNum: number, intervalStart: sbTime, intervalEnd: sbTime) {
         const matchingCompetitors = [];
-        this.classes.forEach(function (courseClass) {
-            courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach(function (comp) {
+        this.classes.forEach( (courseClass) => {
+            courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach( (comp) => {
                 matchingCompetitors.push({ name: comp.name, time: comp.time, className: courseClass.name });
             });
         });

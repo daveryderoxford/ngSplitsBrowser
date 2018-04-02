@@ -53,7 +53,7 @@ declare function Competitor(order: number,
         nc: boolean;
         ok: boolean;
         class: string;
-        splits: firebase.firestore.Blob;
+      //  splits: firebase.firestore.Blob;
     }
 
     export interface Competitor {

@@ -20,7 +20,7 @@
  */
 // tslint:disable:max-line-length
 
-SplitsBrowser.Messages.en_gb = {
+export const en_gb = {
 
     ApplicationVersion: "SplitsBrowser - Version $$VERSION$$",
     Language: "English",

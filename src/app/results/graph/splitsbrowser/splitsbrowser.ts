@@ -30,6 +30,8 @@ import * as d3 from "d3";
 
 import { isNaNStrict, InvalidData, isNotNullNorNaN, isNotNull, normaliseLineEndings, WrongFileFormat, parseCourseLength, parseCourseClimb, isTrue } from "./util";
 
+import { Lang } from "./lang/lang"
+
 // Model
 import { TimeUtilities, sbTime } from "./time";
 import { Competitor } from "./competitor";
@@ -39,209 +41,15 @@ import { Course } from "./course";
 import { Results } from "./results";
 
 // Graph
-import { ChartTypeClass , ChartType} from "./chart-types";
+import { ChartTypeClass, ChartType } from "./chart-types";
 import { CompetitorSelection } from "./competitor-selection";
 import { parseEventData } from "./input";
-
 
 export let SplitsBrowser = {} as any;
 
 SplitsBrowser.Version = "4.0.0";
 
-SplitsBrowser.Model = {} as any;
 SplitsBrowser.Controls = {} as any;
-SplitsBrowser.Messages = {} as any;
-
-// file messages.js
-
-// Whether a warning about missing messages has been given.  We don't
-// really want to irritate the user with many alert boxes if there's a
-// problem with the messages.
-let warnedAboutMessages = true;
-
-// Default alerter function, just calls window.alert.
-let alertFunc = function (message) { window.alert(message); };
-
-// The currently-chosen language, or null if none chosen or found yet.
-let currentLanguage = null;
-
-// The list of all languages read in, or null if none.
-let allLanguages = null;
-
-// The messages object.
-const messages = SplitsBrowser.Messages;
-
-/**
-* Issue a warning about the messages, if a warning hasn't already been
-* issued.
-* @sb-param {String} warning - The warning message to issue.
-*/
-function warn(warning: string) {
-    if (!warnedAboutMessages) {
-        alertFunc(warning);
-        warnedAboutMessages = true;
-    }
-}
-
-/**
-* Sets the alerter to use when a warning message should be shown.
-*
-* This function is intended only for testing purposes.
-
-* @sb-param {Function} alerter - The function to be called when a warning is
-*     to be shown.
-*/
-SplitsBrowser.setMessageAlerter = function (alerter) {
-    alertFunc = alerter;
-};
-
-/**
-* Attempts to get a message, returning a default string if it does not
-* exist.
-* @sb-param {String} key - The key of the message.
-* @sb-param {String} defaultValue - Value to be used
-* @sb-return {String} The message with the given key, if the key exists,
-*     otherwise the default value.
-*/
-SplitsBrowser.tryGetMessage = function (key: string, defaultValue: string): string {
-    return (currentLanguage !== null && messages[currentLanguage].hasOwnProperty(key)) ? SplitsBrowser.getMessage(key) : defaultValue;
-};
-
-/**
-* Returns the message with the given key.
-* @sb-param {String} key - The key of the message.
-* @sb-return {String} The message with the given key, or a placeholder string
-*     if the message could not be looked up.
-*/
-SplitsBrowser.getMessage = function (key: string): string {
-    if (allLanguages === null) {
-        SplitsBrowser.initialiseMessages();
-    }
-
-    if (currentLanguage !== null) {
-        if (messages[currentLanguage].hasOwnProperty(key)) {
-            return messages[currentLanguage][key];
-        } else {
-            // tslint:disable-next-line:quotemark
-            warn("Message not found for key '" + key + '\' in language \'' + currentLanguage + "'");
-            return "?????";
-        }
-    } else {
-        warn("No messages found.  Has a language file been loaded?");
-        return "?????";
-    }
-};
-
-/**
-* Returns the message with the given key, with some string formatting
-* applied to the result.
-*
-* The object 'params' should map search strings to their replacements.
-*
-* @sb-param {String} key - The key of the message.
-* @sb-param {Object} params - Object mapping parameter names to values.
-* @sb-return {String} The resulting message.
-*/
-SplitsBrowser.getMessageWithFormatting = function (key: string, params: any): string {
-    let message = SplitsBrowser.getMessage(key);
-    for (const paramName in params) {
-        if (params.hasOwnProperty(paramName)) {
-            // Irritatingly there isn't a way of doing global replace
-            // without using regexps.  So we must escape any magic regex
-            // metacharacters first, so that we have a regexp that will
-            // match a single static string.
-            const paramNameRegexEscaped = paramName.replace(/([.+*?|{}()^$\[\]\\])/g, "\\$1");
-            message = message.replace(new RegExp(paramNameRegexEscaped, "g"), params[paramName]);
-        }
-    }
-
-    return message;
-};
-
-/**
-* Returns an array of codes of languages that have been loaded.
-* @sb-return {Array} Array of language codes.
-*/
-SplitsBrowser.getAllLanguages = function (): Array<string> {
-    return allLanguages.slice(0);
-};
-
-/**
-* Returns the language code of the current language, e.g. "en_gb".
-* @sb-return {String} Language code of the current language.
-*/
-SplitsBrowser.getLanguage = function (): string {
-    return currentLanguage;
-};
-
-/**
-* Returns the name of the language with the given code.
-* @sb-param {String} language - The code of the language, e.g. "en_gb".
-* @sb-return {String} The name of the language, e.g. "English".
-*/
-SplitsBrowser.getLanguageName = function (language: string): string {
-    if (messages.hasOwnProperty(language) && messages[language].hasOwnProperty("Language")) {
-        return messages[language].Language;
-    } else {
-        return "?????";
-    }
-};
-
-/**
-* Sets the current language.
-* @sb-param {String} language - The code of the new language to set.
-*/
-SplitsBrowser.setLanguage = function (language: string) {
-    if (messages.hasOwnProperty(language)) {
-        currentLanguage = language;
-    }
-};
-
-/**
-* Initialises the messages from those read in.
-*
-* @sb-param {String} defaultLanguage - (Optional) The default language to choose.
-*/
-SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
-    allLanguages = [] as Array<string>;
-    if (messages !== SplitsBrowser.Messages) {
-        // SplitsBrowser.Messages has changed since the JS source was
-        // loaded and now.  Likely culprit is an old-format language file.
-        warn("You appear to have loaded a messages file in the old format.  This file, and all " +
-            "others loaded after it, will not work.\n\nPlease check the messages files.");
-    }
-
-    for (const messageKey in messages) {
-        if (messages.hasOwnProperty(messageKey)) {
-            allLanguages.push(messageKey);
-        }
-    }
-
-    if (allLanguages.length === 0) {
-        warn("No messages files were found.");
-    } else if (defaultLanguage && messages.hasOwnProperty(defaultLanguage)) {
-        currentLanguage = defaultLanguage;
-    } else {
-        currentLanguage = allLanguages[0];
-    }
-};
-
-
-// old file util.js
-
-// old file time.js
-
-// old file competitor.js'
-
-// old file course-class.js
-
-// old file course-class-set.js
-
-// old file course.js
-
-// old file chart-types.js
-
-// old file competitor-selection.js
 
 // file data-repair.js
 (function () {
@@ -262,7 +70,6 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     const Repairer = function () {
         this.madeAnyChanges = false;
     };
-
 
     /**
      * Returns the positions at which the first pair of non-ascending cumulative
@@ -298,7 +105,6 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
         // If we get here, the entire array is in strictly-ascending order.
         return null;
     }
-
 
     /**
     * Remove, by setting to NaN, any cumulative time that is equal to the
@@ -489,22 +295,6 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     };
 })();
 
-
-// old file cvs-reader.js
-
-// file oe-reader.js
-
-// file html-reader.js
-
-// file alternative-csv-reader.js
-
-
-// file iof-xml-reader.js'
-
-
-// file input.js
-
-
 // file competitor-list.js
 (function () {
     "use strict";
@@ -523,8 +313,8 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     // ID of the container that contains the list and the filter textbox.
     const COMPETITOR_LIST_CONTAINER_ID = "competitorListContainer";
 
-    const getMessage = SplitsBrowser.getMessage;
-    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+    const getMessage = Lang.getMessage;
+    const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
     /**
     * Object that controls a list of competitors from which the user can select.
@@ -1051,11 +841,10 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 (function () {
     "use strict";
 
-    const getMessage = SplitsBrowser.getMessage;
-    const getAllLanguages = SplitsBrowser.getAllLanguages;
-    const getLanguage = SplitsBrowser.getLanguage;
-    const getLanguageName = SplitsBrowser.getLanguageName;
-    const setLanguage = SplitsBrowser.setLanguage;
+    const getMessage = Lang.getMessage;
+    const getLanguage = Lang.getLanguage;
+    const getLanguageName = Lang.getLanguageName;
+    const setLanguage = Lang.setLanguage;
 
     /**
     * A control that wraps a drop-down list used to choose the language to view.
@@ -1066,7 +855,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
         this.label = null;
         this.dropDown = null;
 
-        this.allLanguages = getAllLanguages();
+        this.allLanguages = Lang.getAllLanguages();
 
         if (this.allLanguages.length < 2) {
             // User hasn't loaded multiple languages, so no point doing
@@ -1091,7 +880,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 
         optionsList = d3.select(this.dropDown).selectAll("option").data(this.allLanguages);
         optionsList.attr("value", function (language: string): string { return language; })
-            .text(function (language) { return getLanguageName(language); });
+            .text(function (language: string) { return getLanguageName(language); });
 
         optionsList.exit().remove();
 
@@ -1149,7 +938,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 (function () {
     "use strict";
 
-    const getMessage = SplitsBrowser.getMessage;
+    const getMessage = Lang.getMessage;
 
     /**
     * A control that wraps a drop-down list used to choose between classes.
@@ -1439,8 +1228,8 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 (function () {
     "use strict";
 
-    const getMessage = SplitsBrowser.getMessage;
-    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+    const getMessage = Lang.getMessage;
+    const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
     const ALL_COMPARISON_OPTIONS = [
         {
@@ -1721,7 +1510,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 (function () {
     "use strict";
 
-    const getMessage = SplitsBrowser.getMessage;
+    const getMessage = Lang.getMessage;
 
     // ID of the statistics selector control.
     // Must match that used in styles.css.
@@ -1873,7 +1662,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 (function () {
     "use strict";
 
-    const getMessage = SplitsBrowser.getMessage;
+    const getMessage = Lang.getMessage;
 
     /**
     * A control that wraps a drop-down list used to choose the types of chart to view.
@@ -1995,7 +1784,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     // Must match the name defined in styles.css.
     const CONTAINER_DIV_ID = "originalDataSelectorContainer";
 
-    const getMessage = SplitsBrowser.getMessage;
+    const getMessage = Lang.getMessage;
 
     /**
     * Constructs a new OriginalDataSelector object.
@@ -2114,172 +1903,6 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 
     SplitsBrowser.Controls.OriginalDataSelector = OriginalDataSelector;
 
-})();
-
-// file chart-popup-data.js
-(function () {
-    "use strict";
-
-    // The maximum number of fastest splits to show when the popup is open.
-    const MAX_FASTEST_SPLITS = 10;
-
-    // Width of the time interval, in seconds, when viewing nearby competitors
-    // at a control on the race graph.
-    const RACE_GRAPH_COMPETITOR_WINDOW = 240;
-
-    const formatTime = TimeUtilities.formatTime;
-    const getMessage = SplitsBrowser.getMessage;
-    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-
-    const ChartPopupData: any = {} as any;
-
-    /**
-    * Returns the fastest splits to a control.
-    * @sb-param {CourseClassSet} courseClassSet - The
-    *     course-class set containing the splits data.
-    * @sb-param {Number} controlIndex - The index of the control.
-    * @sb-return {Object} Fastest-split data.
-    */
-    ChartPopupData.getFastestSplitsPopupData = function (courseClassSet: CourseClassSet, controlIndex: number) {
-        const data = courseClassSet.getFastestSplitsTo(MAX_FASTEST_SPLITS, controlIndex);
-        const ret = data.map(function (comp) {
-            return { time: comp.split, name: comp.name, highlight: false };
-        });
-
-        return { title: getMessage("SelectedClassesPopupHeader"), data: ret, placeholder: getMessage("SelectedClassesPopupPlaceholder") };
-    };
-
-    /**
-    * Returns the fastest splits for the currently-shown leg.  The list
-    * returned contains the fastest splits for the current leg for each class.
-    * @sb-param {CourseClassSet} courseClassSet - The course-class set
-    *     containing the splits data.
-    * @sb-param {EventData} eventData - Data for the entire
-    *     event.
-    * @sb-param {Number} controlIndex - The index of the control.
-    * @sb-return {Object} Object that contains the title for the popup and the
-    *     array of data to show within it.
-    */
-    ChartPopupData.getFastestSplitsForLegPopupData = function (courseClassSet, eventData, controlIndex) {
-        const course = courseClassSet.getCourse();
-        const startCode = course.getControlCode(controlIndex - 1);
-        const endCode = course.getControlCode(controlIndex);
-
-        const startControl = (startCode === Course.START) ? getMessage("StartName") : startCode;
-        const endControl = (endCode === Course.FINISH) ? getMessage("FinishName") : endCode;
-
-        const title = getMessageWithFormatting("FastestLegTimePopupHeader", { "$$START$$": startControl, "$$END$$": endControl });
-
-        const primaryClass = courseClassSet.getPrimaryClassName();
-        const data = eventData.getFastestSplitsForLeg(startCode, endCode)
-            .map(function (row) { return { name: row.name, className: row.className, time: row.split, highlight: (row.className === primaryClass) }; });
-
-        return { title: title, data: data, placeholder: null };
-    };
-
-    /**
-    * Returns an object containing an array of the competitors visiting a
-    * control at a given time.
-    * @sb-param {.CourseClassSet} courseClassSet - The course-class set
-    *     containing the splits data.
-    * @sb-param {EventData} eventData - Data for the entire
-    *     event.
-    * @sb-param {Number} controlIndex - The index of the control.
-    * @sb-param {Number} time - The current time, in units of seconds past midnight.
-    * @sb-return {Object} Object containing competitor data.
-    */
-    ChartPopupData.getCompetitorsVisitingCurrentControlPopupData = function (courseClassSet: CourseClassSet, resutsData: Results, controlIndex: number, time: number) {
-        const controlCode = courseClassSet.getCourse().getControlCode(controlIndex);
-        const intervalStart = Math.round(time) - RACE_GRAPH_COMPETITOR_WINDOW / 2;
-        const intervalEnd = Math.round(time) + RACE_GRAPH_COMPETITOR_WINDOW / 2;
-        const competitors = resutsData.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd);
-
-        const primaryClass = courseClassSet.getPrimaryClassName();
-        const competitorData = competitors.map(function (row) { return { name: row.name, className: row.className, time: row.time, highlight: (row.className === primaryClass) }; });
-
-        let controlName;
-        if (controlCode === Course.START) {
-            controlName = getMessage("StartName");
-        } else if (controlCode === Course.FINISH) {
-            controlName = getMessage("FinishName");
-        } else {
-            controlName = getMessageWithFormatting("ControlName", { "$$CODE$$": controlCode });
-        }
-
-        const title = getMessageWithFormatting(
-            "NearbyCompetitorsPopupHeader",
-            { "$$START$$": formatTime(intervalStart), "$$END$$": formatTime(intervalEnd), "$$CONTROL$$": controlName });
-
-        return { title: title, data: competitorData, placeholder: getMessage("NoNearbyCompetitors") };
-    };
-
-    /**
-    * Compares two course names.
-    * @sb-param {String} name1 - One course name to compare.
-    * @sb-param {String} name2 - The other course name to compare.
-    * @sb-return {Number} Comparison result: -1 if name1 < name2, 1 if
-    *     name1 > name2 and 0 if name1 === name2.
-    */
-    function compareCourseNames(name1, name2) {
-        if (name1 === name2) {
-            return 0;
-        } else if (name1 === "" || name2 === "" || name1[0] !== name2[0]) {
-            return (name1 < name2) ? -1 : 1;
-        } else {
-            // Both courses begin with the same letter.
-            const regexResult = /^[^0-9]+/.exec(name1);
-            if (regexResult !== null && regexResult.length > 0) {
-                // regexResult should be a 1-element array.
-                const result = regexResult[0];
-                if (0 < result.length && result.length < name1.length && name2.substring(0, result.length) === result) {
-                    const num1 = parseInt(name1.substring(result.length), 10);
-                    const num2 = parseInt(name2.substring(result.length), 10);
-                    if (!isNaN(num1) && !isNaN(num2)) {
-                        return num1 - num2;
-                    }
-                }
-            }
-
-            return (name1 < name2) ? -1 : 1;
-        }
-    }
-
-    /**
-    * Tidy next-control data, by joining up multiple controls into one string,
-    * and substituting the display-name of the finish if necessary.
-    * @sb-param {Array} nextControls - Array of next-control information objects.
-    * @sb-return {String} Next-control information containing joined-up control names.
-    */
-    function tidyNextControlsList(nextControls) {
-        return nextControls.map(function (nextControlRec) {
-            const codes = nextControlRec.nextControls.slice(0);
-            if (codes[codes.length - 1] === Course.FINISH) {
-                codes[codes.length - 1] = getMessage("FinishName");
-            }
-
-            return { course: nextControlRec.course, nextControls: codes.join(", ") };
-        });
-    }
-
-    /**
-    * Returns next-control data to show on the chart popup.
-    * @sb-param {Course} course - The course containing the
-    *     controls data.
-    * @sb-param {EventData} eventData - Data for the entire
-    *     event.
-    * @sb-param {Number} controlIndex - The index of the control.
-    * @sb-return {Object} Next-control data.
-    */
-    ChartPopupData.getNextControlData = function (course: Course, eventData: Results, controlIndex: number) {
-        const controlIdx = Math.min(controlIndex, course.controls.length);
-        const controlCode = course.getControlCode(controlIdx);
-        const nextControls = eventData.getNextControlsAfter(controlCode);
-        nextControls.sort(function (c1, c2) { return compareCourseNames(c1.course.name, c2.course.name); });
-        const thisControlName = (controlCode === Course.START) ? getMessage("StartName") : getMessageWithFormatting("ControlName", { "$$CODE$$": controlCode });
-        return { thisControl: thisControlName, nextControls: tidyNextControlsList(nextControls) };
-    };
-
-    SplitsBrowser.Model.ChartPopupData = ChartPopupData;
 })();
 
 // file chart-popup.js
@@ -2465,8 +2088,16 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 })();
 
 // file chart.js
+
+import { FastestSplitsPopupData, SplitsPopupData } from "./splitspopupdata";
+
 (function () {
     "use strict";
+
+    // 'Imports'.
+    const formatTime = TimeUtilities.formatTime;
+    const getMessage = Lang.getMessage;
+    const ChartPopup = SplitsBrowser.Controls.ChartPopup;
 
     // ID of the hidden text-size element.
     // Must match that used in styles.css.
@@ -2508,12 +2139,12 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
         "#888888", "#FF99FF", "#55BB33"
     ];
 
-    // 'Imports'.
-    const formatTime = TimeUtilities.formatTime;
-    const getMessage = SplitsBrowser.getMessage;
+   // The maximum number of fastest splits to show when the popup is open.
+   const MAX_FASTEST_SPLITS = 10;
 
-    const ChartPopupData = SplitsBrowser.Model.ChartPopupData;
-    const ChartPopup = SplitsBrowser.Controls.ChartPopup;
+    // Width of the time interval, in seconds, when viewing nearby competitors
+    // at a control on the race graph.
+    const RACE_GRAPH_COMPETITOR_WINDOW = 240;
 
     /**
     * Format a time and a rank as a string, with the split time in mm:ss or h:mm:ss
@@ -2594,6 +2225,8 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
         this.maxStartTimeLabelWidth = 0;
 
         this.mouseOutTimeout = null;
+
+        this.popupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
 
         // Indexes of the currently-selected competitors, in the order that
         // they appear in the list of labels.
@@ -2676,7 +2309,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     * @sb-return {Array} Array of fastest-split data.
     */
     Chart.prototype.getFastestSplitsPopupData = function (): Array<any> {
-        return ChartPopupData.getFastestSplitsPopupData(this.courseClassSet, this.currentControlIndex);
+        return this.popupData.getFastestSplitsPopupData(this.courseClassSet, this.currentControlIndex);
     };
 
     /**
@@ -2686,7 +2319,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     *     array of data to show within it.
     */
     Chart.prototype.getFastestSplitsForCurrentLegPopupData = function () {
-        return ChartPopupData.getFastestSplitsForLegPopupData(this.courseClassSet, this.eventData, this.currentControlIndex);
+        return this.popupData.getFastestSplitsForLegPopupData(this.courseClassSet, this.eventData, this.currentControlIndex);
     };
 
     /**
@@ -2704,7 +2337,10 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     * @sb-return {Array} Array of competitor data.
     */
     Chart.prototype.getCompetitorsVisitingCurrentControlPopupData = function () {
-        return ChartPopupData.getCompetitorsVisitingCurrentControlPopupData(this.courseClassSet, this.eventData, this.currentControlIndex, this.currentChartTime);
+        return this.popupData.getCompetitorsVisitingCurrentControlPopupData(this.courseClassSet,
+                                                                            this.eventData,
+                                                                            this.currentControlIndex,
+                                                                            this.currentChartTime);
     };
 
     /**
@@ -2712,7 +2348,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
     * @sb-return {Array} Array of next-control data.
     */
     Chart.prototype.getNextControlData = function () {
-        return ChartPopupData.getNextControlData(this.courseClassSet.getCourse(), this.eventData, this.actualControlIndex);
+        return this.popupData.getNextControlData(this.courseClassSet.getCourse(), this.eventData, this.actualControlIndex);
     };
 
     /**
@@ -3702,8 +3338,8 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 (function () {
     "use strict";
 
-    const getMessage = SplitsBrowser.getMessage;
-    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
+    const getMessage = Lang.getMessage;
+    const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
     const NON_BREAKING_SPACE_CHAR = "\u00a0";
 
@@ -3836,7 +3472,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 
         const controls = this.courseClass.course.controls;
         if (controls === null) {
-            headerCellData = headerCellData.concat(d3.range(1, this.courseClass.numControls + 1));
+            headerCellData = headerCellData.concat(d3.range(1, this.courseClass.numControls + 1).toString());
         } else {
             headerCellData = headerCellData.concat(controls.map(function (control, index) {
                 return (index + 1) + NON_BREAKING_SPACE_CHAR + "(" + control + ")";
@@ -4376,7 +4012,7 @@ SplitsBrowser.initialiseMessages = function (defaultLanguage?: string) {
 (function () {
     "use strict";
 
-    const getMessage = SplitsBrowser.getMessage;
+    const getMessage = Lang.getMessage;
 
     const CONTAINER_DIV_ID = "warningViewerContainer";
 
@@ -4518,12 +4154,11 @@ export interface SplitsbrowserOptions {
 
     const Version = SplitsBrowser.Version;
 
-    const getMessage = SplitsBrowser.getMessage;
-    const tryGetMessage = SplitsBrowser.tryGetMessage;
-    const getMessageWithFormatting = SplitsBrowser.getMessageWithFormatting;
-    const initialiseMessages = SplitsBrowser.initialiseMessages;
+    const getMessage = Lang.getMessage;
+    const tryGetMessage = Lang.tryGetMessage;
+    const getMessageWithFormatting = Lang.getMessageWithFormatting;
+    const initialiseMessages = Lang.initialiseMessages;
 
-    const Model = SplitsBrowser.Model;
     const ChartTypes = ChartTypeClass.chartTypes;
 
     const repairEventData = SplitsBrowser.DataRepair.repairEventData;
@@ -5400,150 +5035,3 @@ export interface SplitsbrowserOptions {
         });
     };
 })();
-
-SplitsBrowser.Messages.en_gb = {
-
-    ApplicationVersion: "SplitsBrowser - Version $$VERSION$$",
-    Language: "English",
-
-    MispunchedShort: "mp",
-    NonCompetitiveShort: "n/c",
-
-    StartName: "Start",
-    ControlName: "Control $$CODE$$",
-    FinishName: "Finish",
-
-    // The start and finish, as they appear at the top of the chart.
-    StartNameShort: "S",
-    FinishNameShort: "F",
-
-    // Button labels.
-    SelectAllCompetitors: "All",
-    SelectNoCompetitors: "None",
-    SelectCrossingRunners: "Crossing runners",
-
-    LowerXAxisChartLabel: "Time (min)",
-
-    // Chart type names and Y-axis labels.
-    SplitsGraphChartType: "Splits graph",
-    SplitsGraphYAxisLabel: "Time (min)",
-    RaceGraphChartType: "Race graph",
-    RaceGraphYAxisLabel: "Time",
-    PositionAfterLegChartType: "Position after leg",
-    SplitPositionChartType: "Split position",
-    PositionYAxisLabel: "Position", // Shared between position-after-leg and split-position.
-    PercentBehindChartType: "Percent behind",
-    PercentBehindYAxisLabel: "Percent behind",
-    ResultsTableChartType: "Results table",
-
-    ChartTypeSelectorLabel: "View: ",
-
-    ClassSelectorLabel: "Class: ",
-    AdditionalClassSelectorLabel: "and",
-    NoClassesLoadedPlaceholder: "[No classes loaded]",
-
-    // Placeholder text shown when additional classes are available to be
-    // selected but none have been selected.
-    NoAdditionalClassesSelectedPlaceholder: "<select>",
-
-    ComparisonSelectorLabel: "Compare with ",
-    CompareWithWinner: "Winner",
-    CompareWithFastestTime: "Fastest time",
-    CompareWithFastestTimePlusPercentage: "Fastest time + $$PERCENT$$%",
-    CompareWithAnyRunner: "Any runner...",
-    CompareWithAnyRunnerLabel: "Runner: ",
-    // Warning message shown to the user when a comparison option cannot be
-    // chosen because the course has no winner.
-    CannotCompareAsNoWinner: "Cannot compare against '$$OPTION$$' because no competitors in this class complete the course.",
-
-    // Label of checkbox that shows the original data as opposed to the
-    // 'repaired' data.  This only appears if data that needs repair has been
-    // loaded.
-    ShowOriginalData: "Show original data",
-
-    // Tooltip of 'Show original' checkbox.  This appears when SplitsBrowser
-    // deduces that some of the cumulatives times in the data shown are
-    // unrealistic.
-    ShowOriginalDataTooltip: "SplitsBrowser has removed some of the times from the data in the selected class(es), believing these times to be unrealistic.  " +
-        "Use this checkbox to control whether the amended or original data is plotted.",
-
-    StatisticsTotalTime: "Total time",
-    StatisticsSplitTime: "Split time",
-    StatisticsBehindFastest: "Behind fastest",
-    StatisticsTimeLoss: "Time loss",
-
-    ResultsTableHeaderSingleControl: "1 control",
-    ResultsTableHeaderMultipleControls: "$$NUM$$ controls",
-    ResultsTableHeaderCourseLength: "$$DISTANCE$$km",
-    ResultsTableHeaderClimb: "$$CLIMB$$m",
-
-    ResultsTableHeaderControlNumber: "#",
-    ResultsTableHeaderName: "Name",
-    ResultsTableHeaderTime: "Time",
-
-    // Alert message shown when you click 'Crossing runners' but there are no
-    // crossing runners to show.
-    RaceGraphNoCrossingRunners: "$$NAME$$ has no crossing runners.",
-    RaceGraphDisabledAsStartTimesMissing: "The Race Graph cannot be shown because the start times of the competitors are missing.",
-
-    LoadFailedHeader: "SplitsBrowser \u2013 Error",
-    LoadFailedInvalidData: "Sorry, it wasn't possible to read in the results data, as the data appears to be invalid: '$$MESSAGE$$'.",
-    LoadFailedUnrecognisedData: "Sorry, it wasn't possible to read in the results data.  The data doesn't appear to be in any recognised format.",
-    LoadFailedStatusNotSuccess: "Sorry, it wasn't possible to read in the results data.  The status of the request was '$$STATUS$$'.",
-    LoadFailedReadError: "Sorry, it wasn't possible to load the results data.  The error message returned from the server was '$$ERROR$$'.",
-
-    // Chart popups.
-
-    SelectedClassesPopupHeader: "Selected classes",
-
-    // Placeholder text shown when the Selected classes dialog is empty,
-    // because no competitors registered a split for the control, or those
-    // that did only registered a dubious split.
-    SelectedClassesPopupPlaceholder: "No competitors",
-
-    // Header for the 'Fastest leg time' popup dialog.
-    FastestLegTimePopupHeader: "Fastest leg-time $$START$$ to $$END$$",
-
-    // Header for the nearby-competitors dialog on the race graph.
-    NearbyCompetitorsPopupHeader: "$$START$$ - $$END$$: $$CONTROL$$",
-
-    // Placeholder text shown in the nearby-competitors dialog on the race
-    // graph when there aren't any competitors visiting the control within the
-    // +/- 2 minute window.
-    NoNearbyCompetitors: "No competitors",
-
-    // Link that appears at the top and opens SplitsBrowser with the settings
-    // (selected classes, competitors, comparison, chart type, etc.) that are
-    // currently shown.
-    DirectLink: "Link",
-    DirectLinkToolTip: "Links to a URL that opens SplitsBrowser with the current settings",
-
-    // The placeholder text shown in the competitor-list filter box when no
-    // text has been entered into this box.
-    CompetitorListFilter: "Filter",
-
-    // Labels that appear beside a competitor on the Results Table to indicate
-    // that they did not start, did not finish, or were disqualified.
-    DidNotStartShort: "dns",
-    DidNotFinishShort: "dnf",
-    DisqualifiedShort: "dsq",
-
-    // Placeholder message shown inside the competitor list if all competitors
-    // in the class did not start.
-    NoCompetitorsStarted: "No competitors started",
-
-    // Label of the language-selector control.
-    LanguageSelectorLabel: "Language:",
-
-    // Label that appears beside a competitor on the Results Table to indicate
-    // that they were over the maximum time.
-    OverMaxTimeShort: "over max time",
-
-    // Alert message shown when you click 'Crossing runners' but there are no
-    // crossing runners to show and also a filter is active.
-    RaceGraphNoCrossingRunnersFiltered: "$$NAME$$ has no crossing runners among the filtered competitors.",
-
-    // Tooltip of the warning-triangle shown along the top if warnings were
-    // issued reading in the file.
-    WarningsTooltip: "It was not possible to read all of the data for this event.  One or more competitors or classes may have been omitted.  Click for more details."
-};

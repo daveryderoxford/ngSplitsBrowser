@@ -16,12 +16,12 @@ function mergeCompetitors(classes: Array<any>) {
 
     const allCompetitors = [];
     const expectedControlCount = classes[0].numControls;
-    classes.forEach(function (courseClass) {
+    classes.forEach( (courseClass) =>  {
         if (courseClass.numControls !== expectedControlCount) {
             throw new InvalidData("Cannot merge classes with " + expectedControlCount + " and " + courseClass.numControls + " controls");
         }
 
-        courseClass.competitors.forEach(function (comp) {
+        courseClass.competitors.forEach( (comp) => {
             if (!comp.isNonStarter) {
                 allCompetitors.push(comp);
             }
@@ -46,14 +46,14 @@ function getRanks(sourceData: Array<number>): Array<number> {
     // Now construct a map that maps from source value to rank.
     // TODO - Check this section DKR was  var rankMap = new d3.map();
     const rankMap = d3.map() as d3.Map<number>;
-    sortedData.forEach(function (value: number, index: number) {
+    sortedData.forEach( (value: number, index: number) => {
         if (!rankMap.has(value.toString())) {
             rankMap.set(value.toString(), index + 1);
         }
     });
 
     // Finally, build and return the list of ranks.
-    const ranks = sourceData.map(function (value) {
+    const ranks = sourceData.map( (value) => {
         return isNotNullNorNaN(value) ? rankMap.get(value.toString()) : value;
     });
 
@@ -127,7 +127,7 @@ export class CourseClassSet {
     *     dubious data, false if none of them do.
     */
     public hasDubiousData(): boolean {
-        return this.classes.some(function (courseClass) { return courseClass.hasDubiousData; });
+        return this.classes.some( (courseClass) => { return courseClass.hasDubiousData; });
     };
 
     /**
@@ -135,7 +135,7 @@ export class CourseClassSet {
     * null or NaN values.  This does not include trailing null or NaN values.
     * @sb-param {Array} times - Array of times, which may include NaNs and nulls.
     * @sb-param {boolean} includeEnd - Whether to include a blank range that ends
-    *    at the end of the array.
+    *    at the end of the array
     * @sb-return {Array} Array of objects that describes when the given array has
     *    ranges of null and/or NaN values.
     */
@@ -264,9 +264,9 @@ export class CourseClassSet {
 
             // Find all blank-ranges of competitors.
             const allCompetitorBlankRanges = [];
-            this.allCompetitors.forEach(function (competitor) {
+            this.allCompetitors.forEach( (competitor) => {
                 const competitorBlankRanges = this.getBlankRanges(competitor.getAllCumulativeTimes(), false);
-                competitorBlankRanges.forEach(function (range) {
+                competitorBlankRanges.forEach( (range) => {
                     allCompetitorBlankRanges.push({
                         start: range.start,
                         end: range.end,
@@ -279,14 +279,14 @@ export class CourseClassSet {
             // Now, for each blank range of the fastest times, find the
             // size of the smallest competitor blank range that covers it,
             // and then the fastest split among those competitors.
-            fastestBlankRanges.forEach(function (fastestRange) {
-                const coveringCompetitorRanges = allCompetitorBlankRanges.filter(function (compRange) {
+            fastestBlankRanges.forEach( (fastestRange) => {
+                const coveringCompetitorRanges = allCompetitorBlankRanges.filter( (compRange) => {
                     return compRange.start <= fastestRange.start && fastestRange.end <= compRange.end + 1;
                 });
 
                 let minSize = null;
                 let minOverallSplit = null;
-                coveringCompetitorRanges.forEach(function (coveringRange) {
+                coveringCompetitorRanges.forEach( (coveringRange) => {
                     if (minSize === null || coveringRange.size < minSize) {
                         minSize = coveringRange.size;
                         minOverallSplit = null;
@@ -321,7 +321,7 @@ export class CourseClassSet {
         }
 
         const fastestCumTimes = new Array(this.numControls + 1);
-        fastestSplits.forEach(function (fastestSplit, index) {
+        fastestSplits.forEach( (fastestSplit, index) => {
             fastestCumTimes[index] = (index === 0) ? 0 : fastestCumTimes[index - 1] + fastestSplit * ratio;
         });
 
@@ -350,21 +350,25 @@ export class CourseClassSet {
         const splitRanksByCompetitor = [];
         const cumRanksByCompetitor = [];
 
-        this.allCompetitors.forEach(function () {
+        this.allCompetitors.forEach( () => {
             splitRanksByCompetitor.push([]);
             cumRanksByCompetitor.push([]);
         });
 
-        d3.range(1, this.numControls + 2).forEach(function (control) {
-            const splitsByCompetitor = this.allCompetitors.map(function (comp) { return comp.getSplitTimeTo(control); });
+        d3.range(1, this.numControls + 2).forEach( (control) => {
+            const splitsByCompetitor = this.allCompetitors.map( (comp) => {
+                return comp.getSplitTimeTo(control);
+            });
             const splitRanksForThisControl = getRanks(splitsByCompetitor);
-            this.allCompetitors.forEach(function (_comp, idx) { splitRanksByCompetitor[idx].push(splitRanksForThisControl[idx]); });
+            this.allCompetitors.forEach( (_comp, idx) => {
+                splitRanksByCompetitor[idx].push(splitRanksForThisControl[idx]);
+            });
         }, this);
 
-        d3.range(1, this.numControls + 2).forEach(function (control) {
+        d3.range(1, this.numControls + 2).forEach( (control) => {
             // We want to null out all subsequent cumulative ranks after a
             // competitor mispunches.
-            const cumSplitsByCompetitor = this.allCompetitors.map(function (comp, idx) {
+            const cumSplitsByCompetitor = this.allCompetitors.map( (comp, idx) => {
                 // -1 for previous control, another -1 because the cumulative
                 // time to control N is cumRanksByCompetitor[idx][N - 1].
                 if (control > 1 && cumRanksByCompetitor[idx][control - 1 - 1] === null) {
@@ -378,10 +382,10 @@ export class CourseClassSet {
                 }
             });
             const cumRanksForThisControl = getRanks(cumSplitsByCompetitor);
-            this.allCompetitors.forEach(function (_comp, idx) { cumRanksByCompetitor[idx].push(cumRanksForThisControl[idx]); });
+            this.allCompetitors.forEach( (_comp, idx) => { cumRanksByCompetitor[idx].push(cumRanksForThisControl[idx]); });
         }, this);
 
-        this.allCompetitors.forEach(function (comp, idx) {
+        this.allCompetitors.forEach( (comp, idx) => {
             comp.setSplitAndCumulativeRanks(splitRanksByCompetitor[idx], cumRanksByCompetitor[idx]);
         });
     };
@@ -409,13 +413,13 @@ export class CourseClassSet {
         } else {
             // Compare competitors by split time at this control, and, if those
             // are equal, total time.
-            const comparator = function (compA: Competitor, compB: Competitor) {
+            const comparator =  (compA: Competitor, compB: Competitor) => {
                 const compASplit = compA.getSplitTimeTo(controlIdx);
                 const compBSplit = compB.getSplitTimeTo(controlIdx);
                 return (compASplit === compBSplit) ? d3.ascending(compA.totalTime, compB.totalTime) : d3.ascending(compASplit, compBSplit);
             };
 
-            const competitors = this.allCompetitors.filter(function (comp) {
+            const competitors = this.allCompetitors.filter( (comp) => {
                 return comp.completed() && !isNaNStrict(comp.getSplitTimeTo(controlIdx));
             });
             competitors.sort(comparator);
@@ -446,8 +450,12 @@ export class CourseClassSet {
             throw new TypeError("chartType undefined or missing");
         }
 
-        const competitorData = this.allCompetitors.map(function (comp) { return chartType.dataSelector(comp, referenceCumTimes); });
-        const selectedCompetitorData = currentIndexes.map(function (index) { return competitorData[index]; });
+        const competitorData = this.allCompetitors.map( (comp) => {
+            return chartType.dataSelector(comp, referenceCumTimes);
+        });
+        const selectedCompetitorData = currentIndexes.map( (index) => {
+            return competitorData[index];
+         });
 
         const xMin = d3.min(referenceCumTimes);
         const xMax = d3.max(referenceCumTimes);
@@ -466,8 +474,8 @@ export class CourseClassSet {
                 yMax = d3.max(firstCompetitorTimes);
             }
         } else {
-            yMin = d3.min(selectedCompetitorData.map(function (values) { return d3.min(values); }));
-            yMax = d3.max(selectedCompetitorData.map(function (values) { return d3.max(values); }));
+            yMin = d3.min(selectedCompetitorData.map( (values) => { return d3.min(values); }));
+            yMax = d3.max(selectedCompetitorData.map( (values) => { return d3.max(values); }));
         }
 
         if (yMax === yMin) {
@@ -477,10 +485,10 @@ export class CourseClassSet {
         }
 
         const controlIndexAdjust = (chartType.skipStart) ? 1 : 0;
-        const dubiousTimesInfo = currentIndexes.map(function (competitorIndex) {
+        const dubiousTimesInfo = currentIndexes.map( (competitorIndex) => {
             const indexPairs = chartType.indexesAroundDubiousTimesFunc(this.allCompetitors[competitorIndex]);
-            return indexPairs.filter(function (indexPair) { return indexPair.start >= controlIndexAdjust; })
-                .map(function (indexPair) {
+            return indexPairs.filter( (indexPair) => { return indexPair.start >= controlIndexAdjust; })
+                .map( (indexPair) => {
                     return {
                         start: indexPair.start - controlIndexAdjust, end: indexPair.end - controlIndexAdjust
                     };
@@ -490,9 +498,9 @@ export class CourseClassSet {
         const cumulativeTimesByControl = d3.transpose(selectedCompetitorData);
         const xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
         const zippedData = d3.zip(xData, cumulativeTimesByControl);
-        const competitorNames = currentIndexes.map(function (index) { return this.allCompetitors[index].name; }, this);
+        const competitorNames = currentIndexes.map( (index) => { return this.allCompetitors[index].name; }, this);
         return {
-            dataColumns: zippedData.map(function (data) { return { x: data[0], ys: data[1] }; }),
+            dataColumns: zippedData.map( (data) => { return { x: data[0], ys: data[1] }; }),
             competitorNames: competitorNames,
             numControls: this.numControls,
             xExtent: [xMin, xMax],

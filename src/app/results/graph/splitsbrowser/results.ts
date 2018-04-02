@@ -28,7 +28,7 @@ export class Results {
     * attempting to plot it.
     */
     public determineTimeLosses = function (): void {
-        this.classes.forEach(function (courseClass) {
+        this.classes.forEach( (courseClass) => {
             courseClass.determineTimeLosses();
         });
     };
@@ -43,8 +43,8 @@ export class Results {
     *     otherwise.
     */
     public needsRepair = function (): boolean {
-        return this.classes.some(function (courseClass) {
-            return courseClass.competitors.some(function (competitor) {
+        return this.classes.some( (courseClass) => {
+            return courseClass.competitors.some( (competitor) => {
                 return (competitor.getAllCumulativeTimes() === null);
             });
         });
@@ -64,13 +64,13 @@ export class Results {
     */
     public getFastestSplitsForLeg = function (startCode: string, endCode: string): Array<any> {
         let fastestSplits = [];
-        this.courses.forEach(function (course) {
+        this.courses.forEach( (course) => {
             if (course.usesLeg(startCode, endCode)) {
                 fastestSplits = fastestSplits.concat(course.getFastestSplitsForLeg(startCode, endCode));
             }
         });
 
-        fastestSplits.sort(function (a, b) { return d3.ascending(a.split, b.split); });
+        fastestSplits.sort( (a, b) => { return d3.ascending(a.split, b.split); });
 
         return fastestSplits;
     };
@@ -91,13 +91,13 @@ export class Results {
     */
     public getCompetitorsAtControlInTimeRange = function (controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<any> {
         const competitors = [];
-        this.courses.forEach(function (course) {
-            course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach(function (comp) {
+        this.courses.forEach( (course) => {
+            course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach( (comp) => {
                 competitors.push(comp);
             });
         });
 
-        competitors.sort(function (a, b) { return d3.ascending(a.time, b.time); });
+        competitors.sort( (a, b) => { return d3.ascending(a.time, b.time); });
 
         return competitors;
     };
@@ -111,9 +111,9 @@ export class Results {
     public getNextControlsAfter(controlCode: string) {
         let courses = this.courses;
         if (controlCode !== Course.START) {
-            courses = courses.filter(function (course) { return course.hasControl(controlCode); });
+            courses = courses.filter( (course) => { return course.hasControl(controlCode); });
         }
 
-        return courses.map(function (course) { return { course: course, nextControls: course.getNextControls(controlCode) }; });
+        return courses.map( (course) => { return { course: course, nextControls: course.getNextControls(controlCode) }; });
     };
 }

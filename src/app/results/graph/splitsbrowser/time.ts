@@ -7,11 +7,9 @@ export class TimeUtilities {
     private static NULL_TIME_PLACEHOLDER = "-----";
 
     /**
-    * Formats a time period given as a number of seconds as a string in the form
-    * [-][h:]mm:ss.ss .
+    * Formats a time period given as a number of seconds as a string in the form [-][h:]mm:ss.ss .
     * @sb-param {Number} seconds - The number of seconds.
-    * @sb-param {?Number} precision - Optional number of decimal places to format
-    *     using, or the default if not specified.
+    * @sb-param {?Number} precision - Optional number of decimal places to format using, or the default if not specified.
     * @sb-returns {string} The string formatting of the time.
     */
     static formatTime(seconds: number, precision?: number): string {

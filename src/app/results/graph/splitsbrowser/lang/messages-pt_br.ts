@@ -21,7 +21,7 @@
  */
 // tslint:disable:max-line-length
 
-SplitsBrowser.Messages.pt_br = {
+export const pt_br = {
 
     ApplicationVersion: "SplitsBrowser - Versão $$VERSION$$",
     Language: "Portugues-BR",
@@ -84,7 +84,7 @@ SplitsBrowser.Messages.pt_br = {
     // Dica da caixa de seleção 'Mostrar original'. Aparece quando SplitsBrowser
     // deduz que alguns dos totalizadores mostrados são irreais.
     ShowOriginalDataTooltip: "SplitsBrowser removeu alguns dos tempos a partir dos dados do(s) percurso(s) selecionado(s), acreditando que estes tempos não são reais. " +
-        "Use esta caixa de seleção para controlar se exibe ou não os dados originais.",
+    "Use esta caixa de seleção para controlar se exibe ou não os dados originais.",
 
     StatisticsTotalTime: "Tempo Total",
     StatisticsSplitTime: "Split time",

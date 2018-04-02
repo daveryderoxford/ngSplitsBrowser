@@ -22,7 +22,7 @@ export class CourseClass {
         public numControls: number,
         public competitors: Array<any>) {
 
-        this.competitors.forEach(function (comp) {
+        this.competitors.forEach( (comp) => {
             comp.setClassName(name);
         });
     }
@@ -39,12 +39,12 @@ export class CourseClass {
     * Determines the time losses for the competitors in this course-class.
     */
     public determineTimeLosses(): void {
-        const fastestSplitTimes = d3.range(1, this.numControls + 2).map(function (controlIdx) {
+        const fastestSplitTimes = d3.range(1, this.numControls + 2).map( (controlIdx) => {
             const splitRec = this.getFastestSplitTo(controlIdx);
             return (splitRec === null) ? null : splitRec.split;
         }, this);
 
-        this.competitors.forEach(function (comp) {
+        this.competitors.forEach( (comp) => {
             comp.determineTimeLosses(fastestSplitTimes);
         });
     };
@@ -82,7 +82,7 @@ export class CourseClass {
 
         let fastestSplit = null;
         let fastestCompetitor = null;
-        this.competitors.forEach(function (comp) {
+        this.competitors.forEach( (comp) => {
             const compSplit = comp.getSplitTimeTo(controlIdx);
             if (isNotNullNorNaN(compSplit)) {
                 if (fastestSplit === null || compSplit < fastestSplit) {
@@ -116,7 +116,7 @@ export class CourseClass {
         }
 
         const matchingCompetitors = [];
-        this.competitors.forEach(function (comp) {
+        this.competitors.forEach( (comp) => {
             const cumTime = comp.getCumulativeTimeTo(controlNum);
             if (cumTime !== null && comp.startTime !== null) {
                 const actualTimeAtControl = cumTime + comp.startTime;
