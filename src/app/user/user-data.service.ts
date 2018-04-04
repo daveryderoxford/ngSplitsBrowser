@@ -1,16 +1,16 @@
-import { Injectable } from '@angular/core';
-import { UserData, UserResultData } from 'app/model/user';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { Injectable } from "@angular/core";
+import { UserData, UserResultData } from "app/model/user";
+import { AngularFireAuth } from "angularfire2/auth";
 
-import * as firebase from 'firebase/app';
-import { FirebaseApp } from 'angularfire2';
-import { AngularFireDatabase } from 'angularfire2/database';
-import { OEvent } from 'app/model/oevent';
-import { Competitor } from 'app/model/competitor';
-import { CourseClass } from 'app/model/courseclass';
-import { Course } from 'app/model/course';
-import { EventInfo } from '../../../firebase/functions/src/index';
-import { Observable } from 'rxjs/Observable';
+import * as firebase from "firebase/app";
+import { FirebaseApp } from "angularfire2";
+import { AngularFireDatabase } from "angularfire2/database";
+import { OEvent } from "app/model/oevent";
+
+import { Competitor, CourseClass, Course } from "app/results/model";
+
+import { EventInfo } from "../../../firebase/functions/src/index";
+import { Observable } from "rxjs/Observable";
 
 @Injectable()
 export class UserDataService {
@@ -42,15 +42,15 @@ export class UserDataService {
 
   private createUser() {
     const user = {
-      firstName: '',
-      lastName: '',
-      club: '',
-      nationality: '',
-      nationalId: '',
-      yearOfBirth: '',
-      ecardEmit: '',
-      ecardSI: '',
-      autoFind: '',
+      firstName: "",
+      lastName: "",
+      club: "",
+      nationality: "",
+      nationalId: "",
+      yearOfBirth: "",
+      ecardEmit: "",
+      ecardSI: "",
+      autoFind: "",
       events: []
     }
     this.getRef().set(user);
@@ -58,7 +58,7 @@ export class UserDataService {
 
   private getPath(): string {
     const uid = this.afAuth.auth.currentUser.uid;
-    return ('users/' + uid);
+    return ("users/" + uid);
   }
 
   private getRef() {

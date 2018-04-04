@@ -1,7 +1,10 @@
 import * as $ from "jquery";
 import d3 = require("d3");
 
-import { InvalidData, isNotNull, isNaNStrict } from "./util";
+import { isNotNull, isNaNStrict } from "./util";
+
+import { InvalidData } from "./exception"
+
 import { sbTime } from "./time";
 
 const NUMBER_TYPE = typeof 0;

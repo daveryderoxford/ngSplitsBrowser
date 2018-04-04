@@ -1,15 +1,28 @@
 import { Injectable, Inject } from "@angular/core";
+<<<<<<< HEAD
 import { OEvent, EventInfo, EventSummary, CourseSummary, SplitsFileFormat} from "app/model/oevent";
 // import * as sb from './filereader/splitsbrowser.data';
 
 import { AngularFireAuth } from "angularfire2/auth";
 
+=======
+
+import { OEvent, EventInfo, EventSummary, CourseSummary, SplitsFileFormat} from "app/model/oevent";
+import {parseEventData} from "app/results/import";
+import { Results} from "app/results/model";
+
+import { AngularFireAuth } from "angularfire2/auth";
+
+>>>>>>> c7f217516b4c1680bf19be94f8356021790beda3
 import * as firebase from "firebase/app";
 import { FirebaseApp } from "angularfire2";
 import { AngularFireDatabase } from "angularfire2/database";
 import { Observable } from "rxjs/Rx";
 
+<<<<<<< HEAD
 import {SplitsBrowser} from "./filereader/splitsbrowser.data"
+=======
+>>>>>>> c7f217516b4c1680bf19be94f8356021790beda3
 
 @Injectable()
 export class EventAdminService {
@@ -122,9 +135,9 @@ export class EventAdminService {
   /* Parse splits file returning parsed results */
   public parseSplits(text: string, oevent: OEvent): any {
 
-    let results: any;
+    let results: Results;
     try {
-      results = SplitsBrowser.Input.parseEventData(text);
+      results = parseEventData(text);
     } catch (e) {
       if (e.name === "InvalidData") {
          console.log("EventAdminServicese Error parsing results" + e.message);

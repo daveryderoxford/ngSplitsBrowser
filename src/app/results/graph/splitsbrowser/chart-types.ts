@@ -1,4 +1,4 @@
-import { Competitor, DubiousTimeInfo } from "app/results/graph/splitsbrowser/competitor";
+import { Competitor, DubiousTimeInfo } from "app/results/model";
 
 export interface ChartType {
     nameKey: string;

@@ -1,14 +1,14 @@
 
 
 import * as $ from "jquery";
-
-import { InvalidData, WrongFileFormat, isNaNStrict } from "./util";
-import { TimeUtilities } from "./time";
-import { Competitor } from "./competitor";
 import d3 = require("d3");
-import { CourseClass } from "./course-class";
-import { Course } from "./course";
-import { Results } from "./results";
+
+import { InvalidData, WrongFileFormat  } from "../model"
+
+import {TimeUtilities, Competitor, CourseClass, Course, Results } from "../model"
+
+import { isNaNStrict } from "app/results/model/util";
+
 
 /**
 * Parses IOF XML data in either the 2.0.3 format or the 3.0 format and

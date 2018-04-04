@@ -1,11 +1,9 @@
 import d3 = require("d3");
 
-import { TimeUtilities } from "./time";
-import { Results } from "./results";
-import { WrongFileFormat, normaliseLineEndings, parseCourseLength, parseCourseClimb } from "./util";
-import { Course } from "./course";
-import { CourseClass } from "./course-class";
-import { Competitor } from "./competitor";
+import { Results, Course, CourseClass, Competitor, TimeUtilities,  WrongFileFormat } from "../model";
+
+import { normaliseLineEndings, parseCourseLength, parseCourseClimb } from "./util";
+
 
 // tslint:disable:max-line-length
 

@@ -1,5 +1,7 @@
 import d3 = require("d3");
-import { isNotNullNorNaN, InvalidData, isNaNStrict, isNotNull } from "./util";
+import { isNotNullNorNaN, , isNaNStrict, isNotNull } from "./util";
+import { InvalidData } from "./exception";
+
 import { Competitor } from "./competitor";
 import { sbTime } from "./time";
 
@@ -68,8 +70,6 @@ export interface FatestSplitsData {
 export class CourseClassSet {
     allCompetitors: Array<Competitor>;
     numControls: number;
-
-
 
     /**
     * An object that represents the currently-selected classes.

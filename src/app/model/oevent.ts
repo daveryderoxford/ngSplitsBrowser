@@ -1,21 +1,21 @@
 
-export type EventGrade = 'IOF' | 'International' | 'National' | 'Regional'| 'Club' | 'Local';
+export type EventGrade = "IOF" | "International" | "National" | "Regional"| "Club" | "Local";
 
 export class EventGrades {
-    static grades: Array<EventGrade> = ['IOF' , 'International' , 'National' , 'Regional', 'Club', 'Local'];
+    static grades: Array<EventGrade> = ["IOF" , "International" , "National" , "Regional", "Club", "Local"];
 }
 
-export type EventDiscipline = 'Sprint' | 'Urban' | 'Middle' | 'Long' | 'Ultralong'| 'Other' ;
+export type EventDiscipline = "Sprint" | "Urban" | "Middle" | "Long" | "Ultralong"| "Other" ;
 export class EventDisciplines {
-    static disciplines: Array<EventDiscipline> = ['Sprint', 'Urban', 'Middle', 'Long', 'Ultralong', 'Other' ];
+    static disciplines: Array<EventDiscipline> = ["Sprint", "Urban", "Middle", "Long", "Ultralong", "Other" ];
 }
 
-export type EventType = 'Foot' | 'Bike' | 'Ski' | 'Trail' | 'Other' ;
+export type EventType = "Foot" | "Bike" | "Ski" | "Trail" | "Other" ;
 export class EventTypes {
-    static types: Array<EventType> = ['Foot', 'Bike' , 'Ski' , 'Trail' , 'Other' ];
+    static types: Array<EventType> = ["Foot", "Bike" , "Ski" , "Trail" , "Other" ];
 }
 
-export type SplitsFileFormat = 'auto' | 'IOFv3' |  'IOFv2' | 'SICSV' | 'SBCSV' | 'SIHTML' | 'ABMHTML' ;
+export type SplitsFileFormat = "auto" | "IOFv3" |  "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML" ;
 
 
 export interface OEvent extends EventInfo {

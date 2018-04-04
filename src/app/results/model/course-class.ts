@@ -1,7 +1,11 @@
 import d3 = require("d3");
 
-import { isNotNullNorNaN, InvalidData } from "./util";
+import { isNotNullNorNaN } from "./util";
+
+import {InvalidData} from "./exception";
+
 import { sbTime } from "./time";
+import { Competitor } from "./competitor";
 
 export interface FastestSplitInfo {
     name: string;
@@ -20,7 +24,7 @@ export class CourseClass {
      */
     constructor(public name: string,
         public numControls: number,
-        public competitors: Array<any>) {
+        public competitors: Array<Competitor>) {
 
         this.competitors.forEach( (comp) => {
             comp.setClassName(name);

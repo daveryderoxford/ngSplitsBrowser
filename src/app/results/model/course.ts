@@ -1,7 +1,10 @@
-import { CourseClass } from "./course-class";
-import { InvalidData } from "./util";
-import { sbTime } from "./time";
+
 import d3 = require("d3");
+
+import { Competitor } from "./competitor";
+import { CourseClass } from "./course-class";
+import { InvalidData } from "./exception";
+import { sbTime } from "./time";
 
 export class Course {
 
@@ -296,6 +299,4 @@ export class Course {
             }
         }
     };
-
 }
-
