@@ -36,14 +36,14 @@ export class EventEditComponent implements OnInit {
 
   private createForm() {
     this.f = this.formBuilder.group({
-      name: ['', Validators.required],
-      eventdate: ['', Validators.required],
-      nationality: ['', Validators.required],
-      club: ['', Validators.required],
-      grade: ['', Validators.required],
-      type: ['', Validators.required],
-      discipline: ['', Validators.required],
-      webpage: ['', Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
+      name: ["", Validators.required],
+      eventdate: ["", Validators.required],
+      nationality: ["", Validators.required],
+      club: ["", Validators.required],
+      grade: ["", Validators.required],
+      type: ["", Validators.required],
+      discipline: ["", Validators.required],
+      webpage: ["", Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
     });
 
   }
@@ -75,7 +75,7 @@ export class EventEditComponent implements OnInit {
   private addhttp(url: string | null): string | null {
   if (url) {
     if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
-      url = 'http://' + url;
+      url = "http://" + url;
     }
   }
     return url;
@@ -98,8 +98,8 @@ async submit() {
         this.showProgressBar = false;
       } catch (err) {
         this.showProgressBar = false;
-        const snackBarRef = this.snackBar.open('Error updating event information');
-        console.log('EventEditComponent:  Error updating event information ' + err);
+        const snackBarRef = this.snackBar.open("Error updating event information");
+        console.log("EventEditComponent:  Error updating event information " + err);
       }
 
       //  this.eventSubmitted.emit(this.event);

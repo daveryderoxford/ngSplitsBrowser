@@ -9,8 +9,8 @@ import { pt_br } from "./messages-pt_br";
 import { sl_si } from "./messages-sl_si";
 
 export const messages = {
-    de: de,
     en_gb: en_gb,
+    de: de,
     fr_be: fr_be,
     nb_no: nb_no,
     nl_be: nl_be,

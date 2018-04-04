@@ -1,10 +1,10 @@
-import { Component, OnInit, ElementRef, ViewEncapsulation } from '@angular/core';
-import { OEvent } from 'app/model/oevent';
-import { ActivatedRoute, Params } from '@angular/router';
+import { Component, OnInit, ElementRef, ViewEncapsulation } from "@angular/core";
+import { OEvent } from "app/model/oevent";
+import { ActivatedRoute, Params } from "@angular/router";
 
-import { ResultsSelectionService } from 'app/results/results-selection.service';
+import { ResultsSelectionService } from "app/results/results-selection.service";
 
-import {SplitsBrowser} from 'app/results/graph/splitsbrowser/splitsbrowser';
+import {SplitsBrowser} from "app/results/graph/splitsbrowser/splitsbrowser";
 
 
 interface SplitsBrowserOptions {
@@ -14,9 +14,9 @@ interface SplitsBrowserOptions {
 }
 
 @Component({
-  selector: 'app-graph',
-  templateUrl: './graph.component.html',
-  styleUrls: ['./graph.component.scss'],
+  selector: "app-graph",
+  templateUrl: "./graph.component.html",
+  styleUrls: ["./graph.component.scss"],
   // To avoid angular re-writting style names that will be used by D3.  These styles will just get appende dto the global styles file
   encapsulation: ViewEncapsulation.None
 })
@@ -29,7 +29,7 @@ export class GraphComponent implements OnInit {
     }
 
   ngOnInit() {
-    this.route.params.subscribe((params: Params) => this.rs.setSelectedEventByKey(params['id']));
+    this.route.params.subscribe((params: Params) => this.rs.setSelectedEventByKey(params["id"]));
     this.rs.getEventObservable().subscribe( (event: OEvent) => this.selectedEventUpdated(event));
   }
 
@@ -37,7 +37,7 @@ export class GraphComponent implements OnInit {
     if (event) {
       this.event = event;
       const url = await this.rs.getSplitsURL();
-      SplitsBrowser.loadEvent(url, {containerElement: 'app-graph'} );
+      SplitsBrowser.loadEvent(url, {containerElement: "app-graph"} );
     }
   }
 

@@ -1,15 +1,15 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed, inject } from "@angular/core/testing";
 
-import { ResultsSelectionService } from './results-selection.service';
+import { ResultsSelectionService } from "./results-selection.service";
 
-describe('ResultsSelectionService', () => {
+describe("ResultsSelectionService", () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [ResultsSelectionService]
     });
   });
 
-  it('should be created', inject([ResultsSelectionService], (service: ResultsSelectionService) => {
+  it("should be created", inject([ResultsSelectionService], (service: ResultsSelectionService) => {
     expect(service).toBeTruthy();
   }));
 });

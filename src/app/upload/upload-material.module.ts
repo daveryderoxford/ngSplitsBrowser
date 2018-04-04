@@ -1,6 +1,6 @@
 
 /** Material componemts used for upload */
-import { NgModule } from '@angular/core';
+import { NgModule } from "@angular/core";
 
 import {
   MatAutocompleteModule, MatButtonModule, MatButtonToggleModule, MatCardModule, MatCheckboxModule,
@@ -8,7 +8,7 @@ import {
   MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatProgressBarModule, MatRadioModule,
   MatProgressSpinnerModule, MatRippleModule, MatSelectModule, MatSidenavModule, MatSliderModule,
   MatSlideToggleModule, MatSnackBarModule, MatTabsModule, MatToolbarModule, MatTooltipModule
-} from '@angular/material';
+} from "@angular/material";
 
 @NgModule({
   exports: [
