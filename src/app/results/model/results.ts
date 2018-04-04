@@ -1,6 +1,7 @@
+import d3 = require("d3");
+
 import { CourseClass } from "./course-class";
 import { Course } from "./course";
-import d3 = require("d3");
 import { sbTime } from "./time";
 
 // file event.js
@@ -27,7 +28,7 @@ export class Results {
     * This method should be called after reading in the event data but before
     * attempting to plot it.
     */
-    public determineTimeLosses = function (): void {
+    public determineTimeLosses(): void {
         this.classes.forEach( (courseClass) => {
             courseClass.determineTimeLosses();
         });
@@ -42,7 +43,7 @@ export class Results {
     * @sb-return {boolean} True if the event data needs repairing, false
     *     otherwise.
     */
-    public needsRepair = function (): boolean {
+    public needsRepair(): boolean {
         return this.classes.some( (courseClass) => {
             return courseClass.competitors.some( (competitor) => {
                 return (competitor.getAllCumulativeTimes() === null);
@@ -62,7 +63,7 @@ export class Results {
     *     null for the finish.
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
-    public getFastestSplitsForLeg = function (startCode: string, endCode: string): Array<any> {
+    public getFastestSplitsForLeg(startCode: string, endCode: string): Array<any> {
         let fastestSplits = [];
         this.courses.forEach( (course) => {
             if (course.usesLeg(startCode, endCode)) {
@@ -89,7 +90,7 @@ export class Results {
     *     null for the finish.
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
-    public getCompetitorsAtControlInTimeRange = function (controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<any> {
+    public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<any> {
         const competitors = [];
         this.courses.forEach( (course) => {
             course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach( (comp) => {

@@ -1,5 +1,5 @@
 
-export type LogSeverity = 'DEFAULT' | 'DEBUG'| 'INFO' | 'NOTICE' | 'WARN' | 'ERROR' | 'CRITICAL' | 'ALERT' | 'EMERGENCY';
+export type LogSeverity = "DEFAULT" | "DEBUG"| "INFO" | "NOTICE" | "WARN" | "ERROR" | "CRITICAL" | "ALERT" | "EMERGENCY";
 
 export interface LogEntry {
    msg: string;

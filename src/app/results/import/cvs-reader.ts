@@ -1,9 +1,10 @@
-import { TimeUtilities } from "./time";
-import { Competitor } from "./competitor";
-import { isTrue, InvalidData, WrongFileFormat, isNotNull, normaliseLineEndings } from "./util";
-import { CourseClass } from "./course-class";
-import { Results } from "./results";
-import { Course } from "./course";
+
+import d3 = require("d3");
+
+import { InvalidData, normaliseLineEndings } from "./util";
+import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results, WrongFileFormat } from "../model";
+
+import { isTrue, isNotNull } from "app/results/model/util";
 
 const parseTime = TimeUtilities.parseTime;
 
@@ -20,7 +21,7 @@ function parseCompetitors(index: number,
     line: string,
     controlCount: number,
     className: string,
-    warnings: Array<string>) {
+    warnings: Array<string>): Competitor {
 
     // Expect forename, surname, club, start time then (controlCount + 1) split times in the form MM:SS.
     const parts = line.split(",");
@@ -79,9 +80,9 @@ function parseCompetitors(index: number,
 * Parse CSV data for a class.
 * @sb-param {string} courseClass - The string containing data for that class.
 * @sb-param {Array} warnings - Array of warnings to add any warnings found to.
-* @sb-return {SplitsBrowser.Model.CourseClass} Parsed class data.
+* @sb-return {CourseClass} Parsed class data.
 */
-function parseCourseClass(courseClass: string, warnings: Array<string>) {
+function parseCourseClass(courseClass: string, warnings: Array<string>): CourseClass {
     const lines = courseClass.split(/\r?\n/).filter(isTrue);
     if (lines.length === 0) {
         throw new InvalidData("parseCourseClass got an empty list of lines");

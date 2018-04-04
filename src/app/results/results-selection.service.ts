@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
-import { OEvent } from '../model/oevent'
-import { AngularFireDatabase } from 'angularfire2/database';
-import { FirebaseApp } from 'angularfire2';
+import { Injectable } from "@angular/core";
+import { Observable, BehaviorSubject } from "rxjs/Rx";
+import { OEvent } from "../model/oevent"
+import { AngularFireDatabase } from "angularfire2/database";
+import { FirebaseApp } from "angularfire2";
 
 
 @Injectable()
@@ -22,7 +22,7 @@ export class ResultsSelectionService {
 
   async setSelectedEventByKey(key: string) {
     if (!this.event || this.event.key !== key) {
-      this.db.object<OEvent>('/events/' + key).valueChanges().subscribe((event) => {
+      this.db.object<OEvent>("/events/" + key).valueChanges().subscribe((event) => {
         this.setSelectedEvent(event);
       });
     }

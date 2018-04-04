@@ -1,11 +1,10 @@
-import { TimeUtilities, sbTime } from "./time";
-import { parseCourseLength, InvalidData, isNotNull, normaliseLineEndings, WrongFileFormat } from "./util";
-import { Competitor } from "./competitor";
-import d3 = require("d3");
-import { CourseClass } from "./course-class";
-import { Course } from "./course";
-import { Results } from "./results";
 
+import d3 = require("d3");
+
+import { parseCourseLength, InvalidData, normaliseLineEndings } from "./util";
+import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results, WrongFileFormat } from "../model";
+
+import { isNotNull } from "app/results/model/util";
 
 const parseTime = TimeUtilities.parseTime;
 

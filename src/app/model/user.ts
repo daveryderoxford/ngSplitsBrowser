@@ -1,6 +1,6 @@
 
 /** data associated with a user */
-import { EventInfo } from 'app/model/oevent';
+import { EventInfo } from "app/model/oevent";
 
 export interface UserData extends UserInfo {
     $key: string;  // Firsbase user Id.

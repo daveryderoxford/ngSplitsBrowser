@@ -23,13 +23,13 @@ export class Utils {
 
     static padRight(str: string, length: number): string {
         while (str.length < length) {
-            str = str + '-';
+            str = str + "-";
         }
         return str;
     }
 
     static decreasingTimeIndex(dateStr: string): string {
-        const d1 = new Date('2050-01-01 00:00:00').getTime() / 1000;
+        const d1 = new Date("2050-01-01 00:00:00").getTime() / 1000;
         const d2 = new Date(dateStr).getTime() / 1000;
         const minusDate = d1 - d2;
 
@@ -38,13 +38,13 @@ export class Utils {
     }
 
     static encodeAsFirebaseKey(string) {
-        return string.replace(/\%/g, '%25')
-            .replace(/\./g, '%2E')
-            .replace(/\#/g, '%23')
-            .replace(/\$/g, '%24')
-            .replace(/\//g, '%2F')
-            .replace(/\[/g, '%5B')
-            .replace(/\]/g, '%5D');
+        return string.replace(/\%/g, "%25")
+            .replace(/\./g, "%2E")
+            .replace(/\#/g, "%23")
+            .replace(/\$/g, "%24")
+            .replace(/\//g, "%2F")
+            .replace(/\[/g, "%5B")
+            .replace(/\]/g, "%5D");
     };
 
     static getClubIndex(club: string, nationality: string): string {
@@ -57,3 +57,5 @@ export class Utils {
         return (key);
     }
 }
+
+

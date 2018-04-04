@@ -1,13 +1,13 @@
 
 import * as d3 from "d3";
 
-import { normaliseLineEndings, WrongFileFormat, parseCourseLength, parseCourseClimb, isNaNStrict, InvalidData } from "./util";
-import { TimeUtilities, sbTime } from "./time";
+import { normaliseLineEndings, parseCourseLength, parseCourseClimb, } from "./util";
 
-import { Competitor } from "./competitor";
-import { CourseClass } from "./course-class";
-import { Course } from "./course";
-import { Results } from "./results";
+import { isNaNStrict } from "app/results/model/util";
+
+import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results  } from "../model";
+import { InvalidData, WrongFileFormat } from "../model";
+
 
 export function parseOEEventData(data): Results {
    const reader = new OEReader(data);

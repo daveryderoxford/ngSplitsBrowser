@@ -1,7 +1,7 @@
 import d3 = require("d3");
 import * as $ from "jquery";
 
-import { InvalidData } from "./util";
+import { InvalidData } from "app/results/import/util";
 
 export class CompetitorSelection {
 
@@ -65,11 +65,11 @@ export class CompetitorSelection {
         if (this.isSingleRunnerSelected()) {
             const refCompetitor = competitorDetails[this.currentIndexes[0]].competitor;
 
-            competitorDetails.forEach(function (compDetails, idx) {
+            competitorDetails.forEach( (compDetails, idx) => {
                 if (compDetails.visible && compDetails.competitor.crosses(refCompetitor)) {
                     this.currentIndexes.push(idx);
                 }
-            }, this);
+            });
 
             this.currentIndexes.sort(d3.ascending);
             this.fireChangeHandlers();
@@ -136,7 +136,7 @@ export class CompetitorSelection {
         // Call slice(0) to return a copy of the list.
         this.changeHandlers.forEach((handler) => {
             handler(this.currentIndexes.slice(0));
-        }, this);
+        });
     };
 
     /**
@@ -146,7 +146,7 @@ export class CompetitorSelection {
     *
     * @sb-param {Function} handler - The handler to register.
     */
-    private deregisterChangeHandler(handler) {
+    public deregisterChangeHandler(handler) {
         const index = this.changeHandlers.indexOf(handler);
         if (index > -1) {
             this.changeHandlers.splice(index, 1);
@@ -182,7 +182,7 @@ export class CompetitorSelection {
     * end if any indexes were added.
     * @sb-param {Array} indexes - Array of indexes of competitors to select.
     */
-    public bulkSelect(indexes) {
+    private bulkSelect(indexes) {
         if (indexes.some(function (index) {
             return (typeof index !== CompetitorSelection.NUMBER_TYPE || index < 0 || index >= this.count);
         }, this)) {
@@ -205,7 +205,7 @@ export class CompetitorSelection {
     * end if any indexes were removed.
     * @sb-param {Array} indexes - Array of indexes of competitors to deselect.
     */
-    public bulkDeselect(indexes) {
+    private bulkDeselect(indexes) {
         if (indexes.some(function (index) {
             return (typeof index !== CompetitorSelection.NUMBER_TYPE || index < 0 || index >= this.count);
         }, this)) {

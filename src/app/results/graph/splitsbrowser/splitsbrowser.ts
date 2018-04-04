@@ -21,29 +21,26 @@
 
 // tslint:disable:max-line-length
 
-
-// Tell JSHint not to complain that this isn't used anywhere.
-/* exported SplitsBrowser */
-/* exported SplitsBrowser */
 import * as $ from "jquery";
 import * as d3 from "d3";
 
-import { isNaNStrict, InvalidData, isNotNullNorNaN, isNotNull, normaliseLineEndings, WrongFileFormat, parseCourseLength, parseCourseClimb, isTrue } from "./util";
+import { isNaNStrict, isNotNullNorNaN } from "app/results/model/util";
 
-import { Lang } from "./lang/lang"
+import { Lang } from "./lang"
+import { parseEventData, InvalidData } from "app/results/import";
+
 
 // Model
-import { TimeUtilities, sbTime } from "./time";
-import { Competitor } from "./competitor";
-import { CourseClass } from "./course-class";
-import { CourseClassSet } from "./course-class-set";
-import { Course } from "./course";
-import { Results } from "./results";
+import { TimeUtilities, sbTime } from "app/results/model/time";
+import { Competitor } from "app/results/model/competitor";
+import { CourseClass } from "app/results/model/course-class";
+import { CourseClassSet } from "app/results/model/course-class-set";
+import { Course } from "app/results/model/course";
+import { Results } from "app/results/model/results";
 
 // Graph
 import { ChartTypeClass, ChartType } from "./chart-types";
 import { CompetitorSelection } from "./competitor-selection";
-import { parseEventData } from "./input";
 
 export let SplitsBrowser = {} as any;
 
