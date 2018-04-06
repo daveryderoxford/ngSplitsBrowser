@@ -5,7 +5,7 @@ import { TimeUtilities, CourseClassSet, Course, Results } from "../../model/";
 
 export interface FastestSplitsPopupData {
     title: string;
-    data: any;
+    data: Array<{ time: number, name: string, highlight: boolean }>;
     placeholder: string;
 }
 

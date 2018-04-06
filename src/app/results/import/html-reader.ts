@@ -1,8 +1,8 @@
 
 import d3 = require("d3");
 
-import { parseCourseLength, InvalidData, normaliseLineEndings } from "./util";
-import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results, WrongFileFormat } from "../model";
+import { parseCourseLength, normaliseLineEndings } from "./util";
+import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results, WrongFileFormat, InvalidData } from "../model";
 
 import { isNotNull } from "app/results/model/util";
 

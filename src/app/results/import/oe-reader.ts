@@ -5,13 +5,14 @@ import { normaliseLineEndings, parseCourseLength, parseCourseClimb, } from "./ut
 
 import { isNaNStrict } from "app/results/model/util";
 
-import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results  } from "../model";
+import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results } from "../model";
 import { InvalidData, WrongFileFormat } from "../model";
+import { FirstnameSurname } from "../model/competitor";
 
 
 export function parseOEEventData(data): Results {
-   const reader = new OEReader(data);
-   return(reader.parseEventData() );
+    const reader = new OEReader(data);
+    return (reader.parseEventData());
 }
 
 const parseTime = TimeUtilities.parseTime;
@@ -19,7 +20,7 @@ const parseTime = TimeUtilities.parseTime;
 // Indexes of the various columns relative to the column for control-1.
 const COLUMN_INDEXES: any = new Object();
 
-[44, 46, 60].forEach( (columnOffset) => {
+[44, 46, 60].forEach((columnOffset) => {
     COLUMN_INDEXES[columnOffset] = {
         course: columnOffset - 7,
         distance: columnOffset - 6,
@@ -32,7 +33,7 @@ const COLUMN_INDEXES: any = new Object();
     };
 });
 
-[44, 46].forEach( (columnOffset) => {
+[44, 46].forEach((columnOffset) => {
     COLUMN_INDEXES[columnOffset].nonCompetitive = columnOffset - 38;
     COLUMN_INDEXES[columnOffset].startTime = columnOffset - 37;
     COLUMN_INDEXES[columnOffset].time = columnOffset - 35;
@@ -72,9 +73,8 @@ const MIN_CONTROLS_OFFSET = 37;
 
 class OEReader {
 
-
-    private classes = <any>d3.map();  // Map that associates classes to all of the competitors running on that class.
-    private courseDetails = <any>d3.map();  // Map that associates course names to length and climb values.
+    private classes = d3.map<any>();  // Map that associates classes to all of the competitors running on that class.
+    private courseDetails = d3.map<any>();  // Map that associates course names to length and climb values.
     private columnIndexes = null; // The indexes of the columns that we read data from.
     private classCoursePairs = [];   // Set of all pairs of classes and course
     // (While it is common that one course may have multiple classes, it
@@ -110,7 +110,7 @@ class OEReader {
         // Discard the header row.
         this.lines.shift();
 
-        this.lines.forEach( (line, lineIndex) => {
+        this.lines.forEach((line, lineIndex) => {
             this.readLine(line, lineIndex + 1, delimiter);
         }, this);
 
@@ -244,7 +244,7 @@ class OEReader {
     */
     private getNumControls(row: Array<string>, lineNumber: number): number | null {
         const className = this.getClassName(row);
-        let name: string;
+        let name: string | FirstnameSurname;
         if (className.trim() === "") {
             name = this.getName(row) || "<name unknown>";
             this.warnings.push("Could not find a class for competitor '" + name + "' (line " + lineNumber + ")");
@@ -321,7 +321,7 @@ class OEReader {
     private createCourseIfNecessary(row: Array<string>, numControls: number) {
         const courseName = row[this.columnIndexes.course];
         if (!this.courseDetails.has(courseName)) {
-            const controlNums = d3.range(0, numControls).map( (controlIdx) => {
+            const controlNums = d3.range(0, numControls).map((controlIdx) => {
                 return row[this.columnIndexes.control1 + 2 * controlIdx];
             }, this);
             this.courseDetails.set(courseName, {
@@ -341,7 +341,7 @@ class OEReader {
         const className = this.getClassName(row);
         const courseName = row[this.columnIndexes.course];
 
-        if (!this.classCoursePairs.some( (pair) => { return pair[0] === className && pair[1] === courseName; })) {
+        if (!this.classCoursePairs.some((pair) => { return pair[0] === className && pair[1] === courseName; })) {
             this.classCoursePairs.push([className, courseName]);
         }
     };
@@ -349,18 +349,18 @@ class OEReader {
     /**
     * Reads the name of the competitor from the row.
     * @sb-param {Array} row - Array of row data items.
-    * @sb-return {String} The name of the competitor.
+    * @sb-return {String | FirstnameSurname} The name of the competitor.
     */
-    private getName(row) {
-        let name = "";
+    private getName(row): string | FirstnameSurname {
+        // Default name to no name
+        let name: string | FirstnameSurname = "";
 
         if (this.columnIndexes.hasOwnProperty("forename") && this.columnIndexes.hasOwnProperty("surname")) {
-            const forename = row[this.columnIndexes.forename];
-            const surname = row[this.columnIndexes.surname];
-            name = (forename + " " + surname).trim();
-        }
-
-        if (name === "" && this.columnIndexes.hasOwnProperty("combinedName")) {
+            name = {
+                firstname: row[this.columnIndexes.forename],
+                surname: row[this.columnIndexes.surname]
+            }
+        } else if (this.columnIndexes.hasOwnProperty("combinedName")) {
             // 'Nameless' or 44-column variation.
             name = row[this.columnIndexes.combinedName];
         }
@@ -393,10 +393,14 @@ class OEReader {
         const ecard = this.getEcard(row);
         const nationalId = null;
 
+        /// Handle variation wwhere the position is appended to the name
         let name = this.getName(row);
         const isPlacingNonNumeric = (placing !== "" && isNaNStrict(parseInt(placing, 10)));
-        if (isPlacingNonNumeric && name.substring(name.length - placing.length) === placing) {
-            name = name.substring(0, name.length - placing.length).trim();
+        if (typeof name === "string") {
+            if (isPlacingNonNumeric && name.substring(name.length - placing.length) === placing) {
+                // trim the name to remove the palcing from it
+                name = name.substring(0, name.length - placing.length).trim();
+            }
         }
 
         const order = this.classes.get(className).competitors.length + 1;
@@ -456,8 +460,8 @@ class OEReader {
             return;
         }
 
-        const row = line.split(delimiter).map( (s) => { return s.trim(); })
-                                         .map( this.dequote );
+        const row = line.split(delimiter).map((s) => { return s.trim(); })
+            .map(this.dequote);
 
         // Check the row is long enough to have all the data besides the
         // controls data.
@@ -489,7 +493,7 @@ class OEReader {
         const classesToCourses = <any>d3.map();
         const coursesToClasses = <any>d3.map();
 
-        this.classCoursePairs.forEach( (pair) => {
+        this.classCoursePairs.forEach((pair) => {
             const className = pair[0];
             const courseName = pair[1];
 
@@ -516,7 +520,7 @@ class OEReader {
     private createClasses() {
         const classNames = this.classes.keys();
         classNames.sort();
-        return classNames.map( (className) => {
+        return classNames.map((className) => {
             const courseClass = this.classes.get(className);
             return new CourseClass(className, courseClass.numControls, courseClass.competitors);
         }, this);
@@ -585,17 +589,17 @@ class OEReader {
         }
 
         // Mark all of the courses that we handled here as done.
-        relatedCourseNames.forEach( (courseName1) => {
+        relatedCourseNames.forEach((courseName1) => {
             doneCourseNames.add(courseName1);
         });
 
-        const classesForThisCourse = relatedClassNames.map( (className1) => {
-                    return classesMap.get(className1);
-                 });
+        const classesForThisCourse = relatedClassNames.map((className1) => {
+            return classesMap.get(className1);
+        });
         const details = this.courseDetails.get(initCourseName);
         const course = new Course(initCourseName, classesForThisCourse, details.length, details.climb, details.controls);
 
-        classesForThisCourse.forEach( (courseClass) => {
+        classesForThisCourse.forEach((courseClass) => {
             courseClass.setCourse(course);
         });
 
@@ -620,13 +624,13 @@ class OEReader {
         const doneCourseNames = d3.set();
 
         const classesMap = d3.map();
-        classes.forEach( (courseClass) => {
+        classes.forEach((courseClass) => {
             classesMap.set(courseClass.name, courseClass);
         });
 
         // List of all Course objects created so far.
         const courses = [];
-        manyToManyMaps.coursesToClasses.keys().forEach( (courseName) => {
+        manyToManyMaps.coursesToClasses.keys().forEach((courseName) => {
             if (!doneCourseNames.has(courseName)) {
                 const course = this.createCourseFromLinkedClassesAndCourses(courseName, manyToManyMaps, doneCourseNames, classesMap);
                 courses.push(course);

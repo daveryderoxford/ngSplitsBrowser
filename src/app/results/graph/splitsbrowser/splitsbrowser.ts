@@ -27,16 +27,12 @@ import * as d3 from "d3";
 import { isNaNStrict, isNotNullNorNaN } from "app/results/model/util";
 
 import { Lang } from "./lang"
-import { parseEventData, InvalidData } from "app/results/import";
+import { parseEventData } from "app/results/import";
 
 
 // Model
-import { TimeUtilities, sbTime } from "app/results/model/time";
-import { Competitor } from "app/results/model/competitor";
-import { CourseClass } from "app/results/model/course-class";
-import { CourseClassSet } from "app/results/model/course-class-set";
-import { Course } from "app/results/model/course";
-import { Results } from "app/results/model/results";
+import { TimeUtilities, sbTime, Competitor, CourseClass, CourseClassSet, Course, Results, InvalidData } from "app/results/model";
+
 
 // Graph
 import { ChartTypeClass, ChartType } from "./chart-types";

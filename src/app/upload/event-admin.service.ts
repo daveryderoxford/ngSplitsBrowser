@@ -1,28 +1,14 @@
 import { Injectable, Inject } from "@angular/core";
-<<<<<<< HEAD
 import { OEvent, EventInfo, EventSummary, CourseSummary, SplitsFileFormat} from "app/model/oevent";
-// import * as sb from './filereader/splitsbrowser.data';
 
 import { AngularFireAuth } from "angularfire2/auth";
 
-=======
-
-import { OEvent, EventInfo, EventSummary, CourseSummary, SplitsFileFormat} from "app/model/oevent";
-import {parseEventData} from "app/results/import";
-import { Results} from "app/results/model";
-
-import { AngularFireAuth } from "angularfire2/auth";
-
->>>>>>> c7f217516b4c1680bf19be94f8356021790beda3
 import * as firebase from "firebase/app";
 import { FirebaseApp } from "angularfire2";
 import { AngularFireDatabase } from "angularfire2/database";
 import { Observable } from "rxjs/Rx";
-
-<<<<<<< HEAD
-import {SplitsBrowser} from "./filereader/splitsbrowser.data"
-=======
->>>>>>> c7f217516b4c1680bf19be94f8356021790beda3
+import { Results } from "app/results/model/results";
+import { parseEventData } from "app/results/import/import";
 
 @Injectable()
 export class EventAdminService {
@@ -53,7 +39,6 @@ export class EventAdminService {
     console.log("EventService:  Event added");
 
   }
-
 
   /** Update the event info for an event */
   async updateEventInfo(key: string, eventInfo: EventInfo) {

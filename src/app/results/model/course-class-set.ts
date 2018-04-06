@@ -1,5 +1,5 @@
 import d3 = require("d3");
-import { isNotNullNorNaN, , isNaNStrict, isNotNull } from "./util";
+import { isNotNullNorNaN, isNaNStrict, isNotNull } from "./util";
 import { InvalidData } from "./exception";
 
 import { Competitor } from "./competitor";

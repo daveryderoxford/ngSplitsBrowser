@@ -2,12 +2,8 @@ import * as $ from "jquery";
 import d3 = require("d3");
 
 import { isNotNull, isNaNStrict } from "./util";
-
 import { InvalidData } from "./exception"
-
 import { sbTime } from "./time";
-
-const NUMBER_TYPE = typeof 0;
 
 export type Genre = "M" | "F";
 
@@ -15,6 +11,13 @@ export interface DubiousTimeInfo {
     start: number;
     end: number;
 }
+
+export interface FirstnameSurname {
+    firstname: string;
+    surname: string;
+}
+
+const NUMBER_TYPE = typeof 0;
 
 /**
 * Returns the sum of two numbers, or null if either is null.
@@ -87,6 +90,9 @@ function splitTimesFromCumTimes(cumTimes: Array<number>): Array<number> {
 
 export class Competitor {
 
+    firstname: string;
+    surname: string;
+
     isNonCompetitive = false;
     isNonStarter = false;
     isNonFinisher = false;
@@ -120,13 +126,17 @@ export class Competitor {
     * later need to be repaired.
     *
     * @sb-param {Number} order - The position of the competitor within the list of results.
-    * @sb-param {String} name - The name of the competitor.
+    * @sb-param {String} name - The name of the competitor.  Either the fullname or firstname/surname
     * @sb-param {String} club - The name of the competitor's club.
     * @sb-param {Number} startTime - The competitor's start time, as seconds past midnight.
     * @sb-param {Array} cumTimes - Array of cumulative split times, as numbers, with nulls for missed controls.
     * @sb-return {Competitor} Created competitor.
     */
-    public static fromOriginalCumTimes(order: number, name: string, club: string, startTime: sbTime, cumTimes: Array<sbTime>): Competitor {
+    public static fromOriginalCumTimes(order: number,
+                                       name: string | FirstnameSurname,
+                                       club: string,
+                                       startTime: sbTime,
+                                       cumTimes: Array<sbTime>): Competitor {
         const splitTimes = splitTimesFromCumTimes(cumTimes);
         return new Competitor(order, name, club, startTime, splitTimes, cumTimes);
     };
@@ -145,13 +155,17 @@ export class Competitor {
     * to be viewed.
     *
     * @sb-param {Number} order - The position of the competitor within the list of results.
-    * @sb-param {String} name - The name of the competitor.
+    * @sb-param {String} name - The name of the competitor.  Either the fullname or firstname/surname
     * @sb-param {String} club - The name of the competitor's club.
     * @sb-param {Number} startTime - The competitor's start time, as seconds past midnight.
     * @sb-param {Array} cumTimes - Array of cumulative split times, as numbers, with nulls for missed controls.
     * @sb-return {Competitor} Created competitor.
     */
-    public static fromCumTimes(order: number, name: string, club: string, startTime: sbTime, cumTimes: Array<sbTime>): Competitor {
+    public static fromCumTimes(order: number,
+                               name: string | FirstnameSurname,
+                               club: string,
+                               startTime: sbTime,
+                               cumTimes: Array<sbTime>): Competitor {
         const competitor = Competitor.fromOriginalCumTimes(order, name, club, startTime, cumTimes);
         competitor.splitTimes = competitor.originalSplitTimes;
         competitor.cumTimes = competitor.originalCumTimes;
@@ -186,16 +200,26 @@ export class Competitor {
         }
     };
 
-    constructor(public order: number,
-        public name: string,
-        public club: string,
-        public startTime: number,
-        public originalSplitTimes: Array<sbTime>,
-        public originalCumTimes: Array<sbTime>,
-        public firstname?: string) {
+    private constructor(public order: number,
+                        name: string | FirstnameSurname,
+                        public club: string,
+                        public startTime: number,
+                        public originalSplitTimes: Array<sbTime>,
+                        public originalCumTimes: Array<sbTime>) {
 
         if (typeof order !== NUMBER_TYPE) {
             throw new InvalidData("Competitor order must be a number, got " + typeof order + " '" + order + "' instead");
+        }
+
+        if (typeof name === "string") {
+            // If a single name is provided split the first word as firstname and rest as surname
+            name = name.trim();
+            const index = name.indexOf(" ");
+            this.firstname = name.slice(0, index);
+            this.surname = name.slice(index).trim();
+        } else {
+            this.firstname = name.firstname;
+            this.surname = name.surname;
         }
 
         this.className = null;
@@ -212,6 +236,11 @@ export class Competitor {
 
         // tslint:disable-next-line:max-line-length
         this.totalTime = (originalCumTimes === null || originalCumTimes.indexOf(null) > -1) ? null : originalCumTimes[originalCumTimes.length - 1];
+    }
+
+    /** Full name of competitor (readonly) */
+    get name() {
+       return( this.firstname + " " + this.surname);
     }
 
     /**
