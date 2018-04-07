@@ -27,51 +27,51 @@ import { parseEventData } from "./import";
 
 const fromCumTimes = Competitor.fromCumTimes;
 
-describe("CVSEventData tests", () => {
+fdescribe("CVSEventData tests", () => {
 
     it("Cannot parse an empty string", () => {
-        expect(() => parseEventData("")).toThrow(InvalidData);
+        expect(() => parseEventData("")).toThrowErrorOfType(InvalidData);
     });
 
     it("Cannot parse single class with no competitors", () => {
-        expect(() => parseEventData("Example, 4")).toThrow(InvalidData);
+        expect(() => parseEventData("Example, 4")).toThrowErrorOfType(InvalidData);
     });
 
     it("Cannot parse single class with non-numeric control count", () => {
         const csvData = "Example, four\r\nJohn,Smith,ABC,10:34,02:57,01:39,03:31,02:01,00:23";
-        expect(() => parseEventData(csvData)).toThrow(InvalidData);
+        expect(() => parseEventData(csvData)).toThrowErrorOfType(InvalidData);
     });
 
     // Allow 0 controls, as that essentially means a start and a finish.
     it("Cannot parse single class with negative control count", () => {
         const csvData = "Example, -1\r\nJohn,Smith,ABC,10:34,02:57,01:39,03:31,02:01,00:23";
-        expect(() => parseEventData(csvData)).toThrow(InvalidData);
+        expect(() => parseEventData(csvData)).toThrowErrorOfType(InvalidData);
     });
 
     it("Rejects single class with only one item on first line as being of the wrong format", () => {
         const csvData = "There is no control count here\r\nJohn,Smith,ABC,10:34,02:57,01:39,03:31,02:01,00:23";
-        expect(() => parseEventData(csvData)).toThrow(WrongFileFormat);
+        expect(() => parseEventData(csvData)).toThrowErrorOfType(WrongFileFormat);
     });
 
     it("Rejects single class with too many items on first line as being of the wrong format", () => {
         const csvData = "Example, 4, 2\r\nJohn,Smith,ABC,10:34,02:57,01:39,03:31,02:01,00:23";
-        expect(() => parseEventData(csvData)).toThrow(WrongFileFormat);
+        expect(() => parseEventData(csvData)).toThrowErrorOfType(WrongFileFormat);
     });
 
     it("Rejects HTML that happens to have a single comma on the first line as being of the wrong format", () => {
         const csvData = "<html><head><title>Blah blah blah, blah blah</title>\n<head><body><p>blah blah blah</p>\n</body>\n</html>\n";
-        expect(() => parseEventData(csvData)).toThrow(WrongFileFormat);
+        expect(() => parseEventData(csvData)).toThrowErrorOfType(WrongFileFormat);
     });
 
     it("Rejects HTML in capitals that happens to have a single comma on the first line as being of the wrong format", () => {
         const csvData = "<HTML><HEAD><TITLE>Blah blah blah, blah blah</TITLE>\n<HEAD><BODY><P>blah blah blah</P>\n</BODY>\n</HTML>\n";
-        expect(() => parseEventData(csvData)).toThrow(WrongFileFormat);
+        expect(() => parseEventData(csvData)).toThrowErrorOfType(WrongFileFormat);
     });
 
     it("Rejects OE-format file as being of the wrong format", () => {
         const siData = "First name;Surname;City;Start;Time;Short;AgeClass controls;Punch1;Punch2;Punch3;\r\n" +
             "John;Smith;ABC;10:00:00;06:33;Test class;3;01:50;03:38;06:02;\r\n";
-        expect(() => parseEventData(siData)).toThrow(WrongFileFormat);
+        expect(() => parseEventData(siData)).toThrowErrorOfType(WrongFileFormat);
 
     });
 
