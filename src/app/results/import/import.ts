@@ -3,14 +3,14 @@
 
 import { parseIOFXMLEventData } from "./iof-xml-reader";
 import { parseOEEventData } from "./oe-reader";
-import { parseCSVventData } from "./cvs-reader";
+import { parseCSVEventData } from "./cvs-reader";
 import { parseHTMLEventData } from "./html-reader";
 import { parseTripleColumnEventData } from "./alternative-cvs-reader";
 import { Results } from "../model";
 
 // All the parsers for parsing event data that are known about.
 const PARSERS = [
-    parseCSVventData,
+    parseCSVEventData,
     parseOEEventData,
     parseHTMLEventData,
     parseTripleColumnEventData,

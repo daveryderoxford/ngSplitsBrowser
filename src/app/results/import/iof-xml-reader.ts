@@ -3,12 +3,14 @@
 import * as $ from "jquery";
 import d3 = require("d3");
 
-import { InvalidData, WrongFileFormat  } from "../model"
-
-import {TimeUtilities, Competitor, CourseClass, Course, Results } from "../model"
+import { InvalidData, WrongFileFormat } from "../model"
+import { TimeUtilities, Competitor, CourseClass, Course, Results, sbTime } from "../model"
 
 import { isNaNStrict } from "app/results/model/util";
+import { FirstnameSurname } from "app/results/model/competitor";
 
+import { Version2Reader } from "./iof-xml-v2-reader";
+import { Version3Reader } from "./iof-xml-v3-reader";
 
 /**
 * Parses IOF XML data in either the 2.0.3 format or the 3.0 format and
@@ -30,7 +32,7 @@ export function parseIOFXMLEventData(data: string): Results {
         throw new InvalidData("No class result elements found");
     }
 
-    const classes = [];
+    const classes: Array<CourseClass> = [];
 
     // Array of all 'temporary' courses, intermediate objects that contain
     // course data but not yet in a suitable form to return.
@@ -40,11 +42,11 @@ export function parseIOFXMLEventData(data: string): Results {
     // to the temporary course with that ID and controls.
     // (We expect that all classes with the same course ID have consistent
     // controls, but we don't assume that.)
-    const coursesMap = <any>d3.map();
+    const coursesMap = d3.map<any>();
 
-    const warnings = [];
+    const warnings: Array<string> = [];
 
-    classResultElements.forEach( (classResultElement) => {
+    classResultElements.forEach((classResultElement) => {
         const parsedClass = parseClassData(classResultElement, reader, warnings);
         if (parsedClass === null) {
             // Class could not be parsed.
@@ -74,22 +76,26 @@ export function parseIOFXMLEventData(data: string): Results {
     });
 
     // Now build up the array of courses.
-    const courses = tempCourses.map( (tempCourse) => {
+    const courses = tempCourses.map((tempCourse) => {
         const course = new Course(tempCourse.name, tempCourse.classes, tempCourse.length, tempCourse.climb, tempCourse.controls);
-        tempCourse.classes.forEach( (courseClass) => { courseClass.setCourse(course); });
+        tempCourse.classes.forEach((courseClass) => { courseClass.setCourse(course); });
         return course;
     });
 
     return new Results(classes, courses, warnings);
 }
 
+// Regexp that matches the year in an ISO-8601 date.
+// Both XML formats use ISO-8601 (YYYY-MM-DD) dates, so parsing is
+// fortunately straightforward.
+const yearRegexp = /^\d{4}/;
 
 /**
 * Parses the given XML string and returns the parsed XML.
 * @sb-param {String} xmlString - The XML string to parse.
 * @sb-return {XMLDocument} The parsed XML document.
 */
-function parseXml(xmlString: string) {
+function parseXml(xmlString: string): XMLDocument {
     let xml: XMLDocument;
     try {
         xml = $.parseXML(xmlString);
@@ -106,21 +112,6 @@ function parseXml(xmlString: string) {
     return xml;
 }
 
-const parseTime = TimeUtilities.parseTime;
-
-// Number of feet in a kilometre.
-const FEET_PER_KILOMETRE = 3280;
-
-
-/**
-* Returns whether the given value is undefined.
-* @sb-param {any} value - The value to check.
-* @sb-return {boolean} True if the value is undefined, false otherwise.
-*/
-function isUndefined(value: any): boolean {
-    return typeof value === "undefined";
-}
-
 /**
 * Parses and returns a competitor name from the given XML element.
 *
@@ -130,467 +121,23 @@ function isUndefined(value: any): boolean {
 *
 * @sb-param {jQuery.selection} nameElement - jQuery selection containing the
 *     PersonName or Name element.
-* @sb-return {String} Name read from the element.
+* @sb-return {Name object} Name read from the element.
 */
-function readCompetitorName(nameElement) {
+function readCompetitorName(nameElement): FirstnameSurname {
 
     const forename = $("> Given", nameElement).text();
     const surname = $("> Family", nameElement).text();
 
-    if (forename === "") {
-        return surname;
-    } else if (surname === "") {
-        return forename;
-    } else {
-        return forename + " " + surname;
-    }
+    return ({
+        firstname: forename,
+        surname: surname
+    });
 }
 
-// Regexp that matches the year in an ISO-8601 date.
-// Both XML formats use ISO-8601 (YYYY-MM-DD) dates, so parsing is
-// fortunately straightforward.
-const yearRegexp = /^\d{4}/;
-
-// Object that contains various functions for parsing bits of data from
-// IOF v2.0.3 XML event data.
-const Version2Reader = {} as any;
-
-/**
-* Returns whether the given event data is likely to be results data of the
-* version 2.0.3 format.
-*
-* This function is called before the XML is parsed and so can provide a
-* quick way to discount files that are not of the v2.0.3 format.  Further
-* functions of this reader are only called if this method returns true.
-*
-* @sb-param {String} data - The event data.
-* @sb-return {boolean} True if the data is likely to be v2.0.3-format data,
-*     false if not.
-*/
-Version2Reader.isOfThisVersion = function (data) {
-    return data.indexOf("IOFdata.dtd") >= 0;
-};
-
-/**
-* Makes a more thorough check that the parsed XML data is likely to be of
-* the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
-* @sb-param {jQuery.selection} rootElement - The root element.
-*/
-Version2Reader.checkVersion = function (rootElement) {
-    const iofVersionElement = $("> IOFVersion", rootElement);
-    if (iofVersionElement.length === 0) {
-        throw new WrongFileFormat("Could not find IOFVersion element");
-    } else {
-        const version = iofVersionElement.attr("version");
-        if (isUndefined(version)) {
-            throw new WrongFileFormat("Version attribute missing from IOFVersion element");
-        } else if (version !== "2.0.3") {
-            throw new WrongFileFormat("Found unrecognised IOF XML data format '" + version + "'");
-        }
-    }
-
-    const status = rootElement.attr("status");
-    if (!isUndefined(status) && status.toLowerCase() !== "complete") {
-        throw new InvalidData("Only complete IOF data supported; snapshot and delta are not supported");
-    }
-};
-
-/**
-* Reads the class name from a ClassResult element.
-* @sb-param {jQuery.selection} classResultElement - ClassResult element
-*     containing the course details.
-* @sb-return {String} Class name.
-*/
-Version2Reader.readClassName = function (classResultElement): string {
-    return $("> ClassShortName", classResultElement).text();
-};
-
-/**
-* Reads the course details from the given ClassResult element.
-* @sb-param {jQuery.selection} classResultElement - ClassResult element
-*     containing the course details.
-* @sb-param {Array} warnings - Array that accumulates warning messages.
-* @sb-return {Object} Course details: id, name, length, climb and numberOfControls
-*/
-Version2Reader.readCourseFromClass = function (classResultElement, warnings) {
-    // Although the IOF v2 format appears to support courses, they
-    // haven't been specified in any of the files I've seen.
-    // So instead grab course details from the class and the first
-    // competitor.
-    const courseName = $("> ClassShortName", classResultElement).text();
-
-    const firstResult = $("> PersonResult > Result", classResultElement).first();
-    let length = null;
-
-    if (firstResult.length > 0) {
-        const lengthElement = $("> CourseLength", firstResult);
-        const lengthStr = lengthElement.text();
-
-        // Course lengths in IOF v2 are a pain, as you have to handle three
-        // units.
-        if (lengthStr.length > 0) {
-            length = parseFloat(lengthStr);
-            if (isFinite(length)) {
-                const unit = lengthElement.attr("unit");
-                if (isUndefined(unit) || unit === "m") {
-                    length /= 1000;
-                } else if (unit === "km") {
-                    // Length already in kilometres, do nothing further.
-                } else if (unit === "ft") {
-                    length /= FEET_PER_KILOMETRE;
-                } else {
-                    warnings.push("Course '" + courseName + "' gives its length in a unit '" + unit +
-                        "', but this unit was not recognised");
-                    length = null;
-                }
-            } else {
-                warnings.push("Course '" + courseName + "' specifies a course length that was not understood: '" +
-                    lengthStr + "'");
-                length = null;
-            }
-        }
-    }
-
-    // Climb does not appear in the per-competitor results, and there is
-    // no NumberOfControls.
-    return { id: null, name: courseName, length: length, climb: null, numberOfControls: null };
-};
-
-/**
-* Returns the XML element that contains a competitor's name.  This element
-* should contain child elements with names 'Given' and 'Family'.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     PersonResult element.
-* @sb-return {jQuery.selection} jQuery selection containing any child
-*     'PersonName' element.
-*/
-Version2Reader.getCompetitorNameElement = function (element) {
-    return $("> Person > PersonName", element);
-};
-
-/**
-* Returns the name of the competitor's club.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     PersonResult element.
-* @sb-return {String} Competitor's club name.
-*/
-Version2Reader.readClubName = function (element) {
-    return $("> Club > ShortName", element).text();
-};
-
-/**
-* Returns the competitor's date of birth, as a string.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     PersonResult element.
-* @sb-return {String} The competitors date of birth, as a string.
-*/
-Version2Reader.readDateOfBirth = function (element) {
-    return $("> Person > BirthDate > Date", element).text();
-};
-
-/**
-* Reads a competitor's start time from the given Result element.
-* @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-*     Result element.
-* @sb-return {?Number} Competitor's start time in seconds since midnight, or
-*     null if not found.
-*/
-Version2Reader.readStartTime = function (resultElement) {
-    const startTimeStr = $("> StartTime > Clock", resultElement).text();
-    const startTime = (startTimeStr === "") ? null : parseTime(startTimeStr);
-    return startTime;
-};
-
-/**
-* Reads a competitor's total time from the given Result element.
-* @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-*     Result element.
-* @sb-return {?Number} - The competitor's total time in seconds, or
-*     null if a valid time was not found.
-*/
-Version2Reader.readTotalTime = function (resultElement) {
-    const totalTimeStr = $("> Time", resultElement).text();
-    const totalTime = (totalTimeStr === "") ? null : parseTime(totalTimeStr);
-    return totalTime;
-};
-
-/**
-* Returns the status of the competitor with the given result.
-* @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-*     Result element.
-* @sb-return {String} Status of the competitor.
-*/
-Version2Reader.getStatus = function (resultElement) {
-    const statusElement = $("> CompetitorStatus", resultElement);
-    return (statusElement.length === 1) ? statusElement.attr("value") : "";
-};
-
-Version2Reader.StatusNonCompetitive = "NotCompeting";
-Version2Reader.StatusNonStarter = "DidNotStart";
-Version2Reader.StatusNonFinisher = "DidNotFinish";
-Version2Reader.StatusDisqualified = "Disqualified";
-Version2Reader.StatusOverMaxTime = "OverTime";
-
-/**
-* Unconditionally returns false - IOF XML version 2.0.3 appears not to
-* support additional controls.
-* @sb-return {boolean} false.
-*/
-Version2Reader.isAdditional = function () {
-    return false;
-};
-
-/**
-* Reads a control code and split time from a SplitTime element.
-* @sb-param {jQuery.selection} splitTimeElement - jQuery selection containing
-*     a SplitTime element.
-* @sb-return {Object} Object containing code and time.
-*/
-Version2Reader.readSplitTime = function (splitTimeElement) {
-    // IOF v2 allows ControlCode or Control elements.
-    let code = $("> ControlCode", splitTimeElement).text();
-    if (code === "") {
-        code = $("> Control > ControlCode", splitTimeElement).text();
-    }
-
-    if (code === "") {
-        throw new InvalidData("Control code missing for control");
-    }
-
-    const timeStr = $("> Time", splitTimeElement).text();
-    const time = (timeStr === "") ? null : parseTime(timeStr);
-    return { code: code, time: time };
-};
-
-// Regexp to match ISO-8601 dates.
-// Ignores timezone info - always display times as local time.
-// We don't assume there are separator characters, and we also don't assume
-// that the seconds will be specified.
-const ISO_8601_RE = /^\d\d\d\d-?\d\d-?\d\dT?(\d\d):?(\d\d)(?::?(\d\d))?/;
-
-// Object that contains various functions for parsing bits of data from
-// IOF v3.0 XML event data.
-const Version3Reader = {} as any;
-
-/**
-* Returns whether the given event data is likely to be results data of the
-* version 3.0 format.
-*
-* This function is called before the XML is parsed and so can provide a
-* quick way to discount files that are not of the v3.0 format.  Further
-* functions of this reader are only called if this method returns true.
-*
-* @sb-param {String} data - The event data.
-* @sb-return {boolean} True if the data is likely to be v3.0-format data,
-*     false if not.
-*/
-Version3Reader.isOfThisVersion = function (data) {
-    return data.indexOf("http://www.orienteering.org/datastandard/3.0") >= 0;
-};
-
-/**
-* Makes a more thorough check that the parsed XML data is likely to be of
-* the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
-* @sb-param {jQuery.selection} rootElement - The root element.
-*/
-Version3Reader.checkVersion = function (rootElement) {
-    const iofVersion = rootElement.attr("iofVersion");
-    if (isUndefined(iofVersion)) {
-        throw new WrongFileFormat("Could not find IOF version number");
-    } else if (iofVersion !== "3.0") {
-        throw new WrongFileFormat("Found unrecognised IOF XML data format '" + iofVersion + "'");
-    }
-
-    const status = rootElement.attr("status");
-    if (!isUndefined(status) && status.toLowerCase() !== "complete") {
-        throw new InvalidData("Only complete IOF data supported; snapshot and delta are not supported");
-    }
-};
-
-/**
-* Reads the class name from a ClassResult element.
-* @sb-param {jQuery.selection} classResultElement - ClassResult element
-*     containing the course details.
-* @sb-return {String} Class name.
-*/
-Version3Reader.readClassName = function (classResultElement) {
-    return $("> Class > Name", classResultElement).text();
-};
-
-/**
-* Reads the course details from the given ClassResult element.
-* @sb-param {jQuery.selection} classResultElement - ClassResult element
-*     containing the course details.
-* @sb-param {Array} warnings - Array that accumulates warning messages.
-* @sb-return {Object} Course details: id, name, length, climb and number of
-*     controls.
-*/
-Version3Reader.readCourseFromClass = function (classResultElement, warnings) {
-    const courseElement = $("> Course", classResultElement);
-    const id = $("> Id", courseElement).text() || null;
-    const name = $("> Name", courseElement).text();
-    const lengthStr = $("> Length", courseElement).text();
-    let length;
-    if (lengthStr === "") {
-        length = null;
-    } else {
-        length = parseInt(lengthStr, 10);
-        if (isNaNStrict(length)) {
-            warnings.push("Course '" + name + "' specifies a course length that was not understood: '" + lengthStr + "'");
-            length = null;
-        } else {
-            // Convert from metres to kilometres.
-            length /= 1000;
-        }
-    }
-
-    const numberOfControlsStr = $("> NumberOfControls", courseElement).text();
-    let numberOfControls = parseInt(numberOfControlsStr, 10);
-    if (isNaNStrict(numberOfControls)) {
-        numberOfControls = null;
-    }
-
-    const climbStr = $("> Climb", courseElement).text();
-    let climb = parseInt(climbStr, 10);
-    if (isNaNStrict(climb)) {
-        climb = null;
-    }
-
-    return { id: id, name: name, length: length, climb: climb, numberOfControls: numberOfControls };
-};
-
-/**
-* Returns the XML element that contains a competitor's name.  This element
-* should contain child elements with names 'Given' and 'Family'.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     PersonResult element.
-* @sb-return {jQuery.selection} jQuery selection containing any child 'Name'
-*     element.
-*/
-Version3Reader.getCompetitorNameElement = function (element) {
-    return $("> Person > Name", element);
-};
-
-/**
-* Returns the name of the competitor's club.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     PersonResult element.
-* @sb-return {String} Competitor's club name.
-*/
-Version3Reader.readClubName = function (element) {
-    return $("> Organisation > ShortName", element).text();
-};
-
-/**
-* Returns the competitor's date of birth, as a string.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     PersonResult element.
-* @sb-return {String} The competitor's date of birth, as a string.
-*/
-Version3Reader.readDateOfBirth = function (element) {
-    const birthDate = $("> Person > BirthDate", element).text();
-    const regexResult = yearRegexp.exec(birthDate);
-    return (regexResult === null) ? null : parseInt(regexResult[0], 10);
-};
-
-/**
-* Reads a competitor's start time from the given Result element.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     Result element.
-* @sb-return {?Number} Competitor's start time, in seconds since midnight,
-*     or null if not known.
-*/
-Version3Reader.readStartTime = function (resultElement) {
-    const startTimeStr = $("> StartTime", resultElement).text();
-    const result = ISO_8601_RE.exec(startTimeStr);
-    if (result === null) {
-        return null;
-    } else {
-        const hours = parseInt(result[1], 10);
-        const minutes = parseInt(result[2], 10);
-        const seconds = (isUndefined(result[3])) ? 0 : parseInt(result[3], 10);
-        return hours * 60 * 60 + minutes * 60 + seconds;
-    }
-};
-
-/**
-* Reads a time, in seconds, from a string.  If the time was not valid,
-* null is returned.
-* @sb-param {String} timeStr - The time string to read.
-* @sb-return {?Number} The parsed time, in seconds, or null if it could not
-*     be read.
-*/
-Version3Reader.readTime = function (timeStr) {
-    // IOF v3 allows fractional seconds, so we use parseFloat instead
-    // of parseInt.
-    const time = parseFloat(timeStr);
-    return (isFinite(time)) ? time : null;
-};
-
-/**
-* Read a competitor's total time from the given Time element.
-* @sb-param {jQuery.selection} element - jQuery selection containing a
-*     Result element.
-* @sb-return {?Number} Competitor's total time, in seconds, or null if a time
-*     was not found or was invalid.
-*/
-Version3Reader.readTotalTime = function (resultElement) {
-    const totalTimeStr = $("> Time", resultElement).text();
-    return Version3Reader.readTime(totalTimeStr);
-};
-
-/**
-* Returns the status of the competitor with the given result.
-* @sb-param {jQuery.selection} resultElement - jQuery selection containing a
-*     Result element.
-* @sb-return {String} Status of the competitor.
-*/
-Version3Reader.getStatus = function (resultElement) {
-    return $("> Status", resultElement).text();
-};
-
-Version3Reader.StatusNonCompetitive = "NotCompeting";
-Version3Reader.StatusNonStarter = "DidNotStart";
-Version3Reader.StatusNonFinisher = "DidNotFinish";
-Version3Reader.StatusDisqualified = "Disqualified";
-Version3Reader.StatusOverMaxTime = "OverTime";
-
-/**
-* Returns whether the given split-time element is for an additional
-* control, and hence should be ignored.
-* @sb-param {jQuery.selection} splitTimeElement - jQuery selection containing
-*     a SplitTime element.
-* @sb-return {boolean} True if the control is additional, false if not.
-*/
-Version3Reader.isAdditional = function (splitTimeElement) {
-    return (splitTimeElement.attr("status") === "Additional");
-};
-
-/**
-* Reads a control code and split time from a SplitTime element.
-* @sb-param {jQuery.selection} splitTimeElement - jQuery selection containing
-*     a SplitTime element.
-* @sb-return {Object} Object containing code and time.
-*/
-Version3Reader.readSplitTime = function (splitTimeElement) {
-    const code = $("> ControlCode", splitTimeElement).text();
-    if (code === "") {
-        throw new InvalidData("Control code missing for control");
-    }
-
-    let time;
-    if (splitTimeElement.attr("status") === "Missing") {
-        // Missed controls have their time omitted.
-        time = null;
-    } else {
-        const timeStr = $("> Time", splitTimeElement).text();
-        time = (timeStr === "") ? null : Version3Reader.readTime(timeStr);
-    }
-
-    return { code: code, time: time };
-};
-
-const ALL_READERS = [Version2Reader, Version3Reader];
+const ALL_READERS = [
+    new Version2Reader(),
+    new Version3Reader()
+];
 
 /**
 * Check that the XML document passed is in a suitable format for parsing.
@@ -613,6 +160,7 @@ function validateData(xml, reader) {
     reader.checkVersion(rootElement);
 }
 
+
 /**
 * Parses data for a single competitor.
 * @sb-param {XMLElement} element - XML PersonResult element.
@@ -624,13 +172,13 @@ function validateData(xml, reader) {
 * @sb-return {Object?} Object containing the competitor data, or null if no
 *     competitor could be read.
 */
-function parseCompetitor(element, number, reader, warnings) {
+function parseCompetitor(element, number: number, reader, warnings: Array<string>) {
     const jqElement = $(element);
 
     const nameElement = reader.getCompetitorNameElement(jqElement);
     const name = readCompetitorName(nameElement);
 
-    if (name === "") {
+    if ((name.surname === "") && (name.firstname === "")) {
         warnings.push("Could not find a name for a competitor");
         return null;
     }
@@ -653,17 +201,23 @@ function parseCompetitor(element, number, reader, warnings) {
 
     const totalTime = reader.readTotalTime(resultElement);
 
-    const splitTimes = $("> SplitTime", resultElement).toArray();
-    const splitData = splitTimes.filter( (splitTime) => { return !reader.isAdditional($(splitTime)); })
-        .map( (splitTime) => { return reader.readSplitTime($(splitTime)); });
+    const ecard = reader.readECard(resultElement);
+    const route = reader.readRoute(resultElement);
 
-    const controls = splitData.map( (datum) => { return datum.code; });
-    const cumTimes = splitData.map( (datum) => { return datum.time; });
+    const splitTimes = $("> SplitTime", resultElement).toArray();
+    const splitData = splitTimes.filter((splitTime) => { return !reader.isAdditional($(splitTime)); })
+        .map((splitTime) => { return reader.readSplitTime($(splitTime)); });
+
+    const controls = splitData.map((datum) => { return datum.code; });
+    const cumTimes = splitData.map((datum) => { return datum.time; });
 
     cumTimes.unshift(0); // Prepend a zero time for the start.
     cumTimes.push(totalTime);
 
-    const competitor = Competitor.fromOriginalCumTimes(number, name, club, startTime, cumTimes);
+    const competitor = Competitor.fromOriginalCumTimes(number, name, club, startTime, cumTimes, );
+
+    competitor.ecard = ecard;
+    competitor.route = route;
 
     if (yearOfBirth !== null) {
         competitor.setYearOfBirth(yearOfBirth);
@@ -784,7 +338,7 @@ function parseClassData(element, reader, warnings) {
 * @sb-param {String} data - The event data.
 * @sb-return {Object} XML reader used to read version-specific information.
 */
-function determineReader(data) {
+function determineReader(data: string) {
     for (let index = 0; index < ALL_READERS.length; index += 1) {
         const reader = ALL_READERS[index];
         if (reader.isOfThisVersion(data)) {
@@ -794,4 +348,3 @@ function determineReader(data) {
 
     throw new WrongFileFormat("Data apparently not of any recognised IOF XML format");
 }
-

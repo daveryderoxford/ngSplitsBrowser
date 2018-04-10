@@ -51,3 +51,5 @@ export function parseCourseClimb(stringValue: string): number | null {
 export function normaliseLineEndings(stringValue: string): string {
     return stringValue.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 };
+
+

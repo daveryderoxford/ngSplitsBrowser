@@ -103,6 +103,7 @@ export class Competitor {
     yearOfBirth: number | null = null;
     gender: Genre | null = null; // "M" or "F" for male or female.
     ecard: number | null = null;
+    route: string | null = null;
     nationalID: string | null = null;
 
     splitTimes: Array<sbTime> | null = null;
@@ -133,10 +134,10 @@ export class Competitor {
     * @sb-return {Competitor} Created competitor.
     */
     public static fromOriginalCumTimes(order: number,
-                                       name: string | FirstnameSurname,
-                                       club: string,
-                                       startTime: sbTime,
-                                       cumTimes: Array<sbTime>): Competitor {
+        name: string | FirstnameSurname,
+        club: string,
+        startTime: sbTime,
+        cumTimes: Array<sbTime>): Competitor {
         const splitTimes = splitTimesFromCumTimes(cumTimes);
         return new Competitor(order, name, club, startTime, splitTimes, cumTimes);
     };
@@ -162,10 +163,10 @@ export class Competitor {
     * @sb-return {Competitor} Created competitor.
     */
     public static fromCumTimes(order: number,
-                               name: string | FirstnameSurname,
-                               club: string,
-                               startTime: sbTime,
-                               cumTimes: Array<sbTime>): Competitor {
+        name: string | FirstnameSurname,
+        club: string,
+        startTime: sbTime,
+        cumTimes: Array<sbTime>): Competitor {
         const competitor = Competitor.fromOriginalCumTimes(order, name, club, startTime, cumTimes);
         competitor.splitTimes = competitor.originalSplitTimes;
         competitor.cumTimes = competitor.originalCumTimes;
@@ -201,25 +202,30 @@ export class Competitor {
     };
 
     private constructor(public order: number,
-                        name: string | FirstnameSurname,
-                        public club: string,
-                        public startTime: number,
-                        public originalSplitTimes: Array<sbTime>,
-                        public originalCumTimes: Array<sbTime>) {
+        name: string | FirstnameSurname,
+        public club: string,
+        public startTime: number,
+        public originalSplitTimes: Array<sbTime>,
+        public originalCumTimes: Array<sbTime>) {
 
         if (typeof order !== NUMBER_TYPE) {
             throw new InvalidData("Competitor order must be a number, got " + typeof order + " '" + order + "' instead");
         }
 
         if (typeof name === "string") {
-            // If a single name is provided split the first word as firstname and rest as surname
+            // If a single name is provided split the last word as surname and rest as firstname
             name = name.trim();
-            const index = name.indexOf(" ");
-            this.firstname = name.slice(0, index);
-            this.surname = name.slice(index).trim();
+            const index = name.lastIndexOf(" ");
+            if (index === -1) {
+                this.firstname = "";
+                this.surname = name;
+            } else {
+                this.firstname = name.slice(0, index).trim();
+                this.surname = name.slice(index).trim();
+            }
         } else {
-            this.firstname = name.firstname;
-            this.surname = name.surname;
+            this.firstname = name.firstname.trim();
+            this.surname = name.surname.trim();
         }
 
         this.className = null;
@@ -240,7 +246,7 @@ export class Competitor {
 
     /** Full name of competitor (readonly) */
     get name() {
-       return( this.firstname + " " + this.surname);
+        return( (this.firstname + " " + this.surname).trim() );
     }
 
     /**
@@ -505,7 +511,7 @@ export class Competitor {
             throw new InvalidData("Cannot adjust competitor times because a null value is in the reference data");
         }
 
-        const adjustedTimes = this.cumTimes.map( (time, idx) => { return subtractIfNotNull(time, referenceCumTimes[idx]); });
+        const adjustedTimes = this.cumTimes.map((time, idx) => { return subtractIfNotNull(time, referenceCumTimes[idx]); });
         return adjustedTimes;
     };
 
@@ -517,7 +523,7 @@ export class Competitor {
     public getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes: Array<sbTime>): Array<sbTime> {
         const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
         const startTime = this.startTime;
-        return adjustedTimes.map( (adjTime) => { return addIfNotNull(adjTime, startTime); });
+        return adjustedTimes.map((adjTime) => { return addIfNotNull(adjTime, startTime); });
     };
 
     /**
@@ -535,7 +541,7 @@ export class Competitor {
         }
 
         const percentsBehind = [0];
-        this.splitTimes.forEach( (splitTime, index) => {
+        this.splitTimes.forEach((splitTime, index) => {
             if (splitTime === null) {
                 percentsBehind.push(null);
             } else {
@@ -564,14 +570,14 @@ export class Competitor {
                 throw new InvalidData("Cannot determine time loss of competitor when there is a NaN value in the fastest splits");
             }
 
-            if (fastestSplitTimes.some( (split) => { return split === 0; })) {
+            if (fastestSplitTimes.some((split) => { return split === 0; })) {
                 // Someone registered a zero split on this course.  In this
                 // situation the time losses don't really make sense.
-                this.timeLosses = this.splitTimes.map( () => { return NaN; });
+                this.timeLosses = this.splitTimes.map(() => { return NaN; });
             } else if (this.splitTimes.some(isNaNStrict)) {
                 // Competitor has some dubious times.  Unfortunately this
                 // means we cannot sensibly calculate the time losses.
-                this.timeLosses = this.splitTimes.map( () => { return NaN; });
+                this.timeLosses = this.splitTimes.map(() => { return NaN; });
             } else {
                 // We use the same algorithm for calculating time loss as the
                 // original, with a simplification: we calculate split ratios
@@ -580,7 +586,7 @@ export class Competitor {
                 // is its time loss rate plus 1.  Not subtracting one at the start
                 // means that we then don't have to add it back on at the end.
 
-                const splitRatios = this.splitTimes.map( (splitTime, index) => {
+                const splitRatios = this.splitTimes.map((splitTime, index) => {
                     return splitTime / fastestSplitTimes[index];
                 });
 
@@ -594,7 +600,7 @@ export class Competitor {
                     medianSplitRatio = (splitRatios[midpt - 1] + splitRatios[midpt]) / 2;
                 }
 
-                this.timeLosses = this.splitTimes.map( (splitTime, index) => {
+                this.timeLosses = this.splitTimes.map((splitTime, index) => {
                     return Math.round(splitTime - fastestSplitTimes[index] * medianSplitRatio);
                 });
             }

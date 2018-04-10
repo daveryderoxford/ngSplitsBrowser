@@ -119,9 +119,9 @@ function parseCourseClass(courseClass: string, warnings: Array<string>): CourseC
 /**
 * Parse CSV data for an entire event.
 * @sb-param {string} eventData - String containing the entire event data.
-* @sb-return {SplitsBrowser.Model.Event} All event data read in.
+* @sb-return {Results} All event data read in.
 */
-export function parseCSVventData(data: string): Results {
+export function parseCSVEventData(data: string): Results {
 
     if (/<html/i.test(data)) {
         throw new WrongFileFormat("Cannot parse this file as CSV as it appears to be HTML");
