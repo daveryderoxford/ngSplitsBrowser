@@ -1,9 +1,23 @@
 import d3 = require("d3");
 
-import { Results, Course, CourseClass, Competitor, TimeUtilities,  WrongFileFormat } from "../model";
+import { Results, Course, CourseClass, Competitor, TimeUtilities, WrongFileFormat } from "../model";
 
 import { normaliseLineEndings, parseCourseLength, parseCourseClimb } from "./util";
 
+
+interface ColumnFormat {
+    controlsOffset;
+    step;
+    name;
+    club;
+    courseName;
+    startTime;
+    length;
+    climb;
+    placing;
+    finishTime;
+    allowMultipleCompetitorNames;
+};
 
 // tslint:disable:max-line-length
 
@@ -19,7 +33,7 @@ const parseTime = TimeUtilities.parseTime;
 //   these formats are quite sparse; many columns (e.g. club, placing,
 //   start time) are blank or are omitted altogether.
 
-const TRIPLE_COLUMN_FORMAT = {
+const TRIPLE_COLUMN_FORMAT: ColumnFormat = {
     controlsOffset: 38,  // Control data starts in column AM (index 38).
     step: 3,             // Number of columns per control.
     name: 3,             // Column indexes of various data
@@ -53,7 +67,8 @@ class TrippleCVSReader {
     * @constructor
     * @sb-param {Object} format - Object that describes the data format to read.
     */
-    constructor(format: any) {
+    constructor( private format: ColumnFormat ) {
+        this.format = format;
 
         // Return the offset within the control data that should be used when
         // looking for control codes.  This will be 0 if the format specifies a
@@ -83,18 +98,18 @@ class TrippleCVSReader {
     };
 
     /**
-* Trim trailing empty-string entries from the given array.
-* The given array is mutated.
-* @sb-param {Array} array - The array of string values.
-*/
-private trimTrailingEmptyCells(array: Array<string>) {
-    let index = array.length - 1;
-    while (index >= 0 && array[index] === "") {
-        index -= 1;
-    }
+    * Trim trailing empty-string entries from the given array.
+    * The given array is mutated.
+    * @sb-param {Array} array - The array of string values.
+    */
+    private trimTrailingEmptyCells(array: Array<string>) {
+        let index = array.length - 1;
+        while (index >= 0 && array[index] === "") {
+            index -= 1;
+        }
 
-    array.splice(index + 1, array.length - index - 1);
-}
+        array.splice(index + 1, array.length - index - 1);
+    }
 
     /**
     * Some lines of some formats can have multiple delimited competitors, which
@@ -129,7 +144,7 @@ private trimTrailingEmptyCells(array: Array<string>) {
         for (let index = this.format.controlsOffset; index + this.controlsTerminationOffset < lineParts.length; index += this.format.step) {
             if (!controlCodeRegexp.test(lineParts[index])) {
                 throw new WrongFileFormat("Data appears not to be in an alternative CSV format - data in cell " + index +
-                                          " of the first row ('" + lineParts[index] + "') is not an number");
+                    " of the first row ('" + lineParts[index] + "') is not an number");
             }
         }
     };
@@ -244,7 +259,7 @@ private trimTrailingEmptyCells(array: Array<string>) {
         // same list of controls can be assumed to be using the same course.
         const coursesByControlsLists = <any>d3.map();
 
-        this.classes.entries().forEach( (keyValuePair) => {
+        this.classes.entries().forEach((keyValuePair) => {
             const className = keyValuePair.key;
             const cls = keyValuePair.value;
             const courseClass = new CourseClass(className, cls.controls.length, cls.competitors);
@@ -261,15 +276,15 @@ private trimTrailingEmptyCells(array: Array<string>) {
                         length: cls.length,
                         climb: cls.climb,
                         controls:
-                            cls.controls
+                        cls.controls
                     });
             }
         });
 
         const courses = [];
-        coursesByControlsLists.values().forEach( (courseObject) => {
+        coursesByControlsLists.values().forEach((courseObject) => {
             const course = new Course(courseObject.name, courseObject.classes, courseObject.length, courseObject.climb, courseObject.controls);
-            courseObject.classes.forEach( (courseClass) => { courseClass.setCourse(course); });
+            courseObject.classes.forEach((courseClass) => { courseClass.setCourse(course); });
             courses.push(course);
         });
 
@@ -308,7 +323,3 @@ private trimTrailingEmptyCells(array: Array<string>) {
         return new Results(classesAndCourses.classes, classesAndCourses.courses, this.warnings);
     };
 }
-
-
-
-

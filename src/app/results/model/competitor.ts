@@ -102,7 +102,7 @@ export class Competitor {
     className: string | null = null;
     yearOfBirth: number | null = null;
     gender: Genre | null = null; // "M" or "F" for male or female.
-    ecard: number | null = null;
+    ecard: string | null = null;
     route: string | null = null;
     nationalID: string | null = null;
 
@@ -201,7 +201,7 @@ export class Competitor {
         }
     };
 
-    private constructor(public order: number,
+    protected constructor(public order: number,
         name: string | FirstnameSurname,
         public club: string,
         public startTime: number,
@@ -453,7 +453,7 @@ export class Competitor {
     * @sb-param {Number} controlIndex - Index of the control.
     * @sb-return {?Number} Time loss in seconds, or null.
     */
-    public getTimeLossAt(controlIndex: number): number {
+    public getTimeLossAt(controlIndex: number): number| null {
         return (controlIndex === 0 || this.timeLosses === null) ? null : this.timeLosses[controlIndex - 1];
     };
 
@@ -496,7 +496,6 @@ export class Competitor {
         this.splitRanks = splitRanks;
         this.cumRanks = cumRanks;
     };
-
 
     /**
     * Return this competitor's cumulative times after being adjusted by a 'reference' competitor.
@@ -613,7 +612,7 @@ export class Competitor {
     * @sb-param {Competitor} other - The competitor to compare against.
     * @sb-return {Boolean} true if the competitors cross, false if they don't.
     */
-    public crosses(other) {
+    public crosses(other: Competitor): boolean {
         if (other.cumTimes.length !== this.cumTimes.length) {
             throw new InvalidData("Two competitors with different numbers of controls cannot cross");
         }

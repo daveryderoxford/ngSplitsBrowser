@@ -14,8 +14,7 @@ const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
 export class SplitsPopupData {
 
-    constructor(public maxFastestSplits, public raceGraphWindow) {
-    }
+    constructor(public maxFastestSplits: number, public raceGraphWindow: number) {}
 
     /**
     * Returns the fastest splits to a control.
@@ -24,6 +23,8 @@ export class SplitsPopupData {
     * @sb-return {Object} Fastest-split data.
     */
     public getFastestSplitsPopupData(courseClassSet: CourseClassSet, controlIndex: number): FastestSplitsPopupData {
+
+        Lang.setLanguage("en_gb");
 
         const data = courseClassSet.getFastestSplitsTo(this.maxFastestSplits, controlIndex);
 

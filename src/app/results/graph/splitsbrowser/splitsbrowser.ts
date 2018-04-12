@@ -2082,7 +2082,7 @@ SplitsBrowser.Controls = {} as any;
 
 // file chart.js
 
-import { FastestSplitsPopupData, SplitsPopupData } from "./splitspopupdata";
+import { FastestSplitsPopupData, SplitsPopupData } from "./splits-popup-data";
 
 (function () {
     "use strict";

@@ -28,7 +28,7 @@ import { parseCSVEventData } from "./cvs-reader";
 
 const fromCumTimes = Competitor.fromCumTimes;
 
-fdescribe("CVSEventData tests", () => {
+describe("CVSEventData tests", () => {
 
     it("Cannot parse an empty string", () => {
         expect(() => parseCSVEventData("")).toThrowErrorOfType("InvalidData");

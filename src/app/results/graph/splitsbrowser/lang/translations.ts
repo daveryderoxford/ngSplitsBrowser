@@ -9,8 +9,8 @@ export class Lang {
     // problem with the messages.
     private static warnedAboutMessages = true;
 
-    // The currently-chosen language, or null if none chosen or found yet.
-    private static currentLanguage: string | null = null;
+    // The currently-chosen language, English by default
+    private static currentLanguage = "en_gb";
 
     // The list of all languages read in, or null if none.
     private static allLanguages = null;

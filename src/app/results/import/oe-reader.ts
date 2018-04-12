@@ -2,13 +2,11 @@
 import * as d3 from "d3";
 
 import { normaliseLineEndings, parseCourseLength, parseCourseClimb, } from "./util";
-
 import { isNaNStrict } from "app/results/model/util";
 
 import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results } from "../model";
 import { InvalidData, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
-
 
 export function parseOEEventData(data): Results {
     const reader = new OEReader(data);
@@ -42,17 +40,17 @@ const COLUMN_INDEXES: any = new Object();
     COLUMN_INDEXES[columnOffset].className = columnOffset - 28;
 });
 
-COLUMN_INDEXES[44].ecard = 2;
+COLUMN_INDEXES[44].ecard = 1;
 COLUMN_INDEXES[44].combinedName = 3;
 COLUMN_INDEXES[44].yearOfBirth = 4;
 
-COLUMN_INDEXES[46].ecard = 2;
+COLUMN_INDEXES[46].ecard = 1;
 COLUMN_INDEXES[46].surname = 3;
 COLUMN_INDEXES[46].forename = 4;
 COLUMN_INDEXES[46].yearOfBirth = 5;
 COLUMN_INDEXES[46].gender = 6;
 
-COLUMN_INDEXES[60].ecard = 4;
+COLUMN_INDEXES[60].ecard = 3;
 COLUMN_INDEXES[60].surname = 5;
 COLUMN_INDEXES[60].forename = 6;
 COLUMN_INDEXES[60].yearOfBirth = 7;
@@ -390,9 +388,6 @@ class OEReader {
 
         const startTime = this.getStartTime(row);
 
-        const ecard = this.getEcard(row);
-        const nationalId = null;
-
         /// Handle variation wwhere the position is appended to the name
         let name = this.getName(row);
         const isPlacingNonNumeric = (placing !== "" && isNaNStrict(parseInt(placing, 10)));
@@ -434,6 +429,8 @@ class OEReader {
                 competitor.setYearOfBirth(yearOfBirth);
             }
         }
+
+        competitor.ecard = this.getEcard(row);
 
         if (this.columnIndexes.hasOwnProperty("gender")) {
             const gender = row[this.columnIndexes.gender];
@@ -639,5 +636,4 @@ class OEReader {
 
         return courses;
     };
-
 }

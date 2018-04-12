@@ -16,8 +16,7 @@ const CLIMB_FIND_REGEXP = /(\d+)\s*(?:Cm|Hm|hm|m)/;
 /**
 * Returns whether the given string is nonempty.
 * @sb-param {String} string - The string to check.
-* @sb-return True if the string is neither null nor empty, false if it is null
-*     or empty.
+* @sb-return True if the string is neither null nor empty, false if it is null or empty.
 */
 function isNonEmpty(string): boolean {
     return string !== null && string !== "";

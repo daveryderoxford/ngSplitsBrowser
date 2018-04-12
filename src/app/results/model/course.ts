@@ -33,7 +33,6 @@ export class Course {
         public length?: number,
         public climb?: number,
         public controls?: Array<string>) {
-
     }
 
     /**

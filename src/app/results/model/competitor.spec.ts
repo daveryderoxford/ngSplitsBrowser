@@ -26,6 +26,7 @@ import { } from "jasmine-expect";
 import { InvalidData } from "../model";
 import { Competitor } from "./competitor";
 import { isNaNStrict } from "./util";
+import { sbTime } from "app/results/model/time";
 
 const fromCumTimes = Competitor.fromCumTimes;
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
@@ -35,31 +36,31 @@ function signum(n) {
     return (n < 0) ? -1 : ((n > 0) ? 1 : 0);
 }
 
-describe("Competitor", () => {
+fdescribe("Competitor", () => {
 
-    const assertSplitTimes = function (competitor, expectedSplitTimes) {
-        expectedSplitTimes.forEach(function (splitTime, controlIdx) {
+    function assertSplitTimes(competitor: Competitor, expectedSplitTimes: Array<sbTime>) {
+        expectedSplitTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getSplitTimeTo(controlIdx + 1)).toEqual(splitTime);
         });
-    };
+    }
 
-    const assertOriginalSplitTimes = function (competitor, expectedSplitTimes) {
-        expectedSplitTimes.forEach(function (splitTime, controlIdx) {
+    function assertOriginalSplitTimes(competitor, expectedSplitTimes) {
+        expectedSplitTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getOriginalSplitTimeTo(controlIdx + 1)).toEqual(splitTime);
         });
-    };
+    }
 
-    const assertCumulativeTimes = function (competitor, expectedCumulativeTimes) {
-        expectedCumulativeTimes.forEach(function (splitTime, controlIdx) {
+    function assertCumulativeTimes(competitor, expectedCumulativeTimes) {
+        expectedCumulativeTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getCumulativeTimeTo(controlIdx)).toEqual(splitTime);
         });
-    };
+    }
 
-    const assertOriginalCumulativeTimes = function (competitor, expectedCumulativeTimes) {
-        expectedCumulativeTimes.forEach(function (splitTime, controlIdx) {
+    function assertOriginalCumulativeTimes(competitor, expectedCumulativeTimes) {
+        expectedCumulativeTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getOriginalCumulativeTimeTo(controlIdx)).toEqual(splitTime);
         });
-    };
+    }
 
     it("Cannot create a competitor from an empty array of cumulative times", () => {
         expect(() => {
@@ -803,8 +804,8 @@ describe("Competitor", () => {
     });
     it("Can set competitor ecard to a number", () => {
         const competitor = fromCumTimes(1, { firstname: "John", surname: "Smith" }, "ABC", 10 * 3600, [0, 188]);
-        competitor.ecard = 1234567;
-        expect(competitor.ecard).toEqual(1234567);
+        competitor.ecard = "1234567";
+        expect(competitor.ecard).toEqual("1234567");
     });
 });
 
