@@ -58,6 +58,9 @@ export class TimeUtilities {
     * @sb-return {?Number} The number of seconds.
     */
     static parseTime(timeStr: string): number | null {
+        if (!timeStr) {
+            return(null);
+        }
         timeStr = timeStr.trim();
         if (/^(\d+:)?\d+:\d\d([,.]\d+)?$/.test(timeStr)) {
             const timeParts = timeStr.replace(",", ".").split(":");

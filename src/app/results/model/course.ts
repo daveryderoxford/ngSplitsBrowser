@@ -170,7 +170,7 @@ export class Course {
     * @sb-return {Array} Array of fastest splits for each course-class using this
     *      course.
     */
-    public getFastestSplitsForLeg(startCode: string, endCode: string): Array<sbTime> {
+    public getFastestSplitsForLeg(startCode: string, endCode: string): Array<any> {
 
         const legNumber = this.getLegNumber(startCode, endCode);
         if (legNumber < 0) {

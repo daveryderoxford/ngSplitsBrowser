@@ -221,7 +221,6 @@ class CompetitorParseRecord {
         public totalTimeStr: string | null,
         public cumTimes: Array<sbTime>,
         public competitive: boolean) {
-
     }
 
     /**

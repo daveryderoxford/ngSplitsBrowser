@@ -4,8 +4,9 @@ import { CourseClass } from "./course-class";
 import { Course } from "./course";
 import { sbTime } from "./time";
 
-// file event.js
 export class Results {
+
+    warnings: Array<string> = [];
 
     /**
     * Contains all of the data for an event.
@@ -17,9 +18,11 @@ export class Results {
     *     encountered when reading in the event data.
     */
     constructor(public classes: Array<CourseClass>,
-        public courses: Array<Course>,
-        public warnings: Array<string>) {
-
+                public courses: Array<Course>,
+                warnings?: Array<string>) {
+            if (warnings) {
+                this.warnings = warnings;
+            }
     }
 
     /**

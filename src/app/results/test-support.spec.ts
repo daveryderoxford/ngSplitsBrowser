@@ -43,7 +43,7 @@ export class TestSupport {
     *     failure message if no exception is thrown.  A default message is used
     *     instead if this is not specified.
     */
-    static assertException(exceptionName: string, func, failureMessage: string) {
+    static assertException(exceptionName: string, func, failureMessage?: string) {
         try {
             func();
             expect(false).toBeTrue(failureMessage || "An exception with name '" + exceptionName + "' should have been thrown, but no exception was thrown");
@@ -62,7 +62,7 @@ export class TestSupport {
     *     failure message if no exception is thrown.  A default message is used
     *     instead if this is not specified.
     */
-    static assertInvalidData(func, failureMessage: string) {
+    static assertInvalidData(func, failureMessage?: string) {
         TestSupport.assertException("InvalidData", func, failureMessage);
     }
 

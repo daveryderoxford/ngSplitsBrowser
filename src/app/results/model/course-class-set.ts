@@ -4,6 +4,7 @@ import { InvalidData } from "./exception";
 
 import { Competitor } from "./competitor";
 import { sbTime } from "./time";
+import { ChartType } from "app/results/graph/splitsbrowser/chart-types";
 
 /**
 * Utility function to merge the lists of all competitors in a number of
@@ -441,7 +442,7 @@ export class CourseClassSet {
     * @sb-param {Object} chartType - The type of chart to draw.
     * @sb-returns {Object} Array of data.
     */
-    public getChartData(referenceCumTimes, currentIndexes, chartType) {
+    public getChartData(referenceCumTimes: Array<number>, currentIndexes: Array<number>, chartType: ChartType) {
         if (typeof referenceCumTimes === "undefined") {
             throw new TypeError("referenceCumTimes undefined or missing");
         } else if (typeof currentIndexes === "undefined") {
@@ -497,7 +498,7 @@ export class CourseClassSet {
 
         const cumulativeTimesByControl = d3.transpose(selectedCompetitorData);
         const xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
-        const zippedData = d3.zip(xData, cumulativeTimesByControl);
+        const zippedData = d3.zip<any>(xData, cumulativeTimesByControl);
         const competitorNames = currentIndexes.map( (index) => { return this.allCompetitors[index].name; }, this);
         return {
             dataColumns: zippedData.map( (data) => { return { x: data[0], ys: data[1] }; }),
