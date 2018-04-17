@@ -1,0 +1,23 @@
+.fill-remaining-space {
+  // This fills the remaining space, by using flexbox. 
+  // Every toolbar row uses a flexbox row layout.
+  flex: 1 1 auto;
+}
+
+.toggle {
+   font-size: 14px;
+}
+
+.displayOptions {
+  font-size: 14px;
+}
+
+.flex-item {
+  margin:5px
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

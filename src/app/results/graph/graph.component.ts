@@ -40,6 +40,5 @@ export class GraphComponent implements OnInit {
       SplitsBrowser.loadEvent(url, {containerElement: "app-graph"} );
     }
   }
-
 }
 

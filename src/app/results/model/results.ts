@@ -2,9 +2,12 @@ import d3 = require("d3");
 
 import { CourseClass } from "./course-class";
 import { Course } from "./course";
+import { Competitor } from "./competitor";
 import { sbTime } from "./time";
 
 export class Results {
+
+    allCompetitors: Array<Competitor> = null;
 
     warnings: Array<string> = [];
 
@@ -19,10 +22,10 @@ export class Results {
     */
     constructor(public classes: Array<CourseClass>,
                 public courses: Array<Course>,
-                warnings?: Array<string>) {
-            if (warnings) {
-                this.warnings = warnings;
-            }
+        warnings?: Array<string>) {
+        if (warnings) {
+            this.warnings = warnings;
+        }
     }
 
     /**
@@ -32,7 +35,7 @@ export class Results {
     * attempting to plot it.
     */
     public determineTimeLosses(): void {
-        this.classes.forEach( (courseClass) => {
+        this.classes.forEach((courseClass) => {
             courseClass.determineTimeLosses();
         });
     };
@@ -47,8 +50,8 @@ export class Results {
     *     otherwise.
     */
     public needsRepair(): boolean {
-        return this.classes.some( (courseClass) => {
-            return courseClass.competitors.some( (competitor) => {
+        return this.classes.some((courseClass) => {
+            return courseClass.competitors.some((competitor) => {
                 return (competitor.getAllCumulativeTimes() === null);
             });
         });
@@ -68,13 +71,13 @@ export class Results {
     */
     public getFastestSplitsForLeg(startCode: string, endCode: string): Array<any> {
         let fastestSplits = [];
-        this.courses.forEach( (course) => {
+        this.courses.forEach((course) => {
             if (course.usesLeg(startCode, endCode)) {
                 fastestSplits = fastestSplits.concat(course.getFastestSplitsForLeg(startCode, endCode));
             }
         });
 
-        fastestSplits.sort( (a, b) => { return d3.ascending(a.split, b.split); });
+        fastestSplits.sort((a, b) => { return d3.ascending(a.split, b.split); });
 
         return fastestSplits;
     };
@@ -95,13 +98,13 @@ export class Results {
     */
     public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<any> {
         const competitors = [];
-        this.courses.forEach( (course) => {
-            course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach( (comp) => {
+        this.courses.forEach((course) => {
+            course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach((comp) => {
                 competitors.push(comp);
             });
         });
 
-        competitors.sort( (a, b) => { return d3.ascending(a.time, b.time); });
+        competitors.sort((a, b) => { return d3.ascending(a.time, b.time); });
 
         return competitors;
     };
@@ -115,9 +118,78 @@ export class Results {
     public getNextControlsAfter(controlCode: string) {
         let courses = this.courses;
         if (controlCode !== Course.START) {
-            courses = courses.filter( (course) => { return course.hasControl(controlCode); });
+            courses = courses.filter((course) => { return course.hasControl(controlCode); });
         }
 
-        return courses.map( (course) => { return { course: course, nextControls: course.getNextControls(controlCode) }; });
+        return courses.map((course) => { return { course: course, nextControls: course.getNextControls(controlCode) }; });
     };
+
+    /** Search for a competior in the results .
+     *  Matches on firstname, surname or club (case independent)
+     *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
+     */
+    public findCompetitors(searchstring: string): Array<Competitor> {
+        const twochars = searchstring.length > 2;
+
+        if (this.allCompetitors === null) {
+            this.populateAllCompetitors()
+        }
+
+        const ss = searchstring.toLocaleLowerCase();
+
+        let found = this.allCompetitors.filter((comp) => {
+            const surname = comp.surname.toLowerCase();
+            const firstname = comp.firstname.toLowerCase();
+            const club = comp.club.toLowerCase();
+
+            return ((surname === ss) || (twochars && surname.startsWith(ss)) ||
+                    (firstname === ss) || (twochars && firstname.startsWith(ss)) ||
+                    (club === ss) || (twochars && club.startsWith(ss)));
+        });
+
+        // Sort into name order
+        found = found.sort((a, b) => {
+            const x = a.name.toLowerCase()
+            const y = b.name.toLowerCase();
+            return x < y ? -1 : x > y ? 1 : 0;
+        });
+        return (found);
+    }
+
+    private populateAllCompetitors() {
+        this.allCompetitors = [];
+        this.classes.forEach((courseClass) => {
+            this.allCompetitors = this.allCompetitors.concat(courseClass.competitors);
+        });
+    }
+
+    /** Search for a course class matching on name.
+     *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
+     */
+    findCourseClasss(searchstring: string): Array<CourseClass> {
+        const twochars = searchstring.length > 2;
+        const ss = searchstring.toLowerCase();
+
+        const found = this.classes.filter((cc) => {
+            const name = cc.name.toLowerCase();
+            return ((name === ss) || (twochars && name.startsWith(ss)));
+        });
+
+        return (found);
+    }
+
+    /** Search for a course matching on name.
+     *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
+     */
+    findCourses(searchstring: string): Array<Course> {
+        const twochars = searchstring.length > 2;
+        const ss = searchstring.toLowerCase();
+
+        const found = this.courses.filter((course) => {
+            const name = course.name.toLowerCase();
+            return ((name === ss) || (twochars && name.startsWith(ss)));
+        });
+        return (found);
+    }
 }
+

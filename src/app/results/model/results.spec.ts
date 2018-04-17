@@ -35,11 +35,27 @@ const fromSplitTimes = TestSupport.fromSplitTimes;
 fdescribe("Results", () => {
 
     function getCompetitor1() {
-        return fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106]);
+        const comp = fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106]);
+        comp.ecard = "1";
+        return comp
     }
 
     function getCompetitor2() {
-        return fromSplitTimes(2, "John Smith", "ABC", 10 * 3600, [65, 221, 184, 100]);
+        const comp = fromSplitTimes(2, "John Smith", "ABC", 10 * 3600, [65, 221, 184, 100]);
+        comp.ecard = "2";
+        return comp
+    }
+
+    function getCompetitor3() {
+        const comp = fromSplitTimes(2, "Aron Ardvark", "HIJK", 10 * 3600, [65, 221, 184, 100]);
+        comp.ecard = "3";
+        return comp
+    }
+
+    function getCompetitor4() {
+        const comp = fromSplitTimes(2, "Aron Ardvarx", "SN", 10 * 3600, [65, 221, 184, 100]);
+        comp.ecard = "4";
+        return comp
     }
 
     function getCompetitor2WithExtraSplit() {
@@ -178,4 +194,85 @@ fdescribe("Results", () => {
         const event = new Results([courseClass], [course]);
         expect(event.needsRepair()).toBe(true);
     });
+
+    function makeSearchData(): Results {
+        const competitor1 = getCompetitor1();
+        const competitor2 = getCompetitor2();
+        const competitor3 = getCompetitor3();
+        const competitor4 = getCompetitor4();
+
+        const courseClass1 = new CourseClass("M45", 3, [competitor1]);
+        const courseClass2 = new CourseClass("W45", 3, [competitor2, competitor3]);
+        const courseClass3 = new CourseClass("M45", 3, [competitor4]);
+
+        const course1 = new Course("Course X", [courseClass1], 8.0, null, ["235", "212", "189"]);
+        const course2 = new Course("Course Y", [courseClass2, courseClass3], 10.00, null, ["226", "212", "189"]);
+
+        return new Results([courseClass1, courseClass2, courseClass3], [course1, course2]);
+
+    }
+
+    it("Search for  surname with more than 2 characters", () => {
+        const results = makeSearchData();
+        const res = results.findCompetitor("ArD");
+        expect(res[0].ecard).toEqual("3");
+        expect(res[1].ecard).toEqual("4");
+        expect(res.length).toBe(2);
+    });
+
+    it("Search by surname with 2 characters", () => {
+        const results = makeSearchData();
+        const res = results.findCompetitor("aR");
+        expect(res.length).toBe(0, "Should be no exact match found for 2 characters");
+    });
+
+    it("Search by firstname with >3 characters", () => {
+        const results = makeSearchData();
+        const res = results.findCompetitor("FreD");
+        expect(res[0].ecard).toEqual("1", "match on first name");
+        expect(res.length).toBe(1, "One name fred matches");
+    });
+
+    it("Search by club with 2 characters", () => {
+        const results = makeSearchData();
+        const res = results.findCompetitor("Sn");
+        expect(res[0].ecard).toEqual("4", "match on first name");
+        expect(res.length).toBe(1, "Exact match on SN");
+    });
+
+    it("Search by club with 2 characters - non excat match", () => {
+        const results = makeSearchData();
+        const res = results.findCompetitor("AB");
+        expect(res.length).toBe(0, "Non exact match on ABC");
+    });
+
+    it("Search for course by name with 3 chracters with distances", () => {
+        const results = makeSearchData();
+        const res = results.findCourse("CoursE");
+        expect(res[0].name).toEqual("Course Y", "Course Y first as sorted by distance");
+        expect(res[1].name).toEqual("Course X");
+        expect(res.length).toBe(2);
+    });
+
+    it("Search for course by name with exact match", () => {
+        const results = makeSearchData();
+        const res = results.findCourse("CouRse X");
+        expect(res[0].name).toEqual("Course X");
+        expect(res.length).toBe(1);
+    });
+
+    it("Search for class with exact match", () => {
+        const results = makeSearchData();
+        const res = results.findCourseClass("m45");
+        expect(res[0].name).toEqual("M45");
+        expect(res[1].name).toEqual("M45");
+        expect(res.length).toBe(2);
+    });
+
+    it("Search for class with non-exact match", () => {
+        const results = makeSearchData();
+        const res = results.findCourseClass("M4");
+        expect(res.length).toBe(0);
+    });
 });
+

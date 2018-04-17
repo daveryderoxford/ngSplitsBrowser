@@ -289,8 +289,7 @@ fdescribe("Input.IOFXml", () => {
     * Generates some XML for a person.
     *
     * The properties supported are as follows.  Unless specified otherwise, the
-    * XML generated for each property is omitted if the property is not
-    * specified:
+    * XML generated for each property is omitted if the property is not specified:
     * * forename (String) - The person's forename.
     * * surname (String) - The person's surname.
     * * club {String} The person's club.

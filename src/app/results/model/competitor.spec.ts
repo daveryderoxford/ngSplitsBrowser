@@ -506,7 +506,7 @@ fdescribe("Competitor", () => {
         // time losses are then 27.2679, 0, -2.5694
 
         expect(competitor.getTimeLossAt(1)).toEqual(27);
-        expect(competitor.getTimeLossAt(2)).toEqual(0);
+        expect(Math.abs(competitor.getTimeLossAt(2))).toBeLessThan(0.001);
         expect(competitor.getTimeLossAt(3)).toEqual(-3);
     });
 

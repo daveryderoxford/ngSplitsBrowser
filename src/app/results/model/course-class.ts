@@ -6,6 +6,7 @@ import {InvalidData} from "./exception";
 
 import { sbTime } from "./time";
 import { Competitor } from "./competitor";
+import { Course } from "./course";
 
 export interface FastestSplitInfo {
     name: string;
@@ -17,10 +18,9 @@ export class CourseClass {
     hasDubiousData = false;
     /**
      * Object that represents a collection of competitor data for a class.
-     * @constructor.
-     * @sb-param {String} name - Name of the class.
-     * @sb-param {Number} numControls - Number of controls.
-     * @sb-param {Array} competitors - Array of Competitor objects.
+     * name - Name of the class.
+     * Number of controls.
+     * Array of Competitor objects.
      */
     constructor(public name: string,
         public numControls: number,
@@ -55,8 +55,7 @@ export class CourseClass {
 
     /**
     * Returns whether this course-class is empty, i.e. has no competitors.
-    * @sb-return {boolean} True if this course-class has no competitors, false if it
-    *     has at least one competitor.
+    * Returns True if this course-class has no competitors, false if it has at least one competitor.
     */
     public isEmpty(): boolean {
         return (this.competitors.length === 0);
@@ -64,9 +63,9 @@ export class CourseClass {
 
     /**
     * Sets the course that this course-class belongs to.
-    * @sb-param {SplitsBrowser.Model.Course} course - The course this class belongs to.
+    * course - The course this class belongs to.
     */
-    public setCourse(course) {
+    public setCourse(course: Course) {
         this.course = course;
     };
 
@@ -74,9 +73,8 @@ export class CourseClass {
     * Returns the fastest split time recorded by competitors in this class.  If
     * no fastest split time is recorded (e.g. because all competitors
     * mispunched that control, or the class is empty), null is returned.
-    * @sb-param {Number} controlIdx - The index of the control to return the
-    *      fastest split to.
-    * @sb-return {?Object} Object containing the name and fastest split, or
+    * controlIdx - The index of the control to return the fastest split to.
+    * Returns Object containing the name and fastest split, or
     *      null if no split times for that control were recorded.
     */
     public getFastestSplitTo(controlIdx: number): FastestSplitInfo | null {

@@ -21,7 +21,7 @@ export type SplitsFileFormat = "auto" | "IOFv3" |  "IOFv2" | "SICSV" | "SBCSV" |
 export interface OEvent extends EventInfo {
      key?: string;
      user: string;
-     splits?: SplitsData | null;
+     splits?: SplitsFileInfo | null;
      summary?: EventSummary | null;
      legacyPassword?: string;
      date_club_index?: string;
@@ -40,7 +40,7 @@ export interface EventInfo {
      email: string;
 }
 
-export interface SplitsData {
+export interface SplitsFileInfo {
      splitsFilename: string;
      splitsFileFormat: SplitsFileFormat;
      valid: boolean;

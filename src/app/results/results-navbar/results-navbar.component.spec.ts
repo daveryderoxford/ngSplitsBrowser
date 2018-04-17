@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EventAdminComponent } from './event-admin.component';
+import { ResultsNavbarComponent } from './results-navbar.component';
 
-xdescribe('EventAdminComponent', () => {
-  let component: EventAdminComponent;
-  let fixture: ComponentFixture<EventAdminComponent>;
+describe('ResultsNavbarComponent', () => {
+  let component: ResultsNavbarComponent;
+  let fixture: ComponentFixture<ResultsNavbarComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EventAdminComponent ]
+      declarations: [ ResultsNavbarComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EventAdminComponent);
+    fixture = TestBed.createComponent(ResultsNavbarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

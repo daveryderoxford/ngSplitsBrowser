@@ -2,7 +2,7 @@ import * as $ from "jquery";
 import d3 = require("d3");
 
 import { isNotNull, isNaNStrict } from "./util";
-import { InvalidData } from "./exception"
+import { InvalidData } from "./exception";
 import { sbTime } from "./time";
 
 export type Genre = "M" | "F";

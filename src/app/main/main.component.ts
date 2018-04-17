@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
 
-import { OEvent } from 'app/model/oevent';
+import { OEvent } from "app/model/oevent";
 
-import { AngularFireDatabase } from 'angularfire2/database';
-import { Observable } from 'rxjs/Observable';
-import { Router } from '@angular/router';
+import { AngularFireDatabase } from "angularfire2/database";
+import { Observable } from "rxjs/Observable";
+import { Router } from "@angular/router";
 
 
 @Component({
-  selector: 'app-main',
-  templateUrl: './main.component.html',
-  styleUrls: ['./main.component.scss']
+  selector: "app-main",
+  templateUrl: "./main.component.html",
+  styleUrls: ["./main.component.scss"]
 })
 export class MainComponent implements OnInit {
 
@@ -23,17 +23,17 @@ export class MainComponent implements OnInit {
 
     const opts = {
       query: {
-        orderByChild: 'date_club_index',
+        orderByChild: "date_club_index",
         limitToFirst: 4
       }
     };
 
-    this.events = this.db.list<OEvent>('/events', ref => ref.orderByChild('date_club_index').limitToFirst(4) ).valueChanges();
+    this.events = this.db.list<OEvent>("/events", ref => ref.orderByChild("date_club_index").limitToFirst(4) ).valueChanges();
 
   }
 
   eventClicked(event: OEvent) {
-     this.router.navigate(['/graph', event.key ]);
+     this.router.navigate(["/graph", event.key ]);
   }
 
 }

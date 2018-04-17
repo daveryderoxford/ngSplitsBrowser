@@ -1,0 +1,17 @@
+<form class="search-form" [formGroup]="searchForm">
+
+  <!--<mat-form-field class="search-full-width"> -->
+
+    <input type="text" formControlName="searchControl" [matAutocomplete]="autoCompletePanel" class="searchinput" placeholder="Search">
+
+    <mat-autocomplete #autoCompletePanel="matAutocomplete">
+      <mat-optgroup *ngFor="let group of filterPanelContents" [label]="group.name">
+        <mat-option *ngFor="let option of group.options" [value]="option" (optionSelected)="onOptionSelected(event)">
+          {{ option.name }}
+        </mat-option>
+      </mat-optgroup>
+    </mat-autocomplete>
+
+   <!-- </mat-form-field> -->
+
+</form>

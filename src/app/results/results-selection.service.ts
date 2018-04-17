@@ -4,12 +4,20 @@ import { OEvent } from "../model/oevent"
 import { AngularFireDatabase } from "angularfire2/database";
 import { FirebaseApp } from "angularfire2";
 
+import { Competitor, Course, CourseClass } from "app/results/model";
+
 
 @Injectable()
 export class ResultsSelectionService {
 
-  public event$: BehaviorSubject<OEvent> = new BehaviorSubject(null);
+  private event$: BehaviorSubject<OEvent> = new BehaviorSubject(null);
   public event: OEvent = null;
+
+  // Observables for results selection
+  private selectedCompetitors$: BehaviorSubject<Array<Competitor>> = new BehaviorSubject(null);
+  private selectedControl$: BehaviorSubject<string> = new BehaviorSubject(null);
+  private selectedCourse$: BehaviorSubject<Course> = new BehaviorSubject(null);
+  private selectedClasses$: BehaviorSubject<Array<CourseClass>> = new BehaviorSubject(null);
 
   constructor(private db: AngularFireDatabase,
     private firebaseApp: FirebaseApp,
@@ -37,5 +45,7 @@ export class ResultsSelectionService {
     const path = this.event.splits.splitsFilename;
     return (this.firebaseApp.storage().ref().child(path).getDownloadURL());
   }
+
+
 
 }

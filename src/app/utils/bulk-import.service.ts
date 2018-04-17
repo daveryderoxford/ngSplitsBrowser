@@ -1,17 +1,17 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
-import { OEvent, SplitsData, EventSummary, SplitsFileFormat } from 'app/model/oevent';
+import { OEvent, SplitsFileInfo, EventSummary, SplitsFileFormat } from "app/model/oevent";
 
-import * as Firebase from 'firebase';
-import { FirebaseApp } from 'angularfire2';
-import { AngularFireDatabase } from 'angularfire2/database';
+import * as Firebase from "firebase";
+import { FirebaseApp } from "angularfire2";
+import { AngularFireDatabase } from "angularfire2/database";
 
-import * as data from './importdata';
-import { EventAdminService } from 'app/upload/event-admin.service';
-import { Utils } from 'app/utils/utils'; import { Http } from '@angular/http';
+import * as data from "./importdata";
+import { EventAdminService } from "app/upload/event-admin.service";
+import { Utils } from "app/utils/utils"; import { Http } from "@angular/http";
 
-import { LogEntry } from 'app/model/log-entry';
-import { Club } from 'app/model/club';
+import { LogEntry } from "app/model/log-entry";
+import { Club } from "app/model/club";
 
 /* Service to import exisitng resilts */
 @Injectable()
@@ -31,8 +31,8 @@ export class BulkImportService {
 
   private async processEvent(inputEvent: data.ImportData) {
 
-    const splits: SplitsData = {
-      splitsFilename: 'results/legacy/' + inputEvent.id,
+    const splits: SplitsFileInfo = {
+      splitsFilename: "results/legacy/" + inputEvent.id,
       splitsFileFormat: inputEvent.format,
       valid: true
     };
@@ -43,12 +43,12 @@ export class BulkImportService {
       eventdate: new Date(inputEvent.eventdate * 1000).toISOString(),
       club: inputEvent.club,
       grade: inputEvent.type,
-      type: 'Foot',
-      discipline: '',
+      type: "Foot",
+      discipline: "",
       webpage: inputEvent.webpage,
       splits: splits,
       email: inputEvent.email,
-      user: 'qWLOONZF1NhBZCV1FI9htz3AitI2',
+      user: "qWLOONZF1NhBZCV1FI9htz3AitI2",
       legacyPassword: inputEvent.legacyPassword
     }
 
@@ -58,26 +58,26 @@ export class BulkImportService {
     try {
       event.summary = await this.createEventSummary(event.splits.splitsFilename);
       if (event.summary.courses.length === 0) {
-        const message1 = ('No courses found for event' + inputEvent.id + '  Name: ' + event.name);
-        await this.log({ severity: 'WARN', source: 'BulkImportService', msg: message1 });
+        const message1 = ("No courses found for event" + inputEvent.id + "  Name: " + event.name);
+        await this.log({ severity: "WARN", source: "BulkImportService", msg: message1 });
         event.splits.valid = false;
       }
     } catch (e) {
-      const message2 = 'Error parsing results Input event Id:' + inputEvent.id + '  Name: ' + event.name + '   Message  ' + e.message;
-      await this.log({ severity: 'WARN', source: 'BulkImportService', msg: message2 });
+      const message2 = "Error parsing results Input event Id:" + inputEvent.id + "  Name: " + event.name + "   Message  " + e.message;
+      await this.log({ severity: "WARN", source: "BulkImportService", msg: message2 });
       event.splits.valid = false;
     }
     await this.writeEvent(inputEvent.id, event);
 
     await this.updateClubs(event);
 
-    const message3 = 'Event sucessfully imported event Id:' + inputEvent.id + '  Name: ' + event.name;
-    await this.log({ severity: 'INFO', source: 'BulkImportService', msg: message3 });
+    const message3 = "Event sucessfully imported event Id:" + inputEvent.id + "  Name: " + event.name;
+    await this.log({ severity: "INFO", source: "BulkImportService", msg: message3 });
   }
 
 
   private getEventsForClubName(clubName: string): Promise<OEvent[]> {
-    const obs = this.af.list<OEvent>('/events', ref => ref.orderByChild('club').equalTo(clubName) ).valueChanges() ;
+    const obs = this.af.list<OEvent>("/events", ref => ref.orderByChild("club").equalTo(clubName) ).valueChanges() ;
 
     return(obs.first().toPromise());
   }
@@ -92,30 +92,30 @@ export class BulkImportService {
     // if no reference then remove the club
     if (events.length === 0) {
       // muct be an error as club added
-      this.log( {severity: 'ERROR', source: 'BulkImportService',  msg: 'Error club not found ' + event.club} );
-      await this.af.object('/clubs/ +  key').remove();
+      this.log( {severity: "ERROR", source: "BulkImportService",  msg: "Error club not found " + event.club} );
+      await this.af.object("/clubs/ +  key").remove();
     } else {
       const club: Club = {
         name: event.club,
         nationality: event.nationality,
         numEvents: events.length
       }
-      await this.af.object('/clubs/' + key).set(club);
+      await this.af.object("/clubs/" + key).set(club);
     }
   }
 
   private async log(log: LogEntry) {
     if (!log.source)  {
-      log.source = '    ';
+      log.source = "    ";
     }
 
     if (!log.severity)  {
-      log.severity = 'DEBUG';
+      log.severity = "DEBUG";
     }
 
-    console.log(log.severity + '  ' + log.source + '   ' + log.msg);
+    console.log(log.severity + "  " + log.source + "   " + log.msg);
     log.timestamp = new Date().toISOString();
-    if (log.severity !== 'DEBUG') {
+    if (log.severity !== "DEBUG") {
          const ref = this.af.object(/logs/ + Utils.encodeAsFirebaseKey(log.timestamp));
          await ref.set(log);
     }

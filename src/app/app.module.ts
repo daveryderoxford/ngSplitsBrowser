@@ -1,52 +1,55 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule, Routes } from '@angular/router';
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { BrowserModule } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { ReactiveFormsModule } from "@angular/forms";
+import { RouterModule, Routes } from "@angular/router";
 
-import { AppMaterialModule } from 'app/app-material.module';
+import { AppMaterialModule } from "app/app-material.module";
 
-import { FlexLayoutModule } from '@angular/flex-layout';
+import { FlexLayoutModule } from "@angular/flex-layout";
 
-import { AngularFireModule } from 'angularfire2';
+import { AngularFireModule } from "angularfire2";
 
-import { AuthGuard } from 'app/auth/guards/auth-guard';
+import { AuthGuard } from "app/auth/guards/auth-guard";
 
 // Custom components
-import { UploadModule } from './upload/upload.module';
-import { AppComponent } from './app.component';
+import { UploadModule } from "./upload/upload.module";
+import { AppComponent } from "./app.component";
 
-import 'hammerjs';
+import "hammerjs";
 
 // Components
-import { LoginComponent } from './auth/login/login.component';
-import { RecoverComponent } from './auth/recover/recover.component';
-import { SignupComponent } from './auth/signup/signup.component';
-import { MainComponent } from './main/main.component';
-import { SharedModule } from 'app/app.shared.module';
-import { EventsComponent } from './results/events/events.component';
-import { firebaseConfig } from 'app/app.firebase-config';
-import { UserComponent } from 'app/user/user.component';
-import { AboutComponent } from './about/about.component';
-import { GraphComponent } from './results/graph/graph.component';
-import { VirtualScrollModule } from 'angular2-virtual-scroll';
+import { LoginComponent } from "./auth/login/login.component";
+import { RecoverComponent } from "./auth/recover/recover.component";
+import { SignupComponent } from "./auth/signup/signup.component";
+import { MainComponent } from "./main/main.component";
+import { SharedModule } from "app/app.shared.module";
+import { EventsListComponent } from "./events/eventslist/eventslist.component";
+import { firebaseConfig } from "app/app.firebase-config";
+import { UserComponent } from "app/user/user.component";
+import { AboutComponent } from "./about/about.component";
+import { GraphComponent } from "./results/graph/graph.component";
+import { VirtualScrollModule } from "angular2-virtual-scroll";
 
 // Services
-import { ResultsSelectionService } from './results/results-selection.service';
-import { UserDataService } from 'app/user/user-data.service';
-import { BulkImportService } from 'app/utils/bulk-import.service';
-import { HttpModule } from '@angular/http';
+import { ResultsSelectionService } from "./results/results-selection.service";
+import { UserDataService } from "app/user/user-data.service";
+import { BulkImportService } from "app/utils/bulk-import.service";
+import { HttpModule } from "@angular/http";
+import { ResultsViewComponent } from "./results/results-view/results-view.component";
+import { ResultsNavbarComponent } from "./results/results-navbar/results-navbar.component";
+import { ResultsSearchComponent } from "./results/results-search/results-search.component";
 
 export const appRoutes: Routes = [
-  { path: '', component: MainComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
-  { path: 'recover', component: RecoverComponent },
-  { path: 'events', component: EventsComponent },
-  { path: 'user', component: UserComponent, canActivate: [AuthGuard] },
-  { path: 'about', component: AboutComponent },
-  { path: 'graph/:id', component: GraphComponent }
+  { path: "", component: MainComponent },
+  { path: "login", component: LoginComponent },
+  { path: "signup", component: SignupComponent },
+  { path: "recover", component: RecoverComponent },
+  { path: "events", component:  EventsListComponent },
+  { path: "user", component: UserComponent, canActivate: [AuthGuard] },
+  { path: "about", component: AboutComponent },
+  { path: "graph/:id", component: GraphComponent }
 ];
 
 @NgModule({
@@ -56,10 +59,13 @@ export const appRoutes: Routes = [
     RecoverComponent,
     SignupComponent,
     MainComponent,
-    EventsComponent,
+    EventsListComponent,
     UserComponent,
     AboutComponent,
     GraphComponent,
+    ResultsViewComponent,
+    ResultsNavbarComponent,
+    ResultsSearchComponent,
   ],
   imports: [
     RouterModule.forRoot(appRoutes),
