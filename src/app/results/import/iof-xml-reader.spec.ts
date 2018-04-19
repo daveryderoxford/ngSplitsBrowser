@@ -21,8 +21,8 @@
 // tslint:disable:max-line-length
 // tslint:disable:quotemark
 
-import {} from "jasmine";
-import {} from "jasmine-expect";
+import { } from "jasmine";
+import { } from "jasmine-expect";
 
 import { parseIOFXMLEventData } from "./iof-xml-reader";
 import { TimeUtilities, CourseClass } from "app/results/model"
@@ -56,7 +56,8 @@ fdescribe("Input.IOFXml", () => {
             totalTime: 65 + 221 + 184 + 100,
             controls: ["182", "148", "167"],
             cumTimes: [65, 65 + 221, 65 + 221 + 184],
-            result: true
+            result: true,
+            ecard: "12345"
         };
     }
 
@@ -157,6 +158,7 @@ fdescribe("Input.IOFXml", () => {
         const clubXml = (exists("club")) ? "<Club><ShortName>" + personData.club + "</ShortName></Club>\n" : "";
         const startTimeXml = (exists("startTime")) ? "<StartTime><Clock>" + formatTime(personData.startTime) + "</Clock></StartTime>\n" : "";
         const totalTimeXml = (exists("totalTime")) ? "<Time>" + formatTime(personData.totalTime) + "</Time>\n" : "";
+        const ecardXml = (exists("ecard")) ? '<CCard> <CCardId>' + personData.ecard + '</CCardId> <PunchingUnitType value="SI" /> </CCard>' : "";
 
         let status;
         if (exists("nonStarter")) {
@@ -191,7 +193,7 @@ fdescribe("Input.IOFXml", () => {
             splitTimesXmls.push("<SplitTime><ControlCode>" + personData.controls[index] + "</ControlCode><Time>" + formatTime(personData.cumTimes[index]) + "</Time></SplitTime>\n");
         }
 
-        const resultXml = exists("result") ? "<Result>" + startTimeXml + totalTimeXml + statusXml + courseLengthXml + splitTimesXmls.join("") + "</Result>\n" : "";
+        const resultXml = exists("result") ? "<Result>" + startTimeXml + totalTimeXml + ecardXml + statusXml + courseLengthXml + splitTimesXmls.join("") + "</Result>\n" : "";
 
         return "<PersonResult>" + personNameXml + clubXml + resultXml + "</PersonResult>\n";
     };
@@ -201,13 +203,13 @@ fdescribe("Input.IOFXml", () => {
     * @param {Number} value - The value to pad.
     * @return {String} Zero-padded number as a string.
     */
-    function zeroPadTwoDigits (value) {
+    function zeroPadTwoDigits(value) {
         return (value < 10) ? "0" + value : value.toString();
     }
 
-    function hours (value) { return zeroPadTwoDigits(Math.floor(value / 3600)); }
-    function minutes (value) { return zeroPadTwoDigits(Math.floor(value / 60) % 60); }
-    function seconds (value) { return zeroPadTwoDigits(value % 60); }
+    function hours(value) { return zeroPadTwoDigits(Math.floor(value / 3600)); }
+    function minutes(value) { return zeroPadTwoDigits(Math.floor(value / 60) % 60); }
+    function seconds(value) { return zeroPadTwoDigits(value % 60); }
 
     /**
     * Formats a start time as an ISO-8601 date.
@@ -223,7 +225,7 @@ fdescribe("Input.IOFXml", () => {
     * @param {Number} startTime - The start time to format.
     * @return {String} The formatted date.
     */
-    function formatStartTimeNoSeconds (startTime) {
+    function formatStartTimeNoSeconds(startTime) {
         return "2014-06-07T" + hours(startTime) + ":" + minutes(startTime);
     }
 
@@ -233,7 +235,7 @@ fdescribe("Input.IOFXml", () => {
     * @param {Number} startTime - The start time to format.
     * @return {String} The formatted date.
     */
-    function formatStartTimeBasic (startTime) {
+    function formatStartTimeBasic(startTime) {
         return "20140607" + hours(startTime) + minutes(startTime) + seconds(startTime);
     }
 
@@ -361,6 +363,7 @@ fdescribe("Input.IOFXml", () => {
 
         const startTimeXml = (exists("startTime")) ? "<StartTime>" + startTimeStr + "</StartTime>\n" : "";
         const totalTimeXml = (exists("totalTime")) ? "<Time>" + personData.totalTime + "</Time>" : "";
+        const ecardXml = (exists("ecard")) ? "<ControlCard>" + personData.ecard + "</ControlCard>" : "";
 
         let status;
         if (exists("nonStarter")) {
@@ -391,7 +394,7 @@ fdescribe("Input.IOFXml", () => {
             }
         }
 
-        const resultXml = exists("result") ? "<Result>" + startTimeXml + totalTimeXml + statusXml + splitTimesXmls.join("") + "</Result>\n" : "";
+        const resultXml = exists("result") ? "<Result>" + startTimeXml + ecardXml + totalTimeXml + statusXml + splitTimesXmls.join("") + "</Result>\n" : "";
 
         return "<PersonResult>" + personNameXml + clubXml + resultXml + "</PersonResult>\n";
     };
@@ -429,17 +432,16 @@ fdescribe("Input.IOFXml", () => {
     * This function also asserts that the event has exactly one course-class and
     * exactly one competitor within that class.  This one competitor is what
     * it returns.
-    * @param {QUnit.assert} assert - QUnit assert object.
     * @param {Event} eventData - Event data parsed by the reader.
     * @param {String} formatterName - Name of the formatter used to generate
     *     the XML.
     * @return {Competitor} The single competitor.
     */
-    function getSingleCompetitor( eventData, formatterName) {
-        expect(eventData.classes.length).toEqual(1,  "Expected one class - " + formatterName);
+    function getSingleCompetitor(eventData, formatterName) {
+        expect(eventData.classes.length).toEqual(1, "Expected one class - " + formatterName);
         if (eventData.classes.length === 1) {
             const courseClass = eventData.classes[0];
-            expect(courseClass.competitors.length).toEqual(1,  "Expected one competitor - " + formatterName);
+            expect(courseClass.competitors.length).toEqual(1, "Expected one competitor - " + formatterName);
             if (courseClass.competitors.length === 1) {
                 return eventData.classes[0].competitors[0];
             } else {
@@ -458,8 +460,8 @@ fdescribe("Input.IOFXml", () => {
     *     failure message if no exception is thrown.  A default message is used
     *     instead if this is not specified.
     */
-    function assertInvalidData( xml: string, failureMessage?: string) {
-        TestSupport.assertInvalidData( () => {
+    function assertInvalidData(xml: string, failureMessage?: string) {
+        TestSupport.assertInvalidData(() => {
             parseEventData(xml);
         }, failureMessage);
     }
@@ -467,14 +469,13 @@ fdescribe("Input.IOFXml", () => {
     /**
     * Asserts that attempting to parse the given string will fail with a
     * WrongFileFormat exception being thrown.
-    * @param {QUnit.assert] assert - QUnit assert object.
     * @param {String} data - The string to attempt to parse.
     * @param {String} failureMessage - Optional message to show in assertion
     *     failure message if no exception is thrown.  A default message is used
     *     instead if this is not specified.
     */
-    function assertWrongFileFormat( data: string, failureMessage?: string) {
-        TestSupport.assertException( "WrongFileFormat", () => {
+    function assertWrongFileFormat(data: string, failureMessage?: string) {
+        TestSupport.assertException("WrongFileFormat", () => {
             parseEventData(data);
         }, failureMessage);
     }
@@ -525,9 +526,9 @@ fdescribe("Input.IOFXml", () => {
     * @param {Object} options - Options object, the contents of which are
     *     described above.
     */
-    function runSingleCompetitorXmlFormatParseTest( clazz: any, checkFunc, options?: any) {
+    function runSingleCompetitorXmlFormatParseTest(clazz: any, checkFunc, options?: any) {
         runXmlFormatParseTest([clazz], function (eventData, formatterName) {
-            const competitor = getSingleCompetitor( eventData, formatterName);
+            const competitor = getSingleCompetitor(eventData, formatterName);
             if (competitor !== null) {
                 checkFunc(competitor);
             }
@@ -548,9 +549,9 @@ fdescribe("Input.IOFXml", () => {
     * @param {Object} options - Options object, the contents of which are
     *     described above.
     */
-    function runSingleCourseXmlFormatParseTest( classes, checkFunc, options?: any) {
+    function runSingleCourseXmlFormatParseTest(classes, checkFunc, options?: any) {
         runXmlFormatParseTest(classes, function (eventData, formatterName) {
-            expect(eventData.courses.length).toEqual(1,  "Expected one course - " + formatterName);
+            expect(eventData.courses.length).toEqual(1, "Expected one course - " + formatterName);
             if (eventData.courses.length === 1) {
                 checkFunc(eventData.courses[0]);
             }
@@ -569,20 +570,19 @@ fdescribe("Input.IOFXml", () => {
     * If none of the above options are required, the options object itself can
     * be omitted.
     *
-    * @param {QUnit.assert} assert - QUnit assert object.
     * @param {Array} classes - Array of class objects to generate the XML
     *     using.
     * @param {Object} options - Options object, the contents of which are
     *     described above.
     */
-    function runFailingXmlFormatParseTest( classes: Array<any>, options?: any) {
+    function runFailingXmlFormatParseTest(classes: Array<any>, options?: any) {
         const formatters = (options && options.formatters) || ALL_FORMATTERS;
         formatters.forEach(function (formatter) {
             let xml = getXmlFromFormatter(formatter, classes);
             if (options && options.preprocessor) {
                 xml = options.preprocessor(xml);
             }
-            assertInvalidData( xml, "Expected invalid data - " + formatter.name);
+            assertInvalidData(xml, "Expected invalid data - " + formatter.name);
         });
     }
 
@@ -591,31 +591,31 @@ fdescribe("Input.IOFXml", () => {
     });
 
     it("Cannot parse a non-empty string that is not XML", () => {
-        assertWrongFileFormat( "This is not valid IOF XML data");
+        assertWrongFileFormat("This is not valid IOF XML data");
     });
 
     it("Cannot parse a string that is XML but does not mention the IOFdata DTD", () => {
-        assertWrongFileFormat( "<ResultList />");
+        assertWrongFileFormat("<ResultList />");
     });
 
     it("Cannot parse a string for the v2.0.3 format that mentions the IOFdata DTD but is not well-formed XML", () => {
-        assertInvalidData( V2_HEADER + "<ResultList <<<");
+        assertInvalidData(V2_HEADER + "<ResultList <<<");
     });
 
     it("Cannot parse a string for the v2.0.3 format that uses the wrong root element name", () => {
-        assertWrongFileFormat( V2_HEADER + "<Wrong />");
+        assertWrongFileFormat(V2_HEADER + "<Wrong />");
     });
 
     it("Cannot parse a string for the v2.0.3 format that does not contain an IOFVersion element", () => {
-        assertWrongFileFormat( V2_HEADER + "<ResultList><NotTheIOFVersion version=\"1.2.3\" /><ClassResult /></ResultList>\n");
+        assertWrongFileFormat(V2_HEADER + "<ResultList><NotTheIOFVersion version=\"1.2.3\" /><ClassResult /></ResultList>\n");
     });
 
     it("Cannot parse a string for the v2.0.3 format that has an IOFVersion element with no version attribute", () => {
-        assertWrongFileFormat( V2_HEADER + "<ResultList><IOFVersion /><ClassResult /></ResultList>\n");
+        assertWrongFileFormat(V2_HEADER + "<ResultList><IOFVersion /><ClassResult /></ResultList>\n");
     });
 
     it("Cannot parse a string for the v2.0.3 format that has an IOFVersion element with a version other than 2.0.3", () => {
-        assertWrongFileFormat( V2_HEADER + "<ResultList><IOFVersion version=\"wrong\" /><ClassResult /></ResultList>\n");
+        assertWrongFileFormat(V2_HEADER + "<ResultList><IOFVersion version=\"wrong\" /><ClassResult /></ResultList>\n");
     });
 
     it("Cannot parse a string for the v2.0.3 format that has a status of something other than complete", () => {
@@ -625,19 +625,19 @@ fdescribe("Input.IOFXml", () => {
     });
 
     it("Cannot parse a string for the v3.0 format that mentions the IOF XSD but is not well-formed XML", () => {
-        assertInvalidData( V3_HEADER.replace("<ResultList", "<ResultList <<<"));
+        assertInvalidData(V3_HEADER.replace("<ResultList", "<ResultList <<<"));
     });
 
     it("Cannot parse a string for the v3.0 format that uses the wrong root element name", () => {
-        assertWrongFileFormat( V3_HEADER.replace("<ResultList", "<Wrong") + "</Wrong>");
+        assertWrongFileFormat(V3_HEADER.replace("<ResultList", "<Wrong") + "</Wrong>");
     });
 
     it("Cannot parse a string for the v3.0 format that contains no iofVersion attribute", () => {
-        assertWrongFileFormat( V3_HEADER.replace("iofVersion=\"3.0\"", "") + "</ResultList>");
+        assertWrongFileFormat(V3_HEADER.replace("iofVersion=\"3.0\"", "") + "</ResultList>");
     });
 
     it("Cannot parse a string for the v3.0 format that has an iofVersion element with a version other than 3.0", () => {
-        assertWrongFileFormat( V3_HEADER.replace("iofVersion=\"3.0\"", "iofVersion=\"4.6\"") + "</ResultList>");
+        assertWrongFileFormat(V3_HEADER.replace("iofVersion=\"3.0\"", "iofVersion=\"4.6\"") + "</ResultList>");
     });
 
     it("Cannot parse a string for the v3.0 format that has a status of something other than complete", () => {
@@ -647,22 +647,22 @@ fdescribe("Input.IOFXml", () => {
     });
 
     it("Cannot parse a string that has no class results in it", () => {
-        runFailingXmlFormatParseTest( []);
+        runFailingXmlFormatParseTest([]);
     });
 
     it("Can parse with warnings a string that has a class with no name", () => {
-        runXmlFormatParseTest( [{length: 2300, courseId: 1, competitors: [getPerson()]}],
-             (eventData, formatterName) => {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
+        runXmlFormatParseTest([{ length: 2300, courseId: 1, competitors: [getPerson()] }],
+            (eventData, formatterName) => {
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
                 expect(eventData.classes[0].name !== "").toBe(true);
             });
     });
 
     it("Can parse a string that has a single class with no competitors", () => {
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, courseId: 1, competitors: []}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, courseId: 1, competitors: [] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(0,  "No classes should have been read - " + formatterName);
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued");
+                expect(eventData.classes.length).toEqual(0, "No classes should have been read - " + formatterName);
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued");
             });
     });
 
@@ -670,13 +670,13 @@ fdescribe("Input.IOFXml", () => {
         const className = "Test Class";
         const classLength = 2300;
         const person = getPerson();
-        runXmlFormatParseTest([{name: className, length: classLength, competitors: [person]}],
+        runXmlFormatParseTest([{ name: className, length: classLength, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
                 if (eventData.classes.length === 1) {
                     const courseClass = eventData.classes[0];
                     expect(courseClass.name).toEqual(className);
-                    expect(courseClass.competitors.length).toEqual(1,  "One competitor should have been read -  " + formatterName);
+                    expect(courseClass.competitors.length).toEqual(1, "One competitor should have been read -  " + formatterName);
                     expect(courseClass.numControls).toEqual(3);
 
                     if (courseClass.competitors.length === 1) {
@@ -687,12 +687,13 @@ fdescribe("Input.IOFXml", () => {
                         expect(competitor.totalTime).toEqual(person.totalTime);
                         expect(competitor.gender).toEqual("M");
                         expect(competitor.yearOfBirth).toEqual(1976);
+                        expect(competitor.ecard).toEqual("12345", "ECard incorrect");
                         expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0].concat(person.cumTimes).concat(person.totalTime));
                         expect(competitor.completed()).toBe(true);
                         expect(!competitor.isNonCompetitive).toBe(true);
                     }
 
-                    expect(eventData.courses.length).toEqual(1,  "One course should have been read - " + formatterName);
+                    expect(eventData.courses.length).toEqual(1, "One course should have been read - " + formatterName);
                     if (eventData.courses.length > 0) {
                         const course = eventData.courses[0];
                         expect(course.name).toEqual(className);
@@ -707,9 +708,9 @@ fdescribe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that has a single class with a single competitor and complete status in IOF v2.0.3 format", () => {
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, competitors: [getPerson()]}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [getPerson()] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
             },
             {
                 preprocessor: function (xml) { return xml.replace(/<ResultList>/, "<ResultList status=\"complete\">"); },
@@ -719,9 +720,9 @@ fdescribe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that has a single class with a single competitor and complete status in IOF v3.0 format", () => {
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, competitors: [getPerson()]}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [getPerson()] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
             },
             {
                 preprocessor: function (xml) { return xml.replace(/<ResultList/, "<ResultList status=\"Complete\""); },
@@ -733,7 +734,7 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that has a single class with a single competitor with forename only", () => {
         const person = getPerson();
         delete person.surname;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.name).toEqual(person.forename);
             });
@@ -742,7 +743,7 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that has a single class with a single competitor with surname only", () => {
         const person = getPerson();
         delete person.forename;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.name).toEqual(person.surname);
             });
@@ -753,18 +754,18 @@ fdescribe("Input.IOFXml", () => {
         delete person.forename;
         delete person.surname;
         runXmlFormatParseTest(
-            [{name: "Test Class", length: 2300, courseId: 1, competitors: [person]}],
+            [{ name: "Test Class", length: 2300, courseId: 1, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(0,  "No competitors should have been read - " + formatterName);
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued - " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(0, "No competitors should have been read - " + formatterName);
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued - " + formatterName);
             });
     });
 
     it("Can parse a string that contains a competitor with missing club", () => {
         const person = getPerson();
         delete person.club;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.club).toEqual("");
             });
@@ -773,10 +774,10 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with no year of birth", () => {
         const person = getPerson();
         delete person.birthDate;
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, competitors: [person]}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(1,  "One competitor should have been read -  " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read -  " + formatterName);
                 expect(eventData.classes[0].competitors[0].yearOfBirth).toEqual(null);
             });
     });
@@ -784,10 +785,10 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with an invalid year of birth, ignoring it", () => {
         const person = getPerson();
         person.birthDate = "This is not a valid birth date";
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, competitors: [person]}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(1,  "One competitor should have been read -  " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read -  " + formatterName);
                 expect(eventData.classes[0].competitors[0].yearOfBirth).toEqual(null);
             });
     });
@@ -796,10 +797,10 @@ fdescribe("Input.IOFXml", () => {
         const person = getPerson();
         person.forename = "Joan";
         person.gender = "F";
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, competitors: [person]}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(1,  "One competitor should have been read -  " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read -  " + formatterName);
                 expect(eventData.classes[0].competitors[0].gender).toEqual("F");
             });
     });
@@ -807,10 +808,10 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with no gender specified", () => {
         const person = getPerson();
         delete person.gender;
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, competitors: [person]}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(1,  "One competitor should have been read -  " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read -  " + formatterName);
                 expect(eventData.classes[0].competitors[0].gender).toEqual(null);
             });
     });
@@ -818,10 +819,10 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with an invalid gender, ignoring it", () => {
         const person = getPerson();
         person.gender = "This is not a valid gender";
-        runXmlFormatParseTest([{name: "Test Class", length: 2300, competitors: [person]}],
+        runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(1,  "One competitor should have been read -  " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read -  " + formatterName);
                 expect(eventData.classes[0].competitors[0].gender).toEqual(null);
             });
     });
@@ -830,17 +831,17 @@ fdescribe("Input.IOFXml", () => {
         const person = getPerson();
         delete person.result;
         runXmlFormatParseTest(
-            [{name: "Test Class", length: 2300, courseId: 1, competitors: [person]}],
+            [{ name: "Test Class", length: 2300, courseId: 1, competitors: [person] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued");
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued");
             });
     });
 
     it("Can parse a string that contains a competitor with missing start time", () => {
         const person = getPerson();
         delete person.startTime;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.startTime).toEqual(null);
             });
@@ -849,7 +850,7 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with invalid start time", () => {
         const person = getPerson();
         person.startTime = null;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.startTime).toEqual(null);
             });
@@ -858,27 +859,27 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with start time using ISO 8601 basic formatting", () => {
         const person = getPerson();
         person.startTimeBasic = true;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.startTime).toEqual(person.startTime);
             },
-            {formatters: [Version3Formatter]});
+            { formatters: [Version3Formatter] });
     });
 
     it("Can parse a string that contains a competitor with start time without seconds", () => {
         const person = getPerson();
         person.startTimeNoSeconds = true;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.startTime).toEqual(person.startTime - (person.startTime % 60));
             },
-            {formatters: [Version3Formatter]});
+            { formatters: [Version3Formatter] });
     });
 
     it("Can parse a string that contains a competitor with missing total time", () => {
         const person = getPerson();
         delete person.totalTime;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.totalTime).toEqual(null);
                 expect(!competitor.completed()).toBe(true);
@@ -888,7 +889,7 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with invalid total time", () => {
         const person = getPerson();
         person.totalTime = null;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.totalTime).toEqual(null);
                 expect(!competitor.completed()).toBe(true);
@@ -898,15 +899,15 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a competitor with fractional seconds to controls", () => {
         const person = getPerson();
         person.cumTimes = [65.7, 65.7 + 221.4, 65.7 + 221.4 + 184.6];
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0].concat(person.cumTimes).concat(person.totalTime));
             },
-            {formatters: [Version3Formatter]});
+            { formatters: [Version3Formatter] });
     });
 
     it("Can parse a string that contains a course with no length", () => {
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", competitors: [getPerson()]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", competitors: [getPerson()] }],
             function (course) {
                 expect(course.length).toEqual(null);
             });
@@ -914,63 +915,63 @@ fdescribe("Input.IOFXml", () => {
 
     it("Can parse with warnings a string that contains an invalid course length", () => {
         runXmlFormatParseTest(
-            [{name: "Test Class", length: "This is not a valid number", competitors: [getPerson()]}],
+            [{ name: "Test Class", length: "This is not a valid number", competitors: [getPerson()] }],
             function (eventData, formatterName) {
-                expect(eventData.courses.length).toEqual(1,  "One course should have been read - " + formatterName);
-                expect(eventData.courses[0].length).toEqual(null,  "No course length should have been read - " + formatterName);
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued");
+                expect(eventData.courses.length).toEqual(1, "One course should have been read - " + formatterName);
+                expect(eventData.courses[0].length).toEqual(null, "No course length should have been read - " + formatterName);
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued");
             });
     });
 
     it("Can parse a string that contains a course length specified in metres", () => {
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", length: 2300, courseId: 1, lengthUnit: "m", competitors: [getPerson()]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", length: 2300, courseId: 1, lengthUnit: "m", competitors: [getPerson()] }],
             function (course) {
                 expect(course.length).toEqual(2.3);
             },
-            {formatters: [Version2Formatter]});
+            { formatters: [Version2Formatter] });
     });
 
     it("Can parse a string that contains a course length specified in kilometres", () => {
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", length: 2.3, lengthUnit: "km", courseId: 1, competitors: [getPerson()]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", length: 2.3, lengthUnit: "km", courseId: 1, competitors: [getPerson()] }],
             function (course) {
                 expect(course.length).toEqual(2.3);
             },
-            {formatters: [Version2Formatter]});
+            { formatters: [Version2Formatter] });
     });
 
     it("Can parse a string that contains a course length specified in feet", () => {
         const courseLength = 10176;
         const expectedLengthKm = courseLength / FEET_PER_KILOMETRE;
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", length: courseLength, lengthUnit: "ft", courseId: 1, competitors: [getPerson()]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", length: courseLength, lengthUnit: "ft", courseId: 1, competitors: [getPerson()] }],
             function (course) {
                 expect(Math.abs(expectedLengthKm - course.length) < 1e-7).toBe(true, "Expected length: " + expectedLengthKm + ", actual: " + course.length);
             },
-            {formatters: [Version2Formatter]});
+            { formatters: [Version2Formatter] });
     });
 
     it("Can parse with warnings a string that contains an unrecognised course length unit", () => {
         runXmlFormatParseTest(
-            [{name: "Test Class", length: "100", lengthUnit: "furlong", competitors: [getPerson()]}],
+            [{ name: "Test Class", length: "100", lengthUnit: "furlong", competitors: [getPerson()] }],
             function (eventData) {
-                expect(eventData.courses.length).toEqual(1,  "One course should have been read");
-                expect(eventData.courses[0].length).toEqual(null,  "No course length should have been read");
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued");
+                expect(eventData.courses.length).toEqual(1, "One course should have been read");
+                expect(eventData.courses[0].length).toEqual(null, "No course length should have been read");
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued");
             },
-            {formatters: [Version2Formatter]});
+            { formatters: [Version2Formatter] });
     });
 
     it("Can parse a string that contains a course climb", () => {
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", length: 2300, climb: 105, courseId: 1, competitors: [getPerson()]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", length: 2300, climb: 105, courseId: 1, competitors: [getPerson()] }],
             function (course) {
                 expect(course.climb).toEqual(105);
             },
-            {formatters: [Version3Formatter]});
+            { formatters: [Version3Formatter] });
     });
 
     it("Can parse a string that contains a non-competitive competitor", () => {
         const person = getPerson();
         person.competitive = false;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.isNonCompetitive).toEqual(true);
             });
@@ -980,7 +981,7 @@ fdescribe("Input.IOFXml", () => {
         const person = getPerson();
         person.nonStarter = true;
         person.cumTimes = [null, null, null];
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.isNonStarter).toEqual(true);
             });
@@ -990,7 +991,7 @@ fdescribe("Input.IOFXml", () => {
         const person = getPerson();
         person.nonFinisher = true;
         person.cumTimes[2] = null;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.isNonFinisher).toEqual(true);
             });
@@ -999,7 +1000,7 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a disqualified competitor", () => {
         const person = getPerson();
         person.disqualified = true;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.isDisqualified).toEqual(true);
             });
@@ -1008,7 +1009,7 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains an over-max-time competitor", () => {
         const person = getPerson();
         person.overMaxTime = true;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.isOverMaxTime).toEqual(true);
             });
@@ -1016,14 +1017,14 @@ fdescribe("Input.IOFXml", () => {
 
     it("Can parse a string that uses alternative element name for control codes", () => {
         const person = getPerson();
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", length: 2300, courseId: 1, competitors: [person]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", length: 2300, courseId: 1, competitors: [person] }],
             function (course) {
                 expect(course.controls).toEqual(person.controls);
             },
             {
                 preprocessor: function (xml) {
                     return xml.replace(/<ControlCode>/g, "<Control><ControlCode>")
-                              .replace(/<\/ControlCode>/g, "</ControlCode></Control>");
+                        .replace(/<\/ControlCode>/g, "</ControlCode></Control>");
                 },
                 formatters: [Version2Formatter]
             });
@@ -1031,67 +1032,73 @@ fdescribe("Input.IOFXml", () => {
 
     it("Can parse a string that uses separate course names", () => {
         const person = getPerson();
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", courseName: "Test Course", length: 2300, courseId: 1, competitors: [person]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", courseName: "Test Course", length: 2300, courseId: 1, competitors: [person] }],
             function (course) {
                 expect(course.name).toEqual("Test Course");
             },
-            {formatters: [Version3Formatter]});
+            { formatters: [Version3Formatter] });
     });
 
     it("Cannot parse a string that contains a competitor with a split with a missing control code", () => {
         const person = getPerson();
-        runFailingXmlFormatParseTest( [{name: "Test Class", length: 2300, courseId: 1, competitors: [person]}],
-            {preprocessor: function (xml) { return xml.replace("<ControlCode>" + person.controls[1] + "</ControlCode>", ""); }});
+        runFailingXmlFormatParseTest([{ name: "Test Class", length: 2300, courseId: 1, competitors: [person] }],
+            { preprocessor: function (xml) { return xml.replace("<ControlCode>" + person.controls[1] + "</ControlCode>", ""); } });
     });
 
     it("Can parse a string that contains a competitor with an additional control, ignoring the additional control", () => {
         const person = getPerson();
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", courseName: "Test Course", length: 2300, courseId: 1, competitors: [person]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", courseName: "Test Course", length: 2300, courseId: 1, competitors: [person] }],
             function (course) {
                 expect(course.classes.length).toEqual(1);
                 expect(course.classes[0].numControls).toEqual(3);
             },
-            {preprocessor: function (xml) { return xml.replace(/<\/Result>/, "<SplitTime status=\"Additional\"><ControlCode>987</ControlCode><Time>234</Time></SplitTime></Result>"); },
-             formatters: [Version3Formatter]});
+            {
+                preprocessor: function (xml) { return xml.replace(/<\/Result>/, "<SplitTime status=\"Additional\"><ControlCode>987</ControlCode><Time>234</Time></SplitTime></Result>"); },
+                formatters: [Version3Formatter]
+            });
     });
 
     it("Can parse a string that contains a competitor with a split with a missing time", () => {
         const person = getPerson();
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", length: 2300, courseId: 1, competitors: [person]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", length: 2300, courseId: 1, competitors: [person] }],
             function (course) {
                 expect(course.classes.length).toEqual(1);
                 expect(course.classes[0].numControls).toEqual(3);
             },
-            {preprocessor: function (xml) {
-                const timeRegex = /<Time>[^<]+<\/Time>/g;
-                timeRegex.exec(xml); // Skip the first match.
-                const secondMatch = timeRegex.exec(xml)[0];
-                return xml.replace(secondMatch, "");
-            }});
+            {
+                preprocessor: function (xml) {
+                    const timeRegex = /<Time>[^<]+<\/Time>/g;
+                    timeRegex.exec(xml); // Skip the first match.
+                    const secondMatch = timeRegex.exec(xml)[0];
+                    return xml.replace(secondMatch, "");
+                }
+            });
     });
 
     it("Can parse a string that contains a competitor with their total time wrapped in a Clock element.", () => {
         const person = getPerson();
-        runSingleCourseXmlFormatParseTest( [{name: "Test Class", length: 2300, courseId: 1, competitors: [person]}],
+        runSingleCourseXmlFormatParseTest([{ name: "Test Class", length: 2300, courseId: 1, competitors: [person] }],
             function (course) {
                 expect(course.classes.length).toEqual(1);
                 expect(course.classes[0].competitors.length).toEqual(1);
-                expect(course.classes[0].competitors[0].totalTime).toEqual(person.totalTime,  "Should read competitor's total time");
+                expect(course.classes[0].competitors[0].totalTime).toEqual(person.totalTime, "Should read competitor's total time");
             },
-            {preprocessor: function (xml) {
-                const timeRegex = /<Time>[^<]+<\/Time>/g;
-                const firstMatch = timeRegex.exec(xml)[0];
-                const firstMatchTime = firstMatch.substring(6, firstMatch.length - 7);
-                xml = xml.replace(firstMatch, "<Time>\r\n<Clock>" + firstMatchTime + "</Clock>\r\n</Time>" );
-                return xml;
-            },
-            formatters: [Version2Formatter]});
+            {
+                preprocessor: function (xml) {
+                    const timeRegex = /<Time>[^<]+<\/Time>/g;
+                    const firstMatch = timeRegex.exec(xml)[0];
+                    const firstMatchTime = firstMatch.substring(6, firstMatch.length - 7);
+                    xml = xml.replace(firstMatch, "<Time>\r\n<Clock>" + firstMatchTime + "</Clock>\r\n</Time>");
+                    return xml;
+                },
+                formatters: [Version2Formatter]
+            });
     });
 
     it("Can parse a string that contains a competitor that mispunched a control", () => {
         const person = getPerson();
         person.cumTimes[1] = null;
-        runSingleCompetitorXmlFormatParseTest( {name: "Test Class", length: 2300, courseId: 1, competitors: [person]},
+        runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0].concat(person.cumTimes).concat([person.totalTime]));
                 expect(!competitor.completed()).toBe(true);
@@ -1108,11 +1115,11 @@ fdescribe("Input.IOFXml", () => {
         person2.totalTime = person2.cumTimes[2] + 177 + 94;
 
         runXmlFormatParseTest(
-            [{name: "Test Class", length: 2300, courseId: 1, competitors: [person1, person2]}],
+            [{ name: "Test Class", length: 2300, courseId: 1, competitors: [person1, person2] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - " + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(1,  "One competitor should have been read - " + formatterName);
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued - " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read - " + formatterName);
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued - " + formatterName);
                 expect(eventData.warnings[0].match(/number of controls/)).toBe(true);
             }
         );
@@ -1121,26 +1128,26 @@ fdescribe("Input.IOFXml", () => {
     it("Can parse a string that contains a class with one competitor whose number of controls matches that specified by the course", () => {
         const person = getPerson();
         runSingleCompetitorXmlFormatParseTest(
-            {name: "Test Class", length: 2300, courseId: 1, numberOfControls: person.controls.length, competitors: [person]},
+            { name: "Test Class", length: 2300, courseId: 1, numberOfControls: person.controls.length, competitors: [person] },
             // In this test we only really want to be sure that the
             // competitor was read without the number-of-controls
             // validation firing.  So there aren't any assertions we really
             // need to run.
             () => { /* empty */ },
-            {formatters: [Version3Formatter]}
+            { formatters: [Version3Formatter] }
         );
     });
 
     it("Can parse with warnings a string that contains a class with one competitor whose number of controls doesn't match that specified by the course", () => {
         const person = getPerson();
         runXmlFormatParseTest(
-            [{name: "Test Class", length: 2300, courseId: 1, numberOfControls: person.controls.length + 2, competitors: [person]}],
+            [{ name: "Test Class", length: 2300, courseId: 1, numberOfControls: person.controls.length + 2, competitors: [person] }],
             function (eventData) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read");
-                expect(eventData.classes[0].competitors.length).toEqual(0,  "No competitors should have been read");
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued");
+                expect(eventData.classes.length).toEqual(1, "One class should have been read");
+                expect(eventData.classes[0].competitors.length).toEqual(0, "No competitors should have been read");
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued");
             },
-            {formatters: [Version3Formatter]}
+            { formatters: [Version3Formatter] }
         );
     });
 
@@ -1152,11 +1159,11 @@ fdescribe("Input.IOFXml", () => {
         person2.controls[1] += "9";
 
         runXmlFormatParseTest(
-            [{name: "Test Class 1", length: 2300, competitors: [person1, person2]}],
+            [{ name: "Test Class 1", length: 2300, competitors: [person1, person2] }],
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(1,  "One class should have been read - "  + formatterName);
-                expect(eventData.classes[0].competitors.length).toEqual(1,  "One competitor should have been read - " + formatterName);
-                expect(eventData.warnings.length).toEqual(1,  "One warning should have been issued - " + formatterName);
+                expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);
+                expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read - " + formatterName);
+                expect(eventData.warnings.length).toEqual(1, "One warning should have been issued - " + formatterName);
             });
     });
 
@@ -1168,15 +1175,15 @@ fdescribe("Input.IOFXml", () => {
         person2.controls[1] += "9";
 
         const classes = [
-            {name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1]},
-            {name: "Test Class 2", length: 2300, courseId: 1, competitors: [person2]}
+            { name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1] },
+            { name: "Test Class 2", length: 2300, courseId: 1, competitors: [person2] }
         ];
 
         runXmlFormatParseTest(classes,
             function (eventData) {
-                expect(eventData.courses.length).toEqual(2,  "Should read the classes' courses as separate");
+                expect(eventData.courses.length).toEqual(2, "Should read the classes' courses as separate");
             },
-            {formatters: [Version3Formatter]}
+            { formatters: [Version3Formatter] }
         );
     });
 
@@ -1190,15 +1197,15 @@ fdescribe("Input.IOFXml", () => {
         person2.totalTime = person2.cumTimes[2] + 177 + 94;
 
         const classes = [
-            {name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1]},
-            {name: "Test Class 2", length: 2300, courseId: 1, competitors: [person2]}
+            { name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1] },
+            { name: "Test Class 2", length: 2300, courseId: 1, competitors: [person2] }
         ];
 
         runXmlFormatParseTest(classes,
             function (eventData) {
-                expect(eventData.courses.length).toEqual(2,  "Should read the classes' courses as separate");
+                expect(eventData.courses.length).toEqual(2, "Should read the classes' courses as separate");
             },
-            {formatters: [Version3Formatter]}
+            { formatters: [Version3Formatter] }
         );
     });
 
@@ -1213,14 +1220,14 @@ fdescribe("Input.IOFXml", () => {
 
         const persons = [person1, person2];
         const classes = [
-            {name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1]},
-            {name: "Test Class 2", length: 2300, courseId: 2, competitors: [person2]}
+            { name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1] },
+            { name: "Test Class 2", length: 2300, courseId: 2, competitors: [person2] }
         ];
 
         runXmlFormatParseTest(classes,
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(2,  "Expected two classes - " + formatterName);
-                expect(eventData.courses.length).toEqual(2,  "Expected two courses - " + formatterName);
+                expect(eventData.classes.length).toEqual(2, "Expected two classes - " + formatterName);
+                expect(eventData.courses.length).toEqual(2, "Expected two courses - " + formatterName);
 
                 if (eventData.classes.length === 2 && eventData.courses.length === 2) {
                     for (let i = 0; i < 2; i += 1) {
@@ -1241,14 +1248,14 @@ fdescribe("Input.IOFXml", () => {
 
         const persons = [person1, person2];
         const classes = [
-            {name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1]},
-            {name: "Test Class 2", length: 2300, courseId: 1, competitors: [person2]}
+            { name: "Test Class 1", length: 2300, courseId: 1, competitors: [person1] },
+            { name: "Test Class 2", length: 2300, courseId: 1, competitors: [person2] }
         ];
 
         runXmlFormatParseTest(classes,
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(2,  "Expected two classes - " + formatterName);
-                expect(eventData.courses.length).toEqual(1,  "Expected one course - " + formatterName);
+                expect(eventData.classes.length).toEqual(2, "Expected two classes - " + formatterName);
+                expect(eventData.courses.length).toEqual(1, "Expected one course - " + formatterName);
 
                 if (eventData.classes.length === 2 && eventData.courses.length === 1) {
                     for (let i = 0; i < 2; i += 1) {
@@ -1259,7 +1266,7 @@ fdescribe("Input.IOFXml", () => {
                     expect(eventData.courses[0].classes).toEqual(eventData.classes);
                 }
             },
-            {formatters: [Version3Formatter]});
+            { formatters: [Version3Formatter] });
     });
 
     it("Can parse a string that contains two classes each with one competitor, deducing that the courses are the same using control codes", () => {
@@ -1269,14 +1276,14 @@ fdescribe("Input.IOFXml", () => {
         person2.surname = "Jones";
 
         const classes = [
-            {name: "Test Class 1", length: 2300, competitors: [person1]},
-            {name: "Test Class 2", length: 2300, competitors: [person2]}
+            { name: "Test Class 1", length: 2300, competitors: [person1] },
+            { name: "Test Class 2", length: 2300, competitors: [person2] }
         ];
 
         runXmlFormatParseTest(classes,
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(2,  "Expected two classes - " + formatterName);
-                expect(eventData.courses.length).toEqual(1,  "Expected one course - " + formatterName);
+                expect(eventData.classes.length).toEqual(2, "Expected two classes - " + formatterName);
+                expect(eventData.courses.length).toEqual(1, "Expected one course - " + formatterName);
                 if (eventData.classes.length === 2 && eventData.courses.length === 1) {
                     expect(eventData.courses[0].classes).toEqual(eventData.classes);
                 }
@@ -1295,14 +1302,14 @@ fdescribe("Input.IOFXml", () => {
         });
 
         const classes = [
-            {name: "Test Class 1", length: 2300, competitors: [person1]},
-            {name: "Test Class 2", length: 2300, competitors: [person2]}
+            { name: "Test Class 1", length: 2300, competitors: [person1] },
+            { name: "Test Class 2", length: 2300, competitors: [person2] }
         ];
 
         runXmlFormatParseTest(classes,
             function (eventData, formatterName) {
-                expect(eventData.classes.length).toEqual(2,  "Expected two classes - " + formatterName);
-                expect(eventData.courses.length).toEqual(2,  "Expected two courses - " + formatterName);
+                expect(eventData.classes.length).toEqual(2, "Expected two classes - " + formatterName);
+                expect(eventData.courses.length).toEqual(2, "Expected two courses - " + formatterName);
             });
     });
 });

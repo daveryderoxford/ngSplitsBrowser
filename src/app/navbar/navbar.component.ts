@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { AngularFireAuth } from 'angularfire2/auth';
-import { Router } from '@angular/router';
-import * as firebase from 'firebase/app';
-import { BulkImportService } from 'app/utils/bulk-import.service';
+import { Component, OnInit } from "@angular/core";
+import { AngularFireAuth } from "angularfire2/auth";
+import { Router } from "@angular/router";
+import * as firebase from "firebase/app";
+import { BulkImportService } from "app/utils/bulk-import.service";
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  selector: "app-navbar",
+  templateUrl: "./navbar.component.html",
+  styleUrls: ["./navbar.component.css"]
 })
 export class NavbarComponent implements OnInit {
 
@@ -28,17 +28,16 @@ export class NavbarComponent implements OnInit {
   logout() {
     this.afAuth.auth.signOut();
     // navigate away from protected pages
-    if (this.router.url.includes('admin') ) {
-       this.router.navigate(['/']);
+    if (this.router.url.includes("admin") ) {
+       this.router.navigate(["/"]);
     }
 
   }
 
   importResults() {
-    console.log('Starting Import');
+    console.log("Starting Import");
     this.bis.loadEvents();
-    console.log('Ended Import');
-
+    console.log("Ended Import");
   }
 
 }

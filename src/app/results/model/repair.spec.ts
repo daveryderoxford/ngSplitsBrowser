@@ -18,7 +18,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-import { DataRepair } from "./data-repairer";
+import { Repairer } from "app/results/model/repairer";
 import { TestSupport } from "app/results/test-support.spec";
 import { Competitor } from "./competitor";
 
@@ -51,12 +51,12 @@ fdescribe("Data Repair", () => {
     */
     function wrapInEventAndRepair(competitors) {
         const eventData = wrapInEvent(competitors);
-        DataRepair.repairEventData(eventData);
+        Repairer.repairEventData(eventData);
         return eventData.classes[0].hasDubiousData;
     }
 
     function wrapInEventAndTransfer(competitors) {
-         DataRepair.transferCompetitorData(wrapInEvent(competitors));
+        Repairer.transferCompetitorData(wrapInEvent(competitors));
     }
 
     it("Can repair competitor with ascending cumulative times leaving them in ascending order", () => {

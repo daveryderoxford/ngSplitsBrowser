@@ -1,10 +1,10 @@
-import * as $ from "jquery";
 import d3 = require("d3");
+import * as $ from "jquery";
 
-import { InvalidData, WrongFileFormat, sbTime } from "../model";
-import { FirstnameSurname } from "app/results/model/competitor";
 import { isNaNStrict } from "app/results/model/util";
 import { isUndefined } from "util";
+import { InvalidData, WrongFileFormat, sbTime } from "../model";
+
 
 export interface CourseDeatils {
     id: string;

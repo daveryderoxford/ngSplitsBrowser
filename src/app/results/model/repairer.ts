@@ -1,65 +1,99 @@
-// file data-repair.js
-import {sbTime, InvalidData,Competitor, CourseClass, Results} from "app/results/model";
-import {isNotNullNorNaN} from "app/results/model/util";
+import { InvalidData } from "./exception";
+import { isNotNullNorNaN } from "./util";
+import { sbTime } from "./time";
+import { Competitor } from "./competitor";
+import { CourseClass } from "./course-class";
+import { Results } from "./results";
 
 
-    interface FirstNonAssendingIndices {
-        first: number;
-        second: number;
+
+interface FirstNonAssendingIndices {
+    first: number;
+    second: number;
+}
+
+// Maximum number of minutes added to finish splits to ensure that all
+// competitors have sensible finish splits.
+const MAX_FINISH_SPLIT_MINS_ADDED = 5;
+
+
+/**
+ * Returns the positions at which the first pair of non-ascending cumulative
+ * times are found.  This is returned as an object with 'first' and 'second'
+ * properties.
+ *
+ * If the entire array of cumulative times is strictly ascending, this
+ * returns null.
+ *
+ * @sb-param {Array} cumTimes - Array of cumulative times.
+ * @sb-return {?Object} Object containing indexes of non-ascending entries, or
+ *     null if none found.
+ */
+function getFirstNonAscendingIndexes(cumTimes: Array<sbTime>): FirstNonAssendingIndices | null {
+    if (cumTimes.length === 0 || cumTimes[0] !== 0) {
+        throw new InvalidData("cumulative times array does not start with a zero cumulative time");
     }
 
-    // Maximum number of minutes added to finish splits to ensure that all
-    // competitors have sensible finish splits.
-    const MAX_FINISH_SPLIT_MINS_ADDED = 5;
+    let lastNumericTimeIndex = 0;
+
+    for (let index = 1; index < cumTimes.length; index += 1) {
+        const time = cumTimes[index];
+        if (isNotNullNorNaN(time)) {
+            // This entry is numeric.
+            if (time <= cumTimes[lastNumericTimeIndex]) {
+                return { first: lastNumericTimeIndex, second: index };
+            }
+
+            lastNumericTimeIndex = index;
+        }
+    }
+
+    // If we get here, the entire array is in strictly-ascending order.
+    return null;
+}
+
+export class Repairer {
+
+    madeAnyChanges = false;
+
+
+    /**
+* Attempt to carry out repairs to the data in an event.
+* @sb-param {Results} eventData - The event data to repair.
+*/
+static repairEventData(resultsData: Results): void {
+    const repairer = new Repairer();
+    repairer.repairEventData(resultsData);
+}
+
+/**
+* Transfer the 'original' data for each competitor to the 'final' data.
+*
+* This is used if the input data has been read in a format that requires
+* the data to be checked, but the user has opted not to perform any such
+* reparations and wishes to view the raw data
+* @sb-param {Event} eventData - The event data to repair.
+*/
+static transferCompetitorData(resultsData: Results): void {
+    resultsData.classes.forEach(function (courseClass) {
+        courseClass.competitors.forEach(function (competitor) {
+            competitor.setRepairedCumulativeTimes(competitor.getAllOriginalCumulativeTimes());
+        });
+    });
+}
 
     /**
      * Construct a Repairer, for repairing some data.
+     * @constructor
     */
-    const Repairer = function () {
-        this.madeAnyChanges = false;
-    };
+    private constructor() { };
 
-    /**
-     * Returns the positions at which the first pair of non-ascending cumulative
-     * times are found.  This is returned as an object with 'first' and 'second'
-     * properties.
-     *
-     * If the entire array of cumulative times is strictly ascending, this
-     * returns null.
-     *
-     * @sb-param {Array} cumTimes - Array of cumulative times.
-     * @sb-return {?Object} Object containing indexes of non-ascending entries, or
-     *     null if none found.
-     */
-    function getFirstNonAscendingIndexes(cumTimes: Array<sbTime>): FirstNonAssendingIndices | null {
-        if (cumTimes.length === 0 || cumTimes[0] !== 0) {
-            throw new InvalidData("cumulative times array does not start with a zero cumulative time");
-        }
-
-        let lastNumericTimeIndex = 0;
-
-        for (let index = 1; index < cumTimes.length; index += 1) {
-            const time = cumTimes[index];
-            if (isNotNullNorNaN(time)) {
-                // This entry is numeric.
-                if (time <= cumTimes[lastNumericTimeIndex]) {
-                    return { first: lastNumericTimeIndex, second: index };
-                }
-
-                lastNumericTimeIndex = index;
-            }
-        }
-
-        // If we get here, the entire array is in strictly-ascending order.
-        return null;
-    }
-
-    /**
+   /**
     * Remove, by setting to NaN, any cumulative time that is equal to the
     * previous cumulative time.
     * @sb-param {Array} cumTimes - Array of cumulative times.
     */
-    Repairer.prototype.removeCumulativeTimesEqualToPrevious = function (cumTimes: Array<number>) {
+    private removeCumulativeTimesEqualToPrevious(cumTimes: Array<number>) {
         let lastCumTime = cumTimes[0];
         for (let index = 1; index + 1 < cumTimes.length; index += 1) {
             if (cumTimes[index] !== null && cumTimes[index] === lastCumTime) {
@@ -83,7 +117,7 @@ import {isNotNullNorNaN} from "app/results/model/util";
     * @sb-return {Array} Array of cumulaive times with perhaps some cumulative
     *     times taken out.
     */
-    Repairer.prototype.removeCumulativeTimesCausingNegativeSplits = function (cumTimes: Array<sbTime>): Array<sbTime> {
+    private removeCumulativeTimesCausingNegativeSplits(cumTimes: Array<sbTime>): Array<sbTime> {
 
         let nonAscIndexes = getFirstNonAscendingIndexes(cumTimes);
         while (nonAscIndexes !== null && nonAscIndexes.second + 1 < cumTimes.length) {
@@ -154,7 +188,7 @@ import {isNotNullNorNaN} from "app/results/model/util";
     * @sb-param {Array} cumTimes - The cumulative times to perhaps remove the
     *     finish split from.
     */
-    Repairer.prototype.removeFinishTimeIfAbsurd = function (cumTimes: Array<sbTime>): void {
+    private removeFinishTimeIfAbsurd(cumTimes: Array<sbTime>): void {
         const finishTime = cumTimes[cumTimes.length - 1];
         const lastControlTime = cumTimes[cumTimes.length - 2];
         if (isNotNullNorNaN(finishTime) &&
@@ -172,7 +206,7 @@ import {isNotNullNorNaN} from "app/results/model/util";
     * @sb-param {Competitor} competitor - Competitor whose cumulative times we
     *     wish to repair.
     */
-    Repairer.prototype.repairCompetitor = function (competitor: Competitor): void {
+    private repairCompetitor(competitor: Competitor): void {
         let cumTimes = competitor.originalCumTimes.slice(0);
 
         this.removeCumulativeTimesEqualToPrevious(cumTimes);
@@ -191,7 +225,7 @@ import {isNotNullNorNaN} from "app/results/model/util";
     * @sb-param {CourseClass} courseClass - The class whose data we wish to
     *     repair.
     */
-    Repairer.prototype.repairCourseClass = function (courseClass: CourseClass): void {
+    private repairCourseClass(courseClass: CourseClass): void {
         this.madeAnyChanges = false;
         courseClass.competitors.forEach(function (competitor) {
             this.repairCompetitor(competitor);
@@ -206,34 +240,11 @@ import {isNotNullNorNaN} from "app/results/model/util";
     * Attempt to carry out repairs to the data in an event.
     * @sb-param {Results} eventData - The event data to repair.
     */
-    Repairer.prototype.repairEventData = function (resultsData: Results): void {
+    private repairEventData(resultsData: Results): void {
         resultsData.classes.forEach(function (courseClass) {
             this.repairCourseClass(courseClass);
         }, this);
     };
+}
 
-    /**
-    * Attempt to carry out repairs to the data in an event.
-    * @sb-param {Results} eventData - The event data to repair.
-    */
-    export function repairEventData(resultsData: Results): void {
-        const repairer = new Repairer();
-        repairer.repairEventData(resultsData);
-    }
-
-    /**
-    * Transfer the 'original' data for each competitor to the 'final' data.
-    *
-    * This is used if the input data has been read in a format that requires
-    * the data to be checked, but the user has opted not to perform any such
-    * reparations and wishes to view the raw data
-    * @sb-param {Event} eventData - The event data to repair.
-    */
-    export function transferCompetitorData(resultsData: Results): void {
-        resultsData.classes.forEach(function (courseClass) {
-            courseClass.competitors.forEach(function (competitor) {
-                competitor.setRepairedCumulativeTimes(competitor.getAllOriginalCumulativeTimes());
-            });
-        });
-    }
 

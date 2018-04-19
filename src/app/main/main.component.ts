@@ -1,11 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-
-import { OEvent } from "app/model/oevent";
-
-import { AngularFireDatabase } from "angularfire2/database";
-import { Observable } from "rxjs/Observable";
 import { Router } from "@angular/router";
-
+import { AngularFireDatabase } from "angularfire2/database";
+import { OEvent } from "app/model/oevent";
+import { Observable } from "rxjs/Observable";
 
 @Component({
   selector: "app-main",

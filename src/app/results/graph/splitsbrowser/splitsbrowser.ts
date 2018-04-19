@@ -31,7 +31,7 @@ import { parseEventData } from "app/results/import";
 import { TimeUtilities, sbTime, Competitor, CourseClass, CourseClassSet, Course, Results, InvalidData } from "app/results/model";
 import { LanguageSelector } from "./lang-selection";
 import { isNaNStrict, isNotNullNorNaN } from "app/results/model/util";
-import { transferCompetitorData, repairEventData } from "./data-repairer";
+import { Repairer } from "app/results/model/repairer";
 
 // Controls
 import { parseQueryString, formatQueryString } from "./query-string";
@@ -704,9 +704,9 @@ Viewer.prototype.selectChartTypeAndRedraw = function (chartType) {
 */
 Viewer.prototype.selectOriginalOrRepairedData = function (showOriginalData) {
     if (showOriginalData) {
-        transferCompetitorData(this.eventData);
+        Repairer.transferCompetitorData(this.eventData);
     } else {
-        repairEventData(this.eventData);
+        Repairer.repairEventData(this.eventData);
     }
 
     this.eventData.determineTimeLosses();
@@ -837,7 +837,7 @@ export const readEvent = function (data: string, options: SplitsbrowserOptions) 
         showLoadFailureMessage("LoadFailedUnrecognisedData", new Object);
     } else {
         if (eventData.needsRepair()) {
-            repairEventData(eventData);
+            Repairer.repairEventData(eventData);
         }
 
         if (typeof options === "string") {

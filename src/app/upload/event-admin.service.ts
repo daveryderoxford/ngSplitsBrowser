@@ -172,5 +172,3 @@ export class EventAdminService {
     return (summary);
   }
 }
-
-

@@ -208,10 +208,6 @@ export class Competitor {
         public originalSplitTimes: Array<sbTime>,
         public originalCumTimes: Array<sbTime>) {
 
-        if (typeof order !== NUMBER_TYPE) {
-            throw new InvalidData("Competitor order must be a number, got " + typeof order + " '" + order + "' instead");
-        }
-
         if (typeof name === "string") {
             // If a single name is provided split the last word as surname and rest as firstname
             name = name.trim();
@@ -227,18 +223,6 @@ export class Competitor {
             this.firstname = name.firstname.trim();
             this.surname = name.surname.trim();
         }
-
-        this.className = null;
-        this.yearOfBirth = null;
-        this.gender = null; // "M" or "F" for male or female.
-        this.ecard = null;
-        this.nationalID = null;
-
-        this.splitTimes = null;
-        this.cumTimes = null;
-        this.splitRanks = null;
-        this.cumRanks = null;
-        this.timeLosses = null;
 
         // tslint:disable-next-line:max-line-length
         this.totalTime = (originalCumTimes === null || originalCumTimes.indexOf(null) > -1) ? null : originalCumTimes[originalCumTimes.length - 1];

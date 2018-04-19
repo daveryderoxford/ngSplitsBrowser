@@ -8,7 +8,7 @@ import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results } from 
 import { InvalidData, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
 
-export function parseOEEventData(data): Results {
+export function parseOEEventData(data: string): Results {
     const reader = new OEReader(data);
     return (reader.parseEventData());
 }
@@ -128,7 +128,7 @@ class OEReader {
     * @sb-param {String} value - The value to trim quotes from.
     * @sb-return {String} The string with any leading and trailing quotes removed.
     */
-    private dequote(value) {
+    private dequote(value: string): string {
         // tslint:disable-next-line:quotemark
         if (value[0] === '"' && value[value.length - 1] === '"') {
             // tslint:disable-next-line:quotemark
@@ -335,7 +335,7 @@ class OEReader {
     * we haven't seen so far, and adds one if not.
     * @sb-param {Array} row - Array of row data items.
     */
-    private createClassCoursePairIfNecessary(row) {
+    private createClassCoursePairIfNecessary(row: Array<string>) {
         const className = this.getClassName(row);
         const courseName = row[this.columnIndexes.course];
 
@@ -349,7 +349,7 @@ class OEReader {
     * @sb-param {Array} row - Array of row data items.
     * @sb-return {String | FirstnameSurname} The name of the competitor.
     */
-    private getName(row): string | FirstnameSurname {
+    private getName(row: Array<string>): string | FirstnameSurname {
         // Default name to no name
         let name: string | FirstnameSurname = "";
 
@@ -376,7 +376,7 @@ class OEReader {
     * @sb-param {Array} row - Row of items read from a line of the input data.
     * @sb-param {Array} cumTimes - Array of cumulative times for the competitor.
     */
-    private addCompetitor(row, cumTimes) {
+    private addCompetitor(row: Array<string>, cumTimes: Array<number>) {
 
         const className = this.getClassName(row);
         const placing = row[this.columnIndexes.placing];
@@ -450,7 +450,7 @@ class OEReader {
     * @sb-param {String} delimiter - The character used to delimit the columns of
     *     data.
     */
-    private readLine(line, lineNumber, delimiter) {
+    private readLine(line: string, lineNumber: number, delimiter: string) {
 
         if (line.trim() === "") {
             // Skip this blank line.
@@ -487,8 +487,8 @@ class OEReader {
     */
     private getMapsBetweenClassesAndCourses() {
 
-        const classesToCourses = <any>d3.map();
-        const coursesToClasses = <any>d3.map();
+        const classesToCourses = d3.map<any>();
+        const coursesToClasses = d3.map<any>();
 
         this.classCoursePairs.forEach((pair) => {
             const className = pair[0];
@@ -514,7 +514,7 @@ class OEReader {
     * Creates and return a list of CourseClass objects from all of the data read.
     * @sb-return {Array} Array of CourseClass objects.
     */
-    private createClasses() {
+    private createClasses(): Array<CourseClass> {
         const classNames = this.classes.keys();
         classNames.sort();
         return classNames.map((className) => {
@@ -547,7 +547,10 @@ class OEReader {
     *     objects.
     * @sb-return {SplitsBrowser.Model.Course} - The created Course object.
     */
-    private createCourseFromLinkedClassesAndCourses(initCourseName: string, manyToManyMaps, doneCourseNames, classesMap): Course {
+    private createCourseFromLinkedClassesAndCourses(initCourseName: string,
+                                                    manyToManyMaps,
+                                                    doneCourseNames: d3.Set,
+                                                    classesMap: d3.Map<any>): Course {
 
         const courseNamesToDo = [initCourseName];
         const classNamesToDo = [];

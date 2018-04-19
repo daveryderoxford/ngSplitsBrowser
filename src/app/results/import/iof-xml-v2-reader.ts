@@ -2,11 +2,10 @@
 import * as $ from "jquery";
 import d3 = require("d3");
 
-import { InvalidData, WrongFileFormat, TimeUtilities, sbTime } from "../model";
-import { FirstnameSurname } from "app/results/model/competitor";
-import { isNaNStrict } from "app/results/model/util";
 import { isUndefined } from "util";
-import { IOFXMLReader, CourseDeatils } from "./iof-xml-v3-reader";
+import { InvalidData, TimeUtilities, WrongFileFormat } from "../model";
+import { CourseDeatils, IOFXMLReader } from "./iof-xml-v3-reader";
+
 
 // Object that contains various functions for parsing bits of data from
 // IOF v2.0.3 XML event data.
@@ -32,7 +31,7 @@ export class Version2Reader implements IOFXMLReader {
     */
     isOfThisVersion(data: string): boolean {
         return data.indexOf("IOFdata.dtd") >= 0;
-    };
+    }
 
     /**
     * Makes a more thorough check that the parsed XML data is likely to be of
@@ -56,7 +55,7 @@ export class Version2Reader implements IOFXMLReader {
         if (!isUndefined(status) && status.toLowerCase() !== "complete") {
             throw new InvalidData("Only complete IOF data supported; snapshot and delta are not supported");
         }
-    };
+    }
 
     /**
     * Reads the class name from a ClassResult element.
@@ -66,7 +65,7 @@ export class Version2Reader implements IOFXMLReader {
     */
     readClassName(classResultElement): string {
         return $("> ClassShortName", classResultElement).text();
-    };
+    }
 
     /**
     * Reads the course details from the given ClassResult element.
@@ -118,7 +117,7 @@ export class Version2Reader implements IOFXMLReader {
         // Climb does not appear in the per-competitor results, and there is
         // no NumberOfControls.
         return { id: null, name: courseName, length: length, climb: null, numberOfControls: null };
-    };
+    }
 
     /**
     * Returns the XML element that contains a competitor's name.  This element
@@ -130,7 +129,7 @@ export class Version2Reader implements IOFXMLReader {
     */
     getCompetitorNameElement(element) {
         return $("> Person > PersonName", element);
-    };
+    }
 
     /**
     * Returns the name of the competitor's club.
@@ -149,8 +148,8 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {String} The competitors date of birth, as a string.
     */
     readDateOfBirth(element) {
-        return $("> Person > BirthDate > Date", element).text();
-    };
+        return Number.parseInt($("> Person > BirthDate > Date", element).text());
+    }
 
     /**
     * Reads a competitor's start time from the given Result element.
@@ -179,15 +178,6 @@ export class Version2Reader implements IOFXMLReader {
     };
 
     /**
-    * Read a competitor's ecard number
-    * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
-    * @sb-return {string} ECard
-    */
-    readECard(resultElement): string {
-        return $("> Person > CCard", resultElement).text();
-    };
-
-    /**
     * Read a competitor's route or null if not avalaible
     * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
     * @sb-return {string | null} Base64-encoded binary route data
@@ -195,7 +185,7 @@ export class Version2Reader implements IOFXMLReader {
     /* TODO needs looking at we just ruteun null correntky */
     readRoute(resultElement): string | null {
         return null;
-    };
+    }
 
     /**
     * Returns the status of the competitor with the given result.
@@ -206,7 +196,7 @@ export class Version2Reader implements IOFXMLReader {
     getStatus(resultElement) {
         const statusElement = $("> CompetitorStatus", resultElement);
         return (statusElement.length === 1) ? statusElement.attr("value") : "";
-    };
+    }
 
     /**
     * Unconditionally returns false - IOF XML version 2.0.3 appears not to
@@ -215,7 +205,7 @@ export class Version2Reader implements IOFXMLReader {
     */
     isAdditional() {
         return false;
-    };
+    }
 
     /**
     * Reads a control code and split time from a SplitTime element.
@@ -237,5 +227,15 @@ export class Version2Reader implements IOFXMLReader {
         const timeStr = $("> Time", splitTimeElement).text();
         const time = (timeStr === "") ? null : TimeUtilities.parseTime(timeStr);
         return { code: code, time: time };
-    };
+    }
+
+    /**
+    * Read a competitor's ecard number
+    * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
+    * @sb-return {string} ECard
+    */
+   readECard(resultElement): string {
+       const card = $("> CCard > CCardId", resultElement).text();
+       return card;
+   }
 }

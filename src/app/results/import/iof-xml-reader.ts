@@ -1,14 +1,9 @@
 
-
 import * as $ from "jquery";
 import d3 = require("d3");
 
-import { InvalidData, WrongFileFormat } from "../model"
-import { TimeUtilities, Competitor, CourseClass, Course, Results, sbTime } from "../model"
-
-import { isNaNStrict } from "app/results/model/util";
 import { FirstnameSurname } from "app/results/model/competitor";
-
+import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
 import { Version2Reader } from "./iof-xml-v2-reader";
 import { Version3Reader } from "./iof-xml-v3-reader";
 
@@ -198,9 +193,7 @@ function parseCompetitor(element, number: number, reader, warnings: Array<string
     }
 
     const startTime = reader.readStartTime(resultElement);
-
     const totalTime = reader.readTotalTime(resultElement);
-
     const ecard = reader.readECard(resultElement);
     const route = reader.readRoute(resultElement);
 
@@ -296,7 +289,8 @@ function parseClassData(element, reader, warnings) {
             let warning = null;
             if (actualControlCount !== cls.course.numberOfControls) {
                 // tslint:disable-next-line:max-line-length
-                warning = "Competitor '" + competitor.name + "' in class '" + className + "' has an unexpected number of controls: expected " + cls.course.numberOfControls + ", actual " + actualControlCount;
+                warning = "Competitor '" + competitor.name + "' in class '" + className + "' has an unexpected number of controls: expected "
+                    + cls.course.numberOfControls + ", actual " + actualControlCount;
             } else {
                 for (let controlIndex = 0; controlIndex < actualControlCount; controlIndex += 1) {
                     if (cls.controls[controlIndex] !== controls[controlIndex]) {

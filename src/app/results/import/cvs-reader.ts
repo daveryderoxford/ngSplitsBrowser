@@ -103,8 +103,7 @@ function parseCourseClass(courseClass: string, warnings: Array<string>): CourseC
         } else {
             const competitors = lines.map( (line, index) => {
                 return parseCompetitors(index, line, controlCount, className, warnings);
-            })
-                .filter(isNotNull);
+            }).filter(isNotNull);
 
             competitors.sort(Competitor.compareCompetitors);
             return new CourseClass(className, controlCount, competitors);
