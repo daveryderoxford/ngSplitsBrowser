@@ -4,7 +4,7 @@ import { ActivatedRoute, Params } from "@angular/router";
 
 import { ResultsSelectionService } from "app/results/results-selection.service";
 
-import {SplitsBrowser} from "app/results/graph/splitsbrowser/splitsbrowser";
+import {loadEvent} from "app/results/graph/splitsbrowser/splitsbrowser";
 
 
 interface SplitsBrowserOptions {
@@ -37,7 +37,7 @@ export class GraphComponent implements OnInit {
     if (event) {
       this.event = event;
       const url = await this.rs.getSplitsURL();
-      SplitsBrowser.loadEvent(url, {containerElement: "app-graph"} );
+      loadEvent(url, {containerElement: "app-graph"} );
     }
   }
 }
