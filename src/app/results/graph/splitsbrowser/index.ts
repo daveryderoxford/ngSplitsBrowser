@@ -1,1 +1,1 @@
-export {loadEvent} from "./splitsbrowser";
+export { displayGraph } from "./splitsbrowser";

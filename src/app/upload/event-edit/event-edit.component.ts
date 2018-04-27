@@ -37,7 +37,7 @@ export class EventEditComponent implements OnInit {
   private createForm() {
     this.f = this.formBuilder.group({
       name: ["", Validators.required],
-      eventdate: ["", Validators.required],
+      date: ["", Validators.required],
       nationality: ["", Validators.required],
       club: ["", Validators.required],
       grade: ["", Validators.required],
@@ -47,7 +47,6 @@ export class EventEditComponent implements OnInit {
     });
 
   }
-
 
   ngOnInit() {
 

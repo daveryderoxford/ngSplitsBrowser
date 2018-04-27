@@ -11,7 +11,7 @@
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput formControlName="eventdate" placeholder="Date" [matDatepicker]="picker">
+        <input matInput formControlName="date" placeholder="Date" [matDatepicker]="picker">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
         <mat-error>Date required</mat-error>
@@ -34,7 +34,7 @@
       <mat-form-field>
 
         <mat-select formControlName="grade" placeholder="Grade">
-          <mat-option *ngFor="let grade of grades; let i = index" [value]="i">
+          <mat-option *ngFor="let grade of grades; let i = index" [value]="grade">
             {{ grade }}
           </mat-option>
         </mat-select>

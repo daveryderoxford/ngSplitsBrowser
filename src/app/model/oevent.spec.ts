@@ -1,0 +1,32 @@
+import { EventGrades } from '.';
+
+fdescribe('OEvent model object', () => {
+
+    it('grade index for properties for local event', () => {
+
+        expect(EventGrades.indexObject("Local")).toEqual({
+            IOF: true,
+            International: true,
+            National: true,
+            Regional: true,
+            Club: true,
+            Local: true
+        });
+    });
+
+    it('grade index for properties for regional event', () => {
+
+        expect(EventGrades.indexObject("Regional")).toEqual({
+            Regional: true,
+            Club: true,
+            Local: true
+        });
+    });
+
+    it('grade index for properties for IOF event', () => {
+
+        expect(EventGrades.indexObject("IOF")).toEqual({
+            IOF: true,
+        });
+    });
+});

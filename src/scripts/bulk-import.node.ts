@@ -1,20 +1,18 @@
-import { Injectable } from "@angular/core";
 
-import { OEvent, SplitsFileInfo, EventSummary, SplitsFileFormat } from "app/model/oevent";
-
-import * as Firebase from "firebase";
+/** Node script to import JSON
+ * ts-node bulk-inoirt.node
+*/
+import { Http } from "@angular/http";
 import { FirebaseApp } from "angularfire2";
 import { AngularFireDatabase } from "angularfire2/database";
-
-import * as data from "./importdata";
-import { EventAdminService } from "app/upload/event-admin.service";
-import { Utils } from "app/utils/utils"; import { Http } from "@angular/http";
-
-import { LogEntry } from "app/model/log-entry";
-import { Club } from "app/model/club";
+import { LogEntry } from "../app/model/log-entry";
+import { Club, EventGrades, EventSummary, OEvent, SplitsFileInfo } from "../app/model";
+import { EventAdminService } from "../app/upload/event-admin.service";
+import { Utils } from "../app/utils/utils";
+import * as data from "./importdata.node";
 
 /* Service to import exisitng resilts */
-@Injectable()
+
 export class BulkImportService {
 
   constructor(private firebaseApp: FirebaseApp,
@@ -37,23 +35,26 @@ export class BulkImportService {
       valid: true
     };
 
+    const grade = EventGrades.grades[inputEvent.type];
+
     const event: OEvent = {
+      key: "TODO need to specify the key to match existing import",
       name: inputEvent.name,
       nationality: inputEvent.nationality,
-      eventdate: new Date(inputEvent.eventdate * 1000).toISOString(),
+      date: new Date(inputEvent.eventdate * 1000).toISOString(),
       club: inputEvent.club,
-      grade: inputEvent.type,
+      grade: grade,
       type: "Foot",
-      discipline: "",
+      discipline: "Long",
       webpage: inputEvent.webpage,
       splits: splits,
       email: inputEvent.email,
       user: "qWLOONZF1NhBZCV1FI9htz3AitI2",
-      legacyPassword: inputEvent.legacyPassword
-    }
+      legacyPassword: inputEvent.legacyPassword,
+      yearIndex: new Date(inputEvent.eventdate * 1000).getFullYear(),
+      gradeIndex: EventGrades.indexObject(grade)
+    };
 
-    event.club_date_index = Utils.getClubIndex(event.club, event.nationality) + Utils.decreasingTimeIndex(event.eventdate);
-    event.date_club_index = Utils.decreasingTimeIndex(event.eventdate) + Utils.getClubIndex(event.club, event.nationality);
 
     try {
       event.summary = await this.createEventSummary(event.splits.splitsFilename);
@@ -75,11 +76,10 @@ export class BulkImportService {
     await this.log({ severity: "INFO", source: "BulkImportService", msg: message3 });
   }
 
-
   private getEventsForClubName(clubName: string): Promise<OEvent[]> {
     const obs = this.af.list<OEvent>("/events", ref => ref.orderByChild("club").equalTo(clubName) ).valueChanges() ;
 
-    return(obs.first().toPromise());
+    return(obs.toPromise());
   }
 
   private async updateClubs(event: OEvent) {
@@ -87,7 +87,7 @@ export class BulkImportService {
     const key = Utils.getClubKey(event.club, event.nationality);
 
     let events = await this.getEventsForClubName(event.club);
-    events = events.filter((e) => { return (e.nationality === event.nationality) });
+    events = events.filter((e) => { return (e.nationality === event.nationality); });
 
     // if no reference then remove the club
     if (events.length === 0) {
@@ -99,7 +99,7 @@ export class BulkImportService {
         name: event.club,
         nationality: event.nationality,
         numEvents: events.length
-      }
+      };
       await this.af.object("/clubs/" + key).set(club);
     }
   }

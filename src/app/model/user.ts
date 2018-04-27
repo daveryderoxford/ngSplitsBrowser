@@ -2,11 +2,13 @@
 /** data associated with a user */
 import { EventInfo } from "app/model/oevent";
 
+/** All the user data stored for the user */
 export interface UserData extends UserInfo {
-    $key: string;  // Firsbase user Id.
+    key: string;  // Matches with the users Firebase reference
     results: Array<UserResultData>;
 }
 
+/** Information on the results for a user.  */
 export interface UserResultData {
    eventInfo:  EventInfo;
    course: string;
@@ -22,14 +24,20 @@ export interface UserResultData {
    classWinningTime: number;
  }
 
+ /** Information set by the users abouth themselves */
 export interface UserInfo {
     firstName: string;
     lastName: string;
-    yearOfBirth: number;
     club: string;
-    nationality: string;
-    nationalId: number;
-    ecardSI: number;      // hard coded ecard ids so I can search on them
-    ecardEmit: number;
+    nationality: string;  // short nationality code
+    nationalId: string;   //
+    ecardSI: string;      // hard coded ecard ids so I can search on them
+    ecardEmit: string;
     autoFind: boolean;
+}
+
+/** Informtion on users ecards */
+export interface ECardInfo {
+    id: string;
+    type: string;
 }

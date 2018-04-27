@@ -1,8 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 import { AngularFireAuth } from "angularfire2/auth";
 import { Router } from "@angular/router";
 import * as firebase from "firebase/app";
-import { BulkImportService } from "app/utils/bulk-import.service";
+import { Results } from "app/results/model";
 
 @Component({
   selector: "app-navbar",
@@ -11,11 +11,13 @@ import { BulkImportService } from "app/utils/bulk-import.service";
 })
 export class NavbarComponent implements OnInit {
 
+  @Input()
+  results: Results;
+
   public authorised = false;
 
   constructor(private afAuth: AngularFireAuth,
-              private router: Router,
-              private bis: BulkImportService ) {
+              private router: Router ) {
 
     this.afAuth.authState.subscribe((user: firebase.User) => {
       this.authorised = (user !== null);
@@ -33,11 +35,4 @@ export class NavbarComponent implements OnInit {
     }
 
   }
-
-  importResults() {
-    console.log("Starting Import");
-    this.bis.loadEvents();
-    console.log("Ended Import");
-  }
-
 }

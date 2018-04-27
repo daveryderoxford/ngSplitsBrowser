@@ -1,19 +1,16 @@
 /** Componnet to results for club class or */
 // tslint:disable:quotemark
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import {FormGroup, FormControl} from '@angular/forms';
-import {Observable} from 'rxjs/Observable';
-import {startWith} from 'rxjs/operators/startWith';
-import {map} from 'rxjs/operators/map';
-import {filter} from 'rxjs/operators/filter';
-import {MatAutocompleteModule, MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
-import { Results, Competitor, CourseClass, Course } from 'app/results/model';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { Competitor, Course, CourseClass, Results } from 'app/results/model';
+import { ResultsSelectionService } from 'app/results/results-selection.service';
 
-export type SearchSelectedItem = Competitor | CourseClass | Course;
+type SearchSelectedItem = Competitor | CourseClass | Course;
 
 interface FilterPanelGroup {
-    name: string;
-    options: Array<SearchSelectedItem>;
+  name: string;
+  options: Array<SearchSelectedItem>;
 }
 
 @Component({
@@ -23,54 +20,68 @@ interface FilterPanelGroup {
 })
 export class ResultsSearchComponent implements OnInit {
 
-  @Input() public results: Results;
-  @Output() public onItemSelected = new EventEmitter<SearchSelectedItem>();
+  results: Results;
 
   // Filter panel contents consisting of groups for courses, classes and competitors
   filterPanelContents: Array<FilterPanelGroup> = [];
 
   searchForm: FormGroup;
 
-  constructor() {
-
-   }
+  constructor(private rs: ResultsSelectionService) { }
 
   ngOnInit() {
+    this.rs.selectedResults.subscribe(results => {
+      this.results = results;
+    });
 
     this.searchForm = new FormGroup({
-       searchControl: new FormControl()
+      searchControl: new FormControl()
     });
 
     // When the search input control changes update the panel contents
-    this.searchForm.get("searchControl").valueChanges.subscribe( (val) => this.updateSearchPanelContents(val));
+    this.searchForm.get("searchControl").valueChanges.subscribe((val) => this.updateSearchPanelContents(val));
   }
 
   private updateSearchPanelContents(searchstring: string) {
-     const courses = this.results.findCourses(searchstring);
-     const classes = this.results.findCourseClasss(searchstring);
-     const competitors = this.results.findCompetitors(searchstring);
+    if (!this.results) { return; }
+    const courses = this.results.findCourses(searchstring);
+    const classes = this.results.findCourseClasss(searchstring);
+    const competitors = this.results.findCompetitors(searchstring);
 
     this.filterPanelContents = [];
 
     if (courses.length > 0) {
-       this.filterPanelContents.push( { name: "Courses", options: courses } );
+      this.filterPanelContents.push({ name: "Courses", options: courses });
     }
 
     if (classes.length > 0) {
-       this.filterPanelContents.push( { name: "Classes", options: classes } );
+      this.filterPanelContents.push({ name: "Classes", options: classes });
     }
 
     if (competitors.length > 0) {
-       this.filterPanelContents.push( { name: "Results", options: competitors } );
+      this.filterPanelContents.push({ name: "Results", options: competitors });
     }
-
   }
 
-  // Fired when an option is selected.  Emit the selected object and reset the search term
+  // Fired when an option is selected.
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     const val = event.option.value;
-    this.onItemSelected.emit(val);
+    this.updateSelections(val);
     console.log("Item selected " + val.name);
     this.searchForm.get("searchControl").setValue("");
+  }
+
+  private updateSelections(selection: SearchSelectedItem) {
+    // Select the competitor and the courses and class of the competiror
+    if (selection instanceof Competitor) {
+      this.rs.selectCompetitor(selection);
+      this.rs.selectClass(selection.courseClass);
+      this.rs.selectCourse(selection.courseClass.course);
+    } else if (selection instanceof CourseClass) {
+      this.rs.selectClass(selection);
+      this.rs.selectCourse(selection.course);
+    } else if (selection instanceof Course) {
+      this.rs.selectCourse(selection);
+    }
   }
 }

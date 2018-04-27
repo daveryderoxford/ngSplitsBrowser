@@ -1,0 +1,22 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+      "moduleResolution": "node",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+
+      "outDir": "../../out-tsc/node",
+      "module": "commonjs",
+      "target": "es5",
+      "baseUrl": ".",
+      "types": [
+        "node",
+      ]
+    },
+    "files": [
+      "test.ts"
+    ],
+    "include": [
+      "**/*.node.ts"
+    ]
+  }

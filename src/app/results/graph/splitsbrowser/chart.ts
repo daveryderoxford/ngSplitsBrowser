@@ -5,11 +5,24 @@ import * as $ from "jquery";
 
 import { Lang } from "./lang";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
-import { TimeUtilities, Competitor } from "app/results/model/index";
+import { TimeUtilities, Competitor, CourseClassSet, sbTime, Results } from "app/results/model/index";
 
 import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
 import { FastestSplitsPopupData, SplitsPopupData } from "./splits-popup-data";
+
+interface ChartData {
+    chartData: ChartType;
+    eventData: Results;
+    courseClassSet: CourseClassSet;
+    referenceCumTimes: Array<sbTime>;
+    fastestCumTimes: Array<sbTime>;
+    numControls?: number;
+    competitorNames?: Array<string>;
+    datacolumns?: any;
+    dubiousTimesInfo?: any;
+
+}
 
 
 // 'Imports'.
@@ -70,7 +83,7 @@ const RACE_GRAPH_COMPETITOR_WINDOW = 240;
 * @sb-param {?Number} rank - The rank, or null.
 * @sb-returns Time and rank formatted as a string.
 */
-function formatTimeAndRank(time, rank) {
+function formatTimeAndRank(time, rank): string {
     let rankStr;
     if (rank === null) {
         rankStr = "-";
@@ -214,7 +227,7 @@ Chart.prototype.setLeftMargin = function (leftMargin: number) {
 * @sb-param {jQuery.event} event - jQuery mouse-down or mouse-move event.
 * @sb-return {Object} Location of the popup.
 */
-Chart.prototype.getPopupLocation = function (event) {
+Chart.prototype.getPopupLocation = function (event: JQueryEventObject) {
     return {
         x: event.pageX + CHART_POPUP_X_OFFSET,
         y: Math.max(event.pageY - this.popup.height() / 2, 0)
@@ -243,7 +256,7 @@ Chart.prototype.getFastestSplitsForCurrentLegPopupData = function () {
 * Stores the current time the mouse is at, on the race graph.
 * @sb-param {jQuery.event} event - The mouse-down or mouse-move event.
 */
-Chart.prototype.setCurrentChartTime = function (event) {
+Chart.prototype.setCurrentChartTime = function (event: JQueryEventObject) {
     const yOffset = event.pageY - $(this.svg.node()).offset().top - MARGIN.top;
     this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
 };
@@ -272,7 +285,7 @@ Chart.prototype.getNextControlData = function () {
 * Handle the mouse entering the chart.
 * @sb-param {jQuery.event} event - jQuery event object.
 */
-Chart.prototype.onMouseEnter = function (event) {
+Chart.prototype.onMouseEnter = function (event: JQueryEventObject) {
     if (this.mouseOutTimeout !== null) {
         clearTimeout(this.mouseOutTimeout);
         this.mouseOutTimeout = null;
@@ -288,7 +301,7 @@ Chart.prototype.onMouseEnter = function (event) {
 * Handle a mouse movement.
 * @sb-param {jQuery.event} event - jQuery event object.
 */
-Chart.prototype.onMouseMove = function (event) {
+Chart.prototype.onMouseMove = function (event: JQueryEventObject) {
     if (this.hasData && this.isMouseIn && this.xScale !== null) {
         this.updateControlLineLocation(event);
     }
@@ -323,7 +336,7 @@ Chart.prototype.onMouseLeave = function () {
 * Handles a mouse button being pressed over the chart.
 * @sb-param {jQuery.Event} event - jQuery event object.
 */
-Chart.prototype.onMouseDown = function (event) {
+Chart.prototype.onMouseDown = function (event: JQueryEventObject) {
     const outerThis = this;
     // Use a timeout to open the dialog as we require other events
     // (mouseover in particular) to be processed first, and the precise
@@ -335,7 +348,7 @@ Chart.prototype.onMouseDown = function (event) {
 * Handles a mouse button being pressed over the chart.
 * @sb-param {jQuery.event} event - The jQuery onMouseUp event.
 */
-Chart.prototype.onMouseUp = function (event) {
+Chart.prototype.onMouseUp = function (even: JQueryEventObject) {
     this.popup.hide();
     event.preventDefault();
 };
@@ -345,7 +358,7 @@ Chart.prototype.onMouseUp = function (event) {
 * @sb-param {jQuery.event} event - The jQuery onMouseDown event that triggered
 *     the popup.
 */
-Chart.prototype.showPopupDialog = function (event) {
+Chart.prototype.showPopupDialog = function (event: JQueryEventObject) {
     if (this.isMouseIn && this.currentControlIndex !== null) {
         let showPopup = false;
         const outerThis = this;
@@ -383,7 +396,7 @@ Chart.prototype.showPopupDialog = function (event) {
 *
 * @sb-param {jQuery.event} event - jQuery mouse-move event.
 */
-Chart.prototype.updatePopupContents = function (event) {
+Chart.prototype.updatePopupContents = function (event: JQueryEventObject) {
     const yOffset = event.pageY - $(this.svg.node()).offset().top;
     const showNextControls = this.hasControls && yOffset < MARGIN.top;
     if (showNextControls) {
@@ -425,7 +438,7 @@ Chart.prototype.drawControlLine = function (controlIndex: number) {
 * Updates the location of the control line from the given mouse event.
 * @sb-param {jQuery.event} event - jQuery mousedown or mousemove event.
 */
-Chart.prototype.updateControlLineLocation = function (event) {
+Chart.prototype.updateControlLineLocation = function (event: JQueryEventObject) {
 
     const svgNodeAsJQuery = $(this.svg.node());
     const offset = svgNodeAsJQuery.offset();
@@ -501,7 +514,7 @@ Chart.prototype.removeControlLine = function () {
 * @sb-return {Array} Array of times in seconds that the given competitors are
 *     behind the fastest time.
 */
-Chart.prototype.getTimesBehindFastest = function (controlIndex: number, indexes: Array<number>) {
+Chart.prototype.getTimesBehindFastest = function (controlIndex: number, indexes: Array<number>): Array<number | null> {
     const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
     const fastestSplit = this.fastestCumTimes[controlIndex] - this.fastestCumTimes[controlIndex - 1];
     const timesBehind = selectedCompetitors.map(function (comp) {
@@ -519,7 +532,7 @@ Chart.prototype.getTimesBehindFastest = function (controlIndex: number, indexes:
 * @sb-return {Array} Array of times in seconds that the given competitors are
 *     deemed to have lost at the given control.
 */
-Chart.prototype.getTimeLosses = function (controlIndex: number, indexes: Array<number>) {
+Chart.prototype.getTimeLosses = function (controlIndex: number, indexes: Array<number>): Array<number | null> {
     const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
     const timeLosses = selectedCompetitors.map(function (comp) { return comp.getTimeLossAt(controlIndex); });
     return timeLosses;
@@ -606,7 +619,7 @@ Chart.prototype.getTextWidth = function (text: string): number {
 * @sb-param {string} text - The piece of text to measure the height of.
 * @sb-returns {Number} The height of the piece of text, in pixels.
 */
-Chart.prototype.getTextHeight = function (text) {
+Chart.prototype.getTextHeight = function (text: string): number {
     return this.textSizeElement.text(text).node().getBBox().height;
 };
 
@@ -617,17 +630,17 @@ Chart.prototype.getTextHeight = function (text) {
 * list given.  This method returns zero if the list is empty.
 * @sb-returns {Number} Maximum width of text, in pixels.
 */
-Chart.prototype.getMaxGraphEndTextWidth = function () {
+Chart.prototype.getMaxGraphEndTextWidth = function (): number {
     if (this.selectedIndexes.length === 0) {
         // No competitors selected.  Avoid problems caused by trying to
         // find the maximum of an empty array.
         return 0;
     } else {
-        const nameWidths = this.selectedIndexes.map(function (index) {
+        const nameWidths = this.selectedIndexes.map(function (index: number) {
             const comp = this.courseClassSet.allCompetitors[index];
             return this.getTextWidth(formatNameAndSuffix(comp.name, getSuffix(comp)));
         }, this);
-        return d3.max(nameWidths) + this.determineMaxStatisticTextWidth();
+        return d3.max<number>(nameWidths) + this.determineMaxStatisticTextWidth();
     }
 };
 
@@ -638,7 +651,7 @@ Chart.prototype.getMaxGraphEndTextWidth = function () {
 * @sb-param {Array} values - Array of values.
 * @sb-return {Number} Maximum non-null or NaN value.
 */
-function maxNonNullNorNaNValue(values) {
+function maxNonNullNorNaNValue(values: Array<number | null>): number {
     const nonNullNorNaNValues: Array<number> = values.filter(isNotNullNorNaN);
     return (nonNullNorNaNValues.length > 0) ? d3.max(nonNullNorNaNValues) : 0;
 }
@@ -652,7 +665,7 @@ function maxNonNullNorNaNValue(values) {
                                  data.
 * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
 */
-Chart.prototype.getMaxTimeAndRankTextWidth = function (timeFuncName, rankFuncName) {
+Chart.prototype.getMaxTimeAndRankTextWidth = function (timeFuncName, rankFuncName): number {
     let maxTime = 0;
     let maxRank = 0;
 
@@ -675,7 +688,7 @@ Chart.prototype.getMaxTimeAndRankTextWidth = function (timeFuncName, rankFuncNam
 * of each competitor
 * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
 */
-Chart.prototype.getMaxSplitTimeAndRankTextWidth = function () {
+Chart.prototype.getMaxSplitTimeAndRankTextWidth = function (): number {
     return this.getMaxTimeAndRankTextWidth("getSplitTimeTo", "getSplitRankTo");
 };
 
@@ -685,7 +698,7 @@ Chart.prototype.getMaxSplitTimeAndRankTextWidth = function () {
 * @sb-returns {Number} Maximum width of cumulative time and cumulative-time rank text, in
 *                   pixels.
 */
-Chart.prototype.getMaxCumulativeTimeAndRankTextWidth = function () {
+Chart.prototype.getMaxCumulativeTimeAndRankTextWidth = function (): number {
     return this.getMaxTimeAndRankTextWidth("getCumulativeTimeTo", "getCumulativeRankTo");
 };
 
@@ -694,7 +707,7 @@ Chart.prototype.getMaxCumulativeTimeAndRankTextWidth = function () {
 * each competitor
 * @sb-returns {Number} Maximum width of behind-fastest time rank text, in pixels.
 */
-Chart.prototype.getMaxTimeBehindFastestWidth = function () {
+Chart.prototype.getMaxTimeBehindFastestWidth = function (): number {
     let maxTime = 0;
 
     for (let controlIndex = 1; controlIndex <= this.numControls + 1; controlIndex += 1) {
@@ -710,7 +723,7 @@ Chart.prototype.getMaxTimeBehindFastestWidth = function () {
 * each competitor
 * @sb-returns {Number} Maximum width of behind-fastest time rank text, in pixels.
 */
-Chart.prototype.getMaxTimeLossWidth = function () {
+Chart.prototype.getMaxTimeLossWidth = function (): number {
     let maxTimeLoss = 0;
     let minTimeLoss = 0;
     for (let controlIndex = 1; controlIndex <= this.numControls + 1; controlIndex += 1) {
@@ -730,7 +743,7 @@ Chart.prototype.getMaxTimeLossWidth = function () {
 * Determines the maximum width of the statistics text at the end of the competitor.
 * @sb-returns {Number} Maximum width of the statistics text, in pixels.
 */
-Chart.prototype.determineMaxStatisticTextWidth = function () {
+Chart.prototype.determineMaxStatisticTextWidth = function (): number {
     let maxWidth = 0;
     if (this.visibleStatistics.TotalTime) {
         maxWidth += this.getMaxCumulativeTimeAndRankTextWidth();
@@ -754,7 +767,7 @@ Chart.prototype.determineMaxStatisticTextWidth = function () {
 * @sb-param {object} chartData - Object containing the chart data.
 * @sb-return {Number} Maximum width of a start time label.
 */
-Chart.prototype.determineMaxStartTimeLabelWidth = function (chartData) {
+Chart.prototype.determineMaxStartTimeLabelWidth = function (chartData): number {
     let maxWidth;
     if (chartData.competitorNames.length > 0) {
         maxWidth = d3.max(chartData.competitorNames.map(function (name) { return this.getTextWidth("00:00:00 " + name); }, this));
@@ -1237,7 +1250,7 @@ Chart.prototype.sortReferenceCumTimes = function (): void {
 * @sb-param {Object} chartType - The type of chart being drawn.
 */
 Chart.prototype.drawChart = function (data, selectedIndexes: Array<number>, visibleStatistics: Array<boolean>, chartType: ChartType) {
-    const chartData = data.chartData;
+    const chartData: ChartData = data.chartData;
     this.numControls = chartData.numControls;
     this.numLines = chartData.competitorNames.length;
     this.selectedIndexes = selectedIndexes;

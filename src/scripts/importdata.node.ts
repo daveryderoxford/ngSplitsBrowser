@@ -1,4 +1,5 @@
- // tslint:disable:quotemark
+// tslint:disable:quotemark
+// tslint:disable:max-line-length
 
 export interface ImportData {
    id;
@@ -110436,4 +110437,3 @@ export interface ImportData {
     "format": "SICSV"
   }
  ];
- 

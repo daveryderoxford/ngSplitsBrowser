@@ -16,6 +16,9 @@
   ],
   "include": [
     "**/*.spec.ts"
+  ],
+  "exclude": [
+    "**/*.node.ts"
   ]
 }
 

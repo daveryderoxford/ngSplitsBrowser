@@ -65,12 +65,12 @@
     ],
     "prefer-const": true,
     "quotemark": [
-      true,
+      false,
       "double"
     ],
     "radix": true,
     "semicolon": [
-      "always"
+     true
     ],
     "triple-equals": [
       true,

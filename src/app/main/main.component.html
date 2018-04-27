@@ -14,7 +14,7 @@
         <h3 matSubheader>Recent Results</h3>
         <div *ngFor="let event of events | async" (click)="eventClicked(event)">
           <mat-list-item>
-            <span matLine class='list-header'> {{ event.eventdate |  date }}  {{ event.name }} </span>
+            <span matLine class='list-header'> {{ event.date |  date }}  {{ event.name }} </span>
             <span matLine>
                   {{event.nationality}}  {{event.club}}
               </span>

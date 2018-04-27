@@ -19,12 +19,12 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 // tslint:disable:max-line-length
-import {} from "jasmine"
+import {} from "jasmine";
 import {} from "jasmine-expect";
 
 import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
-import {TestSupport} from "app/results/test-support.spec"
+import {TestSupport} from "app/results/test-support.spec";
 
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 const fromSplitTimes = TestSupport.fromSplitTimes;
@@ -82,8 +82,8 @@ fdescribe("Course-class", () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const courseClass = new CourseClass("Test class name", 3, [competitor1, competitor2]);
-        expect(competitor1.className).toEqual(courseClass.name);
-        expect(competitor2.className).toEqual(courseClass.name);
+        expect(competitor1.courseClass.name).toEqual(courseClass.name);
+        expect(competitor2.courseClass.name).toEqual(courseClass.name);
     });
 
     it("Can return fastest split for a control", () => {

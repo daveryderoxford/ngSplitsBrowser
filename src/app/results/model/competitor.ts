@@ -1,9 +1,10 @@
 import * as $ from "jquery";
-import d3 = require("d3");
-
-import { isNotNull, isNaNStrict } from "./util";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
+import { isNaNStrict, isNotNull } from "./util";
+import d3 = require("d3");
+import { CourseClass } from "./course-class";
+
 
 export type Genre = "M" | "F";
 
@@ -99,7 +100,7 @@ export class Competitor {
     isDisqualified = false;
     isOverMaxTime = false;
 
-    className: string | null = null;
+    courseClass: CourseClass | null = null;
     yearOfBirth: number | null = null;
     gender: Genre | null = null; // "M" or "F" for male or female.
     ecard: string | null = null;
@@ -111,7 +112,7 @@ export class Competitor {
     splitRanks: Array<sbTime> | null = null;
     cumRanks: Array<sbTime> | null = null;
     timeLosses: Array<sbTime> | null = null;
-    totalTime: sbTime | null = null;
+    totalTime: sbTime = 0;
     /**
     * Create and return a Competitor object where the competitor's times are given
     * as a list of cumulative times.
@@ -140,7 +141,7 @@ export class Competitor {
         cumTimes: Array<sbTime>): Competitor {
         const splitTimes = splitTimesFromCumTimes(cumTimes);
         return new Competitor(order, name, club, startTime, splitTimes, cumTimes);
-    };
+    }
 
     /**
     * Create and return a Competitor object where the competitor's times are given
@@ -171,7 +172,7 @@ export class Competitor {
         competitor.splitTimes = competitor.originalSplitTimes;
         competitor.cumTimes = competitor.originalCumTimes;
         return competitor;
-    };
+    }
 
     /**
     * Function used with the JavaScript sort method to sort competitors in order
@@ -199,7 +200,7 @@ export class Competitor {
         } else {
             return (b.totalTime === null) ? -1 : a.totalTime - b.totalTime;
         }
-    };
+    }
 
     protected constructor(public order: number,
         name: string | FirstnameSurname,
@@ -238,21 +239,21 @@ export class Competitor {
     */
     public setNonCompetitive(): void {
         this.isNonCompetitive = true;
-    };
+    }
 
     /**
     * Marks this competitor as not starting.
     */
     setNonStarter(): void {
         this.isNonStarter = true;
-    };
+    }
 
     /**
     * Marks this competitor as not finishing.
     */
     public setNonFinisher(): void {
         this.isNonFinisher = true;
-    };
+    }
 
     /**
     * Marks this competitor as disqualified, for reasons other than a missing
@@ -260,23 +261,23 @@ export class Competitor {
     */
     public disqualify(): void {
         this.isDisqualified = true;
-    };
+    }
 
     /**
     * Marks this competitor as over maximum time.
     */
     public setOverMaxTime(): void {
         this.isOverMaxTime = true;
-    };
+    }
 
     /**
     * Sets the name of the class that the competitor belongs to.
     * This is the course-class, not the competitor's age class.
     * @sb-param {String} className - The name of the class.
     */
-    public setClassName(className: string) {
-        this.className = className;
-    };
+    public setClass(courseClass: CourseClass) {
+        this.courseClass = courseClass;
+    }
 
     /**
     * Sets the competitor's year of birth.
@@ -284,7 +285,7 @@ export class Competitor {
     */
     public setYearOfBirth(yearOfBirth: number) {
         this.yearOfBirth = yearOfBirth;
-    };
+    }
 
     /**
     * Sets the competitor's gender.  This should be "M" or "F".
@@ -292,7 +293,7 @@ export class Competitor {
     */
     public setGender(gender: Genre) {
         this.gender = gender;
-    };
+    }
 
     /**
     * Sets the 'repaired' cumulative times for a competitor.  This also
@@ -302,7 +303,7 @@ export class Competitor {
     public setRepairedCumulativeTimes(cumTimes: Array<sbTime>) {
         this.cumTimes = cumTimes;
         this.splitTimes = splitTimesFromCumTimes(cumTimes);
-    };
+    }
 
     /**
     * Returns whether this competitor completed the course and did not get
@@ -313,7 +314,7 @@ export class Competitor {
     */
     public completed(): boolean {
         return this.totalTime !== null && !this.isDisqualified && !this.isOverMaxTime;
-    };
+    }
 
     /**
     * Returns whether the competitor has any times recorded at all.
@@ -323,7 +324,7 @@ export class Competitor {
     public hasAnyTimes(): boolean {
         // Trim the leading zero
         return this.originalCumTimes.slice(1).some(isNotNull);
-    };
+    }
 
     /**
     * Returns the competitor's split to the given control.  If the control
@@ -338,7 +339,7 @@ export class Competitor {
     */
     public getSplitTimeTo(controlIndex: number): number | null {
         return (controlIndex === 0) ? 0 : this.splitTimes[controlIndex - 1];
-    };
+    }
 
     /**
     * Returns the competitor's 'original' split to the given control.  This is
@@ -354,7 +355,7 @@ export class Competitor {
     */
     public getOriginalSplitTimeTo(controlIndex: number): number | null {
         return (controlIndex === 0) ? 0 : this.originalSplitTimes[controlIndex - 1];
-    };
+    }
 
     /**
     * Returns whether the control with the given index is deemed to have a
@@ -365,7 +366,7 @@ export class Competitor {
     */
     public isSplitTimeDubious(controlIndex: number): boolean {
         return (controlIndex > 0 && this.originalSplitTimes[controlIndex - 1] !== this.splitTimes[controlIndex - 1]);
-    };
+    }
 
     /**
     * Returns the competitor's cumulative split to the given control.  If the
@@ -379,7 +380,7 @@ export class Competitor {
     */
     public getCumulativeTimeTo(controlIndex: number): number {
         return this.cumTimes[controlIndex];
-    };
+    }
 
     /**
     * Returns the 'original' cumulative time the competitor took to the given
@@ -391,7 +392,7 @@ export class Competitor {
     */
     public getOriginalCumulativeTimeTo(controlIndex: number): number {
         return this.originalCumTimes[controlIndex];
-    };
+    }
 
     /**
     * Returns whether the control with the given index is deemed to have a
@@ -402,7 +403,7 @@ export class Competitor {
     */
     public isCumulativeTimeDubious(controlIndex: number): boolean {
         return this.originalCumTimes[controlIndex] !== this.cumTimes[controlIndex];
-    };
+    }
 
     /**
     * Returns the rank of the competitor's split to the given control.  If the
@@ -415,7 +416,7 @@ export class Competitor {
     */
     public getSplitRankTo(controlIndex: number): number {
         return (this.splitRanks === null || controlIndex === 0) ? null : this.splitRanks[controlIndex - 1];
-    };
+    }
 
     /**
     * Returns the rank of the competitor's cumulative split to the given
@@ -428,7 +429,7 @@ export class Competitor {
     */
     public getCumulativeRankTo(controlIndex: number): number {
         return (this.cumRanks === null || controlIndex === 0) ? null : this.cumRanks[controlIndex - 1];
-    };
+    }
 
     /**
     * Returns the time loss of the competitor at the given control, or null if
@@ -439,7 +440,7 @@ export class Competitor {
     */
     public getTimeLossAt(controlIndex: number): number| null {
         return (controlIndex === 0 || this.timeLosses === null) ? null : this.timeLosses[controlIndex - 1];
-    };
+    }
 
     /**
     * Returns all of the competitor's cumulative time splits.
@@ -447,7 +448,7 @@ export class Competitor {
     */
     public getAllCumulativeTimes(): Array<sbTime> {
         return this.cumTimes;
-    };
+    }
 
     /**
     * Returns all of the competitor's cumulative time splits.
@@ -455,7 +456,7 @@ export class Competitor {
     */
     public getAllOriginalCumulativeTimes(): Array<sbTime> {
         return this.originalCumTimes;
-    };
+    }
 
     /**
     * Returns whether this competitor is missing a start time.
@@ -469,7 +470,7 @@ export class Competitor {
     */
     public lacksStartTime(): boolean {
         return this.startTime === null && this.splitTimes.some(isNotNull);
-    };
+    }
 
     /**
     * Sets the split and cumulative-split ranks for this competitor.
@@ -479,7 +480,7 @@ export class Competitor {
     public setSplitAndCumulativeRanks(splitRanks: Array<sbTime>, cumRanks: Array<number>) {
         this.splitRanks = splitRanks;
         this.cumRanks = cumRanks;
-    };
+    }
 
     /**
     * Return this competitor's cumulative times after being adjusted by a 'reference' competitor.
@@ -496,7 +497,7 @@ export class Competitor {
 
         const adjustedTimes = this.cumTimes.map((time, idx) => { return subtractIfNotNull(time, referenceCumTimes[idx]); });
         return adjustedTimes;
-    };
+    }
 
     /**
     * Returns the cumulative times of this competitor with the start time added on.
@@ -507,7 +508,7 @@ export class Competitor {
         const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
         const startTime = this.startTime;
         return adjustedTimes.map((adjTime) => { return addIfNotNull(adjTime, startTime); });
-    };
+    }
 
     /**
     * Returns an array of percentages that this competitor's splits were behind
@@ -538,7 +539,7 @@ export class Competitor {
         });
 
         return percentsBehind;
-    };
+    }
 
     /**
     * Determines the time losses for this competitor.
@@ -588,7 +589,7 @@ export class Competitor {
                 });
             }
         }
-    };
+    }
 
     /**
     * Returns whether this competitor 'crosses' another.  Two competitors are
@@ -621,7 +622,7 @@ export class Competitor {
         }
 
         return beforeOther && afterOther;
-    };
+    }
 
     /**
     * Returns an array of objects that record the indexes around which times in
@@ -661,7 +662,7 @@ export class Competitor {
     */
     public getControlIndexesAroundDubiousCumulativeTimes(): Array<DubiousTimeInfo> {
         return this.getIndexesAroundDubiousTimes(this.cumTimes);
-    };
+    }
 
     /**
     * Returns an array of objects that list the controls around those that have
@@ -671,5 +672,5 @@ export class Competitor {
     */
     public getControlIndexesAroundDubiousSplitTimes(): Array<DubiousTimeInfo> {
         return this.getIndexesAroundDubiousTimes([0].concat(this.splitTimes));
-    };
+    }
 }

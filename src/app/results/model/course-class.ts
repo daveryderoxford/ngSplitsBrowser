@@ -27,7 +27,7 @@ export class CourseClass {
         public competitors: Array<Competitor>) {
 
         this.competitors.forEach( (comp) => {
-            comp.setClassName(name);
+            comp.setClass(this);
         });
     }
 

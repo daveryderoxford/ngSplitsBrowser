@@ -1,19 +1,19 @@
 <div class="container">
 
-  <button class="flex-item" mat-button (onClick)="displayEvents">< EVENTS</button>
+  <button class="flex-item" mat-button (onClick)="displayEvents()">< EVENTS</button>
 
 
   <mat-button-toggle-group #group="matButtonToggleGroup" class="toggle, flex-item">
-    <mat-button-toggle value="splits">
+    <mat-button-toggle class="toggelebutton" value="splits">
       Splits
     </mat-button-toggle>
-    <mat-button-toggle value="race">
+    <mat-button-toggle class="toggelebutton" value="race">
       Race
     </mat-button-toggle>
-    <mat-button-toggle value="table">
+    <mat-button-toggle class="toggelebutton" value="table">
       Table
     </mat-button-toggle>
-    <mat-button-toggle value="more">
+    <mat-button-toggle class="toggelebutton" value="more">
       More <mat-icon>arrow_drop_down</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>
@@ -25,14 +25,13 @@
 
 
 
-  <app-results-search [results]="events" (onItemSelected)="searchSelected()">
-  </app-results-search>
+  <app-results-search> </app-results-search>
 
 
   <span class="fill-remaining-space"></span>
 
-  <mat-form-field class="displayOptions, flex-item">
-  <mat-select placeholder="Display" [formControl]="displayOptions" multiple class="displayOptions">
+  <mat-form-field floatLabel="false" class="displayOptions, flex-item">
+  <mat-select placeholder="Display" [(value)]="displayOptions" multiple class="displayOptions">
     <mat-option *ngFor="let option of ['Total time','Splits','Poisition','Split position','Time Loss']" [value]="option">{{option}}</mat-option>
   </mat-select>
 </mat-form-field>

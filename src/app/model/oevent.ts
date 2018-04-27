@@ -3,6 +3,17 @@ export type EventGrade = "IOF" | "International" | "National" | "Regional"| "Clu
 
 export class EventGrades {
     static grades: Array<EventGrade> = ["IOF" , "International" , "National" , "Regional", "Club", "Local"];
+
+    static indexObject(grade: EventGrade): any {
+        const grades = EventGrades.grades.reverse();
+        const gradeIndex = grades.indexOf(grade);
+
+        const ret: any = {};
+        for (let i = gradeIndex; i < grades.length; i++) {
+            ret[grades[i]] = true;
+        }
+        return ret;
+    }
 }
 
 export type EventDiscipline = "Sprint" | "Urban" | "Middle" | "Long" | "Ultralong"| "Other" ;
@@ -17,25 +28,24 @@ export class EventTypes {
 
 export type SplitsFileFormat = "auto" | "IOFv3" |  "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML" ;
 
-
 export interface OEvent extends EventInfo {
-     key?: string;
+     key: string;
      user: string;
      splits?: SplitsFileInfo | null;
      summary?: EventSummary | null;
      legacyPassword?: string;
-     date_club_index?: string;
-     club_date_index?: string;
+     yearIndex: number;     // Used for filtering
+     gradeIndex: any;  // Used for filtering
 }
 
 export interface EventInfo {
      name: string;
      nationality: string;
-     eventdate: string;
+     date: string;
      club: string;
-     grade: number;
-     type: string;
-     discipline: string;
+     grade: EventGrade;
+     type: EventType;
+     discipline: EventDiscipline;
      webpage: string;
      email: string;
 }

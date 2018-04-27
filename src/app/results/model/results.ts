@@ -38,7 +38,7 @@ export class Results {
         this.classes.forEach((courseClass) => {
             courseClass.determineTimeLosses();
         });
-    };
+    }
 
     /**
     * Returns whether the event data needs any repairing.
@@ -55,7 +55,7 @@ export class Results {
                 return (competitor.getAllCumulativeTimes() === null);
             });
         });
-    };
+    }
 
     /**
     * Returns the fastest splits for each class on a given leg.
@@ -80,7 +80,7 @@ export class Results {
         fastestSplits.sort((a, b) => { return d3.ascending(a.split, b.split); });
 
         return fastestSplits;
-    };
+    }
 
     /**
     * Returns a list of competitors that visit the control with the given code
@@ -107,7 +107,7 @@ export class Results {
         competitors.sort((a, b) => { return d3.ascending(a.time, b.time); });
 
         return competitors;
-    };
+    }
 
     /**
     * Returns the list of controls that follow after a given control.
@@ -122,7 +122,7 @@ export class Results {
         }
 
         return courses.map((course) => { return { course: course, nextControls: course.getNextControls(controlCode) }; });
-    };
+    }
 
     /** Search for a competior in the results .
      *  Matches on firstname, surname or club (case independent)
@@ -132,7 +132,7 @@ export class Results {
         const twochars = searchstring.length > 2;
 
         if (this.allCompetitors === null) {
-            this.populateAllCompetitors()
+            this.populateAllCompetitors();
         }
 
         const ss = searchstring.toLocaleLowerCase();
@@ -149,7 +149,7 @@ export class Results {
 
         // Sort into name order
         found = found.sort((a, b) => {
-            const x = a.name.toLowerCase()
+            const x = a.name.toLowerCase();
             const y = b.name.toLowerCase();
             return x < y ? -1 : x > y ? 1 : 0;
         });

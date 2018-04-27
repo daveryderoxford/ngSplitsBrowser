@@ -2,8 +2,10 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { DataSource } from "@angular/cdk/collections";
 import { MatPaginator } from "@angular/material";
-import { AngularFireDatabase } from "angularfire2/database";
+
 import { OEvent, EventGrades } from "app/model/oevent";
+import { AngularFirestore, AngularFirestoreDocument } from "angularfire2/firestore";
+
 import { AngularFireAuth } from "angularfire2/auth";
 import { EventAdminService } from "app/upload/event-admin.service";
 
@@ -34,7 +36,7 @@ export class EventsListComponent {
   new = false;
 
   constructor(private afAuth: AngularFireAuth,
-    private db: AngularFireDatabase,
+    private afs: AngularFirestore,
     private router: Router) { }
 
   oeventClicked(event: OEvent) {
@@ -43,8 +45,8 @@ export class EventsListComponent {
 
   // tslint:disable-next-line:use-life-cycle-interface
   ngOnInit() {
-    this.dataSource = new EventDataSource(this.db, this.paginator);
-    this.clubs = this.db.list<Club>("/clubs/").valueChanges();
+    this.dataSource = new EventDataSource(this.afs, this.paginator);
+    this.clubs = this.afs.collection<Club>("/clubs/").valueChanges();
   }
 
   onMouseEnter(row) {
@@ -73,7 +75,7 @@ class EventDataSource extends DataSource<any> {
   protected visibleEvents: OEvent[] = [];
   protected loading = false;
 
-  constructor(private db: AngularFireDatabase,
+  constructor(private afs: AngularFirestore,
     private paginator: MatPaginator) {
     super();
   }
@@ -91,22 +93,19 @@ class EventDataSource extends DataSource<any> {
     let startAt;
 
     if (oevents.length > 0) {
-      startAt = oevents[oevents.length - 1].date_club_index;
+      startAt = oevents[oevents.length - 1].date;
     } else {
       startAt = 0;
-    };
+    }
 
-    const query = this.db.list<OEvent>("/events",
-      res => res.orderByChild("date_club_index").startAt(startAt).limitToFirst(pageSize));
+  //  const query = this.db.list<OEvent>("/events",
+    const query = this.afs.collection<OEvent>("/events",
+      res => res.orderBy("date", "desc")
+                .orderBy("name")
+                .startAfter(startAt)
+                .limit(pageSize));
 
-    const obs: Observable<OEvent[]> = query.snapshotChanges().map( (actions) => {
-      const events = actions.map( (action) => {
-        const oevent = action.payload.val();
-        oevent.key = action.payload.key;
-        return (oevent as OEvent);
-      });
-      return(events);
-    });
+    const obs: Observable<OEvent[]> = query.valueChanges();
 
     return (obs);
   }

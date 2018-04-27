@@ -1,7 +1,5 @@
 import { Component, OnInit } from "@angular/core";
 import { Results } from "app/results/model";
-import { SearchSelectedItem } from "app/results/results-search/results-search.component";
-
 
 @Component({
   selector: "app-results-navbar",
@@ -10,7 +8,7 @@ import { SearchSelectedItem } from "app/results/results-search/results-search.co
 })
 export class ResultsNavbarComponent implements OnInit {
 
-  results: Results;
+  displayOptions: Array<string> = [];
 
   constructor() { }
 
@@ -19,10 +17,6 @@ export class ResultsNavbarComponent implements OnInit {
 
   displayEvents() {
 
-  }
-
-  searchSelected(item: SearchSelectedItem) {
-     // Search item may be course, courseclass or competitor
   }
 
 }

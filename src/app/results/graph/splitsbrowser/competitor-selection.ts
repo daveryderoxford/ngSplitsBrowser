@@ -30,7 +30,7 @@ export class CompetitorSelection {
     * @sb-param {Number} index - The index of the competitor.
     * @sb-returns {boolean} True if the competitor is selected, false if not.
     */
-    public isSelected(index: number): boolean {
+  /*  public isSelected(index: number): boolean {
         return this.currentIndexes.indexOf(index) > -1;
     };
 
@@ -41,7 +41,7 @@ export class CompetitorSelection {
     */
     public isSingleRunnerSelected(): boolean {
         return this.currentIndexes.length === 1;
-    };
+    }
 
     /**
     * Returns the index of the single selected competitor.
@@ -53,7 +53,7 @@ export class CompetitorSelection {
     */
     public getSingleRunnerIndex(): number | null {
         return (this.isSingleRunnerSelected()) ? this.currentIndexes[0] : null;
-    };
+    }
 
     /**
     * Given that a single runner is selected, select also all of the runners
@@ -74,7 +74,7 @@ export class CompetitorSelection {
             this.currentIndexes.sort(d3.ascending);
             this.fireChangeHandlers();
         }
-    };
+    }
 
     /**
   * Select all of the competitors.
@@ -82,7 +82,7 @@ export class CompetitorSelection {
     public selectAll(): void {
         this.currentIndexes = d3.range(this.count);
         this.fireChangeHandlers();
-    };
+    }
 
     /**
     * Select none of the competitors.
@@ -90,7 +90,7 @@ export class CompetitorSelection {
     public selectNone(): void {
         this.currentIndexes = [];
         this.fireChangeHandlers();
-    };
+    }
 
     /**
     * Returns an array of all currently-selected competitor indexes.
@@ -98,7 +98,7 @@ export class CompetitorSelection {
     */
     public getSelectedIndexes(): Array<number> {
         return this.currentIndexes.slice(0);
-    };
+    }
 
     /**
     * Set the selected competitors to those in the given array.
@@ -109,7 +109,7 @@ export class CompetitorSelection {
             this.currentIndexes = selectedIndexes;
             this.fireChangeHandlers();
         }
-    };
+    }
 
     /**
     * Register a handler to be called whenever the list of indexes changes.
@@ -127,7 +127,7 @@ export class CompetitorSelection {
         if (this.changeHandlers.indexOf(handler) === -1) {
             this.changeHandlers.push(handler);
         }
-    };
+    }
 
     /**
         * Fires all of the change handlers currently registered.
@@ -137,7 +137,7 @@ export class CompetitorSelection {
         this.changeHandlers.forEach((handler) => {
             handler(this.currentIndexes.slice(0));
         });
-    };
+    }
 
     /**
     * Unregister a handler from being called when the list of indexes changes.
@@ -151,7 +151,7 @@ export class CompetitorSelection {
         if (index > -1) {
             this.changeHandlers.splice(index, 1);
         }
-    };
+    }
 
     /**
     * Toggles whether the competitor at the given index is selected.
@@ -175,7 +175,7 @@ export class CompetitorSelection {
         } else {
             throw new InvalidData("Index is not a number");
         }
-    };
+    }
 
     /**
     * Selects a number of competitors, firing the change handlers once at the
@@ -198,7 +198,7 @@ export class CompetitorSelection {
             this.currentIndexes.sort(d3.ascending);
             this.fireChangeHandlers();
         }
-    };
+    }
 
     /**
     * Deselects a number of competitors, firing the change handlers once at the
@@ -227,7 +227,7 @@ export class CompetitorSelection {
             this.currentIndexes.sort(d3.ascending);
             this.fireChangeHandlers();
         }
-    };
+    }
 
     /**
     * Migrates the selected competitors from one list to another.
@@ -266,6 +266,6 @@ export class CompetitorSelection {
                 this.currentIndexes.push(idx);
             }
         }, this);
-    };
+    }
 
 }

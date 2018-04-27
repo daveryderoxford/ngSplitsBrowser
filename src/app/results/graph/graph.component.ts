@@ -4,13 +4,15 @@ import { ActivatedRoute, Params } from "@angular/router";
 
 import { ResultsSelectionService } from "app/results/results-selection.service";
 
-import {loadEvent} from "app/results/graph/splitsbrowser/splitsbrowser";
+import { displayGraph } from "app/results/graph/splitsbrowser/splitsbrowser";
+import { Results } from "app/results/model";
+import { DialogsService } from 'app/dialogs/dialogs.service';
 
 
 interface SplitsBrowserOptions {
-   defaultLanguage?: boolean;
-   containerElement?: string;
-   topBar?: string;
+  defaultLanguage?: boolean;
+  containerElement?: string;
+  topBar?: string;
 }
 
 @Component({
@@ -22,23 +24,33 @@ interface SplitsBrowserOptions {
 })
 export class GraphComponent implements OnInit {
 
-  event: OEvent;
+  results: Results;
 
-  constructor( private route: ActivatedRoute,
-               private rs: ResultsSelectionService) {
-    }
+  constructor(private route: ActivatedRoute,
+    private rs: ResultsSelectionService,
+    private dialog: DialogsService) {
+  }
 
   ngOnInit() {
-    this.route.params.subscribe((params: Params) => this.rs.setSelectedEventByKey(params["id"]));
-    this.rs.getEventObservable().subscribe( (event: OEvent) => this.selectedEventUpdated(event));
+    this.route.params.subscribe(async (params: Params) => {
+      try {
+        // load results for the event Id
+        await this.rs.setSelectedEventByKey(params["id"]);
+      } catch (e) {
+        // Display a dialog with the error
+        this.dialog.message('Error loading results', 'Error loading results ' + e.message);
+      }
+    });
+    this.rs.selectedResults.subscribe((results: Results) => this.selectedResultsUpdated(results));
+
   }
 
-  async selectedEventUpdated( event: OEvent) {
-    if (event) {
-      this.event = event;
-      const url = await this.rs.getSplitsURL();
-      loadEvent(url, {containerElement: "app-graph"} );
+  async selectedResultsUpdated(results: Results) {
+    if (results) {
+      displayGraph(results, { containerElement: "app-graph" });
     }
   }
+
+
 }
 

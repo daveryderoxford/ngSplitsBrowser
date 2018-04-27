@@ -135,7 +135,7 @@ export function Viewer(options: SplitsbrowserOptions) {
 *
 * @sb-param {String} message - The message to show.
 */
-function alerter(message) {
+function alerter(message: string) {
     alert(message);
 }
 
@@ -160,7 +160,7 @@ Viewer.prototype.enableOrDisableRaceGraph = function () {
 * Sets the classes that the viewer can view.
 * @sb-param {Event} eventData - All event data loaded.
 */
-Viewer.prototype.setEvent = function (eventData) {
+Viewer.prototype.setReaults = function (eventData: Results) {
     this.eventData = eventData;
     this.classes = eventData.classes;
     if (this.classSelector !== null) {
@@ -329,17 +329,17 @@ Viewer.prototype.addCompetitorList = function () {
 * Construct the UI inside the HTML body.
 */
 Viewer.prototype.buildUi = function (options: SplitsbrowserOptions) {
-    let body: any;
+    let rootElement: any;
     // DKR Attach the D3 output to a div with ID of SB container
     if (options && options.containerElement) {
-        body = d3.select(options.containerElement);
+        rootElement = d3.select(options.containerElement);
     } else {
-        body = d3.select("body");
+        rootElement = d3.select("body");
     }
 
-    body.style("overflow", "hidden");
+    rootElement.style("overflow", "hidden");
 
-    this.container = body.append("div")
+    this.container = rootElement.append("div")
         .attr("id", "sbContainer");
     //     this.container == d3.select('.sb');
     //  this.container.append("Hi Dave");
@@ -442,7 +442,7 @@ Viewer.prototype.hideTransientElements = function () {
 * container element.
 * @sb-return {Number} Total horizontal margin.
 */
-Viewer.prototype.getHorizontalMargin = function () {
+Viewer.prototype.getHorizontalMargin = function (): number {
     const body = $("app-graph");
     const container = $(this.container.node());
     return (body.outerWidth(true) - body.width()) + (container.outerWidth() - container.width());
@@ -454,7 +454,7 @@ Viewer.prototype.getHorizontalMargin = function () {
 * container element.
 * @sb-return {Number} Total vertical margin.
 */
-Viewer.prototype.getVerticalMargin = function () {
+Viewer.prototype.getVerticalMargin = function (): number {
     const body = $("app-graph");
     const container = $(this.container.node());
     return (body.outerHeight(true) - body.height()) + (container.outerHeight() - container.height());
@@ -466,7 +466,7 @@ Viewer.prototype.getVerticalMargin = function () {
 * the competitor list and the chart.
 * @sb-return {Number} Usable height of the window.
 */
-Viewer.prototype.getUsableHeight = function () {
+Viewer.prototype.getUsableHeight = function (): number {
     const bodyHeight = $(window).outerHeight() - this.getVerticalMargin() - this.topBarHeight;
     const topPanelHeight = $(this.topPanel.node()).height();
     return bodyHeight - topPanelHeight;
@@ -602,7 +602,7 @@ Viewer.prototype.retranslate = function () {
 * current course-class set, comparison selector and results table.
 * @sb-param {Array} classIndexes - Array of selected class indexes.
 */
-Viewer.prototype.setClasses = function (classIndexes) {
+Viewer.prototype.setClasses = function (classIndexes: Array<number>) {
     this.currentClasses = classIndexes.map(function (index) { return this.classes[index]; }, this);
     this.courseClassSet = new CourseClassSet(this.currentClasses);
     this.comparisonSelector.setCourseClassSet(this.courseClassSet);
@@ -615,7 +615,7 @@ Viewer.prototype.setClasses = function (classIndexes) {
 * Initialises the viewer with the given initial classes.
 * @sb-param {Array} classIndexes - Array of selected class indexes.
 */
-Viewer.prototype.initClasses = function (classIndexes) {
+Viewer.prototype.initClasses = function (classIndexes: Array<number>) {
     this.classSelector.selectClasses(classIndexes);
     this.setClasses(classIndexes);
     this.competitorList.setCompetitorList(this.courseClassSet.allCompetitors, (this.currentClasses.length > 1));
@@ -626,9 +626,9 @@ Viewer.prototype.initClasses = function (classIndexes) {
 
 /**
 * Change the graph to show the classes with the given indexes.
-* @sb-param {Number} classIndexes - The (zero-based) indexes of the classes.
+* @sb-param {Array<Number}> classIndexes - The (zero-based) indexes of the classes.
 */
-Viewer.prototype.selectClasses = function (classIndexes) {
+Viewer.prototype.selectClasses = function (classIndexes: Array<number>) {
     if (classIndexes.length > 0 && this.currentClasses.length > 0 && this.classes[classIndexes[0]] === this.currentClasses[0]) {
         // The 'primary' class hasn't changed, only the 'other' ones.
         // In this case we don't clear the selection.
@@ -660,7 +660,7 @@ Viewer.prototype.selectComparison = function () {
 * Change the type of chart shown.
 * @sb-param {Object} chartType - The type of chart to draw.
 */
-Viewer.prototype.selectChartType = function (chartType) {
+Viewer.prototype.selectChartType = function (chartType: ChartType) {
     if (chartType.isResultsTable) {
         this.mainPanel.style("display", "none");
 
@@ -674,6 +674,7 @@ Viewer.prototype.selectChartType = function (chartType) {
         this.resultsTable.show();
     } else {
         this.resultsTable.hide();
+        // TODO Should be root to application
         d3.select("body").style("overflow", "hidden");
         this.mainPanel.style("display", null);
         this.setChartSize();
@@ -687,7 +688,7 @@ Viewer.prototype.selectChartType = function (chartType) {
 * Change the type of chart shown.
 * @sb-param {Object} chartType - The type of chart to draw.
 */
-Viewer.prototype.selectChartTypeAndRedraw = function (chartType) {
+Viewer.prototype.selectChartTypeAndRedraw = function (chartType: ChartType) {
     this.selectChartType(chartType);
     if (!chartType.isResultsTable) {
         this.setCompetitorListHeight();
@@ -702,7 +703,7 @@ Viewer.prototype.selectChartTypeAndRedraw = function (chartType) {
 * @sb-param {boolean} showOriginalData - True to show original data, false to
 *     show repaired data.
 */
-Viewer.prototype.selectOriginalOrRepairedData = function (showOriginalData) {
+Viewer.prototype.selectOriginalOrRepairedData = function (showOriginalData: boolean) {
     if (showOriginalData) {
         Repairer.transferCompetitorData(this.eventData);
     } else {
@@ -816,111 +817,43 @@ function showLoadFailureMessage(key: string, params) {
 *     This element can be specified by a CSS selector for the element, or
 *     the HTML element itself, although this behaviour is deprecated.
 */
-export const readEvent = function (data: string, options: SplitsbrowserOptions) {
+export const displayGraph = function (results: Results, options: SplitsbrowserOptions) {
     if (!checkD3Version4()) {
         return;
     }
 
-    let eventData;
-    try {
-        eventData = parseEventData(data);
-    } catch (e) {
-        if (e.name === "InvalidData") {
-            showLoadFailureMessage("LoadFailedInvalidData", { "$$MESSAGE$$": e.message });
-            return;
-        } else {
-            throw e;
-        }
+    if (results.needsRepair()) {
+        Repairer.repairEventData(results);
     }
 
-    if (eventData === null) {
-        showLoadFailureMessage("LoadFailedUnrecognisedData", new Object);
+    if (typeof options === "string") {
+        // Deprecated; support the top-bar specified only as a
+        // string.
+        options = { topBar: options };
+    }
+
+    results.determineTimeLosses();
+
+    if (options && options.defaultLanguage) {
+        initialiseMessages(options.defaultLanguage);
+    }
+
+    const viewer = new Viewer(options);
+    viewer.buildUi(options);
+    viewer.setReaults(results);
+
+    const queryString = document.location.search;
+    if (queryString !== null && queryString.length > 0) {
+        const parsedQueryString = parseQueryString(queryString, results);
+        viewer.updateFromQueryString(parsedQueryString);
     } else {
-        if (eventData.needsRepair()) {
-            Repairer.repairEventData(eventData);
-        }
-
-        if (typeof options === "string") {
-            // Deprecated; support the top-bar specified only as a
-            // string.
-            options = { topBar: options };
-        }
-
-        eventData.determineTimeLosses();
-
-        if (options && options.defaultLanguage) {
-            initialiseMessages(options.defaultLanguage);
-        }
-
-        const viewer = new Viewer(options);
-        viewer.buildUi(options);
-        viewer.setEvent(eventData);
-
-        const queryString = document.location.search;
-        if (queryString !== null && queryString.length > 0) {
-            const parsedQueryString = parseQueryString(queryString, eventData);
-            viewer.updateFromQueryString(parsedQueryString);
-        } else {
-            viewer.setDefaultSelectedClass();
-        }
-
-        viewer.setCompetitorListHeight();
-        viewer.setChartSize();
-        viewer.drawChart();
-        viewer.registerChangeHandlers();
+        viewer.setDefaultSelectedClass();
     }
+
+    viewer.setCompetitorListHeight();
+    viewer.setChartSize();
+    viewer.drawChart();
+    viewer.registerChangeHandlers();
+
 };
 
-/**
-* Handles an asynchronous callback that fetched event data, by parsing the
-* data and starting SplitsBrowser.
-* @sb-param {String} data - The data returned from the AJAX request.
-* @sb-param {String} status - The status of the request.
-* @sb-param {Object|String|HTMLElement|undefined} options - Optional object
-*     containing various options to SplitsBrowser.  It can also be used for
-*     an HTML element that forms a 'banner' across the top of the page.
-*     This element can be specified by a CSS selector for the element, or
-*     the HTML element itself, although this behaviour is deprecated.
-*/
-function readEventData(data: string, status: string, options: SplitsbrowserOptions): void {
-    if (status === "success") {
-        readEvent(data, options);
-    } else {
-        showLoadFailureMessage("LoadFailedStatusNotSuccess", { "$$STATUS$$": status });
-    }
-}
-
-/**
-* Handles the failure to read an event.
-* @sb-param {jQuery.jqXHR} jqXHR - jQuery jqXHR object.
-* @sb-param {String} textStatus - The text status of the request.
-* @sb-param {String} errorThrown - The error message returned from the server.
-*/
-function readEventDataError(jqXHR, textStatus: string, errorThrown: string): void {
-    showLoadFailureMessage("LoadFailedReadError", { "$$ERROR$$": errorThrown });
-}
-
-/**
-* Loads the event data in the given URL and starts SplitsBrowser.
-* @sb-param {String} eventUrl - The URL that points to the event data to load.
-* @sb-param {Object|String|HTMLElement|undefined} options - Optional object
-*     containing various options to SplitsBrowser.  It can also be used for
-*     an HTML element that forms a 'banner' across the top of the page.
-*     This element can be specified by a CSS selector for the element, or
-*     the HTML element itself, although this behaviour is deprecated.
-*/
-export const loadEvent = function (eventUrl: string,
-    options: SplitsbrowserOptions) {
-    if (!checkD3Version4()) {
-        return;
-    }
-
-    // Load the event data
-    $.ajax({
-        url: eventUrl,
-        data: "",
-        success: function (data, status) { readEventData(data, status, options); },
-        dataType: "text",
-        error: readEventDataError
-    });
-};

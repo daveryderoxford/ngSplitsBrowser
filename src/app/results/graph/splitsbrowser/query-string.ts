@@ -5,7 +5,17 @@ import * as $ from "jquery";
 
 import { Lang } from "./lang";
 import { ChartTypeClass, ChartType } from "./chart-types";
-import { Results, CourseClassSet } from "app/results/model";
+import { Results, CourseClassSet, Competitor } from "app/results/model";
+
+export interface ResultsURLOptions {
+    classes: Array<number>;
+    chartType: ChartType;
+    compareWith: boolean | null | {index: number, runner: Competitor},
+    selected: Array<number> | null,
+    stats: any // from readSelectedStatistics(queryString),
+    showOriginal: boolean;
+    filterText: string;
+}
 
 const ChartTypes = ChartTypeClass.chartTypes;
 
@@ -31,7 +41,7 @@ const CLASS_NAME_REGEXP = /(?:^|&|\?)class=([^&]+)/;
 * @sb-return {CourseClassSet|null} - Array of selected CourseClass objects, or null
 *     if none were found.
 */
-function readSelectedClasses(queryString: string, eventData: Results) {
+function readSelectedClasses(queryString: string, eventData: Results): CourseClassSet | null {
     const classNameMatch = CLASS_NAME_REGEXP.exec(queryString);
     if (classNameMatch === null) {
         // No class name specified in the URL.
@@ -80,9 +90,9 @@ const CHART_TYPE_REGEXP = /(?:^|&|\?)chartType=([^&]+)/;
 * Reads the selected chart type from a query string.
 * @sb-param {String} queryString - The query string to read the chart type
 *     from.
-* @sb-return {Object|null} Selected chart type, or null if not recognised.
+* @sb-return {ChartType|null} Selected chart type, or null if not recognised.
 */
-function readChartType(queryString: string) {
+function readChartType(queryString: string): ChartType | null {
     const chartTypeMatch = CHART_TYPE_REGEXP.exec(queryString);
     if (chartTypeMatch === null) {
         return null;
@@ -128,7 +138,7 @@ const BUILTIN_COMPARISON_TYPES = ["Winner", "FastestTime", "FastestTimePlus5",
 * @sb-return {Object|null} Selected comparison type, or null if not
 *     recognised.
 */
-function readComparison(queryString: string, courseClassSet: CourseClassSet) {
+function readComparison(queryString: string, courseClassSet: CourseClassSet): boolean | null | {index: number, runner: Competitor} {
     const comparisonMatch = COMPARE_WITH_REGEXP.exec(queryString);
     if (comparisonMatch === null) {
         return null;
@@ -172,7 +182,7 @@ function readComparison(queryString: string, courseClassSet: CourseClassSet) {
 * @sb-param {Number} index - Index of the comparison type.
 * @sb-param {String} The formatted query-string.
 */
-function formatComparison(queryString: string, index: number, runner) {
+function formatComparison(queryString: string, index: number, runner): string {
     queryString = removeAll(queryString, COMPARE_WITH_REGEXP);
     let comparison = null;
     if (typeof index === typeof 0 && 0 <= index && index < BUILTIN_COMPARISON_TYPES.length) {
@@ -199,7 +209,7 @@ const SELECTED_COMPETITORS_REGEXP = /(?:^|&|\?)selected=([^&]+)/;
 * @sb-return {Array|null} Array of selected competitor indexes, or null if
 *     none found.
 */
-function readSelectedCompetitors(queryString: string, courseClassSet: CourseClassSet) {
+function readSelectedCompetitors(queryString: string, courseClassSet: CourseClassSet): Array<number> | null {
     if (courseClassSet === null) {
         return null;
     } else {
@@ -238,7 +248,7 @@ function readSelectedCompetitors(queryString: string, courseClassSet: CourseClas
 * @sb-return {String} Query-string with the selected competitors formatted
 *     into it.
 */
-function formatSelectedCompetitors(queryString, courseClassSet, selected) {
+function formatSelectedCompetitors(queryString: string, courseClassSet: CourseClassSet, selected: Array<number>) {
     queryString = removeAll(queryString, SELECTED_COMPETITORS_REGEXP);
     const selectedCompetitors = selected.map(function (index) { return courseClassSet.allCompetitors[index]; });
     if (selectedCompetitors.length === 0) {
@@ -264,7 +274,7 @@ const ALL_STATS_NAMES = ["TotalTime", "SplitTime", "BehindFastest", "TimeLoss"];
 * @sb-return {Object|null} - Object containing the statistics read, or null
 *     if no statistics parameter was found.
 */
-function readSelectedStatistics(queryString) {
+function readSelectedStatistics(queryString: string): any {
     const statsMatch = SELECTED_STATISTICS_REGEXP.exec(queryString);
     if (statsMatch === null) {
         return null;
@@ -293,7 +303,7 @@ function readSelectedStatistics(queryString) {
 * @sb-param {Object} stats - The statistics to format.
 * @sb-return Query-string with the selected statistics formatted in.
 */
-function formatSelectedStatistics(queryString, stats) {
+function formatSelectedStatistics(queryString: string, stats) {
     queryString = removeAll(queryString, SELECTED_STATISTICS_REGEXP);
     const statsNames = ALL_STATS_NAMES.filter(function (name) { return stats.hasOwnProperty(name) && stats[name]; });
     return queryString + "&stats=" + encodeURIComponent(statsNames.join(";"));
@@ -311,7 +321,7 @@ const SHOW_ORIGINAL_REGEXP = /(?:^|&|\?)showOriginal=([^&]*)/;
 * @sb-param {String} queryString - The query-string to read.
 * @sb-return {boolean} True to show original data, false not to.
 */
-function readShowOriginal(queryString) {
+function readShowOriginal(queryString: string): boolean {
     const showOriginalMatch = SHOW_ORIGINAL_REGEXP.exec(queryString);
     return (showOriginalMatch !== null && showOriginalMatch[1] === "1");
 }
@@ -323,7 +333,7 @@ function readShowOriginal(queryString) {
 * @sb-return {String} queryString - The query-string with the show-original
 *     data flag formatted in.
 */
-function formatShowOriginal(queryString, showOriginal) {
+function formatShowOriginal(queryString: string, showOriginal: boolean): string {
     queryString = removeAll(queryString, SHOW_ORIGINAL_REGEXP);
     return (showOriginal) ? queryString + "&showOriginal=1" : queryString;
 }
@@ -338,7 +348,7 @@ const FILTER_TEXT_REGEXP = /(?:^|&|\?)filterText=([^&]*)/;
 * @sb-param {String} queryString - The query-string to read.
 * @sb-return {String} The filter text read.
 */
-function readFilterText(queryString) {
+function readFilterText(queryString: string) {
     const filterTextMatch = FILTER_TEXT_REGEXP.exec(queryString);
     if (filterTextMatch === null) {
         return "";
@@ -353,7 +363,7 @@ function readFilterText(queryString) {
 * @sb-param {String} filterText - The filter text.
 * @sb-return {String} The query-string with the filter text formatted in.
 */
-function formatFilterText(queryString, filterText) {
+function formatFilterText(queryString: string, filterText: string): string {
     queryString = removeAll(queryString, FILTER_TEXT_REGEXP);
     return (filterText === "") ? queryString : queryString + "&filterText=" + encodeURIComponent(filterText);
 }
@@ -364,7 +374,7 @@ function formatFilterText(queryString, filterText) {
 * @sb-param {Event} eventData - The parsed event data.
 * @sb-return {Object} The data parsed from the given query string.
 */
-export function parseQueryString(queryString, eventData) {
+export function parseQueryString(queryString: string, eventData: Results): ResultsURLOptions {
     const courseClassSet = readSelectedClasses(queryString, eventData);
     const classIndexes = (courseClassSet === null) ? null :
         courseClassSet.classes.map(function (courseClass) { return eventData.classes.indexOf(courseClass); });
@@ -394,7 +404,7 @@ export function parseQueryString(queryString, eventData) {
 *     query-string.
 * @sb-return The formatted query-string.
 */
-export function formatQueryString(queryString, eventData, courseClassSet, data) {
+export function formatQueryString(queryString: string, eventData: Results, courseClassSet: CourseClassSet, data): string {
     queryString = formatSelectedClasses(queryString, eventData, data.classes);
     queryString = formatChartType(queryString, data.chartType);
     queryString = formatComparison(queryString, data.compareWith.index, data.compareWith.runner);

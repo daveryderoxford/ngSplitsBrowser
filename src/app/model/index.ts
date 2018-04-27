@@ -5,3 +5,5 @@ export { OEvent, EventDiscipline, EventDisciplines, EventGrade, EventGrades, Eve
        CourseSummary, SplitsFileInfo, SplitsFileFormat, EventType, EventTypes } from "./oevent";
 export { LogEntry, LogSeverity } from "./log-entry";
 export { UserData, UserResultData, UserInfo } from "./user";
+export { CompetitorSearchData } from "./competitor-search-data";
+

@@ -6,7 +6,7 @@
 
     <mat-autocomplete #autoCompletePanel="matAutocomplete">
       <mat-optgroup *ngFor="let group of filterPanelContents" [label]="group.name">
-        <mat-option *ngFor="let option of group.options" [value]="option" (optionSelected)="onOptionSelected(event)">
+        <mat-option *ngFor="let option of group.options" [value]="option" (optionSelected)="onOptionSelected(option)">
           {{ option.name }}
         </mat-option>
       </mat-optgroup>
