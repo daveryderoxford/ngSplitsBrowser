@@ -12,6 +12,7 @@ import { MessageDialogComponent } from './message-dialog.component';
     ],
     exports: [
         ConfirmDialogComponent,
+        MessageDialogComponent,
     ],
     declarations: [
         ConfirmDialogComponent,
@@ -22,6 +23,7 @@ import { MessageDialogComponent } from './message-dialog.component';
     ],
     entryComponents: [
         ConfirmDialogComponent,
+        MessageDialogComponent,
     ],
 })
 export class DialogsModule { }

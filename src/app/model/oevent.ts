@@ -26,6 +26,8 @@ export class EventTypes {
     static types: Array<EventType> = ["Foot", "Bike" , "Ski" , "Trail" , "Other" ];
 }
 
+export type ControlCardType = "SI" | "Emit" | "Other";
+
 export type SplitsFileFormat = "auto" | "IOFv3" |  "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML" ;
 
 export interface OEvent extends EventInfo {
@@ -48,6 +50,7 @@ export interface EventInfo {
      discipline: EventDiscipline;
      webpage: string;
      email: string;
+     punchingType: ControlCardType;
 }
 
 export interface SplitsFileInfo {

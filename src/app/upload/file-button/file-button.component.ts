@@ -14,7 +14,7 @@ import { Component, Output, EventEmitter, ViewChild, ElementRef, Input } from "@
 
 export class FileButtonComponent {
   @Input() accept: string;
-  @Input() multiple: boolean;
+  @Input() multiple = false;
   @Input() label = "Select file";
   @Output() onFileSelect = new EventEmitter<File[]>();
 
@@ -24,12 +24,12 @@ export class FileButtonComponent {
 
   get fileCount(): number { return this._files && this._files.length || 0; }
 
-  onNativeInputFileSelect($event) {
+  private onNativeInputFileSelect($event) {
     this._files = $event.srcElement.files;
     this.onFileSelect.emit(this._files);
   }
 
-  selectFile() {
+  private selectFile() {
     this.nativeInputFile.nativeElement.click();
   }
 }

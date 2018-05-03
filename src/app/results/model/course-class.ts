@@ -37,7 +37,7 @@ export class CourseClass {
     */
     public recordHasDubiousData(): void {
         this.hasDubiousData = true;
-    };
+    }
 
     /**
     * Determines the time losses for the competitors in this course-class.
@@ -51,7 +51,7 @@ export class CourseClass {
         this.competitors.forEach( (comp) => {
             comp.determineTimeLosses(fastestSplitTimes);
         });
-    };
+    }
 
     /**
     * Returns whether this course-class is empty, i.e. has no competitors.
@@ -59,7 +59,7 @@ export class CourseClass {
     */
     public isEmpty(): boolean {
         return (this.competitors.length === 0);
-    };
+    }
 
     /**
     * Sets the course that this course-class belongs to.
@@ -67,7 +67,7 @@ export class CourseClass {
     */
     public setCourse(course: Course) {
         this.course = course;
-    };
+    }
 
     /**
     * Returns the fastest split time recorded by competitors in this class.  If
@@ -96,7 +96,7 @@ export class CourseClass {
 
         // @ts-ignore  fastestCompetitor must be set of fastest splt was found
         return (fastestSplit === null) ? null : { split: fastestSplit, name: fastestCompetitor.name };
-    };
+    }
 
     /**
     * Returns all competitors that visited the control in the given time
@@ -129,6 +129,6 @@ export class CourseClass {
         });
 
         return matchingCompetitors;
-    };
+    }
 
 }

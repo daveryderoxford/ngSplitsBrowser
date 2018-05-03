@@ -2,7 +2,7 @@
 export interface CompetitorSearchData {
     key: string;   // Formed from Event and ecard.
     eventKey: string;
-    ecard: string;
+    ecardId: string;
     first: string;
     surname: string;
     club: string;

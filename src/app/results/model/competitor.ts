@@ -103,7 +103,7 @@ export class Competitor {
     courseClass: CourseClass | null = null;
     yearOfBirth: number | null = null;
     gender: Genre | null = null; // "M" or "F" for male or female.
-    ecard: string | null = null;
+    ecardId: string | null = null;
     route: string | null = null;
     nationalID: string | null = null;
 
@@ -229,9 +229,21 @@ export class Competitor {
         this.totalTime = (originalCumTimes === null || originalCumTimes.indexOf(null) > -1) ? null : originalCumTimes[originalCumTimes.length - 1];
     }
 
+
+    /** Returns a key to uniquly identify a competitor
+     * This is the ecardId if present or class and position concateranted if not
+     */
+    get key(): string {
+        if (this.ecardId) {
+            return this.ecardId;
+        } else {
+            return this.courseClass.name + '-' + this.order.toString();
+        }
+    }
+
     /** Full name of competitor (readonly) */
     get name() {
-        return( (this.firstname + " " + this.surname).trim() );
+        return ((this.firstname + " " + this.surname).trim());
     }
 
     /**
@@ -438,7 +450,7 @@ export class Competitor {
     * @sb-param {Number} controlIndex - Index of the control.
     * @sb-return {?Number} Time loss in seconds, or null.
     */
-    public getTimeLossAt(controlIndex: number): number| null {
+    public getTimeLossAt(controlIndex: number): number | null {
         return (controlIndex === 0 || this.timeLosses === null) ? null : this.timeLosses[controlIndex - 1];
     }
 

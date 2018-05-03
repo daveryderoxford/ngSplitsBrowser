@@ -39,6 +39,7 @@ export class EventAdminComponent implements OnInit {
         await this.eventAdmin.uploadResults(this.selectedEvent, splitsFile);
       } catch (err) {
         console.log("EventAdminComponnet: Error uploading splits" + err);
+        this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);
       }
     }
   }

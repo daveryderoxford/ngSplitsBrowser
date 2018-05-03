@@ -100,10 +100,11 @@ class EventDataSource extends DataSource<any> {
 
   //  const query = this.db.list<OEvent>("/events",
     const query = this.afs.collection<OEvent>("/events",
-      res => res.orderBy("date", "desc")
+      res => res.where("splits.valid", "==", true)
+                .orderBy("date", "desc")
                 .orderBy("name")
-                .startAfter(startAt)
                 .limit(pageSize));
+
 
     const obs: Observable<OEvent[]> = query.valueChanges();
 

@@ -7,7 +7,6 @@ import { OEvent } from "app/model/oevent";
 import { HttpClient } from "@angular/common/http";
 import { parseEventData } from "./import";
 
-
 /** Holds results selection state.
  * Selecting an event will load its results
  * This include seelcted event, results, courses, classes and controls.
@@ -24,15 +23,15 @@ export class ResultsSelectionService {
   private selectedClasses$: BehaviorSubject<Array<CourseClass>> = new BehaviorSubject([]);
 
   constructor(private afs: AngularFirestore,
-            private storage: AngularFireStorage,
-            private http: HttpClient
-  ) {}
+    private storage: AngularFireStorage,
+    private http: HttpClient
+  ) { }
 
   /**
    * Selects an event to view.
    * This will load results for the event
    */
-   setSelectedEvent(event: OEvent): Observable<void> {
+  setSelectedEvent(event: OEvent): Observable<void> {
     this.event$.next(event);
 
     /// Read the results if they are not avalaible
@@ -47,7 +46,7 @@ export class ResultsSelectionService {
         this.selectedClasses$.next(null);
       });
 
-      return ret;
+    return ret;
   }
 
   get selectedResults(): Observable<Results> {
@@ -128,7 +127,7 @@ export class ResultsSelectionService {
   async setSelectedEventByKey(key: string): Promise<void> {
     const event = this.event$.getValue();
     if (!event || event.key !== key) {
-      const obs  = this.afs.doc<OEvent>("/events/" + key).valueChanges().switchMap( (evt) => {
+      const obs = this.afs.doc<OEvent>("/events/" + key).valueChanges().switchMap((evt) => {
         return this.setSelectedEvent(evt);
       });
       return obs.toPromise();
@@ -136,18 +135,20 @@ export class ResultsSelectionService {
 
   }
 
-  /** Get obserbavle for selected Event */
-  getEventObservable(): Observable<OEvent> {
+  /** Get observable for selected Event */
+  get selectedEvent(): Observable<OEvent> {
     return (this.event$.asObservable());
   }
 
-  /** Downloads  */
+  /** Downloads results for an event from google storage */
   private downloadResultsFile(event: OEvent): Observable<string> {
     const path = event.splits.splitsFilename;
 
-    return this.storage.ref(path).getDownloadURL()
-      .switchMap((url) => {
-        return this.http.get<string>(url);
+    const obs = this.storage.ref(path).getDownloadURL()
+      .switchMap(url => {
+        return this.http.get(url, { responseType: 'text' });
       });
+
+    return obs;
   }
 }

@@ -30,9 +30,9 @@ export class CompetitorSelection {
     * @sb-param {Number} index - The index of the competitor.
     * @sb-returns {boolean} True if the competitor is selected, false if not.
     */
-  /*  public isSelected(index: number): boolean {
+    public isSelected(index: number): boolean {
         return this.currentIndexes.indexOf(index) > -1;
-    };
+    }
 
     /**
     * Returns whether the selection consists of exactly one competitor.

@@ -804,8 +804,8 @@ fdescribe("Competitor", () => {
     });
     it("Can set competitor ecard to a number", () => {
         const competitor = fromCumTimes(1, { firstname: "John", surname: "Smith" }, "ABC", 10 * 3600, [0, 188]);
-        competitor.ecard = "1234567";
-        expect(competitor.ecard).toEqual("1234567");
+        competitor.ecardId = "1234567";
+        expect(competitor.ecardId).toEqual("1234567");
     });
 });
 

@@ -1,7 +1,6 @@
 <div class="container">
 
-  <button class="flex-item" mat-button (onClick)="displayEvents()">< EVENTS</button>
-
+  <mat-icon class="flex-item" (onClick)="displayEvents()">arrow_back</mat-icon>
 
   <mat-button-toggle-group #group="matButtonToggleGroup" class="toggle, flex-item">
     <mat-button-toggle class="toggelebutton" value="splits">
@@ -17,12 +16,6 @@
       More <mat-icon>arrow_drop_down</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>
-
-  <button mat-button> Splits </button>
-  <button mat-raised-button> Race </button>
-  <button mat-button> Table </button>
-  <button mat-button> More <mat-icon>arrow_drop_down</mat-icon></button>
-
 
 
   <app-results-search> </app-results-search>

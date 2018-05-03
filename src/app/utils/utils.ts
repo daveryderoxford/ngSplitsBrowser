@@ -1,7 +1,7 @@
-/** Async function to load a file from disk returning text string containing file contents */
 
 export class Utils {
 
+    /** Async function to load a file from disk returning text string containing file contents */
     static async loadTextFile(file: File): Promise<string> {
 
         return new Promise<string>((resolve, reject) => {
@@ -26,6 +26,13 @@ export class Utils {
             str = str + "-";
         }
         return str;
+    }
+
+    /** Remove duplicate items from an array */
+    static removeDuplicates<T>(array: Array<T>): Array<T> {
+        return array.filter((result, index) => {
+            return array.indexOf(result) === index;
+        });
     }
 
     static decreasingTimeIndex(dateStr: string): string {

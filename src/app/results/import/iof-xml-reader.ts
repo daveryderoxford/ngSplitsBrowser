@@ -209,7 +209,7 @@ function parseCompetitor(element, number: number, reader, warnings: Array<string
 
     const competitor = Competitor.fromOriginalCumTimes(number, name, club, startTime, cumTimes, );
 
-    competitor.ecard = ecard;
+    competitor.ecardId = ecard;
     competitor.route = route;
 
     if (yearOfBirth !== null) {

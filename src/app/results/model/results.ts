@@ -7,7 +7,7 @@ import { sbTime } from "./time";
 
 export class Results {
 
-    allCompetitors: Array<Competitor> = null;
+    private allCompetitorsList: Array<Competitor>;
 
     warnings: Array<string> = [];
 
@@ -26,6 +26,17 @@ export class Results {
         if (warnings) {
             this.warnings = warnings;
         }
+    }
+
+    get allCompetitors(): Array<Competitor> {
+        if (!this.allCompetitorsList) {
+
+            this.allCompetitorsList = [];
+            this.classes.forEach((courseClass) => {
+                this.allCompetitorsList = this.allCompetitorsList.concat(courseClass.competitors);
+            });
+        }
+        return this.allCompetitorsList;
     }
 
     /**
@@ -124,16 +135,16 @@ export class Results {
         return courses.map((course) => { return { course: course, nextControls: course.getNextControls(controlCode) }; });
     }
 
-    /** Search for a competior in the results .
+    public findByKey(key: string): Competitor {
+        return this.allCompetitors.find( comp => (key === comp.key) );
+    }
+
+    /** Search for a competior in the results.
      *  Matches on firstname, surname or club (case independent)
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
      */
     public findCompetitors(searchstring: string): Array<Competitor> {
         const twochars = searchstring.length > 2;
-
-        if (this.allCompetitors === null) {
-            this.populateAllCompetitors();
-        }
 
         const ss = searchstring.toLocaleLowerCase();
 
@@ -156,12 +167,6 @@ export class Results {
         return (found);
     }
 
-    private populateAllCompetitors() {
-        this.allCompetitors = [];
-        this.classes.forEach((courseClass) => {
-            this.allCompetitors = this.allCompetitors.concat(courseClass.competitors);
-        });
-    }
 
     /** Search for a course class matching on name.
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
