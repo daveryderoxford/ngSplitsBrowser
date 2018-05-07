@@ -212,7 +212,7 @@ fdescribe("Results", () => {
 
     }
 
-    it("Search for  surname with more than 2 characters", () => {
+    it("Search for  surname with more than 1 characters", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("ArD");
         expect(res[0].ecardId).toEqual("3");
@@ -220,13 +220,13 @@ fdescribe("Results", () => {
         expect(res.length).toBe(2);
     });
 
-    it("Search by surname with 2 characters", () => {
+    it("Search by surname with 1 characters", () => {
         const results = makeSearchData();
-        const res = results.findCompetitors("aR");
+        const res = results.findCompetitors("a");
         expect(res.length).toBe(0, "Should be no exact match found for 2 characters");
     });
 
-    it("Search by firstname with >3 characters", () => {
+    it("Search by firstname with >1 characters", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("FreD");
         expect(res[0].ecardId).toEqual("1", "match on first name");
@@ -238,6 +238,12 @@ fdescribe("Results", () => {
         const res = results.findCompetitors("Sn");
         expect(res[0].ecardId).toEqual("4", "match on first name");
         expect(res.length).toBe(1, "Exact match on SN");
+    });
+
+    it('Search for "" should not return any results', () => {
+        const results = makeSearchData();
+        const res = results.findCompetitors("");
+        expect(res.length).toBe(0, 'Expect search on "" not to return any results');
     });
 
     it("Search by club with 2 characters - non excat match", () => {

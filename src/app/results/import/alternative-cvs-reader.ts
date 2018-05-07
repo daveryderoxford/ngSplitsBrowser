@@ -1,4 +1,4 @@
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { Results, Course, CourseClass, Competitor, TimeUtilities, WrongFileFormat } from "../model";
 
@@ -17,7 +17,7 @@ interface ColumnFormat {
     placing;
     finishTime;
     allowMultipleCompetitorNames;
-};
+}
 
 // tslint:disable:max-line-length
 

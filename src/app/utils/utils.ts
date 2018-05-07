@@ -40,11 +40,11 @@ export class Utils {
         const d2 = new Date(dateStr).getTime() / 1000;
         const minusDate = d1 - d2;
 
-        const str = Utils.padRight(minusDate.toString(), 15)
+        const str = Utils.padRight(minusDate.toString(), 15);
         return (str);
     }
 
-    static encodeAsFirebaseKey(string) {
+    static encodeAsKey(string) {
         return string.replace(/\%/g, "%25")
             .replace(/\./g, "%2E")
             .replace(/\#/g, "%23")
@@ -52,16 +52,6 @@ export class Utils {
             .replace(/\//g, "%2F")
             .replace(/\[/g, "%5B")
             .replace(/\]/g, "%5D");
-    };
-
-    static getClubIndex(club: string, nationality: string): string {
-        return (Utils.padRight(club.toLowerCase(), 10) + Utils.padRight(nationality, 3));
-    }
-
-    static getClubKey(club: string, nationality: string): string {
-        let key = Utils.getClubIndex(club, nationality);
-        key = Utils.encodeAsFirebaseKey(key);
-        return (key);
     }
 }
 

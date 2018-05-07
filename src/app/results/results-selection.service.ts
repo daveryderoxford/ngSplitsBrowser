@@ -43,7 +43,7 @@ export class ResultsSelectionService {
         this.selectedCompetitors$.next([]);
         this.selectedControl$.next(null);
         this.selectedCourse$.next(null);
-        this.selectedClasses$.next(null);
+        this.selectedClasses$.next([]);
       });
 
     return ret;

@@ -1,6 +1,6 @@
 // file language-selector.js
 
-import d3 = require("d3");
+import * as d3 from "d3";
 import * as $ from "jquery";
 
 import { Lang } from "./lang";

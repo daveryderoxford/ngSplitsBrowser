@@ -1,6 +1,6 @@
 
 import * as $ from "jquery";
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { FirstnameSurname } from "app/results/model/competitor";
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";

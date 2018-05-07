@@ -1,10 +1,9 @@
+import * as d3 from "d3";
 import * as $ from "jquery";
+import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
 import { isNaNStrict, isNotNull } from "./util";
-import d3 = require("d3");
-import { CourseClass } from "./course-class";
-
 
 export type Genre = "M" | "F";
 

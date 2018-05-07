@@ -146,7 +146,7 @@ it("should delate the datbase entry and file when the event is deleted", inject(
   await eventAdmin.uploadResults(eventresult, file);
 
   await eventAdmin.delete(eventresult);
-   
+
 }));
 
 

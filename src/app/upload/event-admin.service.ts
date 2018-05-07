@@ -2,37 +2,52 @@ import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore } from "angularfire2/firestore";
 import { AngularFireStorage } from "angularfire2/storage";
-import { CompetitorSearchData } from "app/model";
-import { EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat, CourseSummary } from "app/model/oevent";
+import { Club, CompetitorSearchData } from "app/model";
+import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/model/oevent";
+import { ECard } from "app/model/user";
 import { parseEventData } from "app/results/import";
 import { Competitor } from "app/results/model";
 import { Results } from "app/results/model/results";
-import { Observable } from "rxjs/Observable";
 import { Utils } from "app/utils/utils";
+import { firestore } from "firebase";
+import { Observable } from "rxjs/Observable";
 
 type PartialEvent = Partial<OEvent>;
 
 @Injectable()
 export class EventAdminService {
 
+  private clubManger: ClubListManager;
+
   constructor(private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
-    private storage: AngularFireStorage) { }
+    private storage: AngularFireStorage) {
+    this.clubManger = new ClubListManager(afs);
+  }
+
+  /** Get observable for event key */
+  getEvent(key: string): Observable<OEvent> {
+    return this.afs.doc<OEvent>('/events/' + key).valueChanges();
+  }
 
   /** Create new event specifying event info */
   async saveNew(eventInfo: EventInfo): Promise<string> {
     const event = <OEvent>eventInfo;
 
-    // Reformat the date to an ISO date.  I should not need ot do this.
+    // Reformat the date to an ISO date.  I should not need to do this.
     event.date = new Date(event.date).toISOString();
     event.user = this.afAuth.auth.currentUser.uid;
     event.key = this.afs.createId();
-
     this.setIndexProperties(event);
 
     console.log("EventService:  Adding Event " + JSON.stringify(event));
 
-    await this.afs.doc<OEvent>("/events/" + event.key).set(event);
+    // Update club list and event in a transaction
+    this.afs.firestore.runTransaction(async (trans) => {
+      await this.clubManger.eventAdded(event, trans);
+      const ref = this.afs.firestore.doc("/events/" + event.key);
+      trans.set(ref, event);
+    });
 
     console.log("EventService:  Event added");
 
@@ -42,7 +57,6 @@ export class EventAdminService {
 
   /** Update the event info for an event */
   async updateEventInfo(key: string, eventInfo: EventInfo): Promise<void> {
-    const event = <OEvent>eventInfo;
 
     console.log("EventService: Updating key " + key);
 
@@ -51,52 +65,59 @@ export class EventAdminService {
 
     this.setIndexProperties(update);
 
-    await eventsDoc.update(update);
+    // Update club list and event in a transaction
+    this.afs.firestore.runTransaction(async (trans) => {
+      await this.clubManger.eventChanged(key, eventInfo, trans);
+      const ref = this.afs.firestore.doc("/events/" + key);
+      trans.update(ref, update);
+    });
+
     console.log("EventService:  Event updated " + key);
   }
 
-  getEvent(key: string): Observable<OEvent> {
-     return this.afs.doc<OEvent>('/events/' + key).valueChanges();
-  }
-
-  /** Sets index propeties on a patrial even object  */
+  /** Sets index propeties on a partial even object  */
   private setIndexProperties(partialEvent: PartialEvent) {
     partialEvent.yearIndex = new Date(partialEvent.date).getFullYear();
     partialEvent.gradeIndex = EventGrades.indexObject(partialEvent.grade);
   }
 
+  /** Delete an event.  Deleting all event data  */
+  async delete(event: OEvent): Promise<void> {
 
-  async delete(oevent: OEvent) {
-
-    // Get competitors to be deleted before starting transaction
-    const exisitngCompetitors = await this.getExistingCompetitors(oevent);
-
-    // delete the database objects in a transaction
     const fs = this.afs.firestore;
+
+    /* Delete any existing results for the event in the database in a batch.
+       useing a btach to make it performant but does not */
+    try {
+      const batch = new LargeBatch(this.afs);
+      await this.deleteEventResultsFromDB(event, fs, batch);
+      await batch.commit();
+    } catch (err) {
+      console.log('Error perfoming batch deletion');
+      throw err;
+    }
+
+    // Deete event and update club reference in a transaction
     fs.runTransaction(async (trans) => {
-
-      // Delete any existing results for the event in the database
-      for (const existing of exisitngCompetitors) {
-        const ref = fs.doc("/results/" + existing.key);
-        await trans.delete(ref);
-      }
-
-      /// delete the event
-      const eventRef = fs.doc("/events/" + oevent.key);
+      await this.clubManger.eventDeleted(event, trans);
+      const eventRef = this.afs.firestore.doc("/events/" + event.key);
       await trans.delete(eventRef);
     });
 
-    // Finally delete results file
-    if (oevent.splits) {
-      await this.storage.ref(oevent.splits.splitsFilename).delete();
+    // Finally delete results file from Google storage
+    if (event.splits) {
+      await this.storage.ref(event.splits.splitsFilename).delete();
     }
   }
 
-  /** Loads results from a file */
-  private async loadResults(oevent: OEvent, file: File): Promise<Results> {
-    const text = await this.loadTextFile(file);
-    const results = this.parseSplits(text);
-    return results;
+  private async deleteEventResultsFromDB(event: OEvent, fs: firestore.Firestore, batch: LargeBatch) {
+
+    const exisitngCompetitors = await this.getExistingCompetitors(event);
+
+    for (const existing of exisitngCompetitors) {
+      const ref = fs.doc("/results/" + existing.key);
+      await batch.delete(ref);
+    }
   }
 
   /** Async functiom to upload results for an event to the database from a
@@ -109,64 +130,72 @@ export class EventAdminService {
    *  - competitor index lookup
    *  - club index lookup
   */
-  async uploadResults(oevent: OEvent, file: File, fileFormat: SplitsFileFormat = "auto") {
+  async uploadResults(event: OEvent, file: File, fileFormat: SplitsFileFormat = "auto") {
 
     const text = await this.loadTextFile(file);
 
     const results = this.parseSplits(text);
 
-    oevent.summary = this.populateSummary(results);
+    event.summary = this.populateSummary(results);
 
-    // Save file to users area on google clould storage
+    // Save file to users area on Google Clould  Storage
     const uid = this.afAuth.auth.currentUser.uid;
-    const path = "results/" + uid + "/" + oevent.key + "-results";
+    const path = "results/" + uid + "/" + event.key + "-results";
     await this.uploadToGoogle(text, path);
 
     // Update event object with stored file location
-    oevent.splits = {
+    event.splits = {
       splitsFilename: path,
       splitsFileFormat: fileFormat,
       valid: true
     };
 
     const query = this.afs.collection<OEvent>("/events", ref => {
-      return ref.orderBy("date", "desc").where("user", "==", this.afAuth.auth.currentUser.uid);
+      return ref.orderBy("date", "desc")
+        .where("user", "==", this.afAuth.auth.currentUser.uid);
     });
-    // Query existing competotirs to be deleted.
-    // As we must do reads before any writes in the transaction this must be done up front
-    const exisitngCompetitors = await this.getExistingCompetitors(oevent);
-    exisitngCompetitors.forEach( (comp => console.log(comp.surname + '\n') ));
 
-    // Update event information (file details and summary) and results database enteries in a transaction
     const fs = this.afs.firestore;
-    fs.runTransaction(async (trans) => {
-      const eventRef = fs.doc("/events/" + oevent.key);
-      await trans.set(eventRef, oevent);
 
-      // Delete any existing results for the event in the database
-      for (const existing of exisitngCompetitors) {
-        const ref = fs.doc("/results/" + existing.key);
-        await trans.delete(ref);
-      }
+    /* Update competitors in Firestore database.
+       Existing competitors are elteted and new ones  added in a batch */
+    const batch = new LargeBatch(this.afs);
+    try {
+      await this.deleteEventResultsFromDB(event, fs, batch);
 
       // Save new results for the event in the database
       for (const comp of results.allCompetitors) {
-        const compSearchData = this.createCompetitorSearchData(oevent, comp);
-
-        const compRef = fs.doc("/results/" + compSearchData.key);
-        await trans.set(compRef, compSearchData);
-
+        const compDBData = this.createCompetitorSearchData(event, comp);
+        const compRef = fs.doc("/results/" + compDBData.key);
+        await batch.set(compRef, compDBData);
       }
+      await batch.commit();
+    } catch (err) {
+      console.log('Error updating ');
+      throw err;
+    }
 
-    });
+    // seve event details
+    await fs.doc("/events/" + event.key).set(event);
 
     console.log("EventAdminService: Results file uploaded " + file + "  to" + path);
 
   }
 
-  private async getExistingCompetitors(oevent: OEvent): Promise<CompetitorSearchData[]> {
+  /** Gets events owned by the user */
+  getUserEvents(): Observable<OEvent[]> {
+
+    const query = this.afs.collection<OEvent>("/events", ref => {
+      return ref.orderBy("date", "desc")
+        .where("user", "==", this.afAuth.auth.currentUser.uid);
+    });
+
+    return query.valueChanges();
+  }
+
+  private async getExistingCompetitors(event: OEvent): Promise<CompetitorSearchData[]> {
     const promise = this.afs.collection<CompetitorSearchData>("/results", ref => {
-      return ref.where("eventKey", "==", oevent.key);
+      return ref.where("eventKey", "==", event.key);
     }).valueChanges().first().toPromise();
 
     return promise;
@@ -251,23 +280,11 @@ export class EventAdminService {
     return (summary);
   }
 
-  /** Gets events owned by the user */
-  getUserEvents(): Observable<OEvent[]> {
-
-    const query = this.afs.collection<OEvent>("/events", ref => {
-      return ref.orderBy("date", "desc")
-        .where("user", "==", this.afAuth.auth.currentUser.uid);
-    });
-
-    return query.valueChanges();
-
-  }
-
   /** Save the competitor search recored */
-  private createCompetitorSearchData(oevent: OEvent, comp: Competitor): CompetitorSearchData {
+  private createCompetitorSearchData(event: OEvent, comp: Competitor): CompetitorSearchData {
     return {
-      key: oevent.key + '-' + comp.key,
-      eventKey: oevent.key,
+      key: event.key + '-' + comp.key,
+      eventKey: event.key,
       ecardId: comp.ecardId,
       first: comp.firstname,
       surname: comp.surname,
@@ -289,7 +306,7 @@ export class EventAdminService {
         .where("club", "==", firstname);
     }).valueChanges();
 
-    // Merge resukts ofthe two queries and remove duplicates
+    // Merge results of the two queries and remove duplicates
     const merged = Observable.merge(query1, query2).map(results => {
       return Utils.removeDuplicates(results);
     });
@@ -298,13 +315,167 @@ export class EventAdminService {
   }
 
   /** Search for results where any ecard matches */
-  searchResultsByECard(ecards: Array<string>): Observable<CompetitorSearchData[]> {
+  searchResultsByECard(ecards: Array<ECard>): Observable<CompetitorSearchData[]> {
     // Search each of the users ecard numbers defined in ecard object
-    const query = this.afs.collection<CompetitorSearchData>("/results", ref => {
-      return ref.where("ecard", "==", ecards[0])
-        .where("ecard", "==", ecards[1]);
-    });
+    const queryresults: Array<Observable<CompetitorSearchData[]>> = [];
 
-    return query.valueChanges();
+    for (const card of ecards) {
+      const query = this.afs.collection<CompetitorSearchData>("/results", ref => {
+        return ref.where("ecard", "==", card.id)
+          .orderBy('date', 'desc');
+      }).valueChanges();
+
+      queryresults.push(query);
+    }
+
+    const merged = Observable.merge(queryresults[0]).map(results => {
+      return Utils.removeDuplicates(results);
+    });
+    return merged;
+  }
+}
+
+class ClubListManager {
+
+  constructor(private afs: AngularFirestore) { }
+
+  /** Call in transaction before an event is deleetd to decerment its reference count  */
+  public async eventDeleted(event: OEvent, trans: firestore.Transaction): Promise<void> {
+    const club = await this.readClub(event, trans);
+    return await this.removeClubReference(event, club, trans);
+  }
+
+  /** Call in transaction when an event is changed to manage club list  */
+  public async eventChanged(key: string, written: EventInfo,
+    trans: firestore.Transaction) {
+
+    const previous = await this.readEvent(key);
+
+    if ((written.club !== previous.club) ||
+      (written.nationality !== previous.nationality)) {
+
+      // In transaction, Reads must be before any writes
+      const writtenClub = await this.readClub(written, trans);
+      const previousClub = await this.readClub(previous, trans);
+      await this.removeClubReference(previous, previousClub, trans);
+      await this.addClubReference(written, writtenClub, trans);
+    }
+  }
+
+  /** Call in transaction before an event is added to craete club s required and increamrnt its reference count */
+  public async eventAdded(event: OEvent, trans) {
+    const club = await this.readClub(event, trans);
+    await this.addClubReference(event, club, trans);
+  }
+
+  /** Get key string for a club comprised to nationality code and club name concaternated. */
+  private getClubKey(event: EventInfo) {
+    const key = event.nationality + '-' + event.club;
+    return Utils.encodeAsKey(key);
+  }
+
+  /** Read club object in a transaction */
+  private async readClub(event: EventInfo, trans: firestore.Transaction): Promise<Club | undefined> {
+    const ref = this.afs.firestore.doc('/clubs/' + this.getClubKey(event));
+    const snapahot = await trans.get(ref);
+    if (snapahot.exists) {
+      return snapahot.data() as Club;
+    } else {
+      return undefined;
+    }
+  }
+
+  /** Read event object - Not part of the transaction  */
+  private async readEvent(key: string): Promise<OEvent | undefined> {
+    return this.afs.doc<OEvent>('/events/' + key).valueChanges().first().toPromise();
+  }
+
+  /** Add a reference to a club in a transaction, creating club if required */
+  private async addClubReference(eventInfo: EventInfo,
+    club: Club,
+    trans: firestore.Transaction): Promise<void> {
+
+    if (!club) {
+      club = {
+        key: this.getClubKey(eventInfo),
+        name: eventInfo.club,
+        nationality: eventInfo.nationality,
+        numEvents: 0
+      };
+      console.log("Creating new club " + club.name + "  " + club.nationality);
+    }
+
+    club.numEvents = club.numEvents + 1;
+
+    const clubRef = this.afs.firestore.doc('/clubs/' + club.key);
+    trans.set(clubRef, club);
+
+    console.log("Added club reference " + club.name + "  " + club.nationality + " Num events " + club.numEvents);
+  }
+
+  /** Remove a club reference in a transaction deleting the club if required */
+  private async  removeClubReference(event, club: Club, trans: firestore.Transaction): Promise<void> {
+
+    if (!club) {
+      console.log("ERROR Removing reference to a club not found  Name:" + event.club);
+      return;
+    }
+
+    const clubRef = this.afs.firestore.doc('/clubs/' + club.key);
+
+    club.numEvents = club.numEvents - 1;
+    if (club.numEvents < 1) {
+      trans.delete(clubRef);
+    } else {
+      trans.set(clubRef, club);
+    }
+
+    console.log("Removed club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents);
+  }
+}
+
+/** Class to perform Firestore batchs iof more than 500 operations.
+ * The batch is committed and a new batch created each 500 operations.
+ * Note it does nto support collback of committed batches
+*/
+class LargeBatch {
+  batch: firestore.WriteBatch;
+  count = 0;
+  MAX_BATCH_OPERATIONS = 500;
+
+  constructor(private afs: AngularFirestore) {
+    this.batch = afs.firestore.batch();
+  }
+
+  /** Add set operstion to a batch */
+  async set(ref: firestore.DocumentReference, data: firestore.DocumentData, options?: firestore.SetOptions): Promise<void> {
+    await this.checkBatch();
+    this.batch.set(ref, data, options);
+  }
+
+  /** Add update operation ot a batch, */
+  async update(ref: firestore.DocumentReference, data: any): Promise<void> {
+    await this.checkBatch();
+    this.batch.update(ref, data);
+  }
+
+  /** Add delete operation to a batch */
+  async delete(ref: firestore.DocumentReference): Promise<void> {
+    await this.checkBatch();
+    this.batch.delete(ref);
+  }
+
+  /** commit a lrage batch */
+  async commit(): Promise<void> {
+    await this.batch.commit();
+  }
+
+  private async checkBatch() {
+    this.count = this.count + 1;
+    if (this.count === this.MAX_BATCH_OPERATIONS) {
+      await this.batch.commit();
+      this.batch = this.afs.firestore.batch();
+      this.count = 0;
+    }
   }
 }

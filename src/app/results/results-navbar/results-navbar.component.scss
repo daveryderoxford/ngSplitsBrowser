@@ -18,7 +18,11 @@
 }
 
 .flex-item {
-  margin:5px
+  margin-right:10px
+}
+
+.align-baseline {
+  align-self: flex-end;
 }
 
 .container {

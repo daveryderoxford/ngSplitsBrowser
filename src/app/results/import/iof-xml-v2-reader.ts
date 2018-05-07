@@ -1,6 +1,6 @@
 
 import * as $ from "jquery";
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { isUndefined } from "util";
 import { InvalidData, TimeUtilities, WrongFileFormat } from "../model";
@@ -139,7 +139,7 @@ export class Version2Reader implements IOFXMLReader {
     */
     readClubName(element) {
         return $("> Club > ShortName", element).text();
-    };
+    }
 
     /**
     * Returns the competitor's date of birth, as a string.
@@ -162,7 +162,7 @@ export class Version2Reader implements IOFXMLReader {
         const startTimeStr = $("> StartTime > Clock", resultElement).text();
         const startTime = (startTimeStr === "") ? null : TimeUtilities.parseTime(startTimeStr);
         return startTime;
-    };
+    }
 
     /**
     * Reads a competitor's total time from the given Result element.
@@ -175,7 +175,7 @@ export class Version2Reader implements IOFXMLReader {
         const totalTimeStr = $("> Time", resultElement).text();
         const totalTime = (totalTimeStr === "") ? null : TimeUtilities.parseTime(totalTimeStr);
         return totalTime;
-    };
+    }
 
     /**
     * Read a competitor's route or null if not avalaible
