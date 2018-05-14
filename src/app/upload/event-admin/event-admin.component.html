@@ -17,7 +17,7 @@
 
           <div *ngFor="let event of events | async" (click)="eventClicked(event)">
             <mat-list-item>
-              <h2 matLine> {{ event.eventdate | date }} {{ event.name }} </h2>
+              <h2 matLine> {{ event.date | date }} {{ event.name }} </h2>
               <p matLine>
                 <span>  {{event.nationality}}  {{event.club}} </span>
               </p>

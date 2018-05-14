@@ -400,12 +400,15 @@ class ClubListManager {
         key: this.getClubKey(eventInfo),
         name: eventInfo.club,
         nationality: eventInfo.nationality,
-        numEvents: 0
+        numEvents: 0,
+        lastEvent: eventInfo.date,
       };
       console.log("Creating new club " + club.name + "  " + club.nationality);
     }
 
     club.numEvents = club.numEvents + 1;
+    club.lastEvent = eventInfo.date;
+
 
     const clubRef = this.afs.firestore.doc('/clubs/' + club.key);
     trans.set(clubRef, club);

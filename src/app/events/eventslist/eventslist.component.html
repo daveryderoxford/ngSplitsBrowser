@@ -1,100 +1,142 @@
 <app-navbar></app-navbar>
 
-<div class="example-container mat-elevation-z8">
+<div class="main-container">
 
   <mat-tab-group dynamicHeight>
-    <mat-tab label="All">
+    <mat-tab label="ALL">
+      <div class="background">
+        <div class="data-container mat-elevation-z2">
+          <table mat-table #table [dataSource]="dataSource">
 
-      <mat-table [dataSource]="dataSource">
+            <!-- Date Definition -->
+            <ng-container matColumnDef="date">
+              <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.date | date }} </mat-cell>
+            </ng-container>
 
-        <!-- Date Definition -->
-        <ng-container matColumnDef="date">
-          <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{row.date | date }} </mat-cell>
-        </ng-container>
+            <!-- Age Definition -->
+            <ng-container matColumnDef="name">
+              <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+              <mat-cell *matCellDef="let row"> {{row.name}} </mat-cell>
+            </ng-container>
 
-        <!-- Age Definition -->
-        <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-          <mat-cell *matCellDef="let row"> {{row.name}} </mat-cell>
-        </ng-container>
+            <!-- Nationality Definition -->
+            <ng-container matColumnDef="nationality">
+              <mat-header-cell *matHeaderCellDef>Nationality</mat-header-cell>
+              <mat-cell *matCellDef="let row" ngClass=center> {{row.nationality}} </mat-cell>
+            </ng-container>
 
-        <!-- Nationality Definition -->
-        <ng-container matColumnDef="nationality">
-          <mat-header-cell *matHeaderCellDef>Nationality</mat-header-cell>
-          <mat-cell *matCellDef="let row" ngClass=center> {{row.nationality}} </mat-cell>
-        </ng-container>
+            <!-- Club Definition -->
+            <ng-container matColumnDef="club">
+              <mat-header-cell *matHeaderCellDef>Club</mat-header-cell>
+              <mat-cell *matCellDef="let row" ngClass=center> {{row.club}} </mat-cell>
+            </ng-container>
 
-        <!-- Club Definition -->
-        <ng-container matColumnDef="club">
-          <mat-header-cell *matHeaderCellDef>Club</mat-header-cell>
-          <mat-cell *matCellDef="let row" ngClass=center> {{row.club}} </mat-cell>
-        </ng-container>
+            <!-- Grade Definition -->
+            <ng-container matColumnDef="grade">
+              <mat-header-cell *matHeaderCellDef>Grade</mat-header-cell>
+              <mat-cell *matCellDef="let row" ngClass=center> {{row.grade}} </mat-cell>
+            </ng-container>
 
-        <!-- Grade Definition -->
-        <ng-container matColumnDef="grade">
-          <mat-header-cell *matHeaderCellDef>Grade</mat-header-cell>
-          <mat-cell *matCellDef="let row" ngClass=center> {{grades[row.grade]}} </mat-cell>
-        </ng-container>
+            <!-- Type Definition -->
+            <ng-container matColumnDef="type">
+              <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
+              <mat-cell *matCellDef="let row" ngClass=center> {{row.type}} </mat-cell>
+            </ng-container>
 
-        <!-- Type Definition -->
-        <ng-container matColumnDef="type">
-          <mat-header-cell *matHeaderCellDef>Type</mat-header-cell>
-          <mat-cell *matCellDef="let row" ngClass=center> {{row.type}} </mat-cell>
-        </ng-container>
+            <!-- Disapline Definition -->
+            <ng-container matColumnDef="discipline">
+              <mat-header-cell *matHeaderCellDef>Discipline</mat-header-cell>
+              <mat-cell *matCellDef="let row" ngClass=center> {{row.discipline}} </mat-cell>
+            </ng-container>
 
-        <!-- Disapline Definition -->
-        <ng-container matColumnDef="disapline">
-          <mat-header-cell *matHeaderCellDef>Disapline</mat-header-cell>
-          <mat-cell *matCellDef="let row" ngClass=center> {{row.disapline}} </mat-cell>
-        </ng-container>
+            <!-- website -->
+            <ng-container matColumnDef="website">
+              <mat-header-cell *matHeaderCellDef>Website</mat-header-cell>
+              <mat-cell *matCellDef="let row" ngClass=center>
+                <a *ngIf="(row.webpage !== '') && (row.webpage !== undefined)" href={{row.webpage}}>
+                  <mat-icon>link</mat-icon>
+                </a>
+              </mat-cell>
+            </ng-container>
 
-        <!-- website -->
-        <ng-container matColumnDef="website">
-          <mat-header-cell *matHeaderCellDef>Website</mat-header-cell>
-          <mat-cell *matCellDef="let row" ngClass=center>
-            <a *ngIf="(row.webpage !== '') && (row.webpage !== undefined)" href={{row.webpage}}>
-              <mat-icon>link</mat-icon>
-            </a>
-          </mat-cell>
-        </ng-container>
+            <!-- Actions -->
+            <ng-container matColumnDef="actions">
+              <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
+              <mat-cell *matCellDef="let row" ngClass=center>
+                <div *ngIf="row === currentRow">
+                  <mat-icon>home</mat-icon>
+                </div>
+              </mat-cell>
+            </ng-container>
 
-        <!-- Actions -->
-        <ng-container matColumnDef="actions">
-          <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-          <mat-cell *matCellDef="let row" ngClass=center>
-            <div *ngIf="row === currentRow">
-              <mat-icon>home</mat-icon>
-            </div>
-          </mat-cell>
-        </ng-container>
+            <!-- Header and Row Declarations -->
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: displayedColumns;" (click)=oeventClicked(row) (mouseenter)="onMouseEnter(row)" (mouseleave)="onMouseLeave(row)"
+              [ngClass]="rowStyle(row)"></mat-row>
+          </table>
 
-        <!-- Header and Row Declarations -->
-        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)=oeventClicked(row) (mouseenter)="onMouseEnter(row)" (mouseleave)="onMouseLeave(row)" [ngClass]="rowStyle(row)">
-        </mat-row>
-      </mat-table>
+          <mat-paginator #paginator [pageIndex]="0" [pageSize]="25" [pageSizeOptions]="[25, 50, 100]">
+          </mat-paginator>
 
-      <mat-paginator #paginator [pageIndex]="0" [pageSize]="25" [pageSizeOptions]="[25, 50, 100]">
-      </mat-paginator>
+        </div>
+      </div>
 
-    </mat-tab>
-
-    <mat-tab label="By Class">
-
-      <mat-accordion multi="true" class="md-expansion-demo-width">
-
-        <mat-expansion-panel *ngFor="let club of clubs | async">
-          <mat-expansion-panel-header>{{club.name}} {{club.nationality}} {{club.numEvents}} event</mat-expansion-panel-header>
-          <p>This is the content text that makes sense here.</p>
-        </mat-expansion-panel>
-
-      </mat-accordion>
 
     </mat-tab>
 
-    <mat-tab label="My Events">
+    <mat-tab label="CLUB">
+
+      <div class="background">
+
+          <div class="class-filter">
+              <mat-form-field>
+                  <mat-select placeholder="Nationality" (selectionChange)="clubNationalFilterChange()" >
+                    <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
+                      {{ nation.fullname }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+          </div>
+          
+        <div class="data-container mat-elevation-z2">
+
+          <mat-accordion multi="false">
+
+            <mat-expansion-panel *ngFor="let club of clubs$ | async" (opened)="setSelectedClub(club.name)">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <b> {{club.name}} &nbsp;&nbsp;&nbsp; {{club.nationality}} </b>
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{club.numEvents}} events  &nbsp;&nbsp;&nbsp;  Last event {{club.lastEvent | date}}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <ng-template matExpansionPanelContent>
+                <mat-list *ngFor="let event of events">
+                  <mat-list-item> {{event.name}}</mat-list-item>
+                </mat-list>
+                The club is {{club.name}}
+
+              </ng-template>
+
+
+            </mat-expansion-panel>
+
+          </mat-accordion>
+        </div>
+      </div>
+
+    </mat-tab>
+
+    <mat-tab label="MY EVENTS">
       <h1>My events</h1>
+      <p>...</p>
+    </mat-tab>
+
+    <mat-tab label="UPLOADED">
+      <h1>Uploaded events</h1>
       <p>...</p>
     </mat-tab>
   </mat-tab-group>

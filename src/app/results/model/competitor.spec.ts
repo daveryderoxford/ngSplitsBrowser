@@ -20,13 +20,12 @@
  */
 // tslint:disable:max-line-length
 
+import { sbTime } from "app/results/model/time";
 import { } from "jasmine";
 import { } from "jasmine-expect";
-
-import { InvalidData } from "../model";
 import { Competitor } from "./competitor";
 import { isNaNStrict } from "./util";
-import { sbTime } from "app/results/model/time";
+
 
 const fromCumTimes = Competitor.fromCumTimes;
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;

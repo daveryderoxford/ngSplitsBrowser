@@ -455,9 +455,9 @@ Viewer.prototype.getHorizontalMargin = function (): number {
 * @sb-return {Number} Total vertical margin.
 */
 Viewer.prototype.getVerticalMargin = function (): number {
-    const body = $("app-graph");
+    const parent = $("app-graph");
     const container = $(this.container.node());
-    return (body.outerHeight(true) - body.height()) + (container.outerHeight() - container.height());
+    return (parent.outerHeight(true) - parent.height()) + (container.outerHeight() - container.height());
 };
 
 /**
@@ -822,9 +822,8 @@ export const displayGraph = function (results: Results, options: SplitsbrowserOp
         return;
     }
 
-    if (results.needsRepair()) {
-        Repairer.repairEventData(results);
-    }
+    // remove any sbcontainer instances.
+    removeGraph();
 
     if (typeof options === "string") {
         // Deprecated; support the top-bar specified only as a
@@ -832,14 +831,18 @@ export const displayGraph = function (results: Results, options: SplitsbrowserOp
         options = { topBar: options };
     }
 
-    results.determineTimeLosses();
-
     if (options && options.defaultLanguage) {
         initialiseMessages(options.defaultLanguage);
     }
 
     const viewer = new Viewer(options);
     viewer.buildUi(options);
+
+    if (results.needsRepair()) {
+        Repairer.repairEventData(results);
+    }
+
+    results.determineTimeLosses();
     viewer.setReaults(results);
 
     const queryString = document.location.search;
@@ -855,5 +858,9 @@ export const displayGraph = function (results: Results, options: SplitsbrowserOp
     viewer.drawChart();
     viewer.registerChangeHandlers();
 
+};
+
+export const removeGraph = function () {
+     $('#sbContainer').remove();
 };
 

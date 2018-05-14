@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { OEvent, EventInfo } from "app/model";
+import { OEvent, EventInfo, Club } from "app/model";
 import { AngularFirestore, AngularFirestoreDocument, QueryFn } from "angularfire2/firestore";
 
 import { Observable } from "rxjs/Observable";
@@ -63,19 +63,21 @@ export class EventService {
 
   }
 
-  /** Gtes all evenst for a club  */
+  /** Gets all evenst for a club  */
   getEventsForClub(club: string): Observable<OEvent[]> {
 
     const query = this.afs.collection<OEvent>("/events",
-      res => res.orderBy("club")
-        .orderBy("date", "desc")
-        .where("club", "==", club));
+           res => res.where("club", "==", club).where('splits.valid', '==', true).orderBy('date', 'desc')
+    );
 
     return query.valueChanges();
   }
 
-  /** get a list if club namees for all events */
-  getClubs(): Observable<Array<string>> {
-    return (this.afs.collection<string>("/clubs/").valueChanges());
+  /** Get a list if club namees for all events */
+  getClubs(): Observable<Club[]> {
+    return this.afs.collection<Club>("/clubs/", ref =>
+              ref.orderBy("name").orderBy("nationality"))
+     .valueChanges();
   }
+
 }

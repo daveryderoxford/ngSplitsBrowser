@@ -6,7 +6,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 @Component({
   selector: 'app-recover',
   templateUrl: './recover.component.html',
-  styleUrls: ['./recover.component.css']
+  styleUrls: ['./recover.component.scss']
 })
 export class RecoverComponent implements OnInit {
   recoverForm: FormGroup;
