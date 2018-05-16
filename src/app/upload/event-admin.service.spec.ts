@@ -11,14 +11,8 @@ import { AngularFireModule } from "angularfire2";
 import { HttpClient } from "@angular/common/http";
 import { OEvent, EventInfo } from "app/model";
 
-const testFirebaseConfig = {
-  apiKey: "AIzaSyCht99i3Nsn0WNv8t6skBaq1GY-xlHoZoY",
-  authDomain: "splitsbrowsertest.firebaseapp.com",
-  databaseURL: "https://splitsbrowsertest.firebaseio.com",
-  projectId: "splitsbrowsertest",
-  storageBucket: "splitsbrowsertest.appspot.com",
-  messagingSenderId: "751003486699"
-};
+import { testFirebaseConfig } from "app/app.firebase-config";
+
 
 const testEventInfo1: EventInfo = {
   name: "test name 1",
