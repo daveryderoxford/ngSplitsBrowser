@@ -7,14 +7,16 @@ import { Lang } from "./lang";
 import { ChartTypeClass, ChartType } from "./chart-types";
 import { Results, CourseClassSet, Competitor } from "app/results/model";
 
+type ChartCompareTo = "TotalTime"| "SplitTime" | "BehindFastest" | "TimeLoss";
+
 export interface ResultsURLOptions {
     classes: Array<number>;
     chartType: ChartType;
-    compareWith: boolean | null | {index: number, runner: Competitor},
-    selected: Array<number> | null,
-    stats: any // from readSelectedStatistics(queryString),
+    compareWith: boolean | null | {index: number; runner: Competitor};
+    selected: Array<number> | null;
+    stats: ChartCompareTo; // from readSelectedStatistics(queryString),
     showOriginal: boolean;
-    filterText: string;
+    filterText: string; // Text string to filter results with
 }
 
 const ChartTypes = ChartTypeClass.chartTypes;
