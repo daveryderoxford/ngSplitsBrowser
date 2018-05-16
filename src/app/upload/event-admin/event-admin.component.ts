@@ -10,7 +10,7 @@ import { Observable } from "rxjs/Observable";
 @Component({
   selector: "app-event-admin",
   templateUrl: "./event-admin.component.html",
-  styleUrls: ["./event-admin.component.css"]
+  styleUrls: ["./event-admin.component.scss"]
 })
 export class EventAdminComponent implements OnInit {
 
@@ -39,6 +39,7 @@ export class EventAdminComponent implements OnInit {
         await this.eventAdmin.uploadResults(this.selectedEvent, splitsFile);
       } catch (err) {
         console.log("EventAdminComponnet: Error uploading splits" + err);
+        this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);
       }
     }
   }

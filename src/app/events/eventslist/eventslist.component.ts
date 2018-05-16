@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { DataSource } from "@angular/cdk/collections";
-import { MatPaginator } from "@angular/material";
+import { MatPaginator, MatSelectChange } from "@angular/material";
 
 import { OEvent, EventGrades } from "app/model/oevent";
 import { AngularFirestore, AngularFirestoreDocument } from "angularfire2/firestore";
@@ -14,30 +14,37 @@ import { Observable } from "rxjs/Observable";
 import { Club } from "app/model/club";
 import { DataSnapshot } from "@firebase/database";
 import * as _ from "lodash";
+import { EventService } from "app/events/event.service";
+import { BehaviorSubject } from "rxjs";
+import { Nations } from "app/model";
 
 @Component({
   selector: "app-results",
   templateUrl: "./eventslist.component.html",
-  styleUrls: ["./eventslist.component.css"]
+  styleUrls: ["./eventslist.component.scss"]
 })
 export class EventsListComponent {
-
-  clubs: Observable<Club[]>;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   dataSource: EventDataSource | null;
 
-  displayedColumns = ["date", "name", "nationality", "club", "grade", "disapline", "type", "website", "actions"];
+  displayedColumns = ["date", "name", "nationality", "club", "grade", "discipline", "type", "website", "actions"];
   currentRow: any = null;
   grades = EventGrades.grades;
+  clubs$: Observable<Club[]>;
+  events: Array<OEvent> = [];
+
+  // Club related fields
+  nations = Nations.getNations();
+  selctedClub = new BehaviorSubject('');
 
   selectedEvent: OEvent = null;
-  new = false;
 
   constructor(private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
-    private router: Router) { }
+    private router: Router,
+    private es: EventService) { }
 
   oeventClicked(event: OEvent) {
     this.router.navigate(["/graph", event.key]);
@@ -46,7 +53,20 @@ export class EventsListComponent {
   // tslint:disable-next-line:use-life-cycle-interface
   ngOnInit() {
     this.dataSource = new EventDataSource(this.afs, this.paginator);
-    this.clubs = this.afs.collection<Club>("/clubs/").valueChanges();
+    this.clubs$ = this.es.getClubs();
+
+    this.selctedClub.switchMap((name) => {
+      return this.es.getEventsForClub(name);
+    }).subscribe(events =>
+      this.events = events);
+  }
+
+  setSelectedClub(name: string) {
+    this.selctedClub.next(name);
+  }
+
+  clubNationalFilterChange($event: MatSelectChange) {
+    // TODO handle this or use obasevable stream
   }
 
   onMouseEnter(row) {
@@ -86,7 +106,7 @@ class EventDataSource extends DataSource<any> {
 
   disconnect() { }
 
-   private fetchNextChunk(): Observable<OEvent[]> {
+  private fetchNextChunk(): Observable<OEvent[]> {
 
     const oevents = this.oevents;
     const pageSize = this.paginator.pageSize;
@@ -98,12 +118,13 @@ class EventDataSource extends DataSource<any> {
       startAt = 0;
     }
 
-  //  const query = this.db.list<OEvent>("/events",
+    //  const query = this.db.list<OEvent>("/events",
     const query = this.afs.collection<OEvent>("/events",
-      res => res.orderBy("date", "desc")
-                .orderBy("name")
-                .startAfter(startAt)
-                .limit(pageSize));
+      res => res.where("splits.valid", "==", true)
+        .orderBy("date", "desc")
+        .orderBy("name")
+        .limit(pageSize));
+
 
     const obs: Observable<OEvent[]> = query.valueChanges();
 

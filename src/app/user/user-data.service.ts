@@ -43,6 +43,7 @@ export class UserDataService {
       ecardSI: "",
       autoFind: true,
       results: [],
+      ecards: [],
     };
     return this.getUserDoc().set(user);
   }

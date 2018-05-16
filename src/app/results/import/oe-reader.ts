@@ -79,7 +79,7 @@ class OEReader {
     // seems also that one class can be made up of multiple courses, e.g.
     // M21E at BOC 2013.)
     private warnings = [] as Array<string>;   // Warnings about competitors that cannot be read in.
-    private lines = [] as Array<string>
+    private lines = [] as Array<string>;
 
     /**
     * Constructs an OE-format data reader.
@@ -121,7 +121,7 @@ class OEReader {
 
         const courses = this.determineCourses(classes);
         return new Results(classes, courses, this.warnings);
-    };
+    }
 
     /**
     * Remove any leading and trailing double-quotes from the given string.
@@ -160,7 +160,7 @@ class OEReader {
         }
 
         throw new WrongFileFormat("Data appears not to be in the OE CSV format");
-    };
+    }
 
     /**
     * Identifies which variation on the OE CSV format we are parsing.
@@ -203,7 +203,7 @@ class OEReader {
         }
 
         throw new WrongFileFormat("Did not find control 1 at any of the supported indexes");
-    };
+    }
 
     /**
     * Returns the name of the class in the given row.
@@ -217,7 +217,7 @@ class OEReader {
             className = row[this.columnIndexes.classNameFallback];
         }
         return className;
-    };
+    }
 
     /**
     * Reads the start-time in the given row.  The start punch time will
@@ -232,7 +232,7 @@ class OEReader {
         }
 
         return parseTime(startTimeStr);
-    };
+    }
 
     /**
     * Returns the number of controls to expect on the given line.
@@ -261,7 +261,7 @@ class OEReader {
                 return null;
             }
         }
-    };
+    }
 
     /**
     * Reads the cumulative times out of a row of competitor data.
@@ -295,7 +295,7 @@ class OEReader {
         cumTimes.push(totalTime);
 
         return cumTimes;
-    };
+    }
 
     /**
     * Checks to see whether the given row contains a new class, and if so,
@@ -308,7 +308,7 @@ class OEReader {
         if (!this.classes.has(className)) {
             this.classes.set(className, { numControls: numControls, competitors: [] });
         }
-    };
+    }
 
     /**
     * Checks to see whether the given row contains a new course, and if so,
@@ -328,7 +328,7 @@ class OEReader {
                 controls: controlNums
             });
         }
-    };
+    }
 
     /**
     * Checks to see whether the given row contains a class-course pairing that
@@ -342,7 +342,7 @@ class OEReader {
         if (!this.classCoursePairs.some((pair) => { return pair[0] === className && pair[1] === courseName; })) {
             this.classCoursePairs.push([className, courseName]);
         }
-    };
+    }
 
     /**
     * Reads the name of the competitor from the row.
@@ -357,18 +357,18 @@ class OEReader {
             name = {
                 firstname: row[this.columnIndexes.forename],
                 surname: row[this.columnIndexes.surname]
-            }
+            };
         } else if (this.columnIndexes.hasOwnProperty("combinedName")) {
             // 'Nameless' or 44-column variation.
             name = row[this.columnIndexes.combinedName];
         }
 
         return name;
-    };
+    }
 
     private getEcard(row: Array<string>): string | null {
         return row[this.columnIndexes.ecard];
-    };
+    }
 
     /**
     * Reads in the competitor-specific data from the given row and adds it to
@@ -430,7 +430,7 @@ class OEReader {
             }
         }
 
-        competitor.ecard = this.getEcard(row);
+        competitor.ecardId = this.getEcard(row);
 
         if (this.columnIndexes.hasOwnProperty("gender")) {
             const gender = row[this.columnIndexes.gender];
@@ -440,7 +440,7 @@ class OEReader {
         }
 
         this.classes.get(className).competitors.push(competitor);
-    };
+    }
 
     /**
     * Parses the given line and adds it to the event data accumulated so far.
@@ -477,7 +477,7 @@ class OEReader {
 
             this.addCompetitor(row, cumTimes);
         }
-    };
+    }
 
     /**
     * Creates maps that describe the many-to-many join between the class names
@@ -508,7 +508,7 @@ class OEReader {
         });
 
         return { classesToCourses: classesToCourses, coursesToClasses: coursesToClasses };
-    };
+    }
 
     /**
     * Creates and return a list of CourseClass objects from all of the data read.
@@ -521,7 +521,7 @@ class OEReader {
             const courseClass = this.classes.get(className);
             return new CourseClass(className, courseClass.numControls, courseClass.competitors);
         }, this);
-    };
+    }
 
     /**
     * Find all of the courses and classes that are related to the given course.
@@ -604,7 +604,7 @@ class OEReader {
         });
 
         return course;
-    };
+    }
 
     /**
     * Sort through the data read in and create Course objects representing each
@@ -638,5 +638,5 @@ class OEReader {
         }, this);
 
         return courses;
-    };
+    }
 }

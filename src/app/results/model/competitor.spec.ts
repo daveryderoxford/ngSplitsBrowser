@@ -20,13 +20,12 @@
  */
 // tslint:disable:max-line-length
 
+import { sbTime } from "app/results/model/time";
 import { } from "jasmine";
 import { } from "jasmine-expect";
-
-import { InvalidData } from "../model";
 import { Competitor } from "./competitor";
 import { isNaNStrict } from "./util";
-import { sbTime } from "app/results/model/time";
+
 
 const fromCumTimes = Competitor.fromCumTimes;
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
@@ -804,8 +803,8 @@ fdescribe("Competitor", () => {
     });
     it("Can set competitor ecard to a number", () => {
         const competitor = fromCumTimes(1, { firstname: "John", surname: "Smith" }, "ABC", 10 * 3600, [0, 188]);
-        competitor.ecard = "1234567";
-        expect(competitor.ecard).toEqual("1234567");
+        competitor.ecardId = "1234567";
+        expect(competitor.ecardId).toEqual("1234567");
     });
 });
 

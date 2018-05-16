@@ -1,4 +1,4 @@
-import d3 = require("d3");
+import * as d3 from "d3";
 import * as $ from "jquery";
 
 import { InvalidData } from "app/results/model/exception";
@@ -30,9 +30,9 @@ export class CompetitorSelection {
     * @sb-param {Number} index - The index of the competitor.
     * @sb-returns {boolean} True if the competitor is selected, false if not.
     */
-  /*  public isSelected(index: number): boolean {
+    public isSelected(index: number): boolean {
         return this.currentIndexes.indexOf(index) > -1;
-    };
+    }
 
     /**
     * Returns whether the selection consists of exactly one competitor.

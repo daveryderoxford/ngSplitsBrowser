@@ -36,26 +36,26 @@ fdescribe("Results", () => {
 
     function getCompetitor1() {
         const comp = fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106]);
-        comp.ecard = "1";
-        return comp
+        comp.ecardId = "1";
+        return comp;
     }
 
     function getCompetitor2() {
         const comp = fromSplitTimes(2, "John Smith", "ABC", 10 * 3600, [65, 221, 184, 100]);
-        comp.ecard = "2";
-        return comp
+        comp.ecardId = "2";
+        return comp;
     }
 
     function getCompetitor3() {
         const comp = fromSplitTimes(2, "Aron Ardvark", "HIJK", 10 * 3600, [65, 221, 184, 100]);
-        comp.ecard = "3";
-        return comp
+        comp.ecardId = "3";
+        return comp;
     }
 
     function getCompetitor4() {
         const comp = fromSplitTimes(2, "Aron Ardvarx", "SN", 10 * 3600, [65, 221, 184, 100]);
-        comp.ecard = "4";
-        return comp
+        comp.ecardId = "4";
+        return comp;
     }
 
     function getCompetitor2WithExtraSplit() {
@@ -212,32 +212,38 @@ fdescribe("Results", () => {
 
     }
 
-    it("Search for  surname with more than 2 characters", () => {
+    it("Search for  surname with more than 1 characters", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("ArD");
-        expect(res[0].ecard).toEqual("3");
-        expect(res[1].ecard).toEqual("4");
+        expect(res[0].ecardId).toEqual("3");
+        expect(res[1].ecardId).toEqual("4");
         expect(res.length).toBe(2);
     });
 
-    it("Search by surname with 2 characters", () => {
+    it("Search by surname with 1 characters", () => {
         const results = makeSearchData();
-        const res = results.findCompetitors("aR");
+        const res = results.findCompetitors("a");
         expect(res.length).toBe(0, "Should be no exact match found for 2 characters");
     });
 
-    it("Search by firstname with >3 characters", () => {
+    it("Search by firstname with >1 characters", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("FreD");
-        expect(res[0].ecard).toEqual("1", "match on first name");
+        expect(res[0].ecardId).toEqual("1", "match on first name");
         expect(res.length).toBe(1, "One name fred matches");
     });
 
     it("Search by club with 2 characters", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("Sn");
-        expect(res[0].ecard).toEqual("4", "match on first name");
+        expect(res[0].ecardId).toEqual("4", "match on first name");
         expect(res.length).toBe(1, "Exact match on SN");
+    });
+
+    it('Search for "" should not return any results', () => {
+        const results = makeSearchData();
+        const res = results.findCompetitors("");
+        expect(res.length).toBe(0, 'Expect search on "" not to return any results');
     });
 
     it("Search by club with 2 characters - non excat match", () => {

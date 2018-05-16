@@ -1,5 +1,5 @@
 
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
@@ -33,6 +33,11 @@ export class Course {
         public length?: number,
         public climb?: number,
         public controls?: Array<string>) {
+
+        // Create back link to the course in classes
+        for (const courseClass of classes) {
+            courseClass.setCourse(this);
+        }
     }
 
     /**
@@ -42,14 +47,14 @@ export class Course {
     * @sb-return {Array} Array of other course-classes.
     */
     public getOtherClasses(courseClass: CourseClass): Array<CourseClass> {
-        const otherClasses = this.classes.filter( (cls) => { return cls !== courseClass; });
+        const otherClasses = this.classes.filter((cls) => { return cls !== courseClass; });
         if (otherClasses.length === this.classes.length) {
             // Given class not found.
             throw new InvalidData("Course.getOtherClasses: given class is not in this course");
         } else {
             return otherClasses;
         }
-    };
+    }
 
     /**
     * Returns the number of course-classes that use this course.
@@ -57,7 +62,7 @@ export class Course {
     */
     public getNumClasses(): number {
         return this.classes.length;
-    };
+    }
 
     /**
     * Returns whether this course has control code data.
@@ -66,7 +71,7 @@ export class Course {
     */
     public hasControls(): boolean {
         return (this.controls !== null);
-    };
+    }
 
     /**
     * Returns the code of the control at the given number.
@@ -94,7 +99,7 @@ export class Course {
         } else {
             throw new InvalidData("Cannot get control code of control " + controlNum + " because it is out of range");
         }
-    };
+    }
 
     /**
     * Returns whether this course uses the given leg.
@@ -110,7 +115,7 @@ export class Course {
     */
     public usesLeg(startCode: string, endCode: string): boolean {
         return this.getLegNumber(startCode, endCode) >= 0;
-    };
+    }
 
     /**
     * Returns the number of a leg in this course, given the start and end
@@ -155,7 +160,7 @@ export class Course {
             // If we get here, the given leg is not part of this course.
             return -1;
         }
-    };
+    }
 
     /**
     * Returns the fastest splits recorded for a given leg of the course.
@@ -180,7 +185,7 @@ export class Course {
 
         const controlNum = legNumber;
         const fastestSplits = [];
-        this.classes.forEach( (courseClass) => {
+        this.classes.forEach((courseClass) => {
             const classFastest = courseClass.getFastestSplitTo(controlNum);
             if (classFastest !== null) {
                 fastestSplits.push({ name: classFastest.name, className: courseClass.name, split: classFastest.split });
@@ -188,7 +193,7 @@ export class Course {
         });
 
         return fastestSplits;
-    };
+    }
 
     /**
     * Returns a list of all competitors on this course that visit the control
@@ -224,7 +229,7 @@ export class Course {
                 return [];
             }
         }
-    };
+    }
 
     /**
     * Returns a list of all competitors on this course that visit the control
@@ -240,14 +245,14 @@ export class Course {
     */
     public getCompetitorsAtControlNumInTimeRange(controlNum: number, intervalStart: sbTime, intervalEnd: sbTime) {
         const matchingCompetitors = [];
-        this.classes.forEach( (courseClass) => {
-            courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach( (comp) => {
+        this.classes.forEach((courseClass) => {
+            courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach((comp) => {
                 matchingCompetitors.push({ name: comp.name, time: comp.time, className: courseClass.name });
             });
         });
 
         return matchingCompetitors;
-    };
+    }
 
     /**
     * Returns whether the course has the given control.
@@ -257,7 +262,7 @@ export class Course {
     */
     public hasControl(controlCode: string): boolean {
         return this.controls !== null && this.controls.indexOf(controlCode) > -1;
-    };
+    }
 
     /**
     * Returns the control code(s) of the control(s) after the one with the
@@ -297,5 +302,5 @@ export class Course {
                 return nextControls;
             }
         }
-    };
+    }
 }

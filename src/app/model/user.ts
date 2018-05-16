@@ -1,11 +1,16 @@
 
 /** data associated with a user */
-import { EventInfo } from "app/model/oevent";
+import { EventInfo, ControlCardType } from "app/model/oevent";
 
 /** All the user data stored for the user */
 export interface UserData extends UserInfo {
     key: string;  // Matches with the users Firebase reference
     results: Array<UserResultData>;
+}
+
+export interface ECard {
+    id: string;
+    type: ControlCardType;
 }
 
 /** Information on the results for a user.  */
@@ -31,13 +36,8 @@ export interface UserInfo {
     club: string;
     nationality: string;  // short nationality code
     nationalId: string;   //
+    ecards: Array<ECard>;
     ecardSI: string;      // hard coded ecard ids so I can search on them
     ecardEmit: string;
     autoFind: boolean;
-}
-
-/** Informtion on users ecards */
-export interface ECardInfo {
-    id: string;
-    type: string;
 }

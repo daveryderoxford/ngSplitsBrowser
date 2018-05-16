@@ -1,4 +1,4 @@
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { CourseClass } from "./course-class";
 import { Course } from "./course";
@@ -7,7 +7,7 @@ import { sbTime } from "./time";
 
 export class Results {
 
-    allCompetitors: Array<Competitor> = null;
+    private allCompetitorsList: Array<Competitor>;
 
     warnings: Array<string> = [];
 
@@ -21,11 +21,22 @@ export class Results {
     *     encountered when reading in the event data.
     */
     constructor(public classes: Array<CourseClass>,
-                public courses: Array<Course>,
+        public courses: Array<Course>,
         warnings?: Array<string>) {
         if (warnings) {
             this.warnings = warnings;
         }
+    }
+
+    get allCompetitors(): Array<Competitor> {
+        if (!this.allCompetitorsList) {
+
+            this.allCompetitorsList = [];
+            this.classes.forEach((courseClass) => {
+                this.allCompetitorsList = this.allCompetitorsList.concat(courseClass.competitors);
+            });
+        }
+        return this.allCompetitorsList;
     }
 
     /**
@@ -124,17 +135,18 @@ export class Results {
         return courses.map((course) => { return { course: course, nextControls: course.getNextControls(controlCode) }; });
     }
 
-    /** Search for a competior in the results .
+    public findByKey(key: string): Competitor {
+        return this.allCompetitors.find(comp => (key === comp.key));
+    }
+
+    /** Search for a competior in the results.
      *  Matches on firstname, surname or club (case independent)
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
      */
     public findCompetitors(searchstring: string): Array<Competitor> {
-        const twochars = searchstring.length > 2;
+        if (!searchstring || searchstring.trim().length === 0)  { return []; }
 
-        if (this.allCompetitors === null) {
-            this.populateAllCompetitors();
-        }
-
+        const onechar = searchstring.length > 1;
         const ss = searchstring.toLocaleLowerCase();
 
         let found = this.allCompetitors.filter((comp) => {
@@ -142,37 +154,31 @@ export class Results {
             const firstname = comp.firstname.toLowerCase();
             const club = comp.club.toLowerCase();
 
-            return ((surname === ss) || (twochars && surname.startsWith(ss)) ||
-                    (firstname === ss) || (twochars && firstname.startsWith(ss)) ||
-                    (club === ss) || (twochars && club.startsWith(ss)));
+            return ((surname === ss) || (onechar && surname.startsWith(ss)) ||
+                (firstname === ss) || (onechar && firstname.startsWith(ss)) ||
+                (club === ss) || (onechar && club.startsWith(ss)));
         });
 
         // Sort into name order
-        found = found.sort((a, b) => {
-            const x = a.name.toLowerCase();
-            const y = b.name.toLowerCase();
-            return x < y ? -1 : x > y ? 1 : 0;
+        found = found.sort((comp1, comp2) => {
+            return comp1.firstname.localeCompare(comp2.firstname);
         });
         return (found);
     }
 
-    private populateAllCompetitors() {
-        this.allCompetitors = [];
-        this.classes.forEach((courseClass) => {
-            this.allCompetitors = this.allCompetitors.concat(courseClass.competitors);
-        });
-    }
 
     /** Search for a course class matching on name.
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
      */
     findCourseClasss(searchstring: string): Array<CourseClass> {
-        const twochars = searchstring.length > 2;
+        if (!searchstring || searchstring.trim().length === 0)  { return []; }
+
+        const onechar = searchstring.length > 1;
         const ss = searchstring.toLowerCase();
 
         const found = this.classes.filter((cc) => {
             const name = cc.name.toLowerCase();
-            return ((name === ss) || (twochars && name.startsWith(ss)));
+            return ((name === ss) || (onechar && name.startsWith(ss)));
         });
 
         return (found);
@@ -182,12 +188,15 @@ export class Results {
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
      */
     findCourses(searchstring: string): Array<Course> {
-        const twochars = searchstring.length > 2;
+
+        if (!searchstring || searchstring.trim().length === 0)  { return []; }
+
+        const onechar = searchstring.length > 1;
         const ss = searchstring.toLowerCase();
 
         const found = this.courses.filter((course) => {
             const name = course.name.toLowerCase();
-            return ((name === ss) || (twochars && name.startsWith(ss)));
+            return ((name === ss) || (onechar && name.startsWith(ss)));
         });
         return (found);
     }

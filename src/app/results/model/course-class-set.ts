@@ -1,4 +1,4 @@
-import d3 = require("d3");
+import * as d3 from "d3";
 import { isNotNullNorNaN, isNaNStrict, isNotNull } from "./util";
 import { InvalidData } from "./exception";
 
@@ -91,7 +91,7 @@ export class CourseClassSet {
     */
     public isEmpty(): boolean {
         return this.allCompetitors.length === 0;
-    };
+    }
 
     /**
     * Returns the course used by all of the classes that make up this set.  If
@@ -100,7 +100,7 @@ export class CourseClassSet {
     */
     public getCourse() {
         return (this.classes.length > 0) ? this.classes[0].course : null;
-    };
+    }
 
     /**
     * Returns the name of the 'primary' class, i.e. that that has been
@@ -110,7 +110,7 @@ export class CourseClassSet {
     */
     public getPrimaryClassName() {
         return (this.classes.length > 0) ? this.classes[0].name : null;
-    };
+    }
 
     /**
     * Returns the number of classes that this course-class set is made up of.
@@ -119,7 +119,7 @@ export class CourseClassSet {
     */
     public getNumClasses(): number {
         return this.classes.length;
-    };
+    }
 
     /**
     * Returns whether any of the classes within this set have data that
@@ -129,7 +129,7 @@ export class CourseClassSet {
     */
     public hasDubiousData(): boolean {
         return this.classes.some( (courseClass) => { return courseClass.hasDubiousData; });
-    };
+    }
 
     /**
     * Return a list of objects that describe when the given array of times has
@@ -208,7 +208,7 @@ export class CourseClassSet {
 
         const firstCompetitor = this.allCompetitors[0];
         return (firstCompetitor.completed()) ? this.fillBlankRangesInCumulativeTimes(firstCompetitor.cumTimes) : null;
-    };
+    }
 
     /**
     * Return the imaginary competitor who recorded the fastest time on each leg
@@ -220,7 +220,7 @@ export class CourseClassSet {
     */
     public getFastestCumTimes(): Array<any> | null {
         return this.getFastestCumTimesPlusPercentage(0);
-    };
+    }
 
     /**
     * Return the imaginary competitor who recorded the fastest time on each leg
@@ -327,7 +327,7 @@ export class CourseClassSet {
         });
 
         return fastestCumTimes;
-    };
+    }
 
     /**
     * Returns the cumulative times for the competitor with the given index,
@@ -337,7 +337,7 @@ export class CourseClassSet {
     */
     public getCumulativeTimesForCompetitor(competitorIndex: number): Array<sbTime> {
         return this.fillBlankRangesInCumulativeTimes(this.allCompetitors[competitorIndex].getAllCumulativeTimes());
-    };
+    }
 
     /**
     * Compute the ranks of each competitor within their class.
@@ -389,7 +389,7 @@ export class CourseClassSet {
         this.allCompetitors.forEach( (comp, idx) => {
             comp.setSplitAndCumulativeRanks(splitRanksByCompetitor[idx], cumRanksByCompetitor[idx]);
         });
-    };
+    }
 
     /**
     * Returns the best few splits to a given control.
@@ -431,7 +431,7 @@ export class CourseClassSet {
 
             return results;
         }
-    };
+    }
 
     /**
     * Return data from the current classes in a form suitable for plotting in a chart.
@@ -508,6 +508,6 @@ export class CourseClassSet {
             yExtent: [yMin, yMax],
             dubiousTimesInfo: dubiousTimesInfo
         };
-    };
+    }
 
 }

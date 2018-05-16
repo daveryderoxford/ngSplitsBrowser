@@ -1,6 +1,6 @@
 
 import * as $ from "jquery";
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { FirstnameSurname } from "app/results/model/competitor";
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
@@ -209,7 +209,7 @@ function parseCompetitor(element, number: number, reader, warnings: Array<string
 
     const competitor = Competitor.fromOriginalCumTimes(number, name, club, startTime, cumTimes, );
 
-    competitor.ecard = ecard;
+    competitor.ecardId = ecard;
     competitor.route = route;
 
     if (yearOfBirth !== null) {

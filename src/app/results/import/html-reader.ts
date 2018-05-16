@@ -1,5 +1,5 @@
 
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { parseCourseLength, normaliseLineEndings } from "./util";
 import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results, WrongFileFormat, InvalidData } from "../model";
@@ -232,7 +232,7 @@ class CompetitorParseRecord {
     */
     public isContinuation() {
         return (this.name === "" && this.club === "" && this.className === null && this.totalTimeStr === "" && !this.competitive);
-    };
+    }
 
     /**
     * Appends the cumulative split times in another CompetitorParseRecord to
@@ -246,7 +246,7 @@ class CompetitorParseRecord {
         } else {
             throw new Error("Can only append a continuation CompetitorParseRecord");
         }
-    };
+    }
 
     /**
     * Creates a Competitor object from this CompetitorParseRecord object.
@@ -269,7 +269,7 @@ class CompetitorParseRecord {
         }
 
         return competitor;
-    };
+    }
 }
 /*
 * There are three types of HTML format supported by this parser: one that is
@@ -1272,5 +1272,5 @@ export function parseHTMLEventData(data: string): Results {
 
     // If we get here, the format wasn't recognized.
     throw new WrongFileFormat("No HTML recognizers recognised this as HTML they could parse");
-};
+}
 

@@ -11,7 +11,7 @@ import { EventAdminService } from 'app/upload/event-admin.service';
 @Component({
   selector: 'app-event-edit',
   templateUrl: './event-edit.component.html',
-  styleUrls: ['./event-edit.component.css']
+  styleUrls: ['./event-edit.component.scss']
 })
 export class EventEditComponent implements OnInit {
   @Input() oevent: OEvent;

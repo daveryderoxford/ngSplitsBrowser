@@ -1,4 +1,4 @@
-import d3 = require("d3");
+import * as d3 from "d3";
 import * as $ from "jquery";
 
 import { isNaNStrict } from "app/results/model/util";
@@ -68,7 +68,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     isOfThisVersion(data: string): boolean {
         return data.indexOf("http://www.orienteering.org/datastandard/3.0") >= 0;
-    };
+    }
 
     /**
     * Makes a more thorough check that the parsed XML data is likely to be of
@@ -87,7 +87,7 @@ export class Version3Reader implements IOFXMLReader {
         if (!isUndefined(status) && status.toLowerCase() !== "complete") {
             throw new InvalidData("Only complete IOF data supported; snapshot and delta are not supported");
         }
-    };
+    }
 
     /**
     * Reads the class name from a ClassResult element.
@@ -97,7 +97,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     readClassName(classResultElement): string {
         return $("> Class > Name", classResultElement).text();
-    };
+    }
 
     /**
     * Reads the course details from the given ClassResult element.
@@ -138,7 +138,7 @@ export class Version3Reader implements IOFXMLReader {
         }
 
         return { id: id, name: name, length: length, climb: climb, numberOfControls: numberOfControls };
-    };
+    }
 
     /**
     * Returns the XML element that contains a competitor's name.  This element
@@ -150,7 +150,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     getCompetitorNameElement(element) {
         return $("> Person > Name", element);
-    };
+    }
 
     /**
     * Returns the name of the competitor's club.
@@ -160,7 +160,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     readClubName(element): string {
         return $("> Organisation > ShortName", element).text();
-    };
+    }
 
     /**
     * Returns the competitor's date of birth, as a string.
@@ -172,7 +172,7 @@ export class Version3Reader implements IOFXMLReader {
         const birthDate = $("> Person > BirthDate", element).text();
         const regexResult = this.yearRegexp.exec(birthDate);
         return (regexResult === null) ? null : parseInt(regexResult[0], 10);
-    };
+    }
 
     /**
     * Reads a competitor's start time from the given Result element.
@@ -192,7 +192,7 @@ export class Version3Reader implements IOFXMLReader {
             const seconds = (isUndefined(result[3])) ? 0 : parseInt(result[3], 10);
             return hours * 60 * 60 + minutes * 60 + seconds;
         }
-    };
+    }
 
     /**
     * Reads a time, in seconds, from a string.  If the time was not valid,
@@ -205,7 +205,7 @@ export class Version3Reader implements IOFXMLReader {
         // IOF v3 allows fractional seconds, so we use parseFloat instead of parseInt.
         const time = parseFloat(timeStr);
         return (isFinite(time)) ? time : null;
-    };
+    }
 
     /**
     * Read a competitor's total time from the given Time element.
@@ -217,7 +217,7 @@ export class Version3Reader implements IOFXMLReader {
     readTotalTime(resultElement): sbTime | null {
         const totalTimeStr = $("> Time", resultElement).text();
         return this.readTime(totalTimeStr);
-    };
+    }
 
     /**
     * Read a competitor's ecard number
@@ -226,7 +226,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     readECard(resultElement): string {
         return $("> ControlCard", resultElement).text();
-    };
+    }
 
     /**
     * Read a competitor's route or null if not avalaible
@@ -235,7 +235,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     readRoute(resultElement): string | null {
         return $("> Route", resultElement).text();
-    };
+    }
 
     /**
     * Returns the status of the competitor with the given result.
@@ -245,7 +245,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     getStatus(resultElement): string {
         return $("> Status", resultElement).text();
-    };
+    }
 
     /**
     * Returns whether the given split-time element is for an additional
@@ -256,7 +256,7 @@ export class Version3Reader implements IOFXMLReader {
     */
     isAdditional(splitTimeElement): boolean {
         return (splitTimeElement.attr("status") === "Additional");
-    };
+    }
 
     /**
     * Reads a control code and split time from a SplitTime element.
@@ -280,5 +280,5 @@ export class Version3Reader implements IOFXMLReader {
         }
 
         return { code: code, time: time };
-    };
+    }
 }

@@ -8,23 +8,25 @@
   width: 100%;
 }
 
-.searchinput {
-    padding: 5px 5px;
-    margin: 18px 0;
-    box-sizing: border-box;
-    border: 2px solid primary;
-    font-size: 18px;
-    outline: none;
-    background-color: #3CBC8D;
-    color: white;
+/* To display a border for the input */
+.mat-input-wrapper.mat-form-field-wrapper{
+  border: solid 1px grey;
+  padding: 10px;
+}
+/* To remove the default underline */
+.mat-input-underline.mat-form-field-underline {
+   background: transparent;
+}
+/* To remove the underline ripple */
+.mat-input-ripple.mat-form-field-ripple{
+   background-color: transparent; 
 }
 
-input[type=text] {
-  -webkit-transition: width 0.4s ease-in-out;
-  transition: width 0.4s ease-in-out;
+.mat-form-field-ripple {
+  background-color: transparent; 
 }
 
-input[type=text]:focus {
-  width: 100%;
-  background-color: lightblue;
+
+.mat-form-field-appearance-standard.mat-form-field-underline {
+  background: transparent;
 }

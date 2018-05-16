@@ -1,5 +1,5 @@
 
-import d3 = require("d3");
+import * as d3 from "d3";
 
 import { normaliseLineEndings } from "./util";
 import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results, WrongFileFormat, InvalidData } from "../model";

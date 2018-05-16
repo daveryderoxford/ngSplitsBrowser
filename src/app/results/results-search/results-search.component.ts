@@ -39,11 +39,15 @@ export class ResultsSearchComponent implements OnInit {
     });
 
     // When the search input control changes update the panel contents
-    this.searchForm.get("searchControl").valueChanges.subscribe((val) => this.updateSearchPanelContents(val));
+    this.searchForm.get('searchControl').valueChanges.subscribe((val) => this.updateSearchPanelContents(val));
   }
 
-  private updateSearchPanelContents(searchstring: string) {
+  private updateSearchPanelContents(searchstring: string | SearchSelectedItem) {
     if (!this.results) { return; }
+
+    // If a seelction has not been made the value of the contol is a string.   If a seelction has been made it is the object selected
+    searchstring = (typeof searchstring === 'string') ? searchstring : searchstring.name;
+
     const courses = this.results.findCourses(searchstring);
     const classes = this.results.findCourseClasss(searchstring);
     const competitors = this.results.findCompetitors(searchstring);
@@ -51,15 +55,15 @@ export class ResultsSearchComponent implements OnInit {
     this.filterPanelContents = [];
 
     if (courses.length > 0) {
-      this.filterPanelContents.push({ name: "Courses", options: courses });
+      this.filterPanelContents.push({ name: 'Courses', options: courses });
     }
 
     if (classes.length > 0) {
-      this.filterPanelContents.push({ name: "Classes", options: classes });
+      this.filterPanelContents.push({ name: 'Classes', options: classes });
     }
 
     if (competitors.length > 0) {
-      this.filterPanelContents.push({ name: "Results", options: competitors });
+      this.filterPanelContents.push({ name: 'Results', options: competitors });
     }
   }
 
@@ -67,8 +71,8 @@ export class ResultsSearchComponent implements OnInit {
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     const val = event.option.value;
     this.updateSelections(val);
-    console.log("Item selected " + val.name);
-    this.searchForm.get("searchControl").setValue("");
+    console.log('Item selected ' + val.name);
+    this.searchForm.get('searchControl').setValue('');
   }
 
   private updateSelections(selection: SearchSelectedItem) {
@@ -83,5 +87,9 @@ export class ResultsSearchComponent implements OnInit {
     } else if (selection instanceof Course) {
       this.rs.selectCourse(selection);
     }
+  }
+
+  displayFn(value?: SearchSelectedItem): string | undefined {
+    return value ? value.name : undefined;
   }
 }
