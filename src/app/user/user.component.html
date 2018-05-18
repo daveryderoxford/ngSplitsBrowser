@@ -2,7 +2,7 @@
 
 <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
 
-  <div  fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
+  <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
 
     <h5> User details</h5>
 
@@ -18,29 +18,26 @@
 
           <div fxFlexLayout=row>
             <mat-form-field>
-              <input matInput formControlName="firstName" placeholder="First Name">
+              <input matInput required formControlName="firstName" placeholder="First Name">
             </mat-form-field>
 
             <mat-form-field>
-              <input matInput formControlName="lastName" placeholder="Last Names">
+              <input matInput required formControlName="lastName" placeholder="Last Names">
             </mat-form-field>
           </div>
 
           <mat-form-field>
-            <input type="text" matInput formControlName="nationality" [matAutocomplete]="auto" placeholder="Nationality">
-            <mat-error>Nationality required</mat-error>
+            <mat-select required formControlName="nationality" placeholder="Nationality">
+              <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
+                {{ nation.fullname }}
+              </mat-option>
+            </mat-select>
           </mat-form-field>
-
-          <mat-autocomplete #auto="matAutocomplete">
-            <mat-option *ngFor="let nation of filteredNations | async" [value]="nation.fullname">
-              {{ nation.fullname }}
-            </mat-option>
-          </mat-autocomplete>
 
           <mat-form-field>
             <input matInput formControlName="yearOfBirth" type="number" placeholder="Year of birth">
             <mat-hint align="end">yyyy</mat-hint>
-           <mat-error>Invalid year</mat-error>
+            <mat-error>Invalid year</mat-error>
           </mat-form-field>
 
           <mat-form-field>

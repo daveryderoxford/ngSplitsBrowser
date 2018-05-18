@@ -7,7 +7,7 @@ export class SplitsBrowserException {
 
     public toString(): string {
         return this.name + ": " + this.message;
-    };
+    }
 }
 
 export class InvalidData extends SplitsBrowserException {

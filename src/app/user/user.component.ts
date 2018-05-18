@@ -1,14 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-
 import { AngularFireAuth } from "angularfire2/auth";
-import * as firebase from "firebase/app";
-
-import { UserData } from "app/model/user";
-import { Nations, Nation } from "app/model/nations";
-import { Observable } from "rxjs/Observable";
+import { Nations } from "app/model/nations";
 import { UserDataService } from "app/user/user-data.service";
+import * as firebase from "firebase/app";
 
 @Component({
     selector: "app-user",
@@ -22,18 +18,18 @@ export class UserComponent implements OnInit {
 
     showProgressBar = false;
 
-    filteredNations: Observable<Nation[]>;
+    nations = Nations.getNations();
 
     constructor(
         private formBuilder: FormBuilder,
         private afAuth: AngularFireAuth,
         private router: Router,
-        private userdata: UserDataService ) {
+        private userdata: UserDataService) {
 
         this.userForm = this.formBuilder.group({
             firstName: [""],
             lastName: [""],
-            yearOfBirth: ["", [ Validators.min(1900),  Validators.max(new Date().getFullYear()) ] ],
+            yearOfBirth: ["", [Validators.min(1900), Validators.max(new Date().getFullYear())]],
             club: [""],
             nationality: [""],
             nationalId: [""],
@@ -46,28 +42,19 @@ export class UserComponent implements OnInit {
     ngOnInit() {
 
         // monitor login/out
-        this.afAuth.authState.subscribe( (loggedIn) => this.loginChanged(loggedIn) );
+        this.afAuth.authState.subscribe((loggedIn) => this.loginChanged(loggedIn));
 
-       this.userdata.getUser().subscribe( (userData) => this.userChanged(userData));
-
-        this.filteredNations = this.userForm.get("nationality").valueChanges
-            .startWith(null)
-            .map(val => val ? this.filterNations(val) : Nations.getNations().slice());
+        this.userdata.getUser().subscribe((userData) => this.userChanged(userData));
     }
 
     async loginChanged(loggedIn: firebase.User) {
-       if (!loggedIn) {
-           this.router.navigate(["/"]);
-       }
+        if (!loggedIn) {
+            this.router.navigate(["/"]);
+        }
     }
 
     userChanged(userData) {
-       this.userForm.reset(userData);
-    }
-
-    private filterNations(name: string): Nation[] {
-        const ret = Nations.getNations().filter(nation => new RegExp(`^${name}`, "gi").test(nation.fullname));
-        return (ret);
+        this.userForm.reset(userData);
     }
 
     async save() {
@@ -77,8 +64,4 @@ export class UserComponent implements OnInit {
     changePassoword() {
 
     }
-
 }
-
-
-

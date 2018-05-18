@@ -19,6 +19,7 @@ export class EventService {
   private currentSearch: QueryFn;
   private searchSize: number;
   private pageSize: number;
+  private cursor: OEvent = undefined;
 
   constructor(private afs: AngularFirestore) { }
 
@@ -31,7 +32,7 @@ export class EventService {
 
     // order query by order parameter then by decendiung date and name
     this.currentSearch = (res) => {
-      return res.orderBy(orderby).orderBy("date", "desc").orderBy("name");
+      return res.orderBy("date", "desc").orderBy("name");
     };
 
     //  Filter by all propertes in prototype object
@@ -53,11 +54,10 @@ export class EventService {
   */
   extendSearch() {
 
-    this.searchSize = this.searchSize + this.pageSize;
-
     const query = this.afs.collection<OEvent>("/events",
       res => this.currentSearch(res)
-        .limit(this.searchSize));
+        .limit(this.pageSize)
+        .startAfter(this.cursor));
 
     this.events$ = query.valueChanges();
 

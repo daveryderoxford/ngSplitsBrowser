@@ -72,7 +72,7 @@ export class EventAdminService {
       trans.update(ref, update);
     });
 
-    console.log("EventService:  Event updated " + key);
+    console.log("EventAdminService:  Event updated " + key);
   }
 
   /** Sets index propeties on a partial even object  */
@@ -93,11 +93,11 @@ export class EventAdminService {
       await this.deleteEventResultsFromDB(event, fs, batch);
       await batch.commit();
     } catch (err) {
-      console.log('Error perfoming batch deletion');
+      console.log('"EventAdminService: Error perfoming batch deletion ' + event.key + '\n' + err);
       throw err;
     }
 
-    // Deete event and update club reference in a transaction
+    // Delete event and update club reference in a transaction
     fs.runTransaction(async (trans) => {
       await this.clubManger.eventDeleted(event, trans);
       const eventRef = this.afs.firestore.doc("/events/" + event.key);
@@ -158,7 +158,7 @@ export class EventAdminService {
     const fs = this.afs.firestore;
 
     /* Update competitors in Firestore database.
-       Existing competitors are elteted and new ones  added in a batch */
+       Existing competitors are deleted and new ones added in a batch */
     const batch = new LargeBatch(this.afs);
     try {
       await this.deleteEventResultsFromDB(event, fs, batch);
@@ -171,7 +171,7 @@ export class EventAdminService {
       }
       await batch.commit();
     } catch (err) {
-      console.log('Error updating ');
+      console.log('EventAdminService: Error encountered writting batch'  + event.key + '\n' + err);
       throw err;
     }
 
@@ -229,9 +229,9 @@ export class EventAdminService {
       results = parseEventData(text);
     } catch (e) {
       if (e.name === "InvalidData") {
-        console.log("EventAdminServicese Error parsing results" + e.message);
+        console.log("EventAdminService: Error parsing results" + e.message);
       } else {
-        console.log("EventAdminServicese Error parsing results" + e);
+        console.log("EventAdminService: Error parsing results" + e);
       }
       throw e;
     }
@@ -335,6 +335,7 @@ export class EventAdminService {
   }
 }
 
+/** Class to manage list of clubs in all events */
 class ClubListManager {
 
   constructor(private afs: AngularFirestore) { }
@@ -409,7 +410,6 @@ class ClubListManager {
     club.numEvents = club.numEvents + 1;
     club.lastEvent = eventInfo.date;
 
-
     const clubRef = this.afs.firestore.doc('/clubs/' + club.key);
     trans.set(clubRef, club);
 
@@ -417,7 +417,7 @@ class ClubListManager {
   }
 
   /** Remove a club reference in a transaction deleting the club if required */
-  private async  removeClubReference(event, club: Club, trans: firestore.Transaction): Promise<void> {
+  private async removeClubReference(event, club: Club, trans: firestore.Transaction): Promise<void> {
 
     if (!club) {
       console.log("ERROR Removing reference to a club not found  Name:" + event.club);
@@ -468,7 +468,7 @@ class LargeBatch {
     this.batch.delete(ref);
   }
 
-  /** commit a lrage batch */
+  /** Commit a large batch.  This just commits the last partial batch at the end*/
   async commit(): Promise<void> {
     await this.batch.commit();
   }

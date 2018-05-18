@@ -45,7 +45,7 @@ export class ResultsSearchComponent implements OnInit {
   private updateSearchPanelContents(searchstring: string | SearchSelectedItem) {
     if (!this.results) { return; }
 
-    // If a seelction has not been made the value of the contol is a string.   If a seelction has been made it is the object selected
+    // If a selction has not been made the value of the contol is a string.   If a seelction has been made it is the object selected
     searchstring = (typeof searchstring === 'string') ? searchstring : searchstring.name;
 
     const courses = this.results.findCourses(searchstring);

@@ -55,10 +55,8 @@ export class EventsListComponent {
     this.dataSource = new EventDataSource(this.afs, this.paginator);
     this.clubs$ = this.es.getClubs();
 
-    this.selctedClub.switchMap((name) => {
-      return this.es.getEventsForClub(name);
-    }).subscribe(events =>
-      this.events = events);
+    this.selctedClub.switchMap( name => this.es.getEventsForClub(name))
+      .subscribe(events => this.events = events);
   }
 
   setSelectedClub(name: string) {

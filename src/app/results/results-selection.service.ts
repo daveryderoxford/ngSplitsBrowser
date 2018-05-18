@@ -1,11 +1,12 @@
 import { Injectable } from "@angular/core";
 import { AngularFirestore } from "angularfire2/firestore";
 import { AngularFireStorage } from 'angularfire2/storage';
-import { Competitor, Course, CourseClass, Results } from "app/results/model";
+import { Competitor, Course, CourseClass, Results, InvalidData } from "app/results/model";
 import { BehaviorSubject, Observable } from "rxjs/Rx";
 import { OEvent } from "app/model/oevent";
 import { HttpClient } from "@angular/common/http";
 import { parseEventData } from "./import";
+import { exceptionGuard } from "@firebase/database/dist/src/core/util/util";
 
 /** Holds results selection state.
  * Selecting an event will load its results
@@ -31,13 +32,16 @@ export class ResultsSelectionService {
    * Selects an event to view.
    * This will load results for the event
    */
-  setSelectedEvent(event: OEvent): Observable<void> {
+  setSelectedEvent(event: OEvent): Observable<Results> {
     this.event$.next(event);
 
     /// Read the results if they are not avalaible
+    if (!event) {
+      throw new InvalidData('ResultsSelection: Event not specified');
+    }
 
     const ret = this.downloadResultsFile(event)
-      .map((text) => {
+      .do((text) => {
         const results = this.parseSplits(text);
         this.results$.next(results);
         this.selectedCompetitors$.next([]);
@@ -46,7 +50,21 @@ export class ResultsSelectionService {
         this.selectedClasses$.next([]);
       });
 
-    return ret;
+    return this.results$.asObservable();
+  }
+
+  /** Selects event based on the event key, loading the event results */
+  setSelectedEventByKey(key: string): Observable<Results> {
+    const event = this.event$.getValue();
+    const obs = this.afs.doc<OEvent>("/events/" + key)
+      .valueChanges()
+      .switchMap((evt) => this.setSelectedEvent(evt));
+    return obs;
+  }
+
+  /** Get observable for selected Event */
+  get selectedEvent(): Observable<OEvent> {
+    return (this.event$.asObservable());
   }
 
   get selectedResults(): Observable<Results> {
@@ -123,22 +141,7 @@ export class ResultsSelectionService {
     return (results);
   }
 
-  /** Selects event based on the event key, loading the event results*/
-  async setSelectedEventByKey(key: string): Promise<void> {
-    const event = this.event$.getValue();
-    if (!event || event.key !== key) {
-      const obs = this.afs.doc<OEvent>("/events/" + key).valueChanges().switchMap((evt) => {
-        return this.setSelectedEvent(evt);
-      });
-      return obs.toPromise();
-    }
 
-  }
-
-  /** Get observable for selected Event */
-  get selectedEvent(): Observable<OEvent> {
-    return (this.event$.asObservable());
-  }
 
   /** Downloads results for an event from google storage */
   private downloadResultsFile(event: OEvent): Observable<string> {

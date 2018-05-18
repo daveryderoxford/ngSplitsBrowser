@@ -1,12 +1,9 @@
-import { Component, OnInit, ElementRef, ViewEncapsulation, ChangeDetectionStrategy, AfterViewInit } from "@angular/core";
-import { OEvent } from "app/model/oevent";
-import { ActivatedRoute, Params } from "@angular/router";
-
-import { ResultsSelectionService } from "app/results/results-selection.service";
-
-import { displayGraph, removeGraph } from "app/results/graph/splitsbrowser/splitsbrowser";
-import { Results } from "app/results/model";
+import { ChangeDetectionStrategy, Component, ViewEncapsulation, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
 import { DialogsService } from 'app/dialogs/dialogs.service';
+import { displayGraph } from "app/results/graph/splitsbrowser/splitsbrowser";
+import { Results } from "app/results/model";
+import { ResultsSelectionService } from "app/results/results-selection.service";
 
 
 interface SplitsBrowserOptions {
@@ -23,39 +20,21 @@ interface SplitsBrowserOptions {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class GraphComponent implements AfterViewInit {
+export class GraphComponent implements OnInit {
 
   results: Results;
-  viewer: any;
-  loading = false;
 
   constructor(private route: ActivatedRoute,
     private rs: ResultsSelectionService,
     private dialog: DialogsService) {
   }
 
-  ngAfterViewInit() {
-    this.route.params.subscribe(async (params: Params) => {
-      try {
-        this.loading = true;
-        removeGraph();
-        // load results for the event Id
-        await this.rs.setSelectedEventByKey(params["id"]);
-      } catch (e) {
-        // Display a dialog with the error
-        this.dialog.message('Error loading results', 'Error loading results ' + e.message);
-      } finally {
-        this.loading = false;
+  ngOnInit() {
+    this.route.snapshot.data.subscribe( (results) => {
+      if (results) {
+        displayGraph(results, { containerElement: "app-graph" });
       }
     });
-    this.rs.selectedResults.subscribe((results: Results) => this.selectedResultsUpdated(results));
-
-  }
-
-  async selectedResultsUpdated(results: Results) {
-    if (results) {
-      displayGraph(results, { containerElement: "app-graph" });
-    }
   }
 }
 

@@ -1,16 +1,14 @@
+import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { ReactiveFormsModule } from "@angular/forms";
-import { HttpClientModule } from "@angular/common/http";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule, Routes } from "@angular/router";
-
 import { VirtualScrollModule } from "angular2-virtual-scroll";
 import { AngularFireModule } from "angularfire2";
 import { AngularFirestoreModule } from "angularfire2/firestore";
 import { AngularFireStorageModule } from "angularfire2/storage";
-
 import { AboutComponent } from "app/about/about.component";
 import { AppMaterialModule } from "app/app-material.module";
 import { AppComponent } from "app/app.component";
@@ -28,12 +26,11 @@ import { ResultsNavbarComponent } from "app/results/results-navbar/results-navba
 import { ResultsSearchComponent } from "app/results/results-search/results-search.component";
 import { ResultsSelectionService } from "app/results/results-selection.service";
 import { ResultsViewComponent } from "app/results/results-view/results-view.component";
+import { ResultsResolver } from "app/results/results.resolver";
 import { UploadModule } from "app/upload/upload.module";
 import { UserDataService } from "app/user/user-data.service";
 import { UserComponent } from "app/user/user.component";
-
 import "hammerjs";
-
 
 export const appRoutes: Routes = [
   { path: "", component: MainComponent },
@@ -43,7 +40,11 @@ export const appRoutes: Routes = [
   { path: "events", component:  EventsListComponent },
   { path: "user", component: UserComponent, canActivate: [AuthGuard] },
   { path: "about", component: AboutComponent },
-  { path: "graph/:id", component: GraphComponent }
+  { path: "graph/:id",
+   component: GraphComponent,
+   resolve: {
+    results: ResultsResolver
+  }}
 ];
 
 @NgModule({
@@ -80,7 +81,8 @@ export const appRoutes: Routes = [
     AuthGuard,
     ResultsSelectionService,
     UserDataService,
-    EventService
+    EventService,
+    ResultsResolver,
    ],
   bootstrap: [AppComponent]
 })
