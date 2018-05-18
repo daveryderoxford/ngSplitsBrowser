@@ -16,6 +16,7 @@ import {
 import { NavbarComponent } from "app/navbar/navbar.component";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFireDatabase } from "angularfire2/database";
+import { SpinnerComponent } from './utils/spinner.component';
 
 @NgModule({
     imports: [
@@ -33,7 +34,7 @@ import { AngularFireDatabase } from "angularfire2/database";
         FlexLayoutModule,
         DialogsModule,
     ],
-    declarations: [NavbarComponent],
+    declarations: [NavbarComponent, SpinnerComponent],
     exports: [NavbarComponent],
     providers: [AngularFireAuth, AngularFireDatabase]
 })
