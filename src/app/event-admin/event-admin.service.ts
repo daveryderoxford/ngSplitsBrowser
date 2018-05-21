@@ -8,7 +8,7 @@ import { ECard } from "app/model/user";
 import { parseEventData } from "app/results/import";
 import { Competitor } from "app/results/model";
 import { Results } from "app/results/model/results";
-import { Utils } from "app/utils/utils";
+import { Utils } from "app/shared";
 import { firestore } from "firebase";
 import { Observable } from "rxjs/Observable";
 

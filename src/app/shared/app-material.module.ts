@@ -1,5 +1,5 @@
 
-/** Material components used for mail app  */
+/** Material2 components used for application app  */
 import { NgModule } from "@angular/core";
 
 import {
@@ -8,8 +8,11 @@ import {
   MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatProgressBarModule, MatRadioModule,
   MatProgressSpinnerModule, MatRippleModule, MatSelectModule, MatSidenavModule, MatSliderModule,
   MatSlideToggleModule, MatSnackBarModule, MatTabsModule, MatToolbarModule, MatTooltipModule, MatTableModule, MatPaginatorModule,
-  MatExpansionModule, MatFormFieldModule,
+  MatExpansionModule, MatFormFieldModule
 } from "@angular/material";
+
+import { FlexLayoutModule } from "@angular/flex-layout";
+
 
 @NgModule({
   exports: [
@@ -43,6 +46,7 @@ import {
     MatPaginatorModule,
     MatExpansionModule,
     MatFormFieldModule,
+    FlexLayoutModule
   ],
 })
 export class AppMaterialModule { }

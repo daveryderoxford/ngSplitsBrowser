@@ -1,4 +1,4 @@
-
+/** Various utility functions for Splitsbrowser */
 export class Utils {
 
     /** Async function to load a file from disk returning text string containing file contents */
@@ -35,15 +35,7 @@ export class Utils {
         });
     }
 
-    static decreasingTimeIndex(dateStr: string): string {
-        const d1 = new Date("2050-01-01 00:00:00").getTime() / 1000;
-        const d2 = new Date(dateStr).getTime() / 1000;
-        const minusDate = d1 - d2;
-
-        const str = Utils.padRight(minusDate.toString(), 15);
-        return (str);
-    }
-
+    /** Normalise a Firebase key */
     static encodeAsKey(string) {
         return string.replace(/\%/g, "%25")
             .replace(/\./g, "%2E")

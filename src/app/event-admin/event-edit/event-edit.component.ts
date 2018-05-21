@@ -1,12 +1,10 @@
-import { Component, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-
-import { OEvent, EventInfo, EventGrades, EventTypes, EventDisciplines } from 'app/model/oevent';
-import { Nations, Nation } from 'app/model/nations';
-
 import { MatSnackBar } from '@angular/material';
-import { EventAdminService } from 'app/upload/event-admin.service';
+import { Router } from '@angular/router';
+import { EventAdminService } from 'app/event-admin/event-admin.service';
+import { Nations } from 'app/model/nations';
+import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from 'app/model/oevent';
 
 @Component({
   selector: 'app-event-edit',
@@ -72,22 +70,22 @@ export class EventEditComponent implements OnInit {
   }
 
   private addhttp(url: string | null): string | null {
-  if (url) {
-    if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
-      url = "http://" + url;
+    if (url) {
+      if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
+        url = "http://" + url;
+      }
     }
-  }
     return url;
   }
 
-async submit() {
+  async submit() {
 
-  if (this.f.valid) {
+    if (this.f.valid) {
 
-    try {
-      this.showProgressBar = true;
+      try {
+        this.showProgressBar = true;
 
-      this.f.value.webpage = this.addhttp(this.f.value.webpage);
+        this.f.value.webpage = this.addhttp(this.f.value.webpage);
 
         if (this.new) {
           await this.eventService.saveNew(this.f.value);

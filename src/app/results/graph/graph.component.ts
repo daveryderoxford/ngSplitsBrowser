@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { DialogsService } from 'app/dialogs/dialogs.service';
+import { DialogsService } from 'app/shared';
 import { displayGraph } from "app/results/graph/splitsbrowser/splitsbrowser";
 import { Results } from "app/results/model";
 import { ResultsSelectionService } from "app/results/results-selection.service";

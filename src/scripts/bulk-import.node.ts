@@ -7,8 +7,8 @@ import { FirebaseApp } from "angularfire2";
 import { AngularFireDatabase } from "angularfire2/database";
 import { LogEntry } from "../app/model/log-entry";
 import { Club, EventGrades, EventSummary, OEvent, SplitsFileInfo } from "../app/model";
-import { EventAdminService } from "../app/upload/event-admin.service";
-import { Utils } from "../app/utils/utils";
+import { EventAdminService } from "../app/event-admin/event-admin.service";
+import { Utils } from "../app/shared";
 import * as data from "./importdata.node";
 
 /* Service to import exisitng resilts */

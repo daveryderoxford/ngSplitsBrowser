@@ -3,8 +3,8 @@ import { Component, OnInit, Input} from '@angular/core';
 @Component({
   selector: 'app-spinner',
   template: `
-    <div *ngIf="loading" class="loading-spinner">
-      <mat-progress-spinner mode="indeterminate" color="accent"></mat-progress-spinner>
+     <div *ngIf="loading" class="loading-spinner">
+      <mat-spinner mode="indeterminate" color="accent"></mat-spinner>
     </div>
   `,
   styleUrls: ['./spinner.component.scss']

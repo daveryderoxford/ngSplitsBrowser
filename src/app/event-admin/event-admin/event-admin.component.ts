@@ -1,9 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "angularfire2/auth";
-import { AngularFireDatabase } from "angularfire2/database";
-import { DialogsService } from "app/dialogs/dialogs.service";
+import { DialogsService } from "app/shared/dialogs/dialogs.service";
 import { OEvent } from "app/model/oevent";
-import { EventAdminService } from "app/upload/event-admin.service";
+import { EventAdminService } from "app/event-admin/event-admin.service";
 import { Observable } from "rxjs/Observable";
 
 
@@ -21,7 +20,6 @@ export class EventAdminComponent implements OnInit {
 
   constructor(private afAuth: AngularFireAuth,
     private eventAdmin: EventAdminService,
-    private db: AngularFireDatabase,
     private dialogsService: DialogsService) { }
 
   ngOnInit() {

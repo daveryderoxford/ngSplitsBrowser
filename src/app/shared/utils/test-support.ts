@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 
 
 @Injectable()
-class SBTestSupport {
+export class SBTestSupport {
 
 
     constructor(private auth: AngularFireAuth) {

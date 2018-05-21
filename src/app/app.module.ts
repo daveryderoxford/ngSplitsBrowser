@@ -1,23 +1,19 @@
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
-import { FlexLayoutModule } from "@angular/flex-layout";
 import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { RouterModule, Routes } from "@angular/router";
-import { VirtualScrollModule } from "angular2-virtual-scroll";
 import { AngularFireModule } from "angularfire2";
 import { AngularFirestoreModule } from "angularfire2/firestore";
 import { AngularFireStorageModule } from "angularfire2/storage";
 import { AboutComponent } from "app/about/about.component";
-import { AppMaterialModule } from "app/app-material.module";
 import { AppComponent } from "app/app.component";
 import { firebaseConfig } from "app/app.firebase-config";
-import { SharedModule } from "app/app.shared.module";
 import { AuthGuard } from "app/auth/guards/auth-guard";
 import { LoginComponent } from "app/auth/login/login.component";
 import { RecoverComponent } from "app/auth/recover/recover.component";
 import { SignupComponent } from "app/auth/signup/signup.component";
+import { EventAdminModule } from "app/event-admin/event-admin.module";
 import { EventService } from 'app/events/event.service';
 import { EventsListComponent } from "app/events/eventslist/eventslist.component";
 import { MainComponent } from "app/main/main.component";
@@ -27,25 +23,11 @@ import { ResultsSearchComponent } from "app/results/results-search/results-searc
 import { ResultsSelectionService } from "app/results/results-selection.service";
 import { ResultsViewComponent } from "app/results/results-view/results-view.component";
 import { ResultsResolver } from "app/results/results.resolver";
-import { UploadModule } from "app/upload/upload.module";
+import { SharedModule } from "app/shared/shared.module";
 import { UserDataService } from "app/user/user-data.service";
 import { UserComponent } from "app/user/user.component";
 import "hammerjs";
-
-export const appRoutes: Routes = [
-  { path: "", component: MainComponent },
-  { path: "login", component: LoginComponent },
-  { path: "signup", component: SignupComponent },
-  { path: "recover", component: RecoverComponent },
-  { path: "events", component:  EventsListComponent },
-  { path: "user", component: UserComponent, canActivate: [AuthGuard] },
-  { path: "about", component: AboutComponent },
-  { path: "graph/:id",
-   component: GraphComponent,
-   resolve: {
-    results: ResultsResolver
-  }}
-];
+import { AppRoutingModule } from "./app-routing.module";
 
 @NgModule({
   declarations: [
@@ -63,18 +45,15 @@ export const appRoutes: Routes = [
     ResultsSearchComponent,
   ],
   imports: [
-    RouterModule.forRoot(appRoutes),
     BrowserModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
-    FlexLayoutModule,
+    AppRoutingModule,
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
     AngularFireStorageModule,
-    AppMaterialModule,
-    UploadModule,
+    EventAdminModule,
     SharedModule,
-    VirtualScrollModule,
     HttpClientModule,
   ],
   providers: [

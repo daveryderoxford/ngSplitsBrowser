@@ -6,7 +6,7 @@
     <mat-tab label="ALL">
       <div class="background">
         <div class="data-container mat-elevation-z2">
-          <table mat-table #table [dataSource]="dataSource">
+          <table mat-table #table [dataSource]="dataSource" (scroll)="onTableScroll($event)">
 
             <!-- Date Definition -->
             <ng-container matColumnDef="date">
@@ -76,8 +76,7 @@
               [ngClass]="rowStyle(row)"></mat-row>
           </table>
 
-          <mat-paginator #paginator [pageIndex]="0" [pageSize]="25" [pageSizeOptions]="[25, 50, 100]">
-          </mat-paginator>
+          <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
 
         </div>
       </div>
@@ -121,6 +120,7 @@
 
               </ng-template>
 
+              <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
 
             </mat-expansion-panel>
 
@@ -142,3 +142,9 @@
   </mat-tab-group>
 
 </div>
+
+<mat-menu #appMenu="matMenu" xPosition="before">
+    <button (click)="graphMenuSelected(selectedEvent)" mat-menu-item>Graph</button>
+    <button (click)="summaryMenuSelected(selectedEvent)" mat-menu-item>Summary</button>
+    <button *ngIf="eventEditable(selectedEvent)"(click)="adminMenuSelected(selectedEvent)" mat-menu-item>Admin</button>
+</mat-menu>

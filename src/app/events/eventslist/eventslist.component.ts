@@ -1,22 +1,16 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { Router } from "@angular/router";
 import { DataSource } from "@angular/cdk/collections";
+import { Component, ViewChild } from "@angular/core";
 import { MatPaginator, MatSelectChange } from "@angular/material";
-
-import { OEvent, EventGrades } from "app/model/oevent";
-import { AngularFirestore, AngularFirestoreDocument } from "angularfire2/firestore";
-
+import { Router } from "@angular/router";
 import { AngularFireAuth } from "angularfire2/auth";
-import { EventAdminService } from "app/upload/event-admin.service";
-
-import { ChangeEvent } from "angular2-virtual-scroll";
-import { Observable } from "rxjs/Observable";
-import { Club } from "app/model/club";
-import { DataSnapshot } from "@firebase/database";
-import * as _ from "lodash";
+import { AngularFirestore } from "angularfire2/firestore";
 import { EventService } from "app/events/event.service";
-import { BehaviorSubject } from "rxjs";
 import { Nations } from "app/model";
+import { Club } from "app/model/club";
+import { EventGrades, OEvent } from "app/model/oevent";
+import { BehaviorSubject } from "rxjs";
+import { Observable } from "rxjs/Observable";
+
 
 @Component({
   selector: "app-results",
@@ -40,6 +34,8 @@ export class EventsListComponent {
   selctedClub = new BehaviorSubject('');
 
   selectedEvent: OEvent = null;
+  loading: Observable<boolean>;
+
 
   constructor(private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
@@ -52,11 +48,15 @@ export class EventsListComponent {
 
   // tslint:disable-next-line:use-life-cycle-interface
   ngOnInit() {
-    this.dataSource = new EventDataSource(this.afs, this.paginator);
+    this.dataSource = new EventDataSource(this.es);
+
     this.clubs$ = this.es.getClubs();
 
-    this.selctedClub.switchMap( name => this.es.getEventsForClub(name))
+    this.selctedClub.switchMap(name => this.es.getEventsForClub(name))
       .subscribe(events => this.events = events);
+
+    this.loading = this.es.loading;
+
   }
 
   setSelectedClub(name: string) {
@@ -65,6 +65,19 @@ export class EventsListComponent {
 
   clubNationalFilterChange($event: MatSelectChange) {
     // TODO handle this or use obasevable stream
+  }
+  // EVENT TABLE
+  onTableScroll(e) {
+    const tableViewHeight = e.target.offsetHeight; // viewport: ~500px
+    const tableScrollHeight = e.target.scrollHeight; // length of all table
+    const scrollLocation = e.target.scrollTop; // how far user scrolled
+
+    // If the user has scrolled within 200px of the bottom, add more data
+    const buffer = 200;
+    const limit = tableScrollHeight - tableViewHeight - buffer;
+    if (scrollLocation > limit) {
+      this.dataSource.fetchNextChunk();
+    }
   }
 
   onMouseEnter(row) {
@@ -83,50 +96,40 @@ export class EventsListComponent {
     }
   }
 
+  graphMenuSelected(event: OEvent) {
+  }
+
+  summaryMenuSelected(event: OEvent) {
+  }
+
+  adminMenuSelected(event: OEvent) {
+  }
+
+  eventEditable(event: OEvent) {
+
+  }
+
 }
 
 //  ===========================  Data source ========================
 
-class EventDataSource extends DataSource<any> {
+class EventDataSource extends DataSource<OEvent> {
 
-  protected oevents: OEvent[] = [];
-  protected visibleEvents: OEvent[] = [];
-  protected loading = false;
+  protected oevents$: Observable<OEvent[]>;
 
-  constructor(private afs: AngularFirestore,
-    private paginator: MatPaginator) {
+  constructor(private es: EventService) {
     super();
   }
 
   connect(): Observable<OEvent[]> {
-    return (this.fetchNextChunk());
+    // Intialise query
+    return this.es.search("date", null, 30);
   }
 
   disconnect() { }
 
-  private fetchNextChunk(): Observable<OEvent[]> {
-
-    const oevents = this.oevents;
-    const pageSize = this.paginator.pageSize;
-    let startAt;
-
-    if (oevents.length > 0) {
-      startAt = oevents[oevents.length - 1].date;
-    } else {
-      startAt = 0;
-    }
-
-    //  const query = this.db.list<OEvent>("/events",
-    const query = this.afs.collection<OEvent>("/events",
-      res => res.where("splits.valid", "==", true)
-        .orderBy("date", "desc")
-        .orderBy("name")
-        .limit(pageSize));
-
-
-    const obs: Observable<OEvent[]> = query.valueChanges();
-
-    return (obs);
+  fetchNextChunk() {
+    this.es.extendSearch();
   }
 
 }
