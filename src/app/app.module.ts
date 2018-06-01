@@ -15,7 +15,7 @@ import { RecoverComponent } from "app/auth/recover/recover.component";
 import { SignupComponent } from "app/auth/signup/signup.component";
 import { EventAdminModule } from "app/event-admin/event-admin.module";
 import { EventService } from 'app/events/event.service';
-import { EventsListComponent } from "app/events/eventslist/eventslist.component";
+import { EventsViewComponent } from "app/events/eventsview/events-view.component";
 import { MainComponent } from "app/main/main.component";
 import { GraphComponent } from "app/results/graph/graph.component";
 import { ResultsNavbarComponent } from "app/results/results-navbar/results-navbar.component";
@@ -28,6 +28,7 @@ import { UserDataService } from "app/user/user-data.service";
 import { UserComponent } from "app/user/user.component";
 import "hammerjs";
 import { AppRoutingModule } from "./app-routing.module";
+import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 
 @NgModule({
   declarations: [
@@ -36,13 +37,14 @@ import { AppRoutingModule } from "./app-routing.module";
     RecoverComponent,
     SignupComponent,
     MainComponent,
-    EventsListComponent,
+    EventsViewComponent,
     UserComponent,
     AboutComponent,
     GraphComponent,
     ResultsViewComponent,
     ResultsNavbarComponent,
     ResultsSearchComponent,
+    ChangePasswordComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,13 +58,6 @@ import { AppRoutingModule } from "./app-routing.module";
     SharedModule,
     HttpClientModule,
   ],
-  providers: [
-    AuthGuard,
-    ResultsSelectionService,
-    UserDataService,
-    EventService,
-    ResultsResolver,
-   ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -8,6 +8,8 @@
       <button mat-button routerLink="/events">Results</button>
       <button mat-button routerLink="/admin/event-admin">Manage</button>
 
+      <button mat-button (click)="scriptsClicked()">Scripts</button>
+
       <a *ngIf="!authorised" mat-icon-button routerLink="/login">
         <mat-icon class="material-icons md-26">account_box</mat-icon>
       </a>
@@ -23,5 +25,6 @@
 
 <mat-menu #appMenu="matMenu" xPosition="before">
   <button routerLink="/user" mat-menu-item>User settings</button>
+  <button routerLink="/change-password" mat-menu-item>Change password</button>
   <button (click)="logout()" mat-menu-item>Logout</button>
 </mat-menu>

@@ -15,7 +15,9 @@ export interface QueryConfig {
   prepend: boolean; // prepend to source?
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class PaganationService {
 
   // Source data
@@ -35,6 +37,9 @@ export class PaganationService {
   // Initial query sets options and defines the Observable
   // passing opts will override the defaults
   init(path: string, field: string, opts?: any) {
+
+    this._data.next([]);
+
     this.query = {
       path,
       field,

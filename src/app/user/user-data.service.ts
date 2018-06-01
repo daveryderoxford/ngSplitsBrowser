@@ -6,7 +6,9 @@ import { UserData, UserInfo, UserResultData } from "app/model/user";
 import { Competitor, Course, InvalidData } from "app/results/model";
 import { Observable } from "rxjs/Observable";
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class UserDataService {
 
   constructor(
@@ -27,7 +29,7 @@ export class UserDataService {
   }
 
     /** Update the user info */
-    async updateDetails(details: UserInfo): Promise<void> {
+    async updateDetails(details: Partial<UserInfo>): Promise<void> {
       await this.getUserDoc().update(details);
     }
 
@@ -44,6 +46,7 @@ export class UserDataService {
       autoFind: true,
       results: [],
       ecards: [],
+      resultsLastupDated: new Date()
     };
     return this.getUserDoc().set(user);
   }

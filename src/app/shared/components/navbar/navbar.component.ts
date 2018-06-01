@@ -1,8 +1,9 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { AngularFireAuth } from "angularfire2/auth";
+import { Component, Input, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import * as firebase from "firebase/app";
+import { AngularFireAuth } from "angularfire2/auth";
 import { Results } from "app/results/model";
+import * as firebase from "firebase/app";
+import {BulkImportService} from "../../../../scripts/bulk-import";
 
 @Component({
   selector: "app-navbar",
@@ -17,7 +18,8 @@ export class NavbarComponent implements OnInit {
   public authorised = false;
 
   constructor(private afAuth: AngularFireAuth,
-              private router: Router ) {
+              private router: Router,
+              private bs: BulkImportService) {
 
     this.afAuth.authState.subscribe((user: firebase.User) => {
       this.authorised = (user !== null);
@@ -33,6 +35,9 @@ export class NavbarComponent implements OnInit {
     if (this.router.url.includes("admin") ) {
        this.router.navigate(["/"]);
     }
+  }
 
+  async scriptsClicked() {
+    await this.bs.loadEvents();
   }
 }

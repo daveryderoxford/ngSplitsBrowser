@@ -1,12 +1,12 @@
-import { Observable } from 'rxjs/Rx';
-import { ConfirmDialogComponent } from './confirm-dialog.component';
-import { MatDialogRef, MatDialog, MatDialogConfig } from '@angular/material';
 import { Injectable } from '@angular/core';
-
+import { MatDialog, MatDialogRef } from '@angular/material';
 import 'rxjs/add/operator/toPromise';
-import { MessageDialogComponent } from "app/dialogs/message-dialog.component";
+import { ConfirmDialogComponent } from './confirm-dialog.component';
+import { MessageDialogComponent } from "./message-dialog.component";
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+  })
 export class DialogsService {
 
     constructor(private dialog: MatDialog) { }

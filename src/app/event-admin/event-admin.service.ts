@@ -14,14 +14,16 @@ import { Observable } from "rxjs/Observable";
 
 type PartialEvent = Partial<OEvent>;
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class EventAdminService {
 
-  private clubManger: ClubListManager;
+  public clubManger: ClubListManager;
 
-  constructor(private afAuth: AngularFireAuth,
-    private afs: AngularFirestore,
-    private storage: AngularFireStorage) {
+  constructor(protected afAuth: AngularFireAuth,
+    protected afs: AngularFirestore,
+    protected storage: AngularFireStorage) {
     this.clubManger = new ClubListManager(afs);
   }
 
@@ -30,7 +32,9 @@ export class EventAdminService {
     return this.afs.doc<OEvent>('/events/' + key).valueChanges();
   }
 
-  /** Create new event specifying event info */
+  /** Create new event specifying event info
+   * The let
+  */
   async saveNew(eventInfo: EventInfo): Promise<string> {
     const event = <OEvent>eventInfo;
 
@@ -38,12 +42,13 @@ export class EventAdminService {
     event.date = new Date(event.date).toISOString();
     event.user = this.afAuth.auth.currentUser.uid;
     event.key = this.afs.createId();
+
     this.setIndexProperties(event);
 
     console.log("EventService:  Adding Event " + JSON.stringify(event));
 
     // Update club list and event in a transaction
-    this.afs.firestore.runTransaction(async (trans) => {
+    await this.afs.firestore.runTransaction(async (trans) => {
       await this.clubManger.eventAdded(event, trans);
       const ref = this.afs.firestore.doc("/events/" + event.key);
       trans.set(ref, event);
@@ -66,7 +71,7 @@ export class EventAdminService {
     this.setIndexProperties(update);
 
     // Update club list and event in a transaction
-    this.afs.firestore.runTransaction(async (trans) => {
+    await this.afs.firestore.runTransaction(async (trans) => {
       await this.clubManger.eventChanged(key, eventInfo, trans);
       const ref = this.afs.firestore.doc("/events/" + key);
       trans.update(ref, update);
@@ -76,7 +81,7 @@ export class EventAdminService {
   }
 
   /** Sets index propeties on a partial even object  */
-  private setIndexProperties(partialEvent: PartialEvent) {
+  public setIndexProperties(partialEvent: PartialEvent) {
     partialEvent.yearIndex = new Date(partialEvent.date).getFullYear();
     partialEvent.gradeIndex = EventGrades.indexObject(partialEvent.grade);
   }
@@ -98,10 +103,10 @@ export class EventAdminService {
     }
 
     // Delete event and update club reference in a transaction
-    fs.runTransaction(async (trans) => {
+    await fs.runTransaction(async (trans) => {
       await this.clubManger.eventDeleted(event, trans);
       const eventRef = this.afs.firestore.doc("/events/" + event.key);
-      await trans.delete(eventRef);
+      trans.delete(eventRef);
     });
 
     // Finally delete results file from Google storage
@@ -110,7 +115,7 @@ export class EventAdminService {
     }
   }
 
-  private async deleteEventResultsFromDB(event: OEvent, fs: firestore.Firestore, batch: LargeBatch) {
+  public async deleteEventResultsFromDB(event: OEvent, fs: firestore.Firestore, batch: LargeBatch): Promise<void> {
 
     const exisitngCompetitors = await this.getExistingCompetitors(event);
 
@@ -130,55 +135,65 @@ export class EventAdminService {
    *  - competitor index lookup
    *  - club index lookup
   */
-  async uploadResults(event: OEvent, file: File, fileFormat: SplitsFileFormat = "auto") {
-
-    const text = await this.loadTextFile(file);
-
-    const results = this.parseSplits(text);
-
-    event.summary = this.populateSummary(results);
-
-    // Save file to users area on Google Clould  Storage
-    const uid = this.afAuth.auth.currentUser.uid;
-    const path = "results/" + uid + "/" + event.key + "-results";
-    await this.uploadToGoogle(text, path);
-
-    // Update event object with stored file location
-    event.splits = {
-      splitsFilename: path,
-      splitsFileFormat: fileFormat,
-      valid: true
-    };
-
-    const query = this.afs.collection<OEvent>("/events", ref => {
-      return ref.orderBy("date", "desc")
-        .where("user", "==", this.afAuth.auth.currentUser.uid);
-    });
+  async uploadResults(event: OEvent, file: File, fileFormat: SplitsFileFormat = "auto"): Promise<void> {
 
     const fs = this.afs.firestore;
 
-    /* Update competitors in Firestore database.
-       Existing competitors are deleted and new ones added in a batch */
-    const batch = new LargeBatch(this.afs);
     try {
-      await this.deleteEventResultsFromDB(event, fs, batch);
+      const text = await Utils.loadTextFile(file);
 
-      // Save new results for the event in the database
-      for (const comp of results.allCompetitors) {
-        const compDBData = this.createCompetitorSearchData(event, comp);
-        const compRef = fs.doc("/results/" + compDBData.key);
-        await batch.set(compRef, compDBData);
+      const results = this.parseSplits(text);
+
+      event.summary = this.populateSummary(results);
+
+      // Save file to users area on Google Clould  Storage
+      const uid = this.afAuth.auth.currentUser.uid;
+      const path = "results/" + uid + "/" + event.key + "-results";
+      await this.uploadToGoogle(text, path);
+
+      // Update event object with stored file location
+      event.splits = {
+        splitsFilename: path,
+        splitsFileFormat: fileFormat,
+        valid: true
+      };
+
+      const query = this.afs.collection<OEvent>("/events", ref => {
+        return ref.orderBy("date", "desc")
+          .where("user", "==", this.afAuth.auth.currentUser.uid);
+      });
+
+
+      /* Update competitors in Firestore database.
+         Existing competitors are deleted and new ones added in a batch */
+      const batch = new LargeBatch(this.afs);
+      try {
+        await this.deleteEventResultsFromDB(event, fs, batch);
+
+        // Save new results for the event in the database
+        for (const comp of results.allCompetitors) {
+          const compDBData = this.createCompetitorSearchData(event, comp);
+          const compRef = fs.doc("/results/" + compDBData.key);
+          await batch.set(compRef, compDBData);
+        }
+        await batch.commit();
+      } catch (err) {
+        console.log('EventAdminService: Error encountered writting batch ' + event.key + '\n' + err);
+        throw err;
       }
-      await batch.commit();
+
     } catch (err) {
-      console.log('EventAdminService: Error encountered writting batch'  + event.key + '\n' + err);
+      // If an error has occueed save reason in the database
+      event.splits.valid = false;
+      event.splits.failurereason = err;
+      await fs.doc("/events/" + event.key).set(event);
       throw err;
     }
 
-    // seve event details
+    // save event details
     await fs.doc("/events/" + event.key).set(event);
 
-    console.log("EventAdminService: Results file uploaded " + file + "  to" + path);
+    console.log("EventAdminService: Results file uploaded " + file + " to " + event.splits.splitsFilename);
 
   }
 
@@ -193,36 +208,17 @@ export class EventAdminService {
     return query.valueChanges();
   }
 
-  private async getExistingCompetitors(event: OEvent): Promise<CompetitorSearchData[]> {
+  protected async getExistingCompetitors(event: OEvent): Promise<CompetitorSearchData[]> {
     const promise = this.afs.collection<CompetitorSearchData>("/results", ref => {
       return ref.where("eventKey", "==", event.key);
-    }).valueChanges().first().toPromise();
+    }).valueChanges().take(1).toPromise();
 
     return promise;
   }
 
-  /** Async function to load a file from disk returning text string containing file contents */
-  private async loadTextFile(file: File): Promise<string> {
-
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onload = (event: any) => {
-        const text = event.target.result;
-        resolve(text);
-      };
-
-      reader.onerror = () => {
-        reject(reader.error);
-      };
-
-      reader.readAsText(file);
-
-    });
-  }
 
   /* Parse splits file returning parsed results */
-  private parseSplits(text: string): any {
+  public parseSplits(text: string): any {
 
     let results: Results;
     try {
@@ -243,7 +239,7 @@ export class EventAdminService {
    * as file is small we do not support progress monitoring,
    * Just return a promise when complete
   */
-  private async uploadToGoogle(text: string, path: string): Promise<any> {
+  protected async uploadToGoogle(text: string, path: string): Promise<any> {
     return this.storage.ref(path).putString(text).then();
   }
 
@@ -269,7 +265,7 @@ export class EventAdminService {
   }
 
   /** Creates an object summarising the results */
-  private createCourseSummary(course: any): CourseSummary {
+  public createCourseSummary(course: any): CourseSummary {
     const summary: CourseSummary = {
       name: course.name,
       length: course.length,
@@ -281,7 +277,7 @@ export class EventAdminService {
   }
 
   /** Save the competitor search recored */
-  private createCompetitorSearchData(event: OEvent, comp: Competitor): CompetitorSearchData {
+  public createCompetitorSearchData(event: OEvent, comp: Competitor): CompetitorSearchData {
     return {
       key: event.key + '-' + comp.key,
       eventKey: event.key,
@@ -338,12 +334,12 @@ export class EventAdminService {
 /** Class to manage list of clubs in all events */
 class ClubListManager {
 
-  constructor(private afs: AngularFirestore) { }
+  constructor(protected afs: AngularFirestore) { }
 
   /** Call in transaction before an event is deleetd to decerment its reference count  */
   public async eventDeleted(event: OEvent, trans: firestore.Transaction): Promise<void> {
     const club = await this.readClub(event, trans);
-    return await this.removeClubReference(event, club, trans);
+    this.removeClubReference(event, club, trans);
   }
 
   /** Call in transaction when an event is changed to manage club list  */
@@ -358,15 +354,15 @@ class ClubListManager {
       // In transaction, Reads must be before any writes
       const writtenClub = await this.readClub(written, trans);
       const previousClub = await this.readClub(previous, trans);
-      await this.removeClubReference(previous, previousClub, trans);
-      await this.addClubReference(written, writtenClub, trans);
+      this.removeClubReference(previous, previousClub, trans);
+      this.addClubReference(written, writtenClub, trans);
     }
   }
 
   /** Call in transaction before an event is added to craete club s required and increamrnt its reference count */
   public async eventAdded(event: OEvent, trans) {
     const club = await this.readClub(event, trans);
-    await this.addClubReference(event, club, trans);
+    this.addClubReference(event, club, trans);
   }
 
   /** Get key string for a club comprised to nationality code and club name concaternated. */
@@ -388,13 +384,13 @@ class ClubListManager {
 
   /** Read event object - Not part of the transaction  */
   private async readEvent(key: string): Promise<OEvent | undefined> {
-    return this.afs.doc<OEvent>('/events/' + key).valueChanges().first().toPromise();
+    return this.afs.doc<OEvent>('/events/' + key).valueChanges().take(1).toPromise();
   }
 
   /** Add a reference to a club in a transaction, creating club if required */
-  private async addClubReference(eventInfo: EventInfo,
+  private addClubReference(eventInfo: EventInfo,
     club: Club,
-    trans: firestore.Transaction): Promise<void> {
+    trans: firestore.Transaction): void {
 
     if (!club) {
       club = {
@@ -417,7 +413,7 @@ class ClubListManager {
   }
 
   /** Remove a club reference in a transaction deleting the club if required */
-  private async removeClubReference(event, club: Club, trans: firestore.Transaction): Promise<void> {
+  private removeClubReference(event, club: Club, trans: firestore.Transaction): void {
 
     if (!club) {
       console.log("ERROR Removing reference to a club not found  Name:" + event.club);
@@ -441,12 +437,12 @@ class ClubListManager {
  * The batch is committed and a new batch created each 500 operations.
  * Note it does nto support collback of committed batches
 */
-class LargeBatch {
+export class LargeBatch {
   batch: firestore.WriteBatch;
   count = 0;
   MAX_BATCH_OPERATIONS = 500;
 
-  constructor(private afs: AngularFirestore) {
+  constructor(protected afs: AngularFirestore) {
     this.batch = afs.firestore.batch();
   }
 

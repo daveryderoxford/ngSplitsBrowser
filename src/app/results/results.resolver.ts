@@ -4,7 +4,9 @@ import { Results } from "app/results/model";
 import { Observable } from "rxjs";
 import { ResultsSelectionService } from "./results-selection.service";
 
-@Injectable()
+@Injectable({
+    providedIn: 'root',
+})
 export class ResultsResolver implements Resolve<Results> {
 
     constructor(private rs: ResultsSelectionService) { }
@@ -13,10 +15,10 @@ export class ResultsResolver implements Resolve<Results> {
 
         const id = route.paramMap.get('id');
         // Returning Obsrvable of empty does not navigate
-        return this.rs.setSelectedEventByKey(id)
-            .catch(err => {
+        return this.rs.setSelectedEventByKey(id).take(1);
+           /* .catch(err => {
                 console.error('ResultsResolver: Unable to load results:', err);
                 return Observable.empty();
-            });
+            }) */
     }
 }

@@ -30,7 +30,7 @@ import { CompetitorSelection } from "./competitor-selection";
     * @sb-param {HTMLElement} parent - Parent element to add this list to.
     * @sb-param {Function} alerter - Function to call to issue an alert message.
     */
-    export function  CompetitorList(parent: HTMLElement, alerter) {
+    export function CompetitorList(parent: HTMLElement, alerter) {
         this.parent = parent;
         this.alerter = alerter;
         this.handler = null;
@@ -98,7 +98,7 @@ import { CompetitorSelection } from "./competitor-selection";
         d3.select(document.body).on("mouseup", function () { outerThis.stopDrag(); });
 
         this.setMessages();
-    };
+    }
 
     /**
     * Sets messages within this control, following either its creation or a

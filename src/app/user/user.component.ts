@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormGroup, Validators, FormArray } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AngularFireAuth } from "angularfire2/auth";
 import { Nations } from "app/model/nations";
@@ -61,7 +61,18 @@ export class UserComponent implements OnInit {
         this.userdata.updateDetails(this.userForm.value);
     }
 
-    changePassoword() {
+    createECard(): FormGroup {
+        return this.formBuilder.group({
+          name: '',
+          description: '',
+        });
+      }
+
+    addEcard() {
+
+    }
+
+    removeECard() {
 
     }
 }

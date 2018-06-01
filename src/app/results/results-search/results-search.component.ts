@@ -67,7 +67,6 @@ export class ResultsSearchComponent implements OnInit {
     }
   }
 
-  // Fired when an option is selected.
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     const val = event.option.value;
     this.updateSelections(val);

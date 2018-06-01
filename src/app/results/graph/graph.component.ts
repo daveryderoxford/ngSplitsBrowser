@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Params } from "@angular/router";
 import { DialogsService } from 'app/shared';
 import { displayGraph } from "app/results/graph/splitsbrowser/splitsbrowser";
 import { Results } from "app/results/model";
@@ -29,12 +29,21 @@ export class GraphComponent implements OnInit {
     private dialog: DialogsService) {
   }
 
+
   ngOnInit() {
-    this.route.snapshot.data.subscribe( (results) => {
-      if (results) {
-        displayGraph(results, { containerElement: "app-graph" });
-      }
-    });
+
+    this.route.data
+      .subscribe((data: { results: Results }) => {
+        const results = data.results;
+        if (results) {
+          displayGraph(results, { containerElement: "app-graph" });
+        }
+      });
+
+
+    /*  this.route.params
+            .switchMap( params => this.rs.setSelectedEventByKey(params["id"]) )
+            .subscribe( (results: Results) => this.selectedResultsUpdated(results)); */
   }
 }
 

@@ -5,10 +5,10 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { RouterModule, Routes } from "@angular/router";
 import { AngularFirestoreModule } from "angularfire2/firestore";
 import { AngularFireStorageModule } from "angularfire2/storage";
+import { ChangePasswordComponent } from "app/auth/change-password/change-password.component";
 import { AuthGuard } from "app/auth/guards/auth-guard";
 import { SharedModule } from "app/shared/shared.module";
 import "firebase/storage"; // only import firebase storage
-import { EventAdminService } from "./event-admin.service";
 import { EventAdminComponent } from "./event-admin/event-admin.component";
 import { EventEditComponent } from "./event-edit/event-edit.component";
 import { FileButtonComponent } from "./file-button/file-button.component";
@@ -19,7 +19,7 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: "", component: EventAdminComponent },
-      { path: "event-admin", component: EventAdminComponent },
+      { path: "event-admin", component: EventAdminComponent }
     ]
   },
 ];
@@ -32,9 +32,6 @@ export const routes: Routes = [
     AngularFirestoreModule,
     AngularFireStorageModule,
     SharedModule,
-  ],
-  providers: [
-    EventAdminService,
   ],
   declarations: [
     EventEditComponent,

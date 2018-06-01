@@ -25,6 +25,6 @@ import { AppRoutingModule } from "app/app-routing.module";
         AppMaterialModule,
         NavbarComponent,
     ],
-    providers: [PaganationService, AngularFireAuth]
+    providers: [AngularFireAuth]
 })
 export class SharedModule { }

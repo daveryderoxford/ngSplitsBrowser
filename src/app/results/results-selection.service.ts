@@ -7,13 +7,16 @@ import { OEvent } from "app/model/oevent";
 import { HttpClient } from "@angular/common/http";
 import { parseEventData } from "./import";
 import { exceptionGuard } from "@firebase/database/dist/src/core/util/util";
+import { switchMap, tap } from "rxjs/operators";
 
 /** Holds results selection state.
  * Selecting an event will load its results
  * This include seelcted event, results, courses, classes and controls.
  * This state should be used by all results views to maintain them in sync
  * */
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class ResultsSelectionService {
 
   private event$: BehaviorSubject<OEvent> = new BehaviorSubject(null);
@@ -41,24 +44,31 @@ export class ResultsSelectionService {
     }
 
     const ret = this.downloadResultsFile(event)
-      .do((text) => {
+      .switchMap((text) => {
         const results = this.parseSplits(text);
         this.results$.next(results);
         this.selectedCompetitors$.next([]);
         this.selectedControl$.next(null);
         this.selectedCourse$.next(null);
         this.selectedClasses$.next([]);
+        return this.results$.asObservable();
       });
 
-    return this.results$.asObservable();
+    return ret;
   }
 
   /** Selects event based on the event key, loading the event results */
   setSelectedEventByKey(key: string): Observable<Results> {
-    const event = this.event$.getValue();
-    const obs = this.afs.doc<OEvent>("/events/" + key)
-      .valueChanges()
-      .switchMap((evt) => this.setSelectedEvent(evt));
+    const obs = this.afs.doc<OEvent>("/events/" + key).valueChanges().pipe(
+        tap ( evt => {
+            if (evt) {
+              console.log("ResultsSelectionService: Loading Event for key: " + evt.key);
+            } else {
+              console.log("ResultsSelectionService::  Event not found. key:" + evt.key);
+            }
+        }),
+        switchMap( evt => this.setSelectedEvent(evt) )
+      );
     return obs;
   }
 
@@ -123,7 +133,7 @@ export class ResultsSelectionService {
     return this.selectedClasses$.asObservable();
   }
 
-  /** Pase splits file with logging */
+  /** Parse splits file with logging */
   private parseSplits(text: string): any {
 
     let results: Results;
@@ -140,8 +150,6 @@ export class ResultsSelectionService {
 
     return (results);
   }
-
-
 
   /** Downloads results for an event from google storage */
   private downloadResultsFile(event: OEvent): Observable<string> {

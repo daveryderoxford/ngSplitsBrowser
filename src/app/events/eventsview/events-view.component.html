@@ -2,11 +2,13 @@
 
 <div class="main-container">
 
-  <mat-tab-group dynamicHeight>
-    <mat-tab label="ALL">
+  <mat-tab-group (selectedTabChange)="tabChanged($event)">
+    <mat-tab #tabAll label="ALL">
+        <ng-template matTabContent>
+
       <div class="background">
         <div class="data-container mat-elevation-z2">
-          <table mat-table #table [dataSource]="dataSource" (scroll)="onTableScroll($event)">
+          <table mat-table #table [dataSource]="dataSource" class="scroll"(scroll)="onTableScroll($event)">
 
             <!-- Date Definition -->
             <ng-container matColumnDef="date">
@@ -81,16 +83,17 @@
         </div>
       </div>
 
-
+      </ng-template>
     </mat-tab>
 
-    <mat-tab label="CLUB">
+    <mat-tab #tabClub label="CLUB">
+        <ng-template matTabContent>
 
       <div class="background">
 
           <div class="class-filter">
               <mat-form-field>
-                  <mat-select placeholder="Nationality" (selectionChange)="clubNationalFilterChange()" >
+                  <mat-select placeholder="Nationality" (selectionChange)="clubNationalFilterChange($event)" >
                     <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
                       {{ nation.fullname }}
                     </mat-option>
@@ -120,25 +123,27 @@
 
               </ng-template>
 
-              <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
-
             </mat-expansion-panel>
+            <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
 
           </mat-accordion>
+
         </div>
       </div>
 
+      </ng-template>
+
     </mat-tab>
 
-    <mat-tab label="MY EVENTS">
-      <h1>My events</h1>
-      <p>...</p>
+    <mat-tab #tabMyEvents label="MY RESULTS">
+        <ng-template matTabContent>
+
+            <mat-list *ngFor="let result of myResults$ | async">
+                <mat-list-item> {{result.eventInfo.name}</mat-list-item>
+              </mat-list>
+      </ng-template>
     </mat-tab>
 
-    <mat-tab label="UPLOADED">
-      <h1>Uploaded events</h1>
-      <p>...</p>
-    </mat-tab>
   </mat-tab-group>
 
 </div>

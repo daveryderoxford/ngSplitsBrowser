@@ -40,4 +40,5 @@ export interface UserInfo {
     ecardSI: string;      // hard coded ecard ids so I can search on them
     ecardEmit: string;
     autoFind: boolean;
+    resultsLastupDated: Date;
 }
