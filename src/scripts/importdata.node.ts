@@ -2,18 +2,18 @@
 // tslint:disable:max-line-length
 
 export interface ImportData {
-   id;
-   name;
-   eventdate;
-   nationality;
-   club;
-   fileformat;
-   webpage;
-   email;
-   type;
-   legacyPassword;
-   HAS_RESULTS;
-   format;
+   id: number;
+   name: string;
+   eventdate: number;
+   nationality: string;
+   club: string;
+   fileformat: number;
+   webpage: string;
+   email: string;
+   type: number;
+   legacyPassword: string;
+   HAS_RESULTS: string;
+   format: string;
 }
 
  export const inputJSON: ImportData[] =
@@ -34,7 +34,7 @@ export interface ImportData {
   },
   {
     "id": 2,
-    "name": "FRSO - R?gionale Elsenborn",
+    "name": "FRSO - Regionale Elsenborn",
     "eventdate": 1013904000,
     "nationality": "BEL",
     "club": "OLVE1",
@@ -205,7 +205,7 @@ export interface ImportData {
     "name": "MATCH E.O.B.  - F.R.S.O. - N.O.L.B.",
     "eventdate": 1016323200,
     "nationality": "BEL",
-    "club": "F.R.S.O.1",
+    "club": "F.R.S.O.",
     "fileformat": 0,
     "webpage": "http://www.frso.be",
     "email": "robert.marique@skynet.be",
@@ -947,7 +947,7 @@ export interface ImportData {
     "name": "Lakes 5 Day - day 1",
     "eventdate": 1028415600,
     "nationality": "GBR",
-    "club": "BORDER LINERS",
+    "club": "BL",
     "fileformat": 1,
     "webpage": "http://nwoa.org.uk/",
     "email": "lakes5@nwoa.org.uk",
@@ -961,7 +961,7 @@ export interface ImportData {
     "name": "Lakes 5 Day - day 2",
     "eventdate": 1028502000,
     "nationality": "GBR",
-    "club": "WEST CUMBERLAND",
+    "club": "WCOC",
     "fileformat": 1,
     "webpage": "http://nwoa.org.uk/",
     "email": "lakes5@nwoa.org.uk",
@@ -975,7 +975,7 @@ export interface ImportData {
     "name": "Lakes 5 - day 3",
     "eventdate": 1028588400,
     "nationality": "GBR",
-    "club": "SOUTH RIBBLE",
+    "club": "SROC",
     "fileformat": 1,
     "webpage": "http://nwoa.org.uk/",
     "email": "lakes5@nwoa.org.uk",
@@ -2162,7 +2162,7 @@ export interface ImportData {
   },
   {
     "id": 200,
-    "name": "R?gionale ? La Ch?re de C?me",
+    "name": "Regionale ? La Ch?re de C?me",
     "eventdate": 1047772800,
     "nationality": "FRA",
     "club": "BALISE 63",
@@ -4360,7 +4360,7 @@ export interface ImportData {
   },
   {
     "id": 394,
-    "name": "R?gionale n?1 Aquitaine",
+    "name": "Regionale n?1 Aquitaine",
     "eventdate": 1075075200,
     "nationality": "FRA",
     "club": "LACO-HNA",
@@ -4402,7 +4402,7 @@ export interface ImportData {
   },
   {
     "id": 399,
-    "name": "R?gionale n?2  Carcans",
+    "name": "Regionale n?2  Carcans",
     "eventdate": 1075593600,
     "nationality": "FRA",
     "club": "MOM",
@@ -4794,7 +4794,7 @@ export interface ImportData {
   },
   {
     "id": 434,
-    "name": "R?gionale n?3 Carcans",
+    "name": "Regionale n?3 Carcans",
     "eventdate": 1078012800,
     "nationality": "FRA",
     "club": "ASM",
@@ -4948,7 +4948,7 @@ export interface ImportData {
   },
   {
     "id": 449,
-    "name": "R?gionale Remilly",
+    "name": "Regionale Remilly",
     "eventdate": 1079222400,
     "nationality": "FRA",
     "club": "TAF",
@@ -4962,7 +4962,7 @@ export interface ImportData {
   },
   {
     "id": 448,
-    "name": "R?gionale Remilly",
+    "name": "Regionale Remilly",
     "eventdate": 1079222400,
     "nationality": "FRA",
     "club": "TAF",
@@ -5186,7 +5186,7 @@ export interface ImportData {
   },
   {
     "id": 465,
-    "name": "R?gionale 2, L'Eau Sal?e, Sougraigne (11)",
+    "name": "Regionale 2, L'Eau Sal?e, Sougraigne (11)",
     "eventdate": 1080432000,
     "nationality": "FRA",
     "club": "RDPA",
@@ -5410,7 +5410,7 @@ export interface ImportData {
   },
   {
     "id": 484,
-    "name": "R?gionale n?5 St Jean d'Ataux",
+    "name": "Regionale n?5 St Jean d'Ataux",
     "eventdate": 1081033200,
     "nationality": "FRA",
     "club": "CDCO 24",
@@ -5816,7 +5816,7 @@ export interface ImportData {
   },
   {
     "id": 519,
-    "name": "R?gionale L?ge Cap Ferret",
+    "name": "Regionale L?ge Cap Ferret",
     "eventdate": 1083452400,
     "nationality": "FRA",
     "club": "ASEMSO",
@@ -5970,7 +5970,7 @@ export interface ImportData {
   },
   {
     "id": 532,
-    "name": "R?gionale Biscarosse",
+    "name": "Regionale Biscarosse",
     "eventdate": 1085180400,
     "nationality": "FRA",
     "club": "BONO",
@@ -6964,7 +6964,7 @@ export interface ImportData {
   },
   {
     "id": 605,
-    "name": "R?gionale 1",
+    "name": "Regionale 1",
     "eventdate": 1095548400,
     "nationality": "FRA",
     "club": "OPA",
@@ -7174,7 +7174,7 @@ export interface ImportData {
   },
   {
     "id": 620,
-    "name": "R?gionale num?ro 5 LMPCO 2004",
+    "name": "Regionale num?ro 5 LMPCO 2004",
     "eventdate": 1096153200,
     "nationality": "FRA",
     "club": "CDCO81",
@@ -7188,7 +7188,7 @@ export interface ImportData {
   },
   {
     "id": 621,
-    "name": "R?gionale num?ro 5 LMPCO 2004",
+    "name": "Regionale num?ro 5 LMPCO 2004",
     "eventdate": 1096153200,
     "nationality": "FRA",
     "club": "CDCO81",
@@ -7370,7 +7370,7 @@ export interface ImportData {
   },
   {
     "id": 634,
-    "name": "R?gionale Hostens",
+    "name": "Regionale Hostens",
     "eventdate": 1098572400,
     "nationality": "FRA",
     "club": "ASM",
@@ -7776,7 +7776,7 @@ export interface ImportData {
   },
   {
     "id": 663,
-    "name": "6?me Course R?gionale 2004 ? Bouconne (LMPCO)",
+    "name": "6?me Course Regionale 2004 ? Bouconne (LMPCO)",
     "eventdate": 1100390400,
     "nationality": "FRA",
     "club": "MURET ORIENTATI",
@@ -7902,7 +7902,7 @@ export interface ImportData {
   },
   {
     "id": 675,
-    "name": "6?me Course R?gionale 2004 ? Bouconne (LMPCO)",
+    "name": "6?me Course Regionale 2004 ? Bouconne (LMPCO)",
     "eventdate": 1100390400,
     "nationality": "FRA",
     "club": "MURET ORIENTATI",
@@ -7916,7 +7916,7 @@ export interface ImportData {
   },
   {
     "id": 676,
-    "name": "7?me Course R?gionale 2004 ? Caylus (LMPCO)",
+    "name": "7?me Course Regionale 2004 ? Caylus (LMPCO)",
     "eventdate": 1102204800,
     "nationality": "FRA",
     "club": "CDCO12",
@@ -7958,7 +7958,7 @@ export interface ImportData {
   },
   {
     "id": 679,
-    "name": "8?me et der Course R?gionale 2004 ? Vabres (LMPCO)",
+    "name": "8?me et der Course Regionale 2004 ? Vabres (LMPCO)",
     "eventdate": 1102809600,
     "nationality": "FRA",
     "club": "SAO12",
@@ -8182,7 +8182,7 @@ export interface ImportData {
   },
   {
     "id": 697,
-    "name": "R?gionale d'hiver FRSO - Stambruges",
+    "name": "Regionale d'hiver FRSO - Stambruges",
     "eventdate": 1105228800,
     "nationality": "BEL",
     "club": "ASUB ORIENTATIO",
@@ -8241,7 +8241,7 @@ export interface ImportData {
     "name": "Buck Wood District Event",
     "eventdate": 1105228800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -8280,7 +8280,7 @@ export interface ImportData {
   },
   {
     "id": 711,
-    "name": "R?gionale 1-Ile de France-2005",
+    "name": "Regionale 1-Ile de France-2005",
     "eventdate": 1106438400,
     "nationality": "FRA",
     "club": "OPA",
@@ -8308,7 +8308,7 @@ export interface ImportData {
   },
   {
     "id": 714,
-    "name": "R?gionale 1-LIFCO-2005",
+    "name": "Regionale 1-LIFCO-2005",
     "eventdate": 1106438400,
     "nationality": "FRA",
     "club": "OPA",
@@ -8434,7 +8434,7 @@ export interface ImportData {
   },
   {
     "id": 722,
-    "name": "R?gionale Aquitaine n?1",
+    "name": "Regionale Aquitaine n?1",
     "eventdate": 1107043200,
     "nationality": "FRA",
     "club": "MOM",
@@ -9064,7 +9064,7 @@ export interface ImportData {
   },
   {
     "id": 791,
-    "name": "R?gionale MP 2 ? Durbans (Chpt Ligue)",
+    "name": "Regionale MP 2 ? Durbans (Chpt Ligue)",
     "eventdate": 1112482800,
     "nationality": "FRA",
     "club": "FINO",
@@ -9190,7 +9190,7 @@ export interface ImportData {
   },
   {
     "id": 800,
-    "name": "R?gionale de Urval (24)",
+    "name": "Regionale de Urval (24)",
     "eventdate": 1112482800,
     "nationality": "FRA",
     "club": "CD24",
@@ -9204,7 +9204,7 @@ export interface ImportData {
   },
   {
     "id": 801,
-    "name": "R?gionale de Lacanau (33)",
+    "name": "Regionale de Lacanau (33)",
     "eventdate": 1111276800,
     "nationality": "FRA",
     "club": "ASMCO",
@@ -9246,7 +9246,7 @@ export interface ImportData {
   },
   {
     "id": 805,
-    "name": "R?gionale de L?ge Cap Ferret (33)",
+    "name": "Regionale de L?ge Cap Ferret (33)",
     "eventdate": 1110067200,
     "nationality": "FRA",
     "club": "ASEMSO",
@@ -9260,7 +9260,7 @@ export interface ImportData {
   },
   {
     "id": 806,
-    "name": "R?gionale de L?ge Cap Ferret (33)",
+    "name": "Regionale de L?ge Cap Ferret (33)",
     "eventdate": 1112137200,
     "nationality": "FRA",
     "club": "MOM",
@@ -9568,7 +9568,7 @@ export interface ImportData {
   },
   {
     "id": 829,
-    "name": "R?gionale de Sauvagnon (64)",
+    "name": "Regionale de Sauvagnon (64)",
     "eventdate": 1113692400,
     "nationality": "FRA",
     "club": "COOL",
@@ -9694,7 +9694,7 @@ export interface ImportData {
   },
   {
     "id": 838,
-    "name": "R?gionale Biscarosse",
+    "name": "Regionale Biscarosse",
     "eventdate": 1114297200,
     "nationality": "FRA",
     "club": "BONO",
@@ -9708,7 +9708,7 @@ export interface ImportData {
   },
   {
     "id": 839,
-    "name": "R?gionale de Biscarrosse (33)",
+    "name": "Regionale de Biscarrosse (33)",
     "eventdate": 1114210800,
     "nationality": "FRA",
     "club": "BONO",
@@ -10296,7 +10296,7 @@ export interface ImportData {
   },
   {
     "id": 887,
-    "name": "R?gionale de St Germain de Salembre (24)",
+    "name": "Regionale de St Germain de Salembre (24)",
     "eventdate": 1116111600,
     "nationality": "FRA",
     "club": "CD24",
@@ -10324,7 +10324,7 @@ export interface ImportData {
   },
   {
     "id": 889,
-    "name": "R?gionale Fontbruno",
+    "name": "Regionale Fontbruno",
     "eventdate": 1116111600,
     "nationality": "FRA",
     "club": "AO CASTRES",
@@ -10761,7 +10761,7 @@ export interface ImportData {
     "name": "Roundhay Park Sprint O",
     "eventdate": 1117839600,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -10814,7 +10814,7 @@ export interface ImportData {
   },
   {
     "id": 924,
-    "name": "R?gionale Puycelci (LMPCO#4)",
+    "name": "Regionale Puycelci (LMPCO#4)",
     "eventdate": 1117321200,
     "nationality": "FRA",
     "club": "BO ALBI",
@@ -12329,7 +12329,7 @@ export interface ImportData {
     "name": "Dales Weekend Day 1 - Kilnsey",
     "eventdate": 1126306800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -12343,7 +12343,7 @@ export interface ImportData {
     "name": "Dales Weekend Day 1 - Malham",
     "eventdate": 1126393200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -12382,7 +12382,7 @@ export interface ImportData {
   },
   {
     "id": 1041,
-    "name": "R?gionale 4 LIFCO",
+    "name": "Regionale 4 LIFCO",
     "eventdate": 1126998000,
     "nationality": "FRA",
     "club": "GO78",
@@ -12690,7 +12690,7 @@ export interface ImportData {
   },
   {
     "id": 1063,
-    "name": "R?gionale MP 5/8 Ste-Eulalie-de-Cernon (12)",
+    "name": "Regionale MP 5/8 Ste-Eulalie-de-Cernon (12)",
     "eventdate": 1128207600,
     "nationality": "FRA",
     "club": "SAO12",
@@ -12844,7 +12844,7 @@ export interface ImportData {
   },
   {
     "id": 1074,
-    "name": "R?gionale n? 9 ? Etain (55)",
+    "name": "Regionale n? 9 ? Etain (55)",
     "eventdate": 1128812400,
     "nationality": "FRA",
     "club": "55",
@@ -12872,7 +12872,7 @@ export interface ImportData {
   },
   {
     "id": 1076,
-    "name": "R?gionale de Contis (40)",
+    "name": "Regionale de Contis (40)",
     "eventdate": 1128726000,
     "nationality": "FRA",
     "club": "BROS",
@@ -12886,7 +12886,7 @@ export interface ImportData {
   },
   {
     "id": 1077,
-    "name": "R?gionale ? Camurac (11), Languedoc-Roussillon",
+    "name": "Regionale ? Camurac (11), Languedoc-Roussillon",
     "eventdate": 1128812400,
     "nationality": "FRA",
     "club": "RDPA",
@@ -13068,7 +13068,7 @@ export interface ImportData {
   },
   {
     "id": 1090,
-    "name": "R?gionale MP 6/8 ? Lautrec (81)",
+    "name": "Regionale MP 6/8 ? Lautrec (81)",
     "eventdate": 1129417200,
     "nationality": "FRA",
     "club": "AOC",
@@ -13222,7 +13222,7 @@ export interface ImportData {
   },
   {
     "id": 1102,
-    "name": "R?gionale de Carcans (33)",
+    "name": "Regionale de Carcans (33)",
     "eventdate": 1130626800,
     "nationality": "FRA",
     "club": "ASMCO",
@@ -13236,7 +13236,7 @@ export interface ImportData {
   },
   {
     "id": 1103,
-    "name": "R?gionale de Carcans (33)",
+    "name": "Regionale de Carcans (33)",
     "eventdate": 1130626800,
     "nationality": "FRA",
     "club": "ASMCO",
@@ -13796,7 +13796,7 @@ export interface ImportData {
   },
   {
     "id": 1143,
-    "name": "R?gionale MP 7/8 ? La Rouquette (12)",
+    "name": "Regionale MP 7/8 ? La Rouquette (12)",
     "eventdate": 1132444800,
     "nationality": "FRA",
     "club": "VO12",
@@ -15045,7 +15045,7 @@ export interface ImportData {
     "name": "Shipley Glen and Hirst Wood Night event",
     "eventdate": 1137801600,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -15056,7 +15056,7 @@ export interface ImportData {
   },
   {
     "id": 1245,
-    "name": "R?gionale MP 1/8 ? Montech (82)",
+    "name": "Regionale MP 1/8 ? Montech (82)",
     "eventdate": 1137888000,
     "nationality": "FRA",
     "club": "MOLO",
@@ -15143,7 +15143,7 @@ export interface ImportData {
     "name": "British Night Championships 2006",
     "eventdate": 1138406400,
     "nationality": "GBR",
-    "club": "BKO/BAOC",
+    "club": "BKO",
     "fileformat": 1,
     "webpage": "http://www.emituk.com/results/2006/060128_BNC/index.htm",
     "email": "jerry@emituk.com",
@@ -15658,7 +15658,7 @@ export interface ImportData {
   },
   {
     "id": 1288,
-    "name": "R?gionale MP 2/8 ? Bouconne (31)",
+    "name": "Regionale MP 2/8 ? Bouconne (31)",
     "eventdate": 1139702400,
     "nationality": "FRA",
     "club": "TOAC",
@@ -15812,7 +15812,7 @@ export interface ImportData {
   },
   {
     "id": 1299,
-    "name": "R?gionale n?1",
+    "name": "Regionale n?1",
     "eventdate": 1140307200,
     "nationality": "FRA",
     "club": "LO SANCHEY",
@@ -15840,7 +15840,7 @@ export interface ImportData {
   },
   {
     "id": 1301,
-    "name": "R?gionale AQ ? Montesquieu (47)",
+    "name": "Regionale AQ Montesquieu (47)",
     "eventdate": 1140307200,
     "nationality": "FRA",
     "club": "ASCOPA",
@@ -15854,7 +15854,7 @@ export interface ImportData {
   },
   {
     "id": 1302,
-    "name": "R?gionale Montesquieu",
+    "name": "Regionale Montesquieu",
     "eventdate": 1140307200,
     "nationality": "FRA",
     "club": "ASCOPA",
@@ -15966,7 +15966,7 @@ export interface ImportData {
   },
   {
     "id": 1310,
-    "name": "R?gionale Montesquieu",
+    "name": "Regionale Montesquieu",
     "eventdate": 1140307200,
     "nationality": "FRA",
     "club": "ASCOPA",
@@ -16526,7 +16526,7 @@ export interface ImportData {
   },
   {
     "id": 1352,
-    "name": "R?gionale n?2 Lorraine - Sarralbe",
+    "name": "Regionale n?2 Lorraine - Sarralbe",
     "eventdate": 1142121600,
     "nationality": "FRA",
     "club": "5703 LO - TAF",
@@ -16736,7 +16736,7 @@ export interface ImportData {
   },
   {
     "id": 1368,
-    "name": "Inter R?gionale Ile de France ( CD CO 95)",
+    "name": "Inter Regionale Ile de France ( CD CO 95)",
     "eventdate": 1142726400,
     "nationality": "FRA",
     "club": "CD CO 95",
@@ -17044,7 +17044,7 @@ export interface ImportData {
   },
   {
     "id": 1392,
-    "name": "R?gionale 4 - Neuves Maisons",
+    "name": "Regionale 4 - Neuves Maisons",
     "eventdate": 1143932400,
     "nationality": "FRA",
     "club": "SCAPA NANCY",
@@ -17226,7 +17226,7 @@ export interface ImportData {
   },
   {
     "id": 1406,
-    "name": "R?gionale MP 4/8 au chateau de Terrides (82)",
+    "name": "Regionale MP 4/8 au chateau de Terrides (82)",
     "eventdate": 1144537200,
     "nationality": "FRA",
     "club": "MOLO",
@@ -17394,7 +17394,7 @@ export interface ImportData {
   },
   {
     "id": 1418,
-    "name": "R?gionale MP 3/8 ? Goutrens (12)",
+    "name": "Regionale MP 3/8 ? Goutrens (12)",
     "eventdate": 1143331200,
     "nationality": "FRA",
     "club": "VO12",
@@ -17408,7 +17408,7 @@ export interface ImportData {
   },
   {
     "id": 1419,
-    "name": "R?gionale - Cir. - Quemigny (21)",
+    "name": "Regionale - Cir. - Quemigny (21)",
     "eventdate": 1145055600,
     "nationality": "FRA",
     "club": "2105ADOC",
@@ -18038,7 +18038,7 @@ export interface ImportData {
   },
   {
     "id": 1467,
-    "name": "R?gionale - La Bussi?re (21)",
+    "name": "Regionale - La Bussi?re (21)",
     "eventdate": 1146438000,
     "nationality": "FRA",
     "club": "2108BO",
@@ -18066,7 +18066,7 @@ export interface ImportData {
   },
   {
     "id": 1469,
-    "name": "R?gionale Hosteins",
+    "name": "Regionale Hosteins",
     "eventdate": 1146351600,
     "nationality": "FRA",
     "club": "SMOG",
@@ -18444,7 +18444,7 @@ export interface ImportData {
   },
   {
     "id": 1496,
-    "name": "R?gionale Carcans",
+    "name": "Regionale Carcans",
     "eventdate": 1146956400,
     "nationality": "---",
     "club": "SMOG",
@@ -18640,7 +18640,7 @@ export interface ImportData {
   },
   {
     "id": 1515,
-    "name": "R?gionale - Givry (71)",
+    "name": "Regionale - Givry (71)",
     "eventdate": 1147561200,
     "nationality": "FRA",
     "club": "7109BO",
@@ -19074,7 +19074,7 @@ export interface ImportData {
   },
   {
     "id": 1546,
-    "name": "R?gionale Longue distance Centre - Azay le Rideau",
+    "name": "Regionale Longue distance Centre - Azay le Rideau",
     "eventdate": 1148770800,
     "nationality": "FRA",
     "club": "COTS",
@@ -19088,7 +19088,7 @@ export interface ImportData {
   },
   {
     "id": 1547,
-    "name": "R?gionale Sprint Centre - Azay le Rideau",
+    "name": "Regionale Sprint Centre - Azay le Rideau",
     "eventdate": 1148770800,
     "nationality": "FRA",
     "club": "COTS",
@@ -19564,7 +19564,7 @@ export interface ImportData {
   },
   {
     "id": 1581,
-    "name": "R?gionale - Cir. - D?tain (21)",
+    "name": "Regionale - Cir. - D?tain (21)",
     "eventdate": 1149980400,
     "nationality": "FRA",
     "club": "2101 ABCO",
@@ -19634,7 +19634,7 @@ export interface ImportData {
   },
   {
     "id": 1586,
-    "name": "Championnat MP et R?gionale 5/8 ? Potensac (12)",
+    "name": "Championnat MP et Regionale 5/8 ? Potensac (12)",
     "eventdate": 1149980400,
     "nationality": "FRA",
     "club": "SAO12",
@@ -20292,7 +20292,7 @@ export interface ImportData {
   },
   {
     "id": 1635,
-    "name": "4?me R?gionale Languedoc-Roussillon ? Mont-Louis",
+    "name": "4?me Regionale Languedoc-Roussillon ? Mont-Louis",
     "eventdate": 1152054000,
     "nationality": "FRA",
     "club": "CNEC'O MONT-LOU",
@@ -21622,7 +21622,7 @@ export interface ImportData {
   },
   {
     "id": 1738,
-    "name": "R?gionale 9 - Lac de Madine (55)",
+    "name": "Regionale 9 - Lac de Madine (55)",
     "eventdate": 1159052400,
     "nationality": "FRA",
     "club": "PIENNES / LOV",
@@ -21636,7 +21636,7 @@ export interface ImportData {
   },
   {
     "id": 1737,
-    "name": "R?gionale - Marmagne (71)",
+    "name": "Regionale - Marmagne (71)",
     "eventdate": 1158966000,
     "nationality": "FRA",
     "club": "COMM",
@@ -21650,7 +21650,7 @@ export interface ImportData {
   },
   {
     "id": 1739,
-    "name": "R?gionale 4 LIFCO - Marly le Roi",
+    "name": "Regionale 4 LIFCO - Marly le Roi",
     "eventdate": 1159052400,
     "nationality": "FRA",
     "club": "GO78",
@@ -21664,7 +21664,7 @@ export interface ImportData {
   },
   {
     "id": 1740,
-    "name": "R?gionale 4 LIFCO - Marly le Roi",
+    "name": "Regionale 4 LIFCO - Marly le Roi",
     "eventdate": 1159052400,
     "nationality": "FRA",
     "club": "GO78",
@@ -22490,7 +22490,7 @@ export interface ImportData {
   },
   {
     "id": 1800,
-    "name": "R?gionale - Cir. - Gu?rigny (58)",
+    "name": "Regionale - Cir. - Gu?rigny (58)",
     "eventdate": 1160866800,
     "nationality": "FRA",
     "club": "NORD",
@@ -22756,7 +22756,7 @@ export interface ImportData {
   },
   {
     "id": 1820,
-    "name": "R?gionale MP 7/8 ? Bruniquel (82)",
+    "name": "Regionale MP 7/8 ? Bruniquel (82)",
     "eventdate": 1161471600,
     "nationality": "FRA",
     "club": "SCOR",
@@ -22966,7 +22966,7 @@ export interface ImportData {
   },
   {
     "id": 1835,
-    "name": "R?gionale de L?ge",
+    "name": "Regionale de L?ge",
     "eventdate": 1161990000,
     "nationality": "FRA",
     "club": "SMOG",
@@ -23235,7 +23235,7 @@ export interface ImportData {
     "name": "Middleton Woods",
     "eventdate": 1162684800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -23330,7 +23330,7 @@ export interface ImportData {
   },
   {
     "id": 1864,
-    "name": "R?gionale 10 - Laxou (54)",
+    "name": "Regionale 10 - Laxou (54)",
     "eventdate": 1163289600,
     "nationality": "FRA",
     "club": "SCAPA NANCY",
@@ -23358,7 +23358,7 @@ export interface ImportData {
   },
   {
     "id": 1866,
-    "name": "R?gionale Soustons",
+    "name": "Regionale Soustons",
     "eventdate": 1163203200,
     "nationality": "FRA",
     "club": "BROS",
@@ -24954,7 +24954,7 @@ export interface ImportData {
   },
   {
     "id": 1985,
-    "name": "R?gionale MP 1/9 ? Montaigu-de-Quercy (82)",
+    "name": "Regionale MP 1/9 ? Montaigu-de-Quercy (82)",
     "eventdate": 1169942400,
     "nationality": "FRA",
     "club": "MOLO",
@@ -24968,7 +24968,7 @@ export interface ImportData {
   },
   {
     "id": 1986,
-    "name": "R?gionale Carcans",
+    "name": "Regionale Carcans",
     "eventdate": 1169942400,
     "nationality": "FRA",
     "club": "SMOG",
@@ -25433,7 +25433,7 @@ export interface ImportData {
     "name": "Shipley Glen and Hirst Wood night event",
     "eventdate": 1171670400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -25447,7 +25447,7 @@ export interface ImportData {
     "name": "Shipley Glen and Hirst Wood night event",
     "eventdate": 1171670400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -25976,7 +25976,7 @@ export interface ImportData {
   },
   {
     "id": 2060,
-    "name": "R?gionale - Urcy (21)",
+    "name": "Regionale - Urcy (21)",
     "eventdate": 1173571200,
     "nationality": "FRA",
     "club": "CDCO 21",
@@ -26340,7 +26340,7 @@ export interface ImportData {
   },
   {
     "id": 2086,
-    "name": "R?gionale L?ge Cap Ferret (33)",
+    "name": "Regionale L?ge Cap Ferret (33)",
     "eventdate": 1174176000,
     "nationality": "FRA",
     "club": "SMOG",
@@ -26665,7 +26665,7 @@ export interface ImportData {
     "name": "Baildon Moor Regional Event",
     "eventdate": 1174780800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -27239,7 +27239,7 @@ export interface ImportData {
     "name": "Bramham West Woods",
     "eventdate": 1176591600,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -27292,7 +27292,7 @@ export interface ImportData {
   },
   {
     "id": 2161,
-    "name": "R?gionale Biscarrosse (40)",
+    "name": "Regionale Biscarrosse (40)",
     "eventdate": 1176505200,
     "nationality": "FRA",
     "club": "BONO",
@@ -27348,7 +27348,7 @@ export interface ImportData {
   },
   {
     "id": 2167,
-    "name": "BEL - R?gionale FRSO - Silly",
+    "name": "BEL - Regionale FRSO - Silly",
     "eventdate": 1171756800,
     "nationality": "BEL",
     "club": "C.O.M.B.",
@@ -27404,7 +27404,7 @@ export interface ImportData {
   },
   {
     "id": 2171,
-    "name": "BEL - R?gionale FRSO - Oro-Hydro",
+    "name": "BEL - Regionale FRSO - Oro-Hydro",
     "eventdate": 1170374400,
     "nationality": "BEL",
     "club": "ASUB",
@@ -27670,7 +27670,7 @@ export interface ImportData {
   },
   {
     "id": 2190,
-    "name": "R?gionale MP 4/9 ? Bouconne (31)",
+    "name": "Regionale MP 4/9 ? Bouconne (31)",
     "eventdate": 1177196400,
     "nationality": "FRA",
     "club": "MO",
@@ -27726,7 +27726,7 @@ export interface ImportData {
   },
   {
     "id": 2194,
-    "name": "R?gionale n? 3",
+    "name": "Regionale n? 3",
     "eventdate": 1177196400,
     "nationality": "FRA",
     "club": "CDCO 57",
@@ -28174,7 +28174,7 @@ export interface ImportData {
   },
   {
     "id": 2227,
-    "name": "R?gionale - Marmagne (71)",
+    "name": "Regionale - Marmagne (71)",
     "eventdate": 1178406000,
     "nationality": "FRA",
     "club": "GSO 71",
@@ -28930,7 +28930,7 @@ export interface ImportData {
   },
   {
     "id": 2294,
-    "name": "R?gionale - Val suzon (21)",
+    "name": "Regionale - Val suzon (21)",
     "eventdate": 1180220400,
     "nationality": "FRA",
     "club": "2109 ASQ",
@@ -29070,7 +29070,7 @@ export interface ImportData {
   },
   {
     "id": 2305,
-    "name": "R?gionale 5 de Lorraine, Sarralbe",
+    "name": "Regionale 5 de Lorraine, Sarralbe",
     "eventdate": 1180825200,
     "nationality": "FRA",
     "club": "TA FAMECK",
@@ -29154,7 +29154,7 @@ export interface ImportData {
   },
   {
     "id": 2311,
-    "name": "R?gionale - Blanzy (71)",
+    "name": "Regionale - Blanzy (71)",
     "eventdate": 1180825200,
     "nationality": "---",
     "club": "7108BO",
@@ -29168,7 +29168,7 @@ export interface ImportData {
   },
   {
     "id": 2312,
-    "name": "R?gionale MP 5/9 ? La Couvertoirade (12)",
+    "name": "Regionale MP 5/9 ? La Couvertoirade (12)",
     "eventdate": 1180825200,
     "nationality": "FRA",
     "club": "YAKO",
@@ -29364,7 +29364,7 @@ export interface ImportData {
   },
   {
     "id": 2329,
-    "name": "R?gionale 6 - Villers Clairlieu",
+    "name": "Regionale 6 - Villers Clairlieu",
     "eventdate": 1181430000,
     "nationality": "FRA",
     "club": "SCAPA NANCY",
@@ -29378,7 +29378,7 @@ export interface ImportData {
   },
   {
     "id": 2330,
-    "name": "R?gionale - Appoigny (89)",
+    "name": "Regionale - Appoigny (89)",
     "eventdate": 1181430000,
     "nationality": "FRA",
     "club": "YCONE",
@@ -29574,7 +29574,7 @@ export interface ImportData {
   },
   {
     "id": 2346,
-    "name": "R?gionale 7 - La Bresse (54)",
+    "name": "Regionale 7 - La Bresse (54)",
     "eventdate": 1182034800,
     "nationality": "FRA",
     "club": "HVO",
@@ -30778,7 +30778,7 @@ export interface ImportData {
   },
   {
     "id": 2467,
-    "name": "R?gionale MP 6/9 ? Caylus (82)",
+    "name": "Regionale MP 6/9 ? Caylus (82)",
     "eventdate": 1189897200,
     "nationality": "FRA",
     "club": "SCOR",
@@ -31033,7 +31033,7 @@ export interface ImportData {
     "name": "Dales Weekend 2007 - Day 1 - Attermire",
     "eventdate": 1189810800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -31047,7 +31047,7 @@ export interface ImportData {
     "name": "Dales Weekend 2007 - Day 1 - Attermire",
     "eventdate": 1189810800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -31061,7 +31061,7 @@ export interface ImportData {
     "name": "Dales Weekend 2007 - Day 2 - Langstrothdale",
     "eventdate": 1189897200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -31156,7 +31156,7 @@ export interface ImportData {
   },
   {
     "id": 2483,
-    "name": "R?gionale - Flavignerot (21)",
+    "name": "Regionale - Flavignerot (21)",
     "eventdate": 1191106800,
     "nationality": "FRA",
     "club": "2105 ADOC",
@@ -31716,7 +31716,7 @@ export interface ImportData {
   },
   {
     "id": 2531,
-    "name": "R?gionale Lacanau 10/07",
+    "name": "Regionale Lacanau 10/07",
     "eventdate": 1192316400,
     "nationality": "FRA",
     "club": "SMOG",
@@ -31730,7 +31730,7 @@ export interface ImportData {
   },
   {
     "id": 2532,
-    "name": "R?gionale MAUZAC",
+    "name": "Regionale MAUZAC",
     "eventdate": 1193526000,
     "nationality": "FRA",
     "club": "CACC",
@@ -31761,7 +31761,7 @@ export interface ImportData {
     "name": "Danefield & The Chevin",
     "eventdate": 1194134400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -31775,7 +31775,7 @@ export interface ImportData {
     "name": "Danefield & The Chevin",
     "eventdate": 1194134400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -31828,7 +31828,7 @@ export interface ImportData {
   },
   {
     "id": 2539,
-    "name": "R?gionale MP 8/9 ? St-Martial (12)",
+    "name": "Regionale MP 8/9 ? St-Martial (12)",
     "eventdate": 1194134400,
     "nationality": "FRA",
     "club": "VO12",
@@ -32486,7 +32486,7 @@ export interface ImportData {
   },
   {
     "id": 2586,
-    "name": "R?gionale MP 9/9 ? Ligardes (32)",
+    "name": "Regionale MP 9/9 ? Ligardes (32)",
     "eventdate": 1196553600,
     "nationality": "FRA",
     "club": "FLOC",
@@ -34463,7 +34463,7 @@ export interface ImportData {
     "name": "Valley of Desolation",
     "eventdate": 1205625600,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -34967,7 +34967,7 @@ export interface ImportData {
     "name": "Bramham Park - Lendrick Hills & Wothersome",
     "eventdate": 1208041200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -34981,7 +34981,7 @@ export interface ImportData {
     "name": "Bramham Park - Lendrick Hills & Wothersome",
     "eventdate": 1208041200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -35230,7 +35230,7 @@ export interface ImportData {
   },
   {
     "id": 2787,
-    "name": "R?gionale l'Homme Fossile",
+    "name": "Regionale l'Homme Fossile",
     "eventdate": 1208646000,
     "nationality": "FRA",
     "club": "7707",
@@ -35314,7 +35314,7 @@ export interface ImportData {
   },
   {
     "id": 2794,
-    "name": "R?gionale MP 3/7 ? La Gr?signe (81)",
+    "name": "Regionale MP 3/7 ? La Gr?signe (81)",
     "eventdate": 1209250800,
     "nationality": "FRA",
     "club": "BOA",
@@ -35426,7 +35426,7 @@ export interface ImportData {
   },
   {
     "id": 2802,
-    "name": "R?gionale - Foret de la Serre (39)",
+    "name": "Regionale - Foret de la Serre (39)",
     "eventdate": 1209596400,
     "nationality": "FRA",
     "club": "2109 ASQ",
@@ -35720,7 +35720,7 @@ export interface ImportData {
   },
   {
     "id": 2825,
-    "name": "R?gionale LR Moy Dist ? Peyrolles (11)",
+    "name": "Regionale LR Moy Dist ? Peyrolles (11)",
     "eventdate": 1209855600,
     "nationality": "FRA",
     "club": "RDPA",
@@ -36000,7 +36000,7 @@ export interface ImportData {
   },
   {
     "id": 2845,
-    "name": "R?gionale MP 4/7 ? Livernon (46)",
+    "name": "Regionale MP 4/7 ? Livernon (46)",
     "eventdate": 1211065200,
     "nationality": "FRA",
     "club": "FINO",
@@ -36224,7 +36224,7 @@ export interface ImportData {
   },
   {
     "id": 2861,
-    "name": "R?gionale - Etang du Martinet (71)",
+    "name": "Regionale - Etang du Martinet (71)",
     "eventdate": 1211670000,
     "nationality": "FRA",
     "club": "7109 GSO",
@@ -36504,7 +36504,7 @@ export interface ImportData {
   },
   {
     "id": 2881,
-    "name": "R?gionale - Bremur et Vaurois",
+    "name": "Regionale - Bremur et Vaurois",
     "eventdate": 1212274800,
     "nationality": "FRA",
     "club": "2101 ABCO",
@@ -36966,7 +36966,7 @@ export interface ImportData {
   },
   {
     "id": 2918,
-    "name": "R?gionale 6 - La Bresse",
+    "name": "Regionale 6 - La Bresse",
     "eventdate": 1213398000,
     "nationality": "FRA",
     "club": "HVO",
@@ -37008,7 +37008,7 @@ export interface ImportData {
   },
   {
     "id": 2921,
-    "name": "R?gionale LR ? Arques (11)",
+    "name": "Regionale LR ? Arques (11)",
     "eventdate": 1213484400,
     "nationality": "FRA",
     "club": "RDPA",
@@ -37190,7 +37190,7 @@ export interface ImportData {
   },
   {
     "id": 2934,
-    "name": "R?gionale - La Bussiere sur Ouche (21)",
+    "name": "Regionale - La Bussiere sur Ouche (21)",
     "eventdate": 1214089200,
     "nationality": "FRA",
     "club": "2109 TSO",
@@ -37596,7 +37596,7 @@ export interface ImportData {
   },
   {
     "id": 2964,
-    "name": "R?gionale - Saint Sernin (71)",
+    "name": "Regionale - Saint Sernin (71)",
     "eventdate": 1220742000,
     "nationality": "FRA",
     "club": "COMM 71",
@@ -37722,7 +37722,7 @@ export interface ImportData {
   },
   {
     "id": 2973,
-    "name": "R?gionale - Urcy (21)",
+    "name": "Regionale - Urcy (21)",
     "eventdate": 1221346800,
     "nationality": "FRA",
     "club": "CREF",
@@ -37918,7 +37918,7 @@ export interface ImportData {
   },
   {
     "id": 2987,
-    "name": "R?gionale 1 LIFCO",
+    "name": "Regionale 1 LIFCO",
     "eventdate": 1221951600,
     "nationality": "FRA",
     "club": "CSLG MELUN",
@@ -38436,7 +38436,7 @@ export interface ImportData {
   },
   {
     "id": 3026,
-    "name": "R?gionale MP 5/7 ? St-Projet (82)",
+    "name": "Regionale MP 5/7 ? St-Projet (82)",
     "eventdate": 1223766000,
     "nationality": "FRA",
     "club": "SCOR",
@@ -39248,7 +39248,7 @@ export interface ImportData {
   },
   {
     "id": 3085,
-    "name": "R?gionale MP 6/7 ? La Rouquette (12)",
+    "name": "Regionale MP 6/7 ? La Rouquette (12)",
     "eventdate": 1226188800,
     "nationality": "FRA",
     "club": "VO12",
@@ -39500,7 +39500,7 @@ export interface ImportData {
   },
   {
     "id": 3104,
-    "name": "R?gionale Soustons (40)",
+    "name": "Regionale Soustons (40)",
     "eventdate": 1226707200,
     "nationality": "FRA",
     "club": "BROS",
@@ -39892,7 +39892,7 @@ export interface ImportData {
   },
   {
     "id": 3132,
-    "name": "R?gionale MP 7/7 ? S?bazac (12)",
+    "name": "Regionale MP 7/7 ? S?bazac (12)",
     "eventdate": 1228003200,
     "nationality": "FRA",
     "club": "CDCO12",
@@ -40371,7 +40371,7 @@ export interface ImportData {
     "name": "Adel & Meanwood",
     "eventdate": 1231027200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -41239,7 +41239,7 @@ export interface ImportData {
     "name": "Haworth Moor & Pensitone Hill",
     "eventdate": 1235260800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -41334,7 +41334,7 @@ export interface ImportData {
   },
   {
     "id": 3237,
-    "name": "R?gionale - Guerigny (58)",
+    "name": "Regionale - Guerigny (58)",
     "eventdate": 1235952000,
     "nationality": "FRA",
     "club": "5803 BO NORD",
@@ -41418,7 +41418,7 @@ export interface ImportData {
   },
   {
     "id": 3243,
-    "name": "R?gionale - Urcy (21)",
+    "name": "Regionale - Urcy (21)",
     "eventdate": 1236470400,
     "nationality": "FRA",
     "club": "2109BO ASQ",
@@ -41516,7 +41516,7 @@ export interface ImportData {
   },
   {
     "id": 3252,
-    "name": "R?gionale Saint-Just (24)",
+    "name": "Regionale Saint-Just (24)",
     "eventdate": 1236470400,
     "nationality": "FRA",
     "club": "CACC",
@@ -41544,7 +41544,7 @@ export interface ImportData {
   },
   {
     "id": 3254,
-    "name": "Championnat ligue MP et R?gionale MP 1/11",
+    "name": "Championnat ligue MP et Regionale MP 1/11",
     "eventdate": 1235865600,
     "nationality": "FRA",
     "club": "FINO",
@@ -41684,7 +41684,7 @@ export interface ImportData {
   },
   {
     "id": 3265,
-    "name": "R?gionale 1 - Hablainville",
+    "name": "Regionale 1 - Hablainville",
     "eventdate": 1237075200,
     "nationality": "FRA",
     "club": "LUNEVILLE",
@@ -41712,7 +41712,7 @@ export interface ImportData {
   },
   {
     "id": 3267,
-    "name": "R?gionale - La Bussi?re (21)",
+    "name": "Regionale - La Bussi?re (21)",
     "eventdate": 1237075200,
     "nationality": "FRA",
     "club": "CD21",
@@ -41796,7 +41796,7 @@ export interface ImportData {
   },
   {
     "id": 3273,
-    "name": "R?gionale MP 2/11 ? Caucali?res (81)",
+    "name": "Regionale MP 2/11 ? Caucali?res (81)",
     "eventdate": 1237075200,
     "nationality": "FRA",
     "club": "AOC",
@@ -42104,7 +42104,7 @@ export interface ImportData {
   },
   {
     "id": 3295,
-    "name": "R?gionale 2 - Boucq - CREF",
+    "name": "Regionale 2 - Boucq - CREF",
     "eventdate": 1238284800,
     "nationality": "FRA",
     "club": "CREF",
@@ -42132,7 +42132,7 @@ export interface ImportData {
   },
   {
     "id": 3297,
-    "name": "R?gionale MP 3/11 ? La Gr?signe (81)",
+    "name": "Regionale MP 3/11 ? La Gr?signe (81)",
     "eventdate": 1238284800,
     "nationality": "FRA",
     "club": "BOA",
@@ -42328,7 +42328,7 @@ export interface ImportData {
   },
   {
     "id": 3311,
-    "name": "R?gionale 4",
+    "name": "Regionale 4",
     "eventdate": 1238886000,
     "nationality": "FRA",
     "club": "COMM",
@@ -43367,7 +43367,7 @@ export interface ImportData {
     "name": "Flasby Fell",
     "eventdate": 1242514800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -43462,7 +43462,7 @@ export interface ImportData {
   },
   {
     "id": 3399,
-    "name": "R?gionale - Ancey (21)",
+    "name": "Regionale - Ancey (21)",
     "eventdate": 1242514800,
     "nationality": "FRA",
     "club": "2104 VOR",
@@ -43966,7 +43966,7 @@ export interface ImportData {
   },
   {
     "id": 3435,
-    "name": "R?gionale - Saint-Victor (21)",
+    "name": "Regionale - Saint-Victor (21)",
     "eventdate": 1244329200,
     "nationality": "FRA",
     "club": "2108 TSO",
@@ -44008,7 +44008,7 @@ export interface ImportData {
   },
   {
     "id": 3438,
-    "name": "R?gionale 5 - Senon",
+    "name": "Regionale 5 - Senon",
     "eventdate": 1244329200,
     "nationality": "FRA",
     "club": "CO PIENNES",
@@ -45646,7 +45646,7 @@ export interface ImportData {
   },
   {
     "id": 3556,
-    "name": "R?gionale 7 - Courcelles Chaussy",
+    "name": "Regionale 7 - Courcelles Chaussy",
     "eventdate": 1252191600,
     "nationality": "FRA",
     "club": "CSAG METZ",
@@ -45873,7 +45873,7 @@ export interface ImportData {
     "name": "Kilnsey (Dales Weekend Day 1)",
     "eventdate": 1252710000,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -45915,7 +45915,7 @@ export interface ImportData {
     "name": "Malham (Dales Weekend day 2",
     "eventdate": 1252796400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -45929,7 +45929,7 @@ export interface ImportData {
     "name": "Malham (Dales Weekend day 2",
     "eventdate": 1252796400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -46696,7 +46696,7 @@ export interface ImportData {
   },
   {
     "id": 3636,
-    "name": "R?gionale AQ ? Martignas",
+    "name": "Regionale AQ ? Martignas",
     "eventdate": 1254610800,
     "nationality": "FRA",
     "club": "ASM",
@@ -46710,7 +46710,7 @@ export interface ImportData {
   },
   {
     "id": 3637,
-    "name": "R?gionale Antheuil (21)",
+    "name": "Regionale Antheuil (21)",
     "eventdate": 1254610800,
     "nationality": "FRA",
     "club": "ABCO",
@@ -46906,7 +46906,7 @@ export interface ImportData {
   },
   {
     "id": 3652,
-    "name": "R?gionale MP 6/9 ? Saillagol (82)",
+    "name": "Regionale MP 6/9 ? Saillagol (82)",
     "eventdate": 1255215600,
     "nationality": "FRA",
     "club": "SCOR",
@@ -47623,7 +47623,7 @@ export interface ImportData {
     "name": "Harden Moor Middle Distance Event",
     "eventdate": 1258243200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -47637,7 +47637,7 @@ export interface ImportData {
     "name": "Harden Moor Night Event",
     "eventdate": 1258156800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -47648,7 +47648,7 @@ export interface ImportData {
   },
   {
     "id": 3707,
-    "name": "R?gionale MP 7/9 ? Monteils (12) et Coupe AQ-MP",
+    "name": "Regionale MP 7/9 ? Monteils (12) et Coupe AQ-MP",
     "eventdate": 1258243200,
     "nationality": "FRA",
     "club": "VO12",
@@ -47928,7 +47928,7 @@ export interface ImportData {
   },
   {
     "id": 3727,
-    "name": "R?gionale MP 8/9 en for?t de Bouconne (31)",
+    "name": "Regionale MP 8/9 en for?t de Bouconne (31)",
     "eventdate": 1259452800,
     "nationality": "FRA",
     "club": "TOAC",
@@ -47956,7 +47956,7 @@ export interface ImportData {
   },
   {
     "id": 3729,
-    "name": "R?gionale GSO ? Barizey",
+    "name": "Regionale GSO ? Barizey",
     "eventdate": 1252191600,
     "nationality": "FRA",
     "club": "7109 GSO",
@@ -48194,7 +48194,7 @@ export interface ImportData {
   },
   {
     "id": 3747,
-    "name": "R?gionale MP 9/9 au Bois d'Auch (32)",
+    "name": "Regionale MP 9/9 au Bois d'Auch (32)",
     "eventdate": 1260057600,
     "nationality": "FRA",
     "club": "FLOC",
@@ -48208,7 +48208,7 @@ export interface ImportData {
   },
   {
     "id": 3748,
-    "name": "R?gionale Lacanau",
+    "name": "Regionale Lacanau",
     "eventdate": 1260057600,
     "nationality": "FRA",
     "club": "SMOG",
@@ -48558,7 +48558,7 @@ export interface ImportData {
   },
   {
     "id": 3773,
-    "name": "R?gionale MP 1/8 ? Caucali?res (81)",
+    "name": "Regionale MP 1/8 ? Caucali?res (81)",
     "eventdate": 1264291200,
     "nationality": "FRA",
     "club": "AOC",
@@ -48768,7 +48768,7 @@ export interface ImportData {
   },
   {
     "id": 3788,
-    "name": "R?gionale LR ? Montalba (66)",
+    "name": "Regionale LR ? Montalba (66)",
     "eventdate": 1264896000,
     "nationality": "FRA",
     "club": "COTE66",
@@ -49177,7 +49177,7 @@ export interface ImportData {
     "name": "Ilkley Moor",
     "eventdate": 1267315200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -49300,7 +49300,7 @@ export interface ImportData {
   },
   {
     "id": 3828,
-    "name": "R?gionale 1 LBCO Etang du Martinet (71)",
+    "name": "Regionale 1 LBCO Etang du Martinet (71)",
     "eventdate": 1267920000,
     "nationality": "FRA",
     "club": "7109 GSO",
@@ -49328,7 +49328,7 @@ export interface ImportData {
   },
   {
     "id": 3830,
-    "name": "R?gionale - Les Baumes (71)",
+    "name": "Regionale - Les Baumes (71)",
     "eventdate": 1267920000,
     "nationality": "FRA",
     "club": "7109 GSO",
@@ -49356,7 +49356,7 @@ export interface ImportData {
   },
   {
     "id": 3832,
-    "name": "2010 - R?gionale 1 - Luneville",
+    "name": "2010 - Regionale 1 - Luneville",
     "eventdate": 1267920000,
     "nationality": "FRA",
     "club": "LUNEVILLE",
@@ -49762,7 +49762,7 @@ export interface ImportData {
   },
   {
     "id": 3863,
-    "name": "R?gionale 3 - Paimpont",
+    "name": "Regionale 3 - Paimpont",
     "eventdate": 1269129600,
     "nationality": "FRA",
     "club": "CRCO",
@@ -51148,7 +51148,7 @@ export interface ImportData {
   },
   {
     "id": 3970,
-    "name": "R?gionale - Parigny (58)",
+    "name": "Regionale - Parigny (58)",
     "eventdate": 1273964400,
     "nationality": "FRA",
     "club": "5803 NORD",
@@ -51470,7 +51470,7 @@ export interface ImportData {
   },
   {
     "id": 3993,
-    "name": "R?gionale - Cestres (21)",
+    "name": "Regionale - Cestres (21)",
     "eventdate": 1275174000,
     "nationality": "FRA",
     "club": "2109BO",
@@ -51722,7 +51722,7 @@ export interface ImportData {
   },
   {
     "id": 4011,
-    "name": "R?gionale 5 - CREF - LLCO",
+    "name": "Regionale 5 - CREF - LLCO",
     "eventdate": 1275778800,
     "nationality": "FRA",
     "club": "CREF",
@@ -52184,7 +52184,7 @@ export interface ImportData {
   },
   {
     "id": 4044,
-    "name": "R?gionale - La Bussiere (21)",
+    "name": "Regionale - La Bussiere (21)",
     "eventdate": 1276988400,
     "nationality": "FRA",
     "club": "2108BO",
@@ -52254,7 +52254,7 @@ export interface ImportData {
   },
   {
     "id": 4049,
-    "name": "R?gionale Lorraine n?6",
+    "name": "Regionale Lorraine n?6",
     "eventdate": 1276988400,
     "nationality": "FRA",
     "club": "HVO",
@@ -52492,7 +52492,7 @@ export interface ImportData {
   },
   {
     "id": 4066,
-    "name": "R?gionale MP 4/8 ? Bruniquel (82)",
+    "name": "Regionale MP 4/8 ? Bruniquel (82)",
     "eventdate": 1277593200,
     "nationality": "FRA",
     "club": "CDCO82",
@@ -53640,7 +53640,7 @@ export interface ImportData {
   },
   {
     "id": 4150,
-    "name": "R?gionale 8 - Sanchey",
+    "name": "Regionale 8 - Sanchey",
     "eventdate": 1284246000,
     "nationality": "FRA",
     "club": "LO SANCHEY",
@@ -53864,7 +53864,7 @@ export interface ImportData {
   },
   {
     "id": 4167,
-    "name": "R?gionale - Avallon (89)",
+    "name": "Regionale - Avallon (89)",
     "eventdate": 1284850800,
     "nationality": "FRA",
     "club": "CARTO - YCONE",
@@ -53892,7 +53892,7 @@ export interface ImportData {
   },
   {
     "id": 4169,
-    "name": "R?gionale 9 - Cht Lorraine Clubs",
+    "name": "Regionale 9 - Cht Lorraine Clubs",
     "eventdate": 1284850800,
     "nationality": "FRA",
     "club": "METZ",
@@ -54371,7 +54371,7 @@ export interface ImportData {
     "name": "The Full Bronte - Haworth",
     "eventdate": 1286578800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -54385,7 +54385,7 @@ export interface ImportData {
     "name": "The Full Bronte - Thornton",
     "eventdate": 1286578800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -54441,7 +54441,7 @@ export interface ImportData {
     "name": "The Full Bronte - Otley Urban Race",
     "eventdate": 1286665200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -54466,7 +54466,7 @@ export interface ImportData {
   },
   {
     "id": 4212,
-    "name": "Course R?gionale Martignas",
+    "name": "Course Regionale Martignas",
     "eventdate": 1286665200,
     "nationality": "FRA",
     "club": "ASM",
@@ -54536,7 +54536,7 @@ export interface ImportData {
   },
   {
     "id": 4217,
-    "name": "R?gionale MP 5/7 ? Potensac (12, Larzac)",
+    "name": "Regionale MP 5/7 ? Potensac (12, Larzac)",
     "eventdate": 1287270000,
     "nationality": "FRA",
     "club": "YAKO",
@@ -56961,7 +56961,7 @@ export interface ImportData {
     "name": "The Chevin - night event",
     "eventdate": 1297468800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -56975,7 +56975,7 @@ export interface ImportData {
     "name": "The Chevin - day event",
     "eventdate": 1297555200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -62477,7 +62477,7 @@ export interface ImportData {
     "name": "Attermire",
     "eventdate": 1316214000,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -62519,7 +62519,7 @@ export interface ImportData {
     "name": "Conistone South",
     "eventdate": 1316300400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -64073,7 +64073,7 @@ export interface ImportData {
     "name": "Temple Newsam Night event",
     "eventdate": 1321660800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -64129,7 +64129,7 @@ export interface ImportData {
     "name": "Park Wood and Black Carr",
     "eventdate": 1321747200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -66131,7 +66131,7 @@ export interface ImportData {
     "name": "Roundhay Park",
     "eventdate": 1330214400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -67545,7 +67545,7 @@ export interface ImportData {
     "name": "Calverley Woods Middle Distance",
     "eventdate": 1335049200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -68119,7 +68119,7 @@ export interface ImportData {
     "name": "Gigglewick & Settle Urban Event",
     "eventdate": 1336777200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "dave.walton1@btinternet.com",
@@ -68259,7 +68259,7 @@ export interface ImportData {
     "name": "Town & Contry - Kilnsey Moor North",
     "eventdate": 1336863600,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk/",
     "email": "dave.walton1@btinternet.com",
@@ -71801,7 +71801,7 @@ export interface ImportData {
     "name": "Fat Rascal Races - Yeadon",
     "eventdate": 1351382400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -75735,7 +75735,7 @@ export interface ImportData {
     "name": "Danefield (Yvette Baker Trophy qualifier)",
     "eventdate": 1368226800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -76001,7 +76001,7 @@ export interface ImportData {
     "name": "Harden Moor Middle Distance Race",
     "eventdate": 1368399600,
     "nationality": "---",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "dave.walton1@btinternet.com",
@@ -76043,7 +76043,7 @@ export interface ImportData {
     "name": "Harden Moor",
     "eventdate": 1368313200,
     "nationality": "---",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "dave.walton1@btinternet.com",
@@ -78423,7 +78423,7 @@ export interface ImportData {
     "name": "Malham",
     "eventdate": 1379113200,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -80887,7 +80887,7 @@ export interface ImportData {
     "name": "Esholt Woods",
     "eventdate": 1388880000,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -81335,7 +81335,7 @@ export interface ImportData {
     "name": "Middleton Woods Northern Night Champs",
     "eventdate": 1391212800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -84849,7 +84849,7 @@ export interface ImportData {
     "name": "Ilkley Urban Race",
     "eventdate": 1399676400,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -84933,7 +84933,7 @@ export interface ImportData {
     "name": "Baildon Moor",
     "eventdate": 1399762800,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@tiscali.co.uk",
@@ -84947,7 +84947,7 @@ export interface ImportData {
     "name": "Watermillock Galoppen",
     "eventdate": 1399762800,
     "nationality": "GBR",
-    "club": "BORDER LINERS",
+    "club": "BL",
     "fileformat": 1,
     "webpage": "http://bl-orienteering.org.uk/",
     "email": "borderliners.web@gmail.com",
@@ -86333,7 +86333,7 @@ export interface ImportData {
     "name": "Fat Rascal Races - Beckett Park Prologue",
     "eventdate": 1405119600,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@rotork.com",
@@ -86347,7 +86347,7 @@ export interface ImportData {
     "name": "Fat Rascal Races - Beckett Park Chase",
     "eventdate": 1405119600,
     "nationality": "GBR",
-    "club": "AIRIENTEERS",
+    "club": "AIRE",
     "fileformat": 1,
     "webpage": "http://www.aire.org.uk",
     "email": "steve.watkins@rotork.com",
@@ -86431,7 +86431,7 @@ export interface ImportData {
     "name": "Gelt Woods",
     "eventdate": 1405724400,
     "nationality": "GBR",
-    "club": "BORDER LINERS",
+    "club": "BL",
     "fileformat": 1,
     "webpage": "http://bl-orienteering.org.uk/",
     "email": "borderliners.web@gmail.com",
@@ -87313,7 +87313,7 @@ export interface ImportData {
     "name": "Aughertree",
     "eventdate": 1410562800,
     "nationality": "GBR",
-    "club": "BORDER LINERS",
+    "club": "BL",
     "fileformat": 1,
     "webpage": "http://bl-orienteering.org.uk/",
     "email": "borderliners.web@gmail.com",
@@ -88139,7 +88139,7 @@ export interface ImportData {
     "name": "Penrith Beacon",
     "eventdate": 1413072000,
     "nationality": "GBR",
-    "club": "BORDER LINERS",
+    "club": "BL",
     "fileformat": 1,
     "webpage": "http://bl-orienteering.org.uk/",
     "email": "borderliners.web@gmail.com",

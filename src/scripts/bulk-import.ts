@@ -7,8 +7,9 @@ import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore } from "angularfire2/firestore";
 import { AngularFireStorage } from "angularfire2/storage";
 import { EventAdminService, LargeBatch } from "../app/event-admin/event-admin.service";
-import { EventGrades, OEvent, SplitsFileFormat } from "../app/model";
+import { EventGrades, OEvent, SplitsFileFormat, EventGrade } from "../app/model";
 import * as data from "./importdata.node";
+import { ImportData } from "./importdata.node";
 import { Injectable } from "@angular/core";
 import { Results } from "app/results/model";
 
@@ -27,8 +28,36 @@ export class BulkImportService {
     private http: HttpClient) {
   }
 
+  cleanEvents() {
+
+    const events = data.inputJSON;
+
+    for (const inputEvent of events) {
+      // remove . from club names
+      inputEvent.club = inputEvent.club.replace(new RegExp('\\.', 'g'), '');
+
+      // make club names all uppercase
+      inputEvent.club = inputEvent.club.toUpperCase();
+
+    }
+
+    // remove duplicate events
+    for (let i = events.length - 2; i >= 0; i--) {
+      if ((events[i].name === events[i + 1].name) &&
+        (events[i].eventdate === events[i + 1].eventdate) &&
+        (events[i].club === events[i + 1].club)) {
+        console.log('Removing duplicate event ' + events[i].id + '   ' + events[i].name);
+
+        events.slice(i, 1);
+      }
+    }
+    return events;
+
+  }
+
   async loadEvents() {
-    for (const inputEvent of data.inputJSON) {
+    const events = this.cleanEvents();
+    for (const inputEvent of events) {
       if (inputEvent.id >= this.startId && inputEvent.id <= this.endId) {
         await this.processEvent(inputEvent);
       }
@@ -48,7 +77,7 @@ export class BulkImportService {
       }
 
     } catch (err) {
-      console.log("Error encountered process " + inputEvent.id + "  " + err);
+      console.log("Error encountered process " + inputEvent.id.toString() + "  " + err);
       throw err;
     }
 
@@ -56,12 +85,26 @@ export class BulkImportService {
 
   }
 
+  mapeventGrade(index): EventGrade {
+    if (index === 0) {
+      return 'IOF';
+    } else if (index === 1) {
+      return 'International';
+    } else if (index === 2) {
+      return 'National';
+    } else if (index === 3) {
+      return 'Regional';
+    } else if (index === 4) {
+      return 'Club';
+    }
+  }
+
   async addEvent(inputEvent: data.ImportData): Promise<OEvent> {
 
-    const grade = EventGrades.grades[inputEvent.type];
+    const grade = this.mapeventGrade(inputEvent.type);
 
     const event: OEvent = {
-      key: inputEvent.id,
+      key: inputEvent.id.toString(),
       name: inputEvent.name,
       nationality: inputEvent.nationality,
       date: new Date(inputEvent.eventdate * 1000).toISOString(),

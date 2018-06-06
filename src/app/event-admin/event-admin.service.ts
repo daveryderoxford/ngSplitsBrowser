@@ -295,39 +295,44 @@ export class EventAdminService {
     const query1 = this.afs.collection<CompetitorSearchData>("/results", ref => {
       return ref.where("surname", "==", surname)
         .where("club", "==", club);
-    }).valueChanges();
+    }).valueChanges().take(1);
 
     const query2 = this.afs.collection<CompetitorSearchData>("/results", ref => {
       return ref.where("surname", "==", surname)
         .where("club", "==", firstname);
-    }).valueChanges();
+    }).valueChanges().take(1);
 
     // Merge results of the two queries and remove duplicates
-    const merged = Observable.merge(query1, query2).map(results => {
-      return Utils.removeDuplicates(results);
+    const zipped = Observable.zip(query1, query2).map( ([res1, res2]) => {
+      return Utils.removeDuplicates(res1.concat(res2));
     });
 
-    return merged;
+    return zipped;
   }
 
   /** Search for results where any ecard matches */
-  searchResultsByECard(ecards: Array<ECard>): Observable<CompetitorSearchData[]> {
+  searchResultsByECard(ecards: Array<ECard>, eventsAfter: Date): Observable<CompetitorSearchData[]> {
     // Search each of the users ecard numbers defined in ecard object
-    const queryresults: Array<Observable<CompetitorSearchData[]>> = [];
+    const querys: Array<Observable<CompetitorSearchData[]>> = [];
 
     for (const card of ecards) {
       const query = this.afs.collection<CompetitorSearchData>("/results", ref => {
         return ref.where("ecard", "==", card.id)
           .orderBy('date', 'desc');
-      }).valueChanges();
+      }).valueChanges().take(1);
 
-      queryresults.push(query);
+      querys.push(query);
     }
 
-    const merged = Observable.merge(queryresults[0]).map(results => {
+    const zipped = Observable.zip(querys).map(allQueryResults => {
+      // concaternate the queries and remove duplicates
+      let results: CompetitorSearchData[] = [];
+      for (const qresults of allQueryResults) {
+        results = results.concat(qresults);
+      }
       return Utils.removeDuplicates(results);
     });
-    return merged;
+    return zipped;
   }
 }
 
@@ -416,7 +421,7 @@ class ClubListManager {
   private removeClubReference(event, club: Club, trans: firestore.Transaction): void {
 
     if (!club) {
-      console.log("ERROR Removing reference to a club not found  Name:" + event.club);
+      console.log("WARNING Removing reference to a club not found  Name:" + event.club);
       return;
     }
 
