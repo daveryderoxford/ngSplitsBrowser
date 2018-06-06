@@ -1,25 +1,50 @@
 <!doctype html>
-<html>
+<html style="margin: 0; width:100%; height: 100%;">
 
 <head>
-  <meta charset="utf-8">
-  <title>Splitsbrowser</title>
-  <base href="/">
+    <meta charset="utf-8">
+    <title>Splitsbrowser</title>
+    <base href="/">
 
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-   <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
 </head>
 
-<body>
-  <app-root>Loading...</app-root>
-  <script>
-  (function(i, s, o, g, r, a, m) {
+<body style="margin: 0; width:100%; height: 100%;">
+    <noscript>
+        <h3 style="color: rgb(100,100,100); font-family: Roboto; margin: 2rem;">
+            Sorry, but Splitsbrowser is not available without Javascript being enabled.
+        </h3>
+    </noscript>
+
+    <app-root>
+        <div style="width: 100%; 
+                    height: 50px; 
+                    box-shadow: 0 8px 6px -6px #999;
+                    background: rgb(245,245,245);">
+        </div>
+        <div style="width: 100%; 
+                    height: 100%; 
+                    color: rgb(245,245,245);
+                   display: flex;
+                   align-items: center;
+                   justify-content: center;">
+            <h2 style="font-family: Roboto;
+                       color: rgb(100,100,100);">
+                Splitsbrowser loading
+            </div>
+        </div>
+    </app-root>
+
+     <!-- Google analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
             i['GoogleAnalyticsObject'] = r;
-            i[r] = i[r] || function() {
+            i[r] = i[r] || function () {
                 (i[r].q = i[r].q || []).push(arguments)
             }, i[r].l = 1 * new Date();
             a = s.createElement(o),
@@ -28,9 +53,9 @@
             a.src = g;
             m.parentNode.insertBefore(a, m)
         })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-ga('create', 'UA-119313869-1', 'auto');
-ga('send', 'pageview');
-</script>
+        ga('create', 'UA-119313869-1', 'auto');
+        ga('send', 'pageview');
+    </script>
 </body>
 
 </html>
