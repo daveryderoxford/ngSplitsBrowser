@@ -51,11 +51,15 @@ export class EventService {
     return this.ps.done;
   }
   /** Gets all evenst for a club  */
-  getEventsForClub(club: string): Observable<OEvent[]> {
+  getEventsForClub(club: Club): Observable<OEvent[]> {
     this._loading.next(true);
 
     const query = this.afs.collection<OEvent>("/events",
-      res => res.where("club", "==", club).where('splits.valid', '==', true).orderBy('date', 'desc')
+      res => res
+            .where("club", "==", club.name)
+            .where("nationality", "==", club.nationality)
+            .where('splits.valid', '==', true)
+            .orderBy('date', 'desc')
     );
 
     const clubs$ = query.valueChanges();

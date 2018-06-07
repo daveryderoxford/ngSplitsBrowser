@@ -9,7 +9,7 @@ import { Nations, UserData, UserResultData } from "app/model";
 import { Club } from "app/model/club";
 import { EventGrades, OEvent } from "app/model/oevent";
 import { DialogsService } from "app/shared";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { Observable } from "rxjs/Observable";
 import { map, debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { UserDataService } from "app/user/user-data.service";
@@ -21,7 +21,7 @@ import { UserDataService } from "app/user/user-data.service";
 })
 export class EventsViewComponent implements OnInit {
 
- // @ViewChild(MatPaginator) paginator: MatPaginator;
+  // @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild('tabAll') tabAll: MatTab;
   @ViewChild('tabClub') tabClub: MatTab;
   @ViewChild('tabMyEvents') tabMyEvents: MatTab;
@@ -36,10 +36,12 @@ export class EventsViewComponent implements OnInit {
   myResults$: Observable<UserResultData[]> = undefined;
 
   events: Array<OEvent> = [];
+  clubEvents: Array<OEvent> = [];
+
 
   // Club related fields
   nations = Nations.getNations();
-  selctedClub = new BehaviorSubject('');
+  selctedClub = new Subject<Club>();
   clubNationalityFilter = new BehaviorSubject('');
   clubNameFilter = new BehaviorSubject('');
 
@@ -50,11 +52,11 @@ export class EventsViewComponent implements OnInit {
   constructor(private afAuth: AngularFireAuth,
     private afs: AngularFirestore,
     private router: Router,
-    private es: EventService,
+    public es: EventService,
     private ds: DialogsService,
-    private us: UserDataService ) {
+    private us: UserDataService) {
 
-    }
+  }
 
   oeventClicked(event: OEvent) {
     this.router.navigate(["/graph", event.key]).catch(e => {
@@ -64,28 +66,28 @@ export class EventsViewComponent implements OnInit {
   }
 
   filterClubs(clubs: Club[], natFilter: string, nameFilter: string) {
-      return clubs.
-           filter(club => (natFilter === "" || club.nationality === natFilter)).
-           filter(club => (nameFilter === "" || club.name.includes(nameFilter.toUpperCase())));
+    return clubs.
+      filter(club => (natFilter === "" || club.nationality === natFilter)).
+      filter(club => (nameFilter === "" || club.name.includes(nameFilter.toUpperCase())));
   }
 
   // tslint:disable-next-line:use-life-cycle-interface
   ngOnInit() {
     this.loading = this.es.loading;
-
     this.dataSource = new EventDataSource(this.es);
-
   }
 
   initClub() {
     // Club filter
     this.clubs$ = Observable.combineLatest(this.es.getClubs(), this.clubNationalityFilter, this.clubNameFilter)
-    .pipe(
-      map( obs => this.filterClubs(obs[0], obs[1], obs[2]))
-    );
+      .pipe(
+        map(obs => this.filterClubs(obs[0], obs[1], obs[2]))
+      );
 
-    this.selctedClub.switchMap(name => this.es.getEventsForClub(name))
-      .subscribe(events => this.events = events);
+    this.selctedClub
+      .filter((club) => club !== null)
+      .switchMap(club => this.es.getEventsForClub(club))
+      .subscribe(events => this.clubEvents = events);
   }
 
   tabChanged(selection: MatTabChangeEvent) {
@@ -94,14 +96,15 @@ export class EventsViewComponent implements OnInit {
     if (selection.tab === this.tabClub && !this.clubs$) {
       this.initClub();
     } else if (selection.tab === this.tabMyEvents && !this.myResults$) {
-      this.myResults$ = this.us.getUser().map( (userdata) => {
+      this.myResults$ = this.us.getUser().map((userdata) => {
         return userdata.results;
       });
     }
   }
 
-  setSelectedClub(name: string) {
-    this.selctedClub.next(name);
+  setSelectedClub(club: Club) {
+    const c = club;
+    this.selctedClub.next(c);
   }
 
   clubNationalFilterChange(event: MatSelectChange) {

@@ -24,12 +24,12 @@ export class FileButtonComponent {
 
   get fileCount(): number { return this._files && this._files.length || 0; }
 
-  private onNativeInputFileSelect($event) {
+  onNativeInputFileSelect($event) {
     this._files = $event.srcElement.files;
     this.onFileSelect.emit(this._files);
   }
 
-  private selectFile() {
+  selectFile() {
     this.nativeInputFile.nativeElement.click();
   }
 }

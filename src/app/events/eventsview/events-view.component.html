@@ -109,7 +109,9 @@
 
             <mat-accordion multi="false">
 
-              <mat-expansion-panel *ngFor="let club of clubs$ | async" (opened)="setSelectedClub(club.name)">
+              <div *ngFor="let club of clubs$ | async">
+
+              <mat-expansion-panel (opened)="setSelectedClub(club)">
                 <mat-expansion-panel-header>
                   <mat-panel-title>
                     <b> {{club.name}} &nbsp;&nbsp;&nbsp; {{club.nationality}} </b>
@@ -120,15 +122,17 @@
                 </mat-expansion-panel-header>
 
                 <ng-template matExpansionPanelContent>
-                  <mat-list *ngFor="let event of events">
-                    <mat-list-item> {{event.name}}</mat-list-item>
+                   
+                  <mat-list *ngFor="let event of clubEvents">
+                    <mat-list-item> {{event.name}}  {{event.nationality}}  {{event.splits?.valid}}</mat-list-item>
                   </mat-list>
                   The club is {{club.name}}
 
                 </ng-template>
 
               </mat-expansion-panel>
-              <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
+            </div>
+            <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
 
             </mat-accordion>
 
