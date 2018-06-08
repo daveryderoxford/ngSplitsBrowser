@@ -58,6 +58,7 @@ export class EventService {
       res => res
             .where("club", "==", club.name)
             .where("nationality", "==", club.nationality)
+            .where("splits", "==", true)
             .where('splits.valid', '==', true)
             .orderBy('date', 'desc')
     );
