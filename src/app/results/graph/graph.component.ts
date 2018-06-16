@@ -46,4 +46,3 @@ export class GraphComponent implements OnInit {
             .subscribe( (results: Results) => this.selectedResultsUpdated(results)); */
   }
 }
-

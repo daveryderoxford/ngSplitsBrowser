@@ -1,14 +1,13 @@
 import { Injectable } from "@angular/core";
-import { OEvent, EventInfo, Club } from "app/model";
-import { AngularFirestore, AngularFirestoreDocument, QueryFn } from "angularfire2/firestore";
-
-import { Observable } from "rxjs/Observable";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
+import { AngularFirestore, QueryFn } from "angularfire2/firestore";
+import { Club, EventInfo, OEvent } from "app/model";
 import { PaganationService } from "app/shared";
+import { BehaviorSubject } from "rxjs/BehaviorSubject";
+import { Observable } from "rxjs/Observable";
+
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
-
 
 @Injectable({
   providedIn: 'root',
@@ -35,8 +34,7 @@ export class EventService {
     return this.ps.data;
   }
 
-  /** Extends the search by the pagesize.  The current search criteria apply
-  */
+  /** Extends the search by the pagesize.  The current search criteria apply */
   extendSearch() {
     this.ps.more();
   }
@@ -58,14 +56,13 @@ export class EventService {
       res => res
             .where("club", "==", club.name)
             .where("nationality", "==", club.nationality)
-            .where("splits", "==", true)
             .where('splits.valid', '==', true)
             .orderBy('date', 'desc')
     );
 
-    const clubs$ = query.valueChanges();
+    const clubs$ = query.valueChanges().take(1);
 
-    clubs$.do( () => this._loading.next(false));
+    clubs$.finally( () => this._loading.next(false));
 
     return clubs$;
   }

@@ -1,17 +1,17 @@
 import { DataSource } from "@angular/cdk/collections";
-import { Component, ViewChild, OnInit, AfterViewInit } from "@angular/core";
-import { MatPaginator, MatSelectChange, MatTab, MatTabChangeEvent } from "@angular/material";
+import { Component, ViewChild, OnInit } from "@angular/core";
+import { MatSelectChange, MatTab, MatTabChangeEvent } from "@angular/material";
 import { Router } from "@angular/router";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore } from "angularfire2/firestore";
 import { EventService } from "app/events/event.service";
-import { Nations, UserData, UserResultData } from "app/model";
+import { Nations, UserResultData } from "app/model";
 import { Club } from "app/model/club";
 import { EventGrades, OEvent } from "app/model/oevent";
 import { DialogsService } from "app/shared";
 import { BehaviorSubject, Subject } from "rxjs";
 import { Observable } from "rxjs/Observable";
-import { map, debounceTime, distinctUntilChanged } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { UserDataService } from "app/user/user-data.service";
 
 @Component({
@@ -32,26 +32,21 @@ export class EventsViewComponent implements OnInit {
   displayedColumns = ["date", "name", "nationality", "club", "grade", "discipline", "type", "website", "actions"];
   currentRow: any = null;
   grades = EventGrades.grades;
-  clubs$: Observable<Club[]> = undefined;
+  nations = Nations.getNations();
+
   myResults$: Observable<UserResultData[]> = undefined;
 
-  events: Array<OEvent> = [];
+    // Club related fields
+  clubs$: Observable<Club[]> = undefined;
   clubEvents: Array<OEvent> = [];
-
-
-  // Club related fields
-  nations = Nations.getNations();
   selctedClub = new Subject<Club>();
   clubNationalityFilter = new BehaviorSubject('');
   clubNameFilter = new BehaviorSubject('');
 
-
   selectedEvent: OEvent = null;
   loading: Observable<boolean>;
 
-  constructor(private afAuth: AngularFireAuth,
-    private afs: AngularFirestore,
-    private router: Router,
+  constructor(private router: Router,
     public es: EventService,
     private ds: DialogsService,
     private us: UserDataService) {
@@ -59,8 +54,8 @@ export class EventsViewComponent implements OnInit {
   }
 
   oeventClicked(event: OEvent) {
-    this.router.navigate(["/graph", event.key]).catch(e => {
-      console.log('Errror in van');
+    this.router.navigate(["/graph", event.key]).catch((err) => {
+      console.log('Errror in loading results for ' + event.name + ' ' + err);
       this.ds.message('Error loading results', 'Error loading results for event');
     });
   }
@@ -133,7 +128,7 @@ export class EventsViewComponent implements OnInit {
     this.currentRow = row;
   }
 
-  onMouseLeave(row) {
+  onMouseLeave() {
     this.currentRow = null;
   }
 
@@ -145,16 +140,16 @@ export class EventsViewComponent implements OnInit {
     }
   }
 
-  graphMenuSelected(event: OEvent) {
+  graphMenuSelected() {
   }
 
-  summaryMenuSelected(event: OEvent) {
+  summaryMenuSelected() {
   }
 
-  adminMenuSelected(event: OEvent) {
+  adminMenuSelected() {
   }
 
-  eventEditable(event: OEvent) {
+  eventEditable() {
 
   }
 
