@@ -70,6 +70,6 @@ export class Nations {
             { abrievation: "YUG", fullname: "Yugoslavia", },
             { abrievation: "---", fullname: "Other" }
         ];
-        return nations
-    };
+        return nations;
+    }
 }

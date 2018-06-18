@@ -16,9 +16,6 @@ export class ResultsResolver implements Resolve<Results> {
         const id = route.paramMap.get('id');
         // Returning Obsrvable of empty does not navigate
         return this.rs.setSelectedEventByKey(id).take(1);
-           /* .catch(err => {
-                console.error('ResultsResolver: Unable to load results:', err);
-                return Observable.empty();
-            }) */
+
     }
 }

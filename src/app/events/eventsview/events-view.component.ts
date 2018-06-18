@@ -1,15 +1,15 @@
 import { DataSource } from "@angular/cdk/collections";
-import { Component, ViewChild } from "@angular/core";
-import { MatPaginator, MatSelectChange, MatTab, MatTabChangeEvent } from "@angular/material";
+import { Component, ViewChild, OnInit } from "@angular/core";
+import { MatSelectChange, MatTab, MatTabChangeEvent } from "@angular/material";
 import { Router } from "@angular/router";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore } from "angularfire2/firestore";
 import { EventService } from "app/events/event.service";
-import { Nations, UserData, UserResultData } from "app/model";
+import { Nations, UserResultData } from "app/model";
 import { Club } from "app/model/club";
 import { EventGrades, OEvent } from "app/model/oevent";
 import { DialogsService } from "app/shared";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { Observable } from "rxjs/Observable";
 import { map } from "rxjs/operators";
 import { UserDataService } from "app/user/user-data.service";
@@ -19,9 +19,9 @@ import { UserDataService } from "app/user/user-data.service";
   templateUrl: "./events-view.component.html",
   styleUrls: ["./events-view.component.scss"]
 })
-export class EventsViewComponent {
+export class EventsViewComponent implements OnInit {
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  // @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild('tabAll') tabAll: MatTab;
   @ViewChild('tabClub') tabClub: MatTab;
   @ViewChild('tabMyEvents') tabMyEvents: MatTab;
@@ -32,73 +32,82 @@ export class EventsViewComponent {
   displayedColumns = ["date", "name", "nationality", "club", "grade", "discipline", "type", "website", "actions"];
   currentRow: any = null;
   grades = EventGrades.grades;
-  clubs$: Observable<Club[]> = undefined;
+  nations = Nations.getNations();
+
   myResults$: Observable<UserResultData[]> = undefined;
 
-  events: Array<OEvent> = [];
-
-  // Club related fields
-  nations = Nations.getNations();
-  selctedClub = new BehaviorSubject('');
-  clubFilter = new BehaviorSubject('');
+    // Club related fields
+  clubs$: Observable<Club[]> = undefined;
+  clubEvents: Array<OEvent> = [];
+  selctedClub = new Subject<Club>();
+  clubNationalityFilter = new BehaviorSubject('');
+  clubNameFilter = new BehaviorSubject('');
 
   selectedEvent: OEvent = null;
   loading: Observable<boolean>;
 
-  constructor(private afAuth: AngularFireAuth,
-    private afs: AngularFirestore,
-    private router: Router,
-    private es: EventService,
+  constructor(private router: Router,
+    public es: EventService,
     private ds: DialogsService,
-    private us: UserDataService ) { }
+    private us: UserDataService) {
+
+  }
 
   oeventClicked(event: OEvent) {
-    this.router.navigate(["/graph", event.key]).catch(e => {
-      console.log('Errror in van');
+    this.router.navigate(["/graph", event.key]).catch((err) => {
+      console.log('Errror in loading results for ' + event.name + ' ' + err);
       this.ds.message('Error loading results', 'Error loading results for event');
     });
   }
 
-  applyFilter(clubs: Club[], natFilter: string) {
-    if (natFilter === "") {
-      return clubs;
-    } else {
-      const ret = clubs.filter(club => (club.nationality === natFilter));
-      return ret;
-    }
+  filterClubs(clubs: Club[], natFilter: string, nameFilter: string) {
+    return clubs.
+      filter(club => (natFilter === "" || club.nationality === natFilter)).
+      filter(club => (nameFilter === "" || club.name.includes(nameFilter.toUpperCase())));
   }
 
   // tslint:disable-next-line:use-life-cycle-interface
   ngOnInit() {
-    this.dataSource = new EventDataSource(this.es);
-
     this.loading = this.es.loading;
+    this.dataSource = new EventDataSource(this.es);
+  }
 
+  initClub() {
+    // Club filter
+    this.clubs$ = Observable.combineLatest(this.es.getClubs(), this.clubNationalityFilter, this.clubNameFilter)
+      .pipe(
+        map(obs => this.filterClubs(obs[0], obs[1], obs[2]))
+      );
+
+    this.selctedClub
+      .filter((club) => club !== null)
+      .switchMap(club => this.es.getEventsForClub(club))
+      .subscribe(events => this.clubEvents = events);
   }
 
   tabChanged(selection: MatTabChangeEvent) {
     // Lazily load clubs list
+
     if (selection.tab === this.tabClub && !this.clubs$) {
-      this.clubs$ = Observable.combineLatest(this.es.getClubs(), this.clubFilter).pipe(
-        map((obs) => this.applyFilter(obs[0], obs[1]))
-      );
-
-      this.selctedClub.switchMap(name => this.es.getEventsForClub(name))
-        .subscribe(events => this.events = events);
-
+      this.initClub();
     } else if (selection.tab === this.tabMyEvents && !this.myResults$) {
-      this.myResults$ = this.us.getUser().map( (userdata) => {
+      this.myResults$ = this.us.getUser().map((userdata) => {
         return userdata.results;
       });
     }
   }
 
-  setSelectedClub(name: string) {
-    this.selctedClub.next(name);
+  setSelectedClub(club: Club) {
+    const c = club;
+    this.selctedClub.next(c);
   }
 
   clubNationalFilterChange(event: MatSelectChange) {
-    this.clubFilter.next(event.value);
+    this.clubNationalityFilter.next(event.value);
+  }
+
+  clubNameFilterChange(event: any) {
+    this.clubNameFilter.next(event.target.value);
   }
 
   // EVENT TABLE
@@ -119,7 +128,7 @@ export class EventsViewComponent {
     this.currentRow = row;
   }
 
-  onMouseLeave(row) {
+  onMouseLeave() {
     this.currentRow = null;
   }
 
@@ -131,16 +140,16 @@ export class EventsViewComponent {
     }
   }
 
-  graphMenuSelected(event: OEvent) {
+  graphMenuSelected() {
   }
 
-  summaryMenuSelected(event: OEvent) {
+  summaryMenuSelected() {
   }
 
-  adminMenuSelected(event: OEvent) {
+  adminMenuSelected() {
   }
 
-  eventEditable(event: OEvent) {
+  eventEditable() {
 
   }
 

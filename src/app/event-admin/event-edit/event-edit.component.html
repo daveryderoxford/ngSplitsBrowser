@@ -26,10 +26,18 @@
       </mat-form-field>
 
       <mat-form-field>
-        <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
-        <mat-hint align="end">Between 2 and 10 characters</mat-hint>
+        <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation" [matAutocomplete]="auto">
+       <mat-hint align="end">Between 2 and 10 characters</mat-hint>
         <mat-error>Club required</mat-error>
+
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub">
+            <mat-option *ngFor="let club of filteredClubs$ | async" [value]="club.name">
+              {{ club.name }}
+            </mat-option>
+          </mat-autocomplete>
+
       </mat-form-field>
+
 
       <mat-form-field>
 

@@ -5,6 +5,10 @@ import { Router } from '@angular/router';
 import { EventAdminService } from 'app/event-admin/event-admin.service';
 import { Nations } from 'app/model/nations';
 import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from 'app/model/oevent';
+import { Club } from 'app/model';
+import { Observable } from 'rxjs/Observable';
+import { startWith, map, filter } from 'rxjs/operators';
+import { EventService } from 'app/events/event.service';
 
 @Component({
   selector: 'app-event-edit',
@@ -24,9 +28,14 @@ export class EventEditComponent implements OnInit {
   disciplines = EventDisciplines.disciplines;
   email: string;
 
+
+  clubs: Club[] = [];
+  filteredClubs$: Observable<Club[]>;
+
   constructor(private router: Router,
     private formBuilder: FormBuilder,
     private eventService: EventAdminService,
+    private es: EventService,
     public snackBar: MatSnackBar
   ) {
     this.createForm();
@@ -48,6 +57,39 @@ export class EventEditComponent implements OnInit {
 
   ngOnInit() {
 
+    this.filteredClubs$ = Observable.combineLatest(this.es.getClubs(),
+                                                    this.f.controls.club.valueChanges.startWith(''),
+                                                    this.f.controls.nationality.valueChanges.startWith(''))
+      .pipe(
+        filter(club => (club !== null || club !== [])),
+        map(([clubs, name, nat]) => this.filterClubs(clubs, name, nat))
+      );
+
+    this.filteredClubs$.subscribe((clubs) => {
+      this.clubs = clubs;
+    });
+  }
+
+  filterClubs(clubs: Club[], name: string, nationality: string): Club[] {
+
+    const ret: Club[] = [];
+
+    if (clubs) {
+      for (const club of clubs) {
+        if (!nationality || nationality === '' || club.nationality === nationality) {
+          if (!name || name === '') {
+            ret.push(club);
+          } else if (club.name.startsWith(name.toUpperCase()) {
+            ret.push(club);
+          }
+        }
+      }
+    }
+    return ret;
+  }
+
+  displayFn(club?: Club): string | undefined {
+    return club ? club.name : undefined;
   }
 
   // tslint:disable-next-line:use-life-cycle-interface

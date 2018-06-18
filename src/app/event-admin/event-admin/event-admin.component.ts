@@ -17,6 +17,7 @@ export class EventAdminComponent implements OnInit {
 
   selectedEvent: OEvent = null;
   new = false;
+  loading = false;
 
   constructor(private afAuth: AngularFireAuth,
     private eventAdmin: EventAdminService,
@@ -32,12 +33,15 @@ export class EventAdminComponent implements OnInit {
       confirm = await this.dialogsService.confirm("Confirm Dialog", "Are you sure you want to overwrite splits?");
     }
     if (confirm) {
+      this.loading = true;
       const splitsFile = files[0];
       try {
         await this.eventAdmin.uploadResults(this.selectedEvent, splitsFile);
       } catch (err) {
         console.log("EventAdminComponnet: Error uploading splits" + err);
         this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);
+      } finally {
+        this.loading = false;
       }
     }
   }
@@ -51,10 +55,13 @@ export class EventAdminComponent implements OnInit {
     const confirm = await this.dialogsService.confirm("Confirm Dialog", "Are you sure you want to delete is event?");
     if (confirm) {
       try {
+        this.loading = true;
         await this.eventAdmin.delete(this.selectedEvent);
         this.selectedEvent = null;
       } catch (err) {
         console.log("EventAdminComponnet: Error deleting event" + err);
+      } finally {
+        this.loading = false;
       }
     }
   }

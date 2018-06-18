@@ -29,6 +29,8 @@ import { UserComponent } from "app/user/user.component";
 import "hammerjs";
 import { AppRoutingModule } from "./app-routing.module";
 import { ChangePasswordComponent } from './auth/change-password/change-password.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -57,6 +59,7 @@ import { ChangePasswordComponent } from './auth/change-password/change-password.
     EventAdminModule,
     SharedModule,
     HttpClientModule,
+    ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
   ],
   bootstrap: [AppComponent]
 })
