@@ -50,7 +50,7 @@ export class TimeUtilities {
         }
 
         return result;
-    };
+    }
 
     /**
     * Parse a time of the form MM:SS or H:MM:SS into a number of seconds.
