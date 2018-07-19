@@ -1,4 +1,4 @@
-export class SplitsBrowserException {
+class BaseException {
     protected name: string;
 
     constructor(protected message: string) {
@@ -10,7 +10,14 @@ export class SplitsBrowserException {
     }
 }
 
-export class InvalidData extends SplitsBrowserException {
+export class UnexpectedError extends BaseException {
+    constructor(message: string) {
+        super(message);
+        this.name = "UnexpectedError";
+    }
+}
+
+export class InvalidData extends BaseException {
 
     constructor(message: string) {
         super(message);
@@ -18,7 +25,7 @@ export class InvalidData extends SplitsBrowserException {
     }
 }
 
-export class WrongFileFormat extends SplitsBrowserException {
+export class WrongFileFormat extends BaseException {
 
     constructor(message) {
         super(message);

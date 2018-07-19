@@ -41,9 +41,9 @@ export function WarningViewer(parent) {
     $(document).click(function (e) {
         if (outerThis.warningList.style("display") !== "none") {
             const container = $("div#warningTriangleContainer,div.warningList");
-            if (!container.is(e.target) && container.has(e.target).length === 0) {
-                outerThis.warningList.style("display", "none");
-            }
+        //   if (!container.is(e.target) && container.has(e.target).length === 0) {
+        //     outerThis.warningList.style("display", "none");
+        //    }
         }
     });
 

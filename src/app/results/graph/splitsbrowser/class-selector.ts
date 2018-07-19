@@ -64,9 +64,9 @@ export function ClassSelector(parent) {
         const listDiv = outerThis.otherClassesList.node();
         if (listDiv.style.display !== "none") {
             const container = $("div.otherClassList,div.otherClassSelector");
-            if (!container.is(e.target) && container.has(e.target).length === 0) {
-                listDiv.style.display = "none";
-            }
+       //     if (!container.is(e.target) && container.has(e.target).length === 0) {
+       //         listDiv.style.display = "none";
+      //      }
         }
     });
 

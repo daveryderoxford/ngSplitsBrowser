@@ -4,6 +4,7 @@ import { CourseClass } from "./course-class";
 import { Course } from "./course";
 import { Competitor } from "./competitor";
 import { sbTime } from "./time";
+import { ECard, UserData } from "app/model/user";
 
 export class Results {
 
@@ -141,15 +142,15 @@ export class Results {
 
     /** Search for a competior in the results.
      *  Matches on firstname, surname or club (case independent)
-     *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
+     *  Requires exact match if search string is 2 characters or less or match on start if >1 characters
      */
     public findCompetitors(searchstring: string): Array<Competitor> {
-        if (!searchstring || searchstring.trim().length === 0)  { return []; }
+        if (!searchstring || searchstring.trim().length === 0) { return []; }
 
         const onechar = searchstring.length > 1;
         const ss = searchstring.toLocaleLowerCase();
 
-        let found = this.allCompetitors.filter((comp) => {
+        let filtered = this.allCompetitors.filter((comp) => {
             const surname = comp.surname.toLowerCase();
             const firstname = comp.firstname.toLowerCase();
             const club = comp.club.toLowerCase();
@@ -160,18 +161,30 @@ export class Results {
         });
 
         // Sort into name order
-        found = found.sort((comp1, comp2) => {
+        filtered = filtered.sort((comp1, comp2) => {
             return comp1.firstname.localeCompare(comp2.firstname);
         });
-        return (found);
+        return (filtered);
     }
 
+    /** Find competitors by ecard from results  Only a simngle competitir should be found for a given ecard number */
+    findCompetitorByECard(ecards: ECard | Array<ECard> ): Competitor {
+        const foundComp = this.allCompetitors.find((comp) => {
+            if (Array.isArray(ecards)) {
+                return ecards.some(card => card.id === comp.ecardId);
+            } else {
+                return ecards.id === comp.ecardId;
+            }
+        });
+
+        return (foundComp);
+    }
 
     /** Search for a course class matching on name.
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
      */
     findCourseClasss(searchstring: string): Array<CourseClass> {
-        if (!searchstring || searchstring.trim().length === 0)  { return []; }
+        if (!searchstring || searchstring.trim().length === 0) { return []; }
 
         const onechar = searchstring.length > 1;
         const ss = searchstring.toLowerCase();
@@ -189,7 +202,7 @@ export class Results {
      */
     findCourses(searchstring: string): Array<Course> {
 
-        if (!searchstring || searchstring.trim().length === 0)  { return []; }
+        if (!searchstring || searchstring.trim().length === 0) { return []; }
 
         const onechar = searchstring.length > 1;
         const ss = searchstring.toLowerCase();

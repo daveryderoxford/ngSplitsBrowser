@@ -54,10 +54,14 @@ export class EventsViewComponent implements OnInit {
   }
 
   oeventClicked(event: OEvent) {
+    if (!event.splits || event.splits.valid === false) {
+       this.ds.message("Results display failed", "No valid results uploaded for event");
+    } else {
     this.router.navigate(["/graph", event.key]).catch((err) => {
       console.log('Errror in loading results for ' + event.name + ' ' + err);
       this.ds.message('Error loading results', 'Error loading results for event');
     });
+  }
   }
 
   filterClubs(clubs: Club[], natFilter: string, nameFilter: string) {
@@ -70,6 +74,10 @@ export class EventsViewComponent implements OnInit {
   ngOnInit() {
     this.loading = this.es.loading;
     this.dataSource = new EventDataSource(this.es);
+  }
+
+  initAll() {
+
   }
 
   initClub() {
@@ -94,6 +102,7 @@ export class EventsViewComponent implements OnInit {
       this.myResults$ = this.us.getUser().map((userdata) => {
         return userdata.results;
       });
+    } else if (selection.tab === this.tabAll) {
     }
   }
 
@@ -158,7 +167,7 @@ export class EventsViewComponent implements OnInit {
 //  ===========================  Data source ========================
 class EventDataSource extends DataSource<OEvent> {
 
-  protected oevents$: Observable<OEvent[]>;
+  protected oevents$: Observable<OEvent[]> = null;
 
   constructor(private es: EventService) {
     super();
@@ -166,7 +175,8 @@ class EventDataSource extends DataSource<OEvent> {
 
   connect(): Observable<OEvent[]> {
     // Intialise query
-    return this.es.search("date", null, 30);
+    this.oevents$ = this.es.search("date", null, 40);
+    return this.oevents$;
   }
 
   disconnect() { }

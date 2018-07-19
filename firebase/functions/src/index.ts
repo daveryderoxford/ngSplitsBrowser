@@ -1,5 +1,7 @@
 // import { OEvent } from '../../../src/app/model/oevent';
 
+import {UserData} from '../../../src/app/model';
+
 export interface OEvent extends EventInfo {
   $key?: string;
   user: string;
@@ -23,12 +25,34 @@ interface Club {
   nationality: string;
   numEvents: number;
 }
-///////////////////
 
 import * as functions from "firebase-functions";
-import * as admin from "firebase-admin"
+import * as admin from "firebase-admin";
 
 admin.initializeApp(functions.config().firebase);
+
+exports.updateUser = functions.firestore
+    .document('users/{userId}')
+    .onUpdate((change, context) => {
+      // Get an object representing the document
+      // e.g. {'name': 'Marie', 'age': 66}
+      const updated = change.after.data() as UserData;
+
+      // ...or the previous value before this update
+      const old = change.before.data() as UserData;
+
+
+
+      // If samrtcard has changed then look for new samrtcards
+
+      // if names or club has changed look for new name/club
+      if  ( !old || (updated.firstName !== old.firstName) || updated.surname !== old.surname) { } );
+      {
+        // Query for results
+      }
+
+
+    })
 
 exports.eventIndices = functions.database.ref("/events/{key}").onWrite(async event => {
 
@@ -60,7 +84,7 @@ exports.eventClubReferencesUpdate = functions.database.ref("/events/{key}").onUp
 
 exports.eventClubReferencesDelete = functions.database.ref("/events/{key}").onDelete(async event => {
   await removeClubReference(event.data.previous.val());
-})
+});
 
 exports.eventClubReferencesCreate = functions.database.ref("/events/{key}").onCreate(async event => {
   await addClubReference(event.data.val());
@@ -77,7 +101,7 @@ async function addClubReference(event: OEvent): Promise<void> {
       name: event.club,
       nationality: event.nationality,
       numEvents: 0
-    }
+    };
     console.log("Creating new club " + club.name + "  " + club.nationality);
   }
   club.numEvents = club.numEvents + 1;
@@ -95,7 +119,7 @@ async function removeClubReference(event): Promise<void> {
 
   if (!club) {
     console.log("Removing reference club not found");
-    return
+    return;
   }
 
   club.numEvents = club.numEvents - 1;
@@ -120,7 +144,7 @@ function decreasingTimeIndex(dateStr: string): string {
   const d2 = new Date(dateStr).getTime() / 1000;
   const minusDate = d1 - d2;
 
-  const str = padRight(minusDate.toString(), 15)
+  const str = padRight(minusDate.toString(), 15);
   return (str);
 }
 
@@ -139,5 +163,5 @@ function encodeAsFirebaseKey(string) {
     .replace(/\//g, "%2F")
     .replace(/\[/g, "%5B")
     .replace(/\]/g, "%5D");
-};
+}
 

@@ -12,6 +12,7 @@ import * as data from "./importdata.node";
 import { ImportData } from "./importdata.node";
 import { Injectable } from "@angular/core";
 import { Results } from "app/results/model";
+import {CompetitorDataService } from "../app/shared/services/competitor-data.service";
 
 /* Service to import exisitng results */
 @Injectable({
@@ -23,6 +24,7 @@ export class BulkImportService {
   endId = 200;
 
   constructor(protected es: EventAdminService,
+    protected cs: CompetitorDataService,
     protected afs: AngularFirestore,
     protected storage: AngularFireStorage,
     private http: HttpClient) {
@@ -163,7 +165,7 @@ export class BulkImportService {
 
         // Save new results for the event in the database
         for (const comp of results.allCompetitors) {
-          const compDBData = this.es.createCompetitorSearchData(event, comp);
+          const compDBData = this.cs.createNew(event, comp);
           const compRef = fs.doc("/results/" + compDBData.key);
           await batch.set(compRef, compDBData);
         }

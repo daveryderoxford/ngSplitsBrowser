@@ -79,7 +79,7 @@ export class EventEditComponent implements OnInit {
         if (!nationality || nationality === '' || club.nationality === nationality) {
           if (!name || name === '') {
             ret.push(club);
-          } else if (club.name.startsWith(name.toUpperCase()) {
+          } else if (club.name.startsWith(name.toUpperCase())) {
             ret.push(club);
           }
         }

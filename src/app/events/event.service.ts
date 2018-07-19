@@ -21,7 +21,7 @@ export class EventService {
   private _loading = new BehaviorSubject<boolean>(false);
 
   constructor(private afs: AngularFirestore,
-    private ps: PaganationService) { }
+    private ps: PaganationService<OEvent>) { }
 
   /** Sets search critera to use events list
    * @param orderby order the results by specified paremeter name.
@@ -30,7 +30,7 @@ export class EventService {
   */
   search(orderby: EventSearchOrder, eventfilter: Partial<EventInfo>, pageSize: number): Observable<OEvent[]> {
 
-    this.ps.init('/events', 'date', { reverse: true, prepend: true, limit: pageSize });
+    this.ps.init('/events', 'date', { reverse: true, limit: pageSize });
     return this.ps.data;
   }
 
@@ -56,7 +56,6 @@ export class EventService {
       res => res
             .where("club", "==", club.name)
             .where("nationality", "==", club.nationality)
-            .where('splits.valid', '==', true)
             .orderBy('date', 'desc')
     );
 

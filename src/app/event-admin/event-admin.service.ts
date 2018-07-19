@@ -11,6 +11,7 @@ import { Results } from "app/results/model/results";
 import { Utils } from "app/shared";
 import { firestore } from "firebase";
 import { Observable } from "rxjs/Observable";
+import { CompetitorDataService } from "app/shared/services/competitor-data.service";
 
 type PartialEvent = Partial<OEvent>;
 
@@ -23,13 +24,14 @@ export class EventAdminService {
 
   constructor(protected afAuth: AngularFireAuth,
     protected afs: AngularFirestore,
-    protected storage: AngularFireStorage) {
+    protected storage: AngularFireStorage,
+    protected csd: CompetitorDataService) {
     this.clubManger = new ClubListManager(afs);
   }
 
   /** Get observable for event key */
   getEvent(key: string): Observable<OEvent> {
-    return this.afs.doc<OEvent>('/events/' + key).valueChanges();
+    return this.afs.doc<OEvent>('25/events/' + key).valueChanges();
   }
 
   /** Create new event specifying event info
@@ -172,7 +174,7 @@ export class EventAdminService {
 
         // Save new results for the event in the database
         for (const comp of results.allCompetitors) {
-          const compDBData = this.createCompetitorSearchData(event, comp);
+          const compDBData = this.csd.createNew(event, comp);
           const compRef = fs.doc("/results/" + compDBData.key);
           await batch.set(compRef, compDBData);
         }
@@ -276,64 +278,6 @@ export class EventAdminService {
     return (summary);
   }
 
-  /** Save the competitor search recored */
-  public createCompetitorSearchData(event: OEvent, comp: Competitor): CompetitorSearchData {
-    return {
-      key: event.key + '-' + comp.key,
-      eventKey: event.key,
-      ecardId: comp.ecardId,
-      first: comp.firstname,
-      surname: comp.surname,
-      club: comp.club,
-    };
-  }
-
-  /** Search for result where name matches
-   *  matches if surname + club match or surname + firstname match
-  */
-  searchResultsByName(firstname: string, surname: string, club: string): Observable<CompetitorSearchData[]> {
-    const query1 = this.afs.collection<CompetitorSearchData>("/results", ref => {
-      return ref.where("surname", "==", surname)
-        .where("club", "==", club);
-    }).valueChanges().take(1);
-
-    const query2 = this.afs.collection<CompetitorSearchData>("/results", ref => {
-      return ref.where("surname", "==", surname)
-        .where("club", "==", firstname);
-    }).valueChanges().take(1);
-
-    // Merge results of the two queries and remove duplicates
-    const zipped = Observable.zip(query1, query2).map( ([res1, res2]) => {
-      return Utils.removeDuplicates(res1.concat(res2));
-    });
-
-    return zipped;
-  }
-
-  /** Search for results where any ecard matches */
-  searchResultsByECard(ecards: Array<ECard>, eventsAfter: Date): Observable<CompetitorSearchData[]> {
-    // Search each of the users ecard numbers defined in ecard object
-    const querys: Array<Observable<CompetitorSearchData[]>> = [];
-
-    for (const card of ecards) {
-      const query = this.afs.collection<CompetitorSearchData>("/results", ref => {
-        return ref.where("ecard", "==", card.id)
-          .orderBy('date', 'desc');
-      }).valueChanges().take(1);
-
-      querys.push(query);
-    }
-
-    const zipped = Observable.zip(querys).map(allQueryResults => {
-      // concaternate the queries and remove duplicates
-      let results: CompetitorSearchData[] = [];
-      for (const qresults of allQueryResults) {
-        results = results.concat(qresults);
-      }
-      return Utils.removeDuplicates(results);
-    });
-    return zipped;
-  }
 }
 
 /** Class to manage list of clubs in all events */

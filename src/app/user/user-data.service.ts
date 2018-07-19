@@ -5,6 +5,7 @@ import { OEvent } from "app/model/oevent";
 import { UserData, UserInfo, UserResultData } from "app/model/user";
 import { Competitor, Course, InvalidData } from "app/results/model";
 import { Observable } from "rxjs/Observable";
+import { UnexpectedError } from "app/results/model/exception";
 
 @Injectable({
   providedIn: 'root',
@@ -16,8 +17,8 @@ export class UserDataService {
     private afs: AngularFirestore) { }
 
   /** Get a reference to use data for a user, creating it if it does not exist */
-   getUser(): Observable<UserData> {
-    const user = this.getUserDoc().snapshotChanges().map( (ret) => {
+  getUser(): Observable<UserData> {
+    const user = this.getUserDoc().snapshotChanges().map((ret) => {
       const snapshot = ret.payload;
       if (!snapshot.exists) {
         this.createUser();
@@ -28,10 +29,14 @@ export class UserDataService {
     return (user);
   }
 
-    /** Update the user info */
-    async updateDetails(details: Partial<UserInfo>): Promise<void> {
-      await this.getUserDoc().update(details);
-    }
+
+  /** Update the user info */
+  async updateDetails(details: Partial<UserInfo>): Promise<void> {
+    const oldUser: UserData = await this.getUserDoc().snapshotChanges()
+      .map(ret => ret.payload.data() as UserData).toPromise();
+
+    await this.getUserDoc().update(details);
+  }
 
   private createUser(): Promise<void> {
     const user = {
@@ -57,10 +62,16 @@ export class UserDataService {
     return userDoc;
   }
 
-  /** Add a result for the currently signed in user  */
+  /** Add a result for the currently signed in user.  the results  for the event must be in memory */
   async addResult(user: UserData, result: Competitor, event: OEvent): Promise<any> {
 
-    if (user.key !== this.afAuth.auth.currentUser.uid) { throw new InvalidData("User data key must match signed in user"); }
+    if (user.key !== this.afAuth.auth.currentUser.uid) {
+      throw new InvalidData("User data key must match signed in user");
+    }
+
+    if (!result.courseClass || !result.courseClass.course) {
+      throw new UnexpectedError("Course and class must be defined for competitor to add to results");
+    }
 
     const course = result.courseClass.course;
 
@@ -91,7 +102,7 @@ export class UserDataService {
     user.results.sort((a, b) => {
       const d1 = new Date(a.eventInfo.date);
       const d2 = new Date(b.eventInfo.date);
-      return ( d1.valueOf() - d2.valueOf() );
+      return (d1.valueOf() - d2.valueOf());
     });
 
     return this.getUserDoc().set(user);
