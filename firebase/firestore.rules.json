@@ -1,0 +1,44 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Re=turns if currently logged on user is an adminsitrator
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin == true; 
+    }
+
+    // Returns if the currently logged on user owns an event Id 
+    function isEventOwner(eventId) {
+      return get(/databases/$(database)/documents/events/$(eventId)).data.uid == request.auth.uid; 
+    }
+
+    // EVERYTHING Can read and updated if Admin
+    match {document=**} {
+        allow read, write: if isAdmin();
+    }
+
+    // EVENTS   All can read events. Only logged in user can create.  Only owner (or admin) users can change.  
+    match /events/{event} {
+         allow read; 
+         allow update, delete: if request.auth.uid == event.uid;
+         allow create: if request.auth.uid != null;
+    }
+
+      // USERS   Only user themselves (or admin) can read or change user data.  Anyone can create. 
+      match /users/{user} {
+         allow read, update, delete: if request.auth.uid == event.uid;
+         allow create;
+    }
+
+    // RESULTS  All can read results.  Only owner (or admin) users can create change results for an event.
+    match /results/{result} {
+         allow read;
+         allow create, update, delete: if isEventOwner($(result.eventId));
+    }
+
+    // CLUBS  All can read clubs. other operations if eventId exists
+    match /clubs/{club} {
+         allow read;
+         allow create, update, delete: if isEventOwner($(club.eventId));
+    }
+  }
+}

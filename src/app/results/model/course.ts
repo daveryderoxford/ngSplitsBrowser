@@ -14,6 +14,8 @@ export class Course {
     /** 'Magic' control code that represents the finish. */
     static FINISH = "__FINISH__";
 
+    private _numControls = -1;
+
     /**
     * A collection of 'classes', all runners within which ran the same physical
     * course.
@@ -62,6 +64,24 @@ export class Course {
     */
     public getNumClasses(): number {
         return this.classes.length;
+    }
+
+    /**
+    * Returns the number of controls on the course.  Note this is one less than the number of split times.
+    * @sb-return {Number} Number of course-classes that use this course.
+    */
+    public get numControls(): number {
+        if (this._numControls === -1) {
+            let numSplits = -1;
+           for (const oclass of this.classes) {
+               for (const comp of oclass.competitors) {
+                numSplits  = Math.max(numSplits, comp.splitTimes.length );
+               }
+           }
+           this._numControls = numSplits - 1;
+        }
+
+        return this._numControls;
     }
 
     /**

@@ -31,6 +31,7 @@ import { AppRoutingModule } from "./app-routing.module";
 import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { SplitsGridComponent } from './results/splits-grid/splits-grid.component';
 
 @NgModule({
   declarations: [
@@ -47,6 +48,7 @@ import { environment } from '../environments/environment';
     ResultsNavbarComponent,
     ResultsSearchComponent,
     ChangePasswordComponent,
+    SplitsGridComponent,
   ],
   imports: [
     BrowserModule,

@@ -4,13 +4,19 @@
   flex: 1 1 auto;
 }
 
-.toggle {
-   font-size: 14px;
+mat-button-toggle-group {
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+  border-color: rgb(200,200,200);
+  border-width: 1px;
+  border-style: solid;
 }
 
 .toggelebutton {
-  color: black;
-}
+
+
+  }
 
 .displayOptions {
   font-size: 14px;

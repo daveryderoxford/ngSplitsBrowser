@@ -11,6 +11,7 @@ import { GraphComponent } from "app/results/graph/graph.component";
 import { ResultsResolver } from 'app/results/results.resolver';
 import { UserComponent } from 'app/user/user.component';
 import { ChangePasswordComponent } from 'app/auth/change-password/change-password.component';
+import { SplitsGridComponent } from 'app/results/splits-grid/splits-grid.component';
 
 const routes: Routes = [
     { path: "", component: MainComponent },
@@ -26,6 +27,11 @@ const routes: Routes = [
     resolve: {
       results: ResultsResolver
     }},
+    { path: "table/:id",
+    component: SplitsGridComponent,
+   resolve: {
+     results: ResultsResolver
+   }},
   ];
 
 @NgModule({
