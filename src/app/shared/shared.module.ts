@@ -6,7 +6,6 @@ import { AppMaterialModule } from "./app-material.module";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { SpinnerModule } from './components/spinner.module';
 import { DialogsModule } from "./dialogs/dialogs.module";
-import { PaganationService } from "./services/paganation.service";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AppRoutingModule } from "app/app-routing.module";
 

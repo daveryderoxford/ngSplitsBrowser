@@ -3,19 +3,25 @@
   <mat-icon (onClick)="displayEvents()">arrow_back</mat-icon>
 
   <mat-button-toggle-group  #group="matButtonToggleGroup" class="toggle, flex-item">
-    <mat-button-toggle class="toggelebutton" value="splits">
+    <mat-button-toggle class="toggelebutton" routerLink="/graph" value="splits">
       Splits
     </mat-button-toggle>
     <mat-button-toggle class="toggelebutton" value="race">
       Race
     </mat-button-toggle>
-    <mat-button-toggle class="toggelebutton" value="table">
+    <mat-button-toggle class="toggelebutton" routerLink="/table" value="table">
       Table
     </mat-button-toggle>
     <mat-button-toggle class="toggelebutton" value="more">
       More <mat-icon>arrow_drop_down</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>
+
+  <mat-form-field appearance="outline" floatLabel="false" class="displayOptions, align-baseline, flex-item">
+    <mat-select placeholder="View" [(value)]="displayOptions">
+      <mat-option *ngFor="let option of ['Total time','Splits','Poisition','Split position','Time Loss']" [value]="option">{{option}}</mat-option>
+    </mat-select>
+  </mat-form-field>
 
   <app-results-search class="align-baseline, flex-item"> </app-results-search>
 

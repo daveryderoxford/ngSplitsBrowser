@@ -1,6 +1,51 @@
+/* Structure */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.header-container {
+   flex: auto;
+}
+
+.table-container {
+    flex-grow: 1;
+    min-width: 300px;
+    overflow: scroll;
+  //  height: 400px;
+   // width: 550px;
+}
+
 .selected {
         border-color: rgb(100, 100, 100);
         border-width: 2;
         border-style: solid;
  }
+
+ .fastest {
+   color: red;
+ }
+
+ .splitcolumn {
+    width: 100px;
+    min-width: 100px;
+    padding-right: 8px;
+ }
+
+ .totaltimecolumn {
+   width: 75px;
+   min-width: 75px;
+   padding-right: 8px;
+ }
  
+tr {
+  border: 1px solid #e0e0e0;
+}
+
+th.mat-sort-header-sorted {
+  color: black;
+}
+      

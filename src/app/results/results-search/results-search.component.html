@@ -1,7 +1,6 @@
 <form class="search-form" [formGroup]="searchForm">
 
-
-    <input type="search" class="mat-elevation-z2" [matAutocomplete]="autoCompletePanel" [formControl]="searchControl">
+    <input type="search" class="mat-elevation-z2" [matAutocomplete]="autoCompletePanel" formControlName="searchControl">
     
     <mat-autocomplete #autoCompletePanel="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onOptionSelected($event)">
       <mat-optgroup *ngFor="let group of filterPanelContents" [label]="group.name">

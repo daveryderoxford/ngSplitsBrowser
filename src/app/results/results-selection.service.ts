@@ -48,8 +48,22 @@ export class ResultsSelectionService {
         const results = this.parseSplits(text);
         this.results$.next(results);
         this.selectedCompetitors$.next([]);
+
+        //  Select first coure by default
+        if (results.courses.length > 0) {
+           this.selectedCourse$.next(results.courses[0]);
+        } else {
+          this.selectedCourse$.next(null);
+        }
+
+        if (results.classes.length > 0) {
+          this.selectedClasses$.next(results.classes[0]);
+        } else {
+          this.selectedClasses$.next([]);
+        }
+
         this.selectedControl$.next(null);
-        this.selectedCourse$.next(null);
+
         this.selectedClasses$.next([]);
         return this.results$.asObservable();
       });

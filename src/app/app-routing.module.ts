@@ -32,6 +32,7 @@ const routes: Routes = [
    resolve: {
      results: ResultsResolver
    }},
+   { path: "table", component: SplitsGridComponent },
   ];
 
 @NgModule({
