@@ -2,7 +2,9 @@
 
    <div class="header-container">
       <app-results-search> </app-results-search>
-      Hi Dave
+
+      <mat-slide-toggle [(ngModel)]="colorCells">Color</mat-slide-toggle>
+
    </div>
 
    <div class="table-container">
@@ -33,7 +35,7 @@
          <ng-container *ngFor="let split of splitsColumns; let i index">
             <ng-container [matColumnDef]="split">
                <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} </th>
-               <td mat-cell [ngStyle]="{'background': cellColor(i, competitor)}" *matCellDef="let competitor">
+               <td mat-cell [ngStyle]="{'background': cellColor(colorCells, i, competitor)}" *matCellDef="let competitor">
                   <span [ngClass]="{ 'fastest': (competitor.splitRanks[i]===1) }"> {{ formatTime(competitor.splitTimes[i]) }} ({{competitor.splitRanks[i]}}) </span>
                   <br>
                   <span [ngClass]="{ 'fastest': (competitor.cumRanks[i]===1) }">{{ formatTime(competitor.cumTimes[i]) }} ({{competitor.cumRanks[i]}})</span>
