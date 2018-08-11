@@ -18,8 +18,8 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-import { Repairer } from "app/results/model/repairer";
-import { TestSupport } from "app/results/test-support.spec";
+import { Repairer } from "./repairer";
+import { TestSupport } from "../test-support.spec";
 import { Competitor } from "./competitor";
 
 

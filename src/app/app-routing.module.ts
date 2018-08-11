@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AboutComponent } from 'app/about/about.component';
-import { AuthGuard } from "app/auth/guards/auth-guard";
-import { LoginComponent } from "app/auth/login/login.component";
-import { RecoverComponent } from "app/auth/recover/recover.component";
-import { SignupComponent } from "app/auth/signup/signup.component";
-import { EventsViewComponent } from "app/events/eventsview/events-view.component";
-import { MainComponent } from "app/main/main.component";
-import { GraphComponent } from "app/results/graph/graph.component";
-import { ResultsResolver } from 'app/results/results.resolver';
-import { UserComponent } from 'app/user/user.component';
-import { ChangePasswordComponent } from 'app/auth/change-password/change-password.component';
-import { SplitsGridComponent } from 'app/results/splits-grid/splits-grid.component';
+import { AboutComponent } from './about/about.component';
+import { AuthGuard } from "./auth/guards/auth-guard";
+import { LoginComponent } from "./auth/login/login.component";
+import { RecoverComponent } from "./auth/recover/recover.component";
+import { SignupComponent } from "./auth/signup/signup.component";
+import { EventsViewComponent } from "./events/eventsview/events-view.component";
+import { MainComponent } from "./main/main.component";
+import { GraphComponent } from "./results/graph/graph.component";
+import { ResultsResolver } from './results/results.resolver';
+import { UserComponent } from './user/user.component';
+import { ChangePasswordComponent } from './auth/change-password/change-password.component';
+import { SplitsGridComponent } from './results/splits-grid/splits-grid.component';
 
 const routes: Routes = [
     { path: "", component: MainComponent },

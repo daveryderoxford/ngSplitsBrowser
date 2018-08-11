@@ -5,7 +5,7 @@ import * as $ from "jquery";
 
 import { Lang } from "./lang";
 import { ChartTypeClass, ChartType } from "./chart-types";
-import { Results, CourseClassSet, Competitor } from "app/results/model";
+import { Results, CourseClassSet, Competitor } from "../../model";
 
 type ChartCompareTo = "TotalTime"| "SplitTime" | "BehindFastest" | "TimeLoss";
 

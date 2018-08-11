@@ -1,4 +1,4 @@
-import { Competitor, DubiousTimeInfo } from "app/results/model";
+import { Competitor, DubiousTimeInfo } from "../../model";
 
 export interface ChartType {
     nameKey: string;

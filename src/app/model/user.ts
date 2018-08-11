@@ -1,6 +1,6 @@
 
 /** data associated with a user */
-import { EventInfo, ControlCardType } from "app/model/oevent";
+import { EventInfo, ControlCardType } from "./oevent";
 
 /** All the user data stored for the user */
 export interface UserData extends UserInfo {

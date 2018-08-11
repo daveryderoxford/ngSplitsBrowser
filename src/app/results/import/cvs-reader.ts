@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import { normaliseLineEndings } from "./util";
 import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results, WrongFileFormat, InvalidData } from "../model";
 
-import { isTrue, isNotNull } from "app/results/model/util";
+import { isTrue, isNotNull } from "../model/util";
 
 const parseTime = TimeUtilities.parseTime;
 

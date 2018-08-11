@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "angularfire2/auth";
-import { DialogsService } from "app/shared/dialogs/dialogs.service";
-import { OEvent } from "app/model/oevent";
-import { EventAdminService } from "app/event-admin/event-admin.service";
+import { DialogsService } from "../../shared/dialogs/dialogs.service";
+import { OEvent } from "../../model/oevent";
+import { EventAdminService } from "../event-admin.service";
 import { Observable } from "rxjs/Observable";
 
 

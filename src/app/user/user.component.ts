@@ -2,9 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators, FormArray } from "@angular/forms";
 import { Router } from "@angular/router";
 import { AngularFireAuth } from "angularfire2/auth";
-import { Nations } from "app/model/nations";
-import { UserDataService } from "app/user/user-data.service";
-import * as firebase from "firebase/app";
+import { Nations } from "../model/nations";
+import { UserDataService } from "./user-data.service";
+import * as firebase from "firebase";
 
 @Component({
     selector: "app-user",

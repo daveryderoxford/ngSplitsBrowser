@@ -4,6 +4,7 @@ import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
 import { isNaNStrict, isNotNull } from "./util";
+import { isThisTypeNode } from "typescript";
 
 export type Genre = "M" | "F";
 
@@ -112,6 +113,9 @@ export class Competitor {
     cumRanks: Array<sbTime> | null = null;
     timeLosses: Array<sbTime> | null = null;
     totalTime: sbTime = 0;
+
+    private _classPosition = 999;
+    private _coursePosition = 999;
     /**
     * Create and return a Competitor object where the competitor's times are given
     * as a list of cumulative times.
@@ -683,5 +687,21 @@ export class Competitor {
     */
     public getControlIndexesAroundDubiousSplitTimes(): Array<DubiousTimeInfo> {
         return this.getIndexesAroundDubiousTimes([0].concat(this.splitTimes));
+    }
+
+    public get coursePosition() {
+        if (this._coursePosition = 999) {
+
+        }
+
+        return this._coursePosition;
+    }
+
+    public get classPosition() {
+        if (this._classPosition = 999) {
+
+        }
+
+        return this._classPosition;
     }
 }

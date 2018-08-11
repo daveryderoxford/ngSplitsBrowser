@@ -2,13 +2,13 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
-import { EventAdminService } from 'app/event-admin/event-admin.service';
-import { Nations } from 'app/model/nations';
-import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from 'app/model/oevent';
-import { Club } from 'app/model';
+import { EventAdminService } from '../event-admin.service';
+import { Nations } from '../../model/nations';
+import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
+import { Club } from '../../model';
 import { Observable } from 'rxjs/Observable';
 import { startWith, map, filter } from 'rxjs/operators';
-import { EventService } from 'app/events/event.service';
+import { EventService } from '../../events/event.service';
 
 @Component({
   selector: 'app-event-edit',

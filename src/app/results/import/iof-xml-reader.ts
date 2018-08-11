@@ -2,7 +2,7 @@
 import * as $ from "jquery";
 import * as d3 from "d3";
 
-import { FirstnameSurname } from "app/results/model/competitor";
+import { FirstnameSurname } from "../model/competitor";
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
 import { Version2Reader } from "./iof-xml-v2-reader";
 import { Version3Reader } from "./iof-xml-v3-reader";

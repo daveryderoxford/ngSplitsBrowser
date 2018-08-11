@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { AngularFirestore } from "angularfire2/firestore";
 import { AngularFireStorage } from 'angularfire2/storage';
-import { Competitor, Course, CourseClass, Results, InvalidData } from "app/results/model";
+import { Competitor, Course, CourseClass, Results, InvalidData } from "./model";
 import { BehaviorSubject, Observable } from "rxjs/Rx";
-import { OEvent } from "app/model/oevent";
+import { OEvent } from "../model/oevent";
 import { HttpClient } from "@angular/common/http";
 import { parseEventData } from "./import";
 import { exceptionGuard } from "@firebase/database/dist/src/core/util/util";

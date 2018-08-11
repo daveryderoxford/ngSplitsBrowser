@@ -27,7 +27,7 @@ import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
 import { Course } from "./course";
 import { isNotNull } from "./util";
-import { TestSupport } from "app/results/test-support.spec";
+import { TestSupport } from "../test-support.spec";
 
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 const fromSplitTimes = TestSupport.fromSplitTimes;

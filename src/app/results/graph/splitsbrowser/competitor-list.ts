@@ -5,7 +5,7 @@ import * as $ from "jquery";
 
 import { Lang } from "./lang";
 import { ChartType } from "./chart-types";
-import { Competitor } from "app/results/model";
+import { Competitor } from "../../model";
 import { CompetitorSelection } from "./competitor-selection";
 
 // ID of the competitor list div.

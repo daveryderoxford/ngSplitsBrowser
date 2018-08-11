@@ -4,7 +4,7 @@ import { InvalidData } from "./exception";
 
 import { Competitor } from "./competitor";
 import { sbTime } from "./time";
-import { ChartType } from "app/results/graph/splitsbrowser/chart-types";
+import { ChartType } from "../graph/splitsbrowser/chart-types";
 
 /**
 * Utility function to merge the lists of all competitors in a number of

@@ -4,8 +4,8 @@ import * as d3 from "d3";
 import * as $ from "jquery";
 
 import { Lang } from "./lang";
-import { Competitor, TimeUtilities, CourseClass } from "app/results/model";
-import { isNotNullNorNaN } from "app/results/model/util";
+import { Competitor, TimeUtilities, CourseClass } from "../../model";
+import { isNotNullNorNaN } from "../../model/util";
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;

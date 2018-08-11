@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
-import { Results } from "app/results/model";
+import { Results } from "./model";
 import { Observable } from "rxjs";
 import { ResultsSelectionService } from "./results-selection.service";
 

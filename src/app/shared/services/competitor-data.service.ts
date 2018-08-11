@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
-import { Competitor } from 'app/results/model';
-import { OEvent, CompetitorSearchData } from 'app/model';
+import { Competitor } from '../../results/model';
+import { OEvent, CompetitorSearchData } from '../../model';
 import { Observable } from 'rxjs/Observable';
-import { Utils } from 'app/shared';
-import { ECard } from 'app/model/user';
+import { Utils } from '..';
+import { ECard } from '../../model/user';
 
 @Injectable({
   providedIn: 'root'

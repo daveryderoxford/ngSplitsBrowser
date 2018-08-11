@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import * as $ from "jquery";
 
 import { Lang } from "./lang";
-import { TimeUtilities } from "app/results/model";
+import { TimeUtilities } from "../../model";
 
     const formatTime = TimeUtilities.formatTime;
 

@@ -9,9 +9,9 @@ import { AngularFireStorage, AngularFireStorageModule } from "angularfire2/stora
 import { EventAdminService } from "./event-admin.service";
 import { AngularFireModule } from "angularfire2";
 import { HttpClient } from "@angular/common/http";
-import { OEvent, EventInfo } from "app/model";
+import { OEvent, EventInfo } from "../model";
 
-import { testFirebaseConfig } from "app/app.firebase-config";
+import { testFirebaseConfig } from "../app.firebase-config";
 
 
 const testEventInfo1: EventInfo = {

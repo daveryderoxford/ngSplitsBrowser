@@ -5,9 +5,9 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { RouterModule, Routes } from "@angular/router";
 import { AngularFirestoreModule } from "angularfire2/firestore";
 import { AngularFireStorageModule } from "angularfire2/storage";
-import { ChangePasswordComponent } from "app/auth/change-password/change-password.component";
-import { AuthGuard } from "app/auth/guards/auth-guard";
-import { SharedModule } from "app/shared/shared.module";
+import { ChangePasswordComponent } from "../auth/change-password/change-password.component";
+import { AuthGuard } from "../auth/guards/auth-guard";
+import { SharedModule } from "../shared/shared.module";
 import "firebase/storage"; // only import firebase storage
 import { EventAdminComponent } from "./event-admin/event-admin.component";
 import { EventEditComponent } from "./event-edit/event-edit.component";

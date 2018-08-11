@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Results } from "app/results/model";
+import { Results } from "../model";
 
 @Component({
   selector: "app-results-navbar",

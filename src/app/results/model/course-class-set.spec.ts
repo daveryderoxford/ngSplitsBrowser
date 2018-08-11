@@ -27,9 +27,9 @@ import {CourseClassSet} from "./course-class-set";
 import {Course} from "./course";
 import {CourseClass} from "./course-class";
 import {Competitor} from "./competitor";
-import {TestSupport} from "app/results/test-support.spec";
+import {TestSupport} from "../test-support.spec";
 import { isNaNStrict } from "./util";
-import { ChartType } from "app/results/graph/splitsbrowser/chart-types";
+import { ChartType } from "../graph/splitsbrowser/chart-types";
 
 fdescribe("Course-class set", () => {
 

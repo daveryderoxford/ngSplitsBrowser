@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore, AngularFirestoreDocument } from "angularfire2/firestore";
-import { OEvent } from "app/model/oevent";
-import { UserData, UserInfo, UserResultData } from "app/model/user";
-import { Competitor, Course, InvalidData } from "app/results/model";
+import { OEvent } from "../model/oevent";
+import { UserData, UserInfo, UserResultData } from "../model/user";
+import { Competitor, Course, InvalidData } from "../results/model";
 import { Observable } from "rxjs/Observable";
-import { UnexpectedError } from "app/results/model/exception";
+import { UnexpectedError } from "../results/model/exception";
 
 @Injectable({
   providedIn: 'root',

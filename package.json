@@ -27,6 +27,7 @@
     "@angular/platform-server": "6.0.5",
     "@angular/pwa": "^0.6.8",
     "@angular/router": "6.0.5",
+    "@angular/service-worker": "6.0.5",
     "angular2-virtual-scroll": "^0.3.2",
     "angularfire2": "^5.0.0-rc.10",
     "core-js": "^2.5.7",
@@ -37,11 +38,11 @@
     "install": "^0.11.0",
     "jquery": "^3.2.1",
     "moment": "^2.22.2",
+    "ng-mat-search-bar": "^1.0.0-rc.1",
     "npm": "^6.1.0",
     "rxjs": "^6.2.1",
     "rxjs-compat": "^6.2.1",
-    "zone.js": "^0.8.26",
-    "@angular/service-worker": "6.0.5"
+    "zone.js": "^0.8.26"
   },
   "devDependencies": {
     "@angular/cli": "6.0.5",
