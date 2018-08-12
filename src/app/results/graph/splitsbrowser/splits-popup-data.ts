@@ -1,7 +1,7 @@
 
 
-import { Lang } from "app/results/graph/splitsbrowser/lang";
-import { TimeUtilities, CourseClassSet, Course, Results } from "../../model/";
+import { Lang } from "./lang";
+import { TimeUtilities, CourseClassSet, Course, Results } from "../../model";
 
 export interface FastestSplitsPopupData {
     title: string;

@@ -1,6 +1,6 @@
 // import { OEvent } from '../../../src/app/model/oevent';
 
-import {UserData} from '../../../src/app/model';
+import {UserData} from 'app/model';
 
 export interface OEvent extends EventInfo {
   $key?: string;

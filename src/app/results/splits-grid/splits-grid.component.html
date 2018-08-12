@@ -3,7 +3,19 @@
    <div class="header-container">
       <app-results-search> </app-results-search>
 
-      <mat-slide-toggle [(ngModel)]="colorCells">Color</mat-slide-toggle>
+      <mat-form-field>
+         <mat-select placeholder="Class">
+            <mat-option *ngFor="let oclass of results.classes" [value]="oclass.name" [formControl]="classOption">
+               {{oclass.name}}
+            </mat-option>
+         </mat-select>
+      </mat-form-field>
+
+      <mat-slide-toggle *ngIf="course.classes.length > 1" [formControl]="courseToggle">Course</mat-slide-toggle>
+
+      <mat-slide-toggle [formControl]="courseToggle">By Course</mat-slide-toggle>
+
+      <mat-slide-toggle [formControl]="colorToggle">Color</mat-slide-toggle>
 
    </div>
 
@@ -35,7 +47,7 @@
          <ng-container *ngFor="let split of splitsColumns; let i index">
             <ng-container [matColumnDef]="split">
                <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} </th>
-               <td mat-cell [ngStyle]="{'background': cellColor(colorCells, i, competitor)}" *matCellDef="let competitor">
+               <td mat-cell [ngStyle]="{'background': cellColor(colorToggle.value, i, competitor)}" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor) }"*matCellDef="let competitor">
                   <span [ngClass]="{ 'fastest': (competitor.splitRanks[i]===1) }"> {{ formatTime(competitor.splitTimes[i]) }} ({{competitor.splitRanks[i]}}) </span>
                   <br>
                   <span [ngClass]="{ 'fastest': (competitor.cumRanks[i]===1) }">{{ formatTime(competitor.cumTimes[i]) }} ({{competitor.cumRanks[i]}})</span>
@@ -45,8 +57,8 @@
          </ng-container>
 
          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-         <tr mat-row *matRowDef="let competitor; columns: displayedColumns;" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor) }"
-            (click)="selectedCompetitors.toggle(competitor)">
+         <tr mat-row *matRowDef="let competitor; columns: displayedColumns;" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor)}"
+            (click)="updateSelectedCompetitor(competitor)">
          </tr>
       </table>
    </div>

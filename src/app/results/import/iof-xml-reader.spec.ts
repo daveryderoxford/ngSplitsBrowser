@@ -25,8 +25,8 @@ import { } from "jasmine";
 import { } from "jasmine-expect";
 
 import { parseIOFXMLEventData } from "./iof-xml-reader";
-import { TimeUtilities, CourseClass } from "app/results/model"
-import { TestSupport } from "app/results/test-support.spec";
+import { TimeUtilities, CourseClass } from "../model"
+import { TestSupport } from "../test-support.spec";
 
 const formatTime = TimeUtilities.formatTime;
 const parseEventData = parseIOFXMLEventData;

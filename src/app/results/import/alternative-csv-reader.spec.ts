@@ -25,7 +25,7 @@ import {} from "jasmine-expect";
 
 import { parseTripleColumnEventData } from "./alternative-cvs-reader";
 import {TimeUtilities} from "../model";
-import {TestSupport} from "app/results/test-support.spec";
+import {TestSupport} from "../test-support.spec";
 
 const formatTime = TimeUtilities.formatTime;
 

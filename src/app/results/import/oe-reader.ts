@@ -2,7 +2,7 @@
 import * as d3 from "d3";
 
 import { normaliseLineEndings, parseCourseLength, parseCourseClimb, } from "./util";
-import { isNaNStrict } from "app/results/model/util";
+import { isNaNStrict } from "../model/util";
 
 import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results } from "../model";
 import { InvalidData, WrongFileFormat } from "../model";

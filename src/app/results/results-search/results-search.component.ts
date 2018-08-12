@@ -3,8 +3,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Competitor, Course, CourseClass, Results } from 'app/results/model';
-import { ResultsSelectionService } from 'app/results/results-selection.service';
+import { Competitor, Course, CourseClass, Results } from '../model';
+import { ResultsSelectionService } from '../results-selection.service';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 

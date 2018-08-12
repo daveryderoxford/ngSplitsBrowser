@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { AngularFirestore, QueryFn } from "angularfire2/firestore";
-import { Club, EventInfo, OEvent } from "app/model";
-import { PaganationService } from "app/shared";
+import { Club, EventInfo, OEvent } from "../model";
+import { PaganationService } from "../shared";
 import { BehaviorSubject } from "rxjs/BehaviorSubject";
 import { Observable } from "rxjs/Observable";
 

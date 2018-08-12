@@ -25,13 +25,13 @@ import * as d3 from "d3";
 import { Lang } from "./lang";
 
 // import
-import { parseEventData } from "app/results/import";
+import { parseEventData } from "../../import";
 
 // Model
-import { TimeUtilities, sbTime, Competitor, CourseClass, CourseClassSet, Course, Results, InvalidData } from "app/results/model";
+import { TimeUtilities, sbTime, Competitor, CourseClass, CourseClassSet, Course, Results, InvalidData } from "../../model";
 import { LanguageSelector } from "./lang-selection";
-import { isNaNStrict, isNotNullNorNaN } from "app/results/model/util";
-import { Repairer } from "app/results/model/repairer";
+import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
+import { Repairer } from "../../model/repairer";
 
 // Controls
 import { parseQueryString, formatQueryString } from "./query-string";

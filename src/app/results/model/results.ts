@@ -4,7 +4,7 @@ import { CourseClass } from "./course-class";
 import { Course } from "./course";
 import { Competitor } from "./competitor";
 import { sbTime } from "./time";
-import { ECard, UserData } from "app/model/user";
+import { ECard, UserData } from "../../model/user";
 
 export class Results {
 

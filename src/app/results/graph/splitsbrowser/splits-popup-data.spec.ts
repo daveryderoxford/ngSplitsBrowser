@@ -26,9 +26,9 @@ import { } from "jasmine-expect";
 import * as d3 from "d3";
 
 import { SplitsPopupData } from "./splits-popup-data";
-import { CourseClass, CourseClassSet, Course, Results, TimeUtilities } from "app/results/model";
+import { CourseClass, CourseClassSet, Course, Results, TimeUtilities } from "../../model";
 import { Lang } from "./lang";
-import { TestSupport } from "app/results/test-support.spec";
+import { TestSupport } from "../../test-support.spec";
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;

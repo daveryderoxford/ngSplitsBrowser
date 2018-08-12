@@ -6,7 +6,7 @@ import * as d3 from "d3";
 import * as $ from "jquery";
 
 import { Lang } from "./lang";
-import { InvalidData } from "app/results/model";
+import { InvalidData } from "../../model";
 
 const getMessage = Lang.getMessage;
 

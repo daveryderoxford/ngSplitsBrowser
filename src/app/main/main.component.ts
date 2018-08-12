@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { OEvent } from "app/model/oevent";
+import { OEvent } from "../model/oevent";
 import { Observable } from "rxjs/Observable";
 import { AngularFirestore } from "angularfire2/firestore";
 

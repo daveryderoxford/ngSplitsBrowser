@@ -4,20 +4,20 @@ import { MatSelectChange, MatTab, MatTabChangeEvent } from "@angular/material";
 import { Router } from "@angular/router";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore } from "angularfire2/firestore";
-import { EventService } from "app/events/event.service";
-import { Nations, UserResultData } from "app/model";
-import { Club } from "app/model/club";
-import { EventGrades, OEvent } from "app/model/oevent";
-import { DialogsService } from "app/shared";
+import { EventService } from "../event.service";
+import { Nations, UserResultData } from "../../model";
+import { Club } from "../../model/club";
+import { EventGrades, OEvent } from "../../model/oevent";
+import { DialogsService } from "../../shared";
 import { BehaviorSubject, Subject } from "rxjs";
 import { Observable } from "rxjs/Observable";
 import { map } from "rxjs/operators";
-import { UserDataService } from "app/user/user-data.service";
+import { UserDataService } from "../../user/user-data.service";
 
 @Component({
   selector: "app-results",
   templateUrl: "./events-view.component.html",
-  styleUrls: ["./events-view.component.scss"]
+  styleUrls: ["./events-view.component.scss"],
 })
 export class EventsViewComponent implements OnInit {
 
@@ -30,7 +30,6 @@ export class EventsViewComponent implements OnInit {
   dataSource: EventDataSource | null;
 
   displayedColumns = ["date", "name", "nationality", "club", "grade", "discipline", "type", "website", "actions"];
-  currentRow: any = null;
   grades = EventGrades.grades;
   nations = Nations.getNations();
 
@@ -50,7 +49,6 @@ export class EventsViewComponent implements OnInit {
     public es: EventService,
     private ds: DialogsService,
     private us: UserDataService) {
-
   }
 
   oeventClicked(event: OEvent) {
@@ -72,7 +70,7 @@ export class EventsViewComponent implements OnInit {
 
   // tslint:disable-next-line:use-life-cycle-interface
   ngOnInit() {
-    this.loading = this.es.loading;
+    this.loading = this.es.loading.delay(0);
     this.dataSource = new EventDataSource(this.es);
   }
 
@@ -133,21 +131,6 @@ export class EventsViewComponent implements OnInit {
     }
   }
 
-  onMouseEnter(row) {
-    this.currentRow = row;
-  }
-
-  onMouseLeave() {
-    this.currentRow = null;
-  }
-
-  rowStyle(row): string {
-    if (this.currentRow === row) {
-      return ("selected");
-    } else {
-      return ("");
-    }
-  }
 
   graphMenuSelected() {
   }

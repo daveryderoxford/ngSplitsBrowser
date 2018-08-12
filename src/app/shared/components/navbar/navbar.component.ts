@@ -1,9 +1,9 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { AngularFireAuth } from "angularfire2/auth";
-import { Results } from "app/results/model";
-import * as firebase from "firebase/app";
-import {BulkImportService} from "../../../../scripts/bulk-import";
+import { Results } from "../../../results/model";
+import * as firebase from "firebase";
+import {BulkImportService} from "scripts/bulk-import";
 
 @Component({
   selector: "app-navbar",

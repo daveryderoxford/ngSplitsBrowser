@@ -2,16 +2,16 @@ import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore } from "angularfire2/firestore";
 import { AngularFireStorage } from "angularfire2/storage";
-import { Club, CompetitorSearchData } from "app/model";
-import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/model/oevent";
-import { ECard } from "app/model/user";
-import { parseEventData } from "app/results/import";
-import { Competitor } from "app/results/model";
-import { Results } from "app/results/model/results";
-import { Utils } from "app/shared";
+import { Club, CompetitorSearchData } from "../model";
+import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "../model/oevent";
+import { ECard } from "../model/user";
+import { parseEventData } from "../results/import";
+import { Competitor } from "../results/model";
+import { Results } from "../results/model/results";
+import { Utils } from "../shared";
 import { firestore } from "firebase";
 import { Observable } from "rxjs/Observable";
-import { CompetitorDataService } from "app/shared/services/competitor-data.service";
+import { CompetitorDataService } from "../shared/services/competitor-data.service";
 
 type PartialEvent = Partial<OEvent>;
 

@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import * as $ from "jquery";
 
-import { InvalidData } from "app/results/model/exception";
+import { InvalidData } from "../../model/exception";
 
 export class CompetitorSelection {
 

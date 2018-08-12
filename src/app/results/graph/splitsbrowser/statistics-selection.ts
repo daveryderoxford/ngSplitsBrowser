@@ -1,7 +1,7 @@
 
 
 
-import { Lang } from "./lang/index";
+import { Lang } from "./lang";
 import * as d3 from "d3";
 import * as $ from "jquery";
 

@@ -6,13 +6,13 @@ import { HttpClient } from "@angular/common/http";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore } from "angularfire2/firestore";
 import { AngularFireStorage } from "angularfire2/storage";
-import { EventAdminService, LargeBatch } from "../app/event-admin/event-admin.service";
-import { EventGrades, OEvent, SplitsFileFormat, EventGrade } from "../app/model";
+import { EventAdminService, LargeBatch } from "app/event-admin/event-admin.service";
+import { EventGrades, OEvent, SplitsFileFormat, EventGrade } from "app/model";
 import * as data from "./importdata.node";
 import { ImportData } from "./importdata.node";
 import { Injectable } from "@angular/core";
 import { Results } from "app/results/model";
-import {CompetitorDataService } from "../app/shared/services/competitor-data.service";
+import {CompetitorDataService } from "app/shared/services/competitor-data.service";
 
 /* Service to import exisitng results */
 @Injectable({

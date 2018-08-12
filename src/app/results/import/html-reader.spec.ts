@@ -26,7 +26,7 @@ import {} from "jasmine-expect";
 
 import { parseHTMLEventData } from "./html-reader";
 import { Course } from "../model/course";
-import { CourseClass, Competitor } from "../model/index";
+import { CourseClass, Competitor } from "../model";
 
 const parseEventData = parseHTMLEventData;
 

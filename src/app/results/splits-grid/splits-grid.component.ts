@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { ResultsSelectionService } from "app/results/results-selection.service";
+import { ResultsSelectionService } from "../results-selection.service";
 import {
    Results,
    Course,
@@ -7,9 +7,10 @@ import {
    CourseClass,
    sbTime,
    TimeUtilities
-} from "app/results/model";
+} from "../model";
 import { SelectionModel } from "@angular/cdk/collections";
 import { MatSort, MatTableDataSource } from "@angular/material";
+import { FormControl } from "@angular/forms";
 
 @Component({
    selector: "app-splits-grid",
@@ -29,10 +30,11 @@ export class SplitsGridComponent implements OnInit {
    displayedColumns: string[] = [];
    splitsColumns: string[] = [];
 
-   colorCells = true;
+   classOption = new  FormControl();
+   courseToggle = new FormControl();
+   colorToggle = new FormControl();
 
    @ViewChild(MatSort) sort: MatSort;
-
 
    constructor(private rs: ResultsSelectionService) { }
 
@@ -116,9 +118,10 @@ export class SplitsGridComponent implements OnInit {
       return ret;
    }
 
-   updateSelectedCompetitor() { }
+   updateSelectedCompetitor(competitor: Competitor) {
+      this.selectedCompetitors.toggle(competitor);
+   }
 
-   updateSelectedControl() { }
 
    /** Format title for split time */
    splitTitle(indexStr: string): string {

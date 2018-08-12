@@ -5,7 +5,7 @@ import * as $ from "jquery";
 
 import { Lang } from "./lang";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
-import { TimeUtilities, Competitor, CourseClassSet, sbTime, Results } from "app/results/model/index";
+import { TimeUtilities, Competitor, CourseClassSet, sbTime, Results } from "../../model";
 
 import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";

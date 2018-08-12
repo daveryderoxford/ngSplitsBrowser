@@ -20,7 +20,7 @@
  */
 // tslint:disable:max-line-length
 
-import { sbTime } from "app/results/model/time";
+import { sbTime } from "./time";
 import { } from "jasmine";
 import { } from "jasmine-expect";
 import { Competitor } from "./competitor";

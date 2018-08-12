@@ -1,12 +1,11 @@
 import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "angularfire2/auth";
 import { AngularFirestore, AngularFirestoreDocument } from "angularfire2/firestore";
-import { OEvent } from "app/model/oevent";
-import { UserData, UserInfo, UserResultData } from "app/model/user";
-import { Competitor, Course, InvalidData } from "app/results/model";
+import { OEvent } from "../model/oevent";
+import { UserData, UserInfo, UserResultData } from "../model/user";
+import { Competitor, Course, InvalidData } from "../results/model";
 import { Observable } from "rxjs/Observable";
-import { UnexpectedError } from "app/results/model/exception";
-import { CompetitorDataService } from "app/shared/services/competitor-data.service";
+import { UnexpectedError } from "../results/model/exception";
 
 @Injectable({
   providedIn: 'root',
@@ -15,8 +14,7 @@ export class UserDataService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private afs: AngularFirestore, 
-    private cds: CompetitorDataService
+    private afs: AngularFirestore
   ) { }
 
   /** Get a reference to use data for a user, creating it if it does not exist */
@@ -37,13 +35,6 @@ export class UserDataService {
   async updateDetails(details: Partial<UserInfo>): Promise<OEvent[]> {
     const oldUser: UserData = await this.getUserDoc().snapshotChanges()
       .map(ret => ret.payload.data() as UserData).toPromise();
-
-    // if user data has changed then find any results associated with updated data 
-    if (details.name && oldUser.name !== details.name) {
-      const results = this.cds.searchResultsByName(details.name);
-    } 
-
-    if (details.ecards && details.ecards)
 
     await this.getUserDoc().update(details);
   }

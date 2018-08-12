@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { sbTime, TimeUtilities } from 'app/results/model';
+import { sbTime, TimeUtilities } from '../model';
 
 /*
  * Format splitsbrowser time
