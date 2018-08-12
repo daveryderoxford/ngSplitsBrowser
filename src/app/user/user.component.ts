@@ -5,6 +5,7 @@ import { AngularFireAuth } from "angularfire2/auth";
 import { Nations } from "app/model/nations";
 import { UserDataService } from "app/user/user-data.service";
 import * as firebase from "firebase/app";
+import { UserData } from "app/model";
 
 @Component({
     selector: "app-user",
@@ -13,6 +14,7 @@ import * as firebase from "firebase/app";
 })
 export class UserComponent implements OnInit {
 
+    originalData: UserData = null;
     userForm: FormGroup;
     error = "";
 
@@ -45,6 +47,9 @@ export class UserComponent implements OnInit {
         this.afAuth.authState.subscribe((loggedIn) => this.loginChanged(loggedIn));
 
         this.userdata.getUser().subscribe((userData) => this.userChanged(userData));
+
+        const t = this.userForm.controls["ecardEmit"].value;
+
     }
 
     async loginChanged(loggedIn: firebase.User) {
@@ -54,22 +59,30 @@ export class UserComponent implements OnInit {
     }
 
     userChanged(userData) {
+        this.originalData = userData;
         this.userForm.reset(userData);
     }
 
     async save() {
+       const  controls = this.userForm.controls;
+       const orig = this.originalData; 
+        if (this.originalData.ecardEmit !== this.userForm.controls["ecardEmit"].value ) {
+
+        }
+
+   
+
         this.userdata.updateDetails(this.userForm.value);
     }
 
     createECard(): FormGroup {
         return this.formBuilder.group({
-          name: '',
-          description: '',
+          id: '',
+          type: '',
         });
       }
 
     addEcard() {
-
     }
 
     removeECard() {

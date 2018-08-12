@@ -6,6 +6,7 @@ import { UserData, UserInfo, UserResultData } from "app/model/user";
 import { Competitor, Course, InvalidData } from "app/results/model";
 import { Observable } from "rxjs/Observable";
 import { UnexpectedError } from "app/results/model/exception";
+import { CompetitorDataService } from "app/shared/services/competitor-data.service";
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,9 @@ export class UserDataService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private afs: AngularFirestore) { }
+    private afs: AngularFirestore, 
+    private cds: CompetitorDataService
+  ) { }
 
   /** Get a reference to use data for a user, creating it if it does not exist */
   getUser(): Observable<UserData> {
@@ -31,15 +34,22 @@ export class UserDataService {
 
 
   /** Update the user info */
-  async updateDetails(details: Partial<UserInfo>): Promise<void> {
+  async updateDetails(details: Partial<UserInfo>): Promise<OEvent[]> {
     const oldUser: UserData = await this.getUserDoc().snapshotChanges()
       .map(ret => ret.payload.data() as UserData).toPromise();
+
+    // if user data has changed then find any results associated with updated data 
+    if (details.name && oldUser.name !== details.name) {
+      const results = this.cds.searchResultsByName(details.name);
+    } 
+
+    if (details.ecards && details.ecards)
 
     await this.getUserDoc().update(details);
   }
 
   private createUser(): Promise<void> {
-    const user = {
+    const userdata = {
       key: this.afAuth.auth.currentUser.uid,
       firstName: "",
       lastName: "",
@@ -53,7 +63,9 @@ export class UserDataService {
       ecards: [],
       resultsLastupDated: new Date()
     };
-    return this.getUserDoc().set(user);
+    const user = this.getUserDoc().set(userdata);
+
+    return user;
   }
 
   private getUserDoc(): AngularFirestoreDocument<UserData> {
@@ -104,9 +116,6 @@ export class UserDataService {
       const d2 = new Date(b.eventInfo.date);
       return (d1.valueOf() - d2.valueOf());
     });
-
-    return this.getUserDoc().set(user);
-
   }
 
   private getCourseWinner(course: Course): Competitor {
