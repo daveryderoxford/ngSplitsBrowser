@@ -23,6 +23,11 @@ export class EventService {
   constructor(private afs: AngularFirestore,
     private ps: PaganationService<OEvent>) { }
 
+    /** load event by key */
+    getEvent(key: string): Observable<OEvent> {
+      return this.afs.doc<OEvent>("/events/" + key).valueChanges();
+    }
+
   /** Sets search critera to use events list
    * @param orderby order the results by specified paremeter name.
    * @param filter the results by ay properties set on the event object

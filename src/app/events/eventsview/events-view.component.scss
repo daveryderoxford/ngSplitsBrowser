@@ -7,34 +7,8 @@
   height: 100%;
 }
 
-.data-container {
-  display: flex;
-  flex-direction: column;
-  max-width: 1500px;
-  min-width: 300px;
-  margin: 20px;
-  height: 100%;
-  box-sizing: border-box;
-  flex-grow: 1;
-  overflow: scroll;
-}
-
-.background {
-  background: $gray-background;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: 100%
-
-}
-
 ::ng-deep .mat-tab-body-content {
   overflow: hidden !important;
-}
-
-.class-filter {
-  display: flex;
-  margin-left: 20px;
 }
 
 /* Workaround to meterial2 expansion panl bug see

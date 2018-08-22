@@ -1,6 +1,6 @@
 
 /** data associated with a user */
-import { EventInfo, ControlCardType } from "./oevent";
+import { EventInfo, ControlCardType, OEvent } from "./oevent";
 
 /** All the user data stored for the user */
 export interface UserData extends UserInfo {
@@ -13,12 +13,16 @@ export interface ECard {
     type: ControlCardType;
 }
 
-/** Information on the results for a user.  */
+/** Information on the results for a user.
+ * the event key plus the ecard +id uniqiely identifies the result
+ */
 export interface UserResultData {
-   eventInfo:  EventInfo;
+   ecardId: string;
+   event:  OEvent;
    course: string;
    courseclass: string;
    name: string;
+   coursePosition: number;
    classPosition: number;
    totalTime: number;  // in milliseconds
    distance: number;

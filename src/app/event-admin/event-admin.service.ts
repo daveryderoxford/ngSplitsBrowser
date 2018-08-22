@@ -220,7 +220,7 @@ export class EventAdminService {
 
 
   /* Parse splits file returning parsed results */
-  public parseSplits(text: string): any {
+  public parseSplits(text: string): Results {
 
     let results: Results;
     try {

@@ -168,12 +168,12 @@ export class Results {
     }
 
     /** Find competitors by ecard from results  Only a simngle competitir should be found for a given ecard number */
-    findCompetitorByECard(ecards: ECard | Array<ECard> ): Competitor {
+    findCompetitorByECard(ecards: string | Array<string> ): Competitor {
         const foundComp = this.allCompetitors.find((comp) => {
             if (Array.isArray(ecards)) {
-                return ecards.some(card => card.id === comp.ecardId);
+                return ecards.some(card => card === comp.ecardId);
             } else {
-                return ecards.id === comp.ecardId;
+                return ecards === comp.ecardId;
             }
         });
 

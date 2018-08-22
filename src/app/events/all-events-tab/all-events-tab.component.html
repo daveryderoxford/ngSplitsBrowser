@@ -1,3 +1,10 @@
-<p>
-  all-events-tab works!
-</p>
+<div class="background">
+
+  <div class="data-container mat-elevation-z2" (scroll)="onTableScroll($event)">
+
+    <app-events-table [dataSource]="dataSource" (eventSelected)="eventClicked($event)"></app-events-table>
+
+    <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
+
+  </div>
+</div>

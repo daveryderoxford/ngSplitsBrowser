@@ -1,3 +1,7 @@
+<div *ngIf="dataSource.length === 0" class="nodata">
+   <h3>No events found</h3>
+</div>
+
 <table mat-table class="table" [dataSource]="dataSource">
 
     <!-- Date Definition -->
@@ -62,9 +66,7 @@
       </td>
     </ng-container>
 
-    
     <!-- Header and Row Declarations -->
     <tr mat-header-row  *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)=oeventClicked(row) (mouseenter)="onMouseEnter(row)" (mouseleave)="onMouseLeave(row)"
-      [ngClass]="rowStyle(row)"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)=eventClicked(row)></tr>
   </table>

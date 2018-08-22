@@ -13,31 +13,9 @@ export class EventsTableComponent implements OnInit {
 
   @Output() eventSelected = new EventEmitter<OEvent>();
 
-  currentRow: any = null;
-
   constructor() { }
 
   ngOnInit() {
-  }
-
-  onMouseEnter(row) {
-    this.currentRow = row;
-  }
-
-  onMouseLeave() {
-    this.currentRow = null;
-  }
-
-  rowStyle(row): string {
-    if (this.currentRow === row) {
-      return ("selected");
-    } else {
-      return ("");
-    }
-  }
-
-  oeventClicked(row) {
-    this.eventSelected.emit(row);
   }
 
 }

@@ -31,6 +31,7 @@ import { EventsTableComponent } from './events/events-table/events-table.compone
 import { AllEventsTabComponent } from './events/all-events-tab/all-events-tab.component';
 import { ClubEventsTabComponent } from './events/club-events-tab/club-events-tab.component';
 import { MyEventsTabComponent } from './events/my-events-tab/my-events-tab.component';
+import { MyResultsTableComponent } from './events/my-results-table/my-results-table.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { MyEventsTabComponent } from './events/my-events-tab/my-events-tab.compo
     AllEventsTabComponent,
     ClubEventsTabComponent,
     MyEventsTabComponent,
+    MyResultsTableComponent,
   ],
   imports: [
     BrowserModule,

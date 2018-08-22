@@ -49,7 +49,7 @@ export class ResultsSelectionService {
         this.results$.next(results);
         this.selectedCompetitors$.next([]);
 
-        //  Select first coure by default
+        //  Select first course by default
         if (results.courses.length > 0) {
            this.selectedCourse$.next(results.courses[0]);
         } else {
@@ -57,7 +57,7 @@ export class ResultsSelectionService {
         }
 
         if (results.classes.length > 0) {
-          this.selectedClasses$.next(results.classes[0]);
+          this.selectedClasses$.next([results.classes[0]]);
         } else {
           this.selectedClasses$.next([]);
         }
@@ -148,7 +148,7 @@ export class ResultsSelectionService {
   }
 
   /** Parse splits file with logging */
-  private parseSplits(text: string): any {
+  public parseSplits(text: string): Results {
 
     let results: Results;
     try {
@@ -166,7 +166,7 @@ export class ResultsSelectionService {
   }
 
   /** Downloads results for an event from google storage */
-  private downloadResultsFile(event: OEvent): Observable<string> {
+  public downloadResultsFile(event: OEvent): Observable<string> {
     const path = event.splits.splitsFilename;
 
     const obs = this.storage.ref(path).getDownloadURL()

@@ -13,5 +13,17 @@ xdescribe('UserDataService', () => {
     expect(service).toBeTruthy();
   }));
 
+  it('user data on first login', inject([UserDataService], (service: UserDataService) => {
+    expect(service).toBeTruthy();
+  }));
+
+  it('user data when not logged in', inject([UserDataService], (service: UserDataService) => {
+    expect(service).toBeTruthy();
+  }));
+
+  it('should be created', inject([UserDataService], (service: UserDataService) => {
+    expect(service).toBeTruthy();
+  }));
+
 
 });

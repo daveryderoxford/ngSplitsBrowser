@@ -1,3 +1,25 @@
-<p>
-  my-events-tab works!
-</p>
+<div *ngIf="!loggedIn" class="nologin">
+    <h1>You need to be logged in to view your events</h1>
+    <div class=loginbuttons>
+        <button mat-button routerLink="/login">LOGIN</button>
+        <button mat-button routerLink="/signup">REGISTER</button>
+    </div>
+</div>
+
+<ng-container *ngIf="loggedIn && (myResults$ | async) as results; else loading">
+
+    <div *ngIf="results.length === 0" class=nodata>
+        No results or user avalaible. Add ecard number to your user details to automatically find your results
+    </div>
+
+    <div *ngIf="results.length > 0">
+        <mat-list *ngFor="let result of results">
+            <mat-list-item> {{result.eventInfo.na}</mat-list-item>
+        </mat-list>
+    </div>
+
+</ng-container>
+
+<ng-template #loading>
+
+</ng-template>
