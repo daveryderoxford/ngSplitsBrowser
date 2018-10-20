@@ -1,6 +1,5 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { OEvent, UserResultData } from 'app/model';
-import { TimeUtilities } from '../../results/model';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { OEvent, UserResult } from 'app/model';
 
 @Component({
   selector: 'app-my-results-table',
@@ -9,14 +8,15 @@ import { TimeUtilities } from '../../results/model';
 })
 export class MyResultsTableComponent implements OnInit {
 
-  @Input() dataSource: UserResultData[];
+  @Input() dataSource: UserResult[];
   @Input() displayedColumns = ["eventInfo.date",
                               "eventInfo.name",
                               "eventInfo.club",
                               "classPosition",
                               "classWinningTime",
                               "totalTime",
-                               "minPerKm"
+                              "minPerKm",
+                              "behindWinner"
                               ];
 
   @Output() eventSelected = new EventEmitter<OEvent>();
@@ -26,11 +26,11 @@ export class MyResultsTableComponent implements OnInit {
   ngOnInit() {
   }
 
-  minPerKm(res: UserResultData): string {
-     if (!res.distance || res.distance === 0) {
+  minPerKm(res: UserResult): string {
+     if (!res.result.distance || res.result.distance === 0) {
        return "";
      } else {
-      return (res.totalTime / res.distance * 60).toString(2);
+      return (res.result.totalTime / res.result.distance * 60).toString(2);
      }
   }
 

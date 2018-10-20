@@ -17,9 +17,9 @@ fdescribe('OEvent model object', () => {
     it('grade index for properties for regional event', () => {
 
         expect(EventGrades.indexObject("Regional")).toEqual({
-            Regional: true,
             Club: true,
-            Local: true
+            Local: true,
+            Regional: true,
         });
     });
 

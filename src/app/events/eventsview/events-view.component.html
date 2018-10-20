@@ -5,19 +5,19 @@
   <mat-tab-group backgroundColor="primary">
     <mat-tab #tabAll label="ALL">
       <ng-template matTabContent>
-        <app-all-events-tab (eventSelected)="eventClicked($event)"></app-all-events-tab>
+        <app-all-events-tab (eventSelected)="eventClicked($event)" [matMenuTriggerFor]="appMenu"></app-all-events-tab>
       </ng-template>
     </mat-tab>
 
     <mat-tab #tabClub label="CLUB">
       <ng-template matTabContent>
-        <app-club-events-tab (eventSelected)="eventClicked($event)"></app-club-events-tab>
+        <app-club-events-tab (eventSelected)="eventClicked($event)" [matMenuTriggerFor]="appMenu"></app-club-events-tab>
       </ng-template>
     </mat-tab>
 
     <mat-tab #tabMyEvents label="MY RESULTS">
       <ng-template matTabContent>
-        <app-my-events-tab (eventSelected)="eventClicked($event)"></app-my-events-tab>
+        <app-my-events-tab (eventSelected)="eventClicked($event)" [matMenuTriggerFor]="appMenu"></app-my-events-tab>
       </ng-template>
     </mat-tab>
 

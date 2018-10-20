@@ -4,7 +4,7 @@
 
   <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
 
-    <h5> User details</h5>
+    <h5>User details</h5>
 
     <div class=error>{{error}}</div>
 
@@ -16,13 +16,13 @@
 
           <mat-progress-bar *ngIf="showProgressBar" mode="query"> </mat-progress-bar>
 
-          <div fxFlexLayout=row>
+          <div fxFlexLayout=row fxLayoutAlign="space-between">
             <mat-form-field>
-              <input matInput required formControlName="firstName" placeholder="First Name">
+              <input matInput required formControlName="firstname" placeholder="First Name">
             </mat-form-field>
 
             <mat-form-field>
-              <input matInput required formControlName="lastName" placeholder="Last Names">
+              <input matInput required formControlName="surname" placeholder="Last Names">
             </mat-form-field>
           </div>
 
@@ -35,12 +35,6 @@
           </mat-form-field>
 
           <mat-form-field>
-            <input matInput formControlName="yearOfBirth" type="number" placeholder="Year of birth">
-            <mat-hint align="end">yyyy</mat-hint>
-            <mat-error>Invalid year</mat-error>
-          </mat-form-field>
-
-          <mat-form-field>
             <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
             <mat-hint align="end">Between 2 and 10 characters</mat-hint>
           </mat-form-field>
@@ -49,13 +43,40 @@
             <input matInput formControlName="nationalId" type="number" placeholder="National ID number">
           </mat-form-field>
 
-          <mat-form-field>
-            <input matInput formControlName="ecardSI" type="number" placeholder="Sportident ecard number">
-          </mat-form-field>
+          <div class="ecardgroup">
+            <div fxLayout="row" fxLayoutAlign="space-between">
+               <b>ECards</b>
+               <button mat-button (click)="addEcard()">
+                   <mat-icon [ngStyle]="{'color':'green'}">add_circle</mat-icon>
+                   ADD
+               </button>
+           </div>
 
-          <mat-form-field>
-            <input matInput formControlName="ecardEmit" type="number" placeholder="Emit ecard number">
-          </mat-form-field>
+
+            <div formArrayName="ecards" *ngFor="let ecard of userForm.controls['ecards'].controls; let i = index;">
+
+              <div [formGroupName]="i" fxFlexLayout=row fxLayoutAlign="space-between">
+
+                <mat-form-field>
+                  <input matInput required formControlName="id" placeholder="Number">
+                </mat-form-field>
+
+                <mat-form-field>
+                  <mat-select required formControlName="type" placeholder="Type">
+                    <mat-option *ngFor="let type of ecardTypes" [value]="type">
+                      {{ type }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <button mat-icon-button (click)="removeEcard(i)">
+                  <mat-icon [ngStyle]="{'color':'red'}">remove_circle</mat-icon>
+                </button>
+
+              </div>
+            </div>
+
+          </div>
 
           <mat-checkbox formControlName="autoFind"> Automatically add results </mat-checkbox>
 

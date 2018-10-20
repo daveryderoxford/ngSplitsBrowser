@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
-import { AngularFireAuth } from "angularfire2/auth";
+import { AngularFireAuth } from "@angular/fire/auth";
 import { Results } from "../../../results/model";
 import * as firebase from "firebase";
 import {BulkImportService} from "scripts/bulk-import";

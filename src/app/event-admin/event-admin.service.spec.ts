@@ -1,18 +1,14 @@
 // tslint:disable:max-line-length
 
-import { TestBed, inject } from "@angular/core/testing";
-
-import { AngularFireAuth } from "angularfire2/auth";
-import { AngularFirestore, AngularFirestoreModule } from "angularfire2/firestore";
-import { AngularFireStorage, AngularFireStorageModule } from "angularfire2/storage";
-
-import { EventAdminService } from "./event-admin.service";
-import { AngularFireModule } from "angularfire2";
 import { HttpClient } from "@angular/common/http";
-import { OEvent, EventInfo } from "../model";
-
-import { testFirebaseConfig } from "../app.firebase-config";
-
+import { inject, TestBed } from "@angular/core/testing";
+import { AngularFireModule } from "@angular/fire";
+import { AngularFirestoreModule } from "@angular/fire/firestore";
+import { AngularFireStorageModule } from "@angular/fire/storage";
+import { testFirebaseConfig } from "app/app.firebase-config";
+import { EventInfo } from "app/model";
+import { CompetitorDataService } from "app/shared/services/competitor-data.service";
+import { EventAdminService } from "./event-admin.service";
 
 const testEventInfo1: EventInfo = {
   name: "test name 1",
@@ -24,7 +20,7 @@ const testEventInfo1: EventInfo = {
   discipline: "Long",
   webpage: "www.sn.co.uk",
   email: "fred@splitsbrowser.org.uk",
-  punchingType: "SI"
+  controlCardType: "SI"
 };
 
 const testEventInfo2: EventInfo = {
@@ -37,7 +33,7 @@ const testEventInfo2: EventInfo = {
   discipline: "Urban",
   webpage: "www.tvoc.co.uk",
   email: "joe@splitsbrowser.org.uk",
-  punchingType: "Emit"
+  controlCardType: "Emit"
 };
 
 const resultsfile = [
@@ -67,12 +63,13 @@ describe("EventAdminService", () => {
         AngularFireModule.initializeApp(testFirebaseConfig),
         AngularFirestoreModule,
         AngularFireStorageModule,
-        HttpClient
+        HttpClient,
+        CompetitorDataService
       ]
     });
   });
 
-  it("should ...", inject([EventAdminService], (eventAdmin: EventAdminService) => {
+  it("should create event admin service", inject([EventAdminService], (eventAdmin: EventAdminService) => {
     expect(eventAdmin).toBeTruthy();
   }));
 
@@ -122,12 +119,17 @@ describe("EventAdminService", () => {
   }));
 });
 
+
 it("should update a results file that has already been downloaded once", inject([EventAdminService], async (eventAdmin: EventAdminService) => {
   const key = await eventAdmin.saveNew(testEventInfo1);
   const eventresult = await eventAdmin.getEvent(key).toPromise();
 
   const file = new File(resultsfile, 'test');
   await eventAdmin.uploadResults(eventresult, file);
+
+  // Read all search results and check them
+
+
 
 
 }));
@@ -140,6 +142,7 @@ it("should delate the datbase entry and file when the event is deleted", inject(
   await eventAdmin.uploadResults(eventresult, file);
 
   await eventAdmin.delete(eventresult);
+
 
 }));
 

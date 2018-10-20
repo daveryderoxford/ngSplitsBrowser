@@ -20,6 +20,7 @@ import { FormControl } from "@angular/forms";
 export class SplitsGridComponent implements OnInit {
    results: Results;
    course: Course;
+   oclass: CourseClass;
    dataSource = new MatTableDataSource<Competitor>([]);
 
    selectedControl = new SelectionModel<number>(false, null);
@@ -30,7 +31,7 @@ export class SplitsGridComponent implements OnInit {
    displayedColumns: string[] = [];
    splitsColumns: string[] = [];
 
-   classOption = new  FormControl();
+   classSelect = new FormControl();
    courseToggle = new FormControl();
    colorToggle = new FormControl();
 
@@ -42,11 +43,20 @@ export class SplitsGridComponent implements OnInit {
 
       this.dataSource.sort = this.sort;
 
+      // Subecribed to updates from results selection
       this.rs.selectedResults.subscribe(results => this.selectedResultsUpdated(results));
-
       this.rs.selectedCourse.subscribe(course => this.selectedCourseUpdated(course));
+      this.rs.selectedClass.subscribe(oclass => this.selectedClassesUpdated(oclass));
 
-      this.rs.selectedClasses.subscribe(classes => this.selectedClassesUpdated(classes));
+      /// Update resukts seelction when user changed form controls
+      this.classSelect.valueChanges.distinctUntilChanged().subscribe( (courseClass: CourseClass) => {
+         this.rs.selectClass(courseClass);
+      });
+
+      this.courseToggle.valueChanges.distinctUntilChanged().subscribe( (showCourses: boolean) => {
+         this.rs.displayAllCourseCompetitors(showCourses);
+      });
+
 
    }
 
@@ -57,6 +67,7 @@ export class SplitsGridComponent implements OnInit {
    private selectedCourseUpdated(course: Course) {
       this.course = course;
 
+      // Created a column for each control for the course
       if (course) {
          this.splitsColumns = Array.from({ length: course.numSplits }, (x, i) =>
             i.toString()
@@ -66,15 +77,15 @@ export class SplitsGridComponent implements OnInit {
       }
    }
 
-   selectClass(courseClass: CourseClass) {
-      this.rs.selectClass(courseClass);
-   }
-
    selectedClassesUpdated(classes) {
+      // When lass is updated then set the
+
 
       if (this.results && this.results.classes && this.results.classes.length > 0) {
          this.dataSource = new MatTableDataSource(this.results.classes[0].competitors);
          this.dataSource.sort = this.sort;
+
+         this.oclass = this.results.classes[0];
 
          //  const oclass = this.results.classes.find(c => c.name === classes[0].name);
          //  this.dataSource = oclass.competitors;

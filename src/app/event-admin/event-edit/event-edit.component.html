@@ -30,7 +30,7 @@
        <mat-hint align="end">Between 2 and 10 characters</mat-hint>
         <mat-error>Club required</mat-error>
 
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub()">
             <mat-option *ngFor="let club of filteredClubs$ | async" [value]="club.name">
               {{ club.name }}
             </mat-option>
@@ -62,6 +62,14 @@
         <mat-select formControlName="discipline" placeholder="Discipline">
           <mat-option *ngFor="let discipline of disciplines" [value]="discipline">
             {{ discipline }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-select formControlName="controlCardType" placeholder="Punching type">
+          <mat-option *ngFor="let controlCardType of controlCardTypes" [value]="controlCardType">
+            {{ controlCardType }}
           </mat-option>
         </mat-select>
       </mat-form-field>

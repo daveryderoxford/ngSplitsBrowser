@@ -25,7 +25,7 @@ import { } from "jasmine";
 import { } from "jasmine-expect";
 
 import { parseIOFXMLEventData } from "./iof-xml-reader";
-import { TimeUtilities, CourseClass } from "../model"
+import { TimeUtilities, Competitor } from "../model";
 import { TestSupport } from "../test-support.spec";
 
 const formatTime = TimeUtilities.formatTime;
@@ -57,7 +57,7 @@ fdescribe("Input.IOFXml", () => {
             controls: ["182", "148", "167"],
             cumTimes: [65, 65 + 221, 65 + 221 + 184],
             result: true,
-            ecard: "12345"
+            ecardId: "12345"
         };
     }
 
@@ -158,7 +158,7 @@ fdescribe("Input.IOFXml", () => {
         const clubXml = (exists("club")) ? "<Club><ShortName>" + personData.club + "</ShortName></Club>\n" : "";
         const startTimeXml = (exists("startTime")) ? "<StartTime><Clock>" + formatTime(personData.startTime) + "</Clock></StartTime>\n" : "";
         const totalTimeXml = (exists("totalTime")) ? "<Time>" + formatTime(personData.totalTime) + "</Time>\n" : "";
-        const ecardXml = (exists("ecard")) ? '<CCard> <CCardId>' + personData.ecard + '</CCardId> <PunchingUnitType value="SI" /> </CCard>' : "";
+        const ecardXml = (exists("ecard")) ? '<CCard> <CCardId>' + personData.ecardId + '</CCardId> <PunchingUnitType value="SI" /> </CCard>' : "";
 
         let status;
         if (exists("nonStarter")) {
@@ -292,7 +292,7 @@ fdescribe("Input.IOFXml", () => {
     *
     * The properties supported are as follows.  Unless specified otherwise, the
     * XML generated for each property is omitted if the property is not specified:
-    * * forename (String) - The person's forename.
+    * * forname (String) - The person's formname.
     * * surname (String) - The person's surname.
     * * club {String} The person's club.
     * * startTime (Number) - The person's start time, in seconds since
@@ -363,7 +363,7 @@ fdescribe("Input.IOFXml", () => {
 
         const startTimeXml = (exists("startTime")) ? "<StartTime>" + startTimeStr + "</StartTime>\n" : "";
         const totalTimeXml = (exists("totalTime")) ? "<Time>" + personData.totalTime + "</Time>" : "";
-        const ecardXml = (exists("ecard")) ? "<ControlCard>" + personData.ecard + "</ControlCard>" : "";
+        const ecardXml = (exists("ecard")) ? "<ControlCard>" + personData.ecardId + "</ControlCard>" : "";
 
         let status;
         if (exists("nonStarter")) {
@@ -687,7 +687,7 @@ fdescribe("Input.IOFXml", () => {
                         expect(competitor.totalTime).toEqual(person.totalTime);
                         expect(competitor.gender).toEqual("M");
                         expect(competitor.yearOfBirth).toEqual(1976);
-                        expect(competitor.ecard).toEqual("12345", "ECard incorrect");
+                        expect(competitor.ecardId).toEqual("12345", "ECard incorrect");
                         expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0].concat(person.cumTimes).concat(person.totalTime));
                         expect(competitor.completed()).toBe(true);
                         expect(!competitor.isNonCompetitive).toBe(true);

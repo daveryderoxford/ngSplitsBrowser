@@ -6,7 +6,7 @@ import { AppMaterialModule } from "./app-material.module";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { SpinnerModule } from './components/spinner.module';
 import { DialogsModule } from "./dialogs/dialogs.module";
-import { AngularFireAuth } from "angularfire2/auth";
+import { AngularFireAuth } from "@angular/fire/auth";
 import { AppRoutingModule } from "../app-routing.module";
 import { MatSearchBarComponent } from "./components/mat-search-bar/mat-search-bar.component";
 

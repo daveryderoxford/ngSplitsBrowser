@@ -73,5 +73,5 @@ export class TimeUtilities {
             // Assume anything unrecognised is a missed split.
             return null;
         }
-    };
+    }
 }

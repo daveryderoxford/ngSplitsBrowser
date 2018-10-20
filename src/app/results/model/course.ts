@@ -16,6 +16,8 @@ export class Course {
 
    private _numSplits = -1;
 
+   private _competitors = new Array([]);
+
    /**
    * A collection of 'classes', all runners within which ran the same physical
    * course.
@@ -324,4 +326,16 @@ export class Course {
          }
       }
    }
+
+   /** Returns an ordered list of results for the course */
+   public get competitors(): Competitor[] {
+      if (!this.competitors ) {
+         for (const courseClass of this.classes) {
+            
+         }
+
+      }
+      return this.competitors;
+   }
+
 }

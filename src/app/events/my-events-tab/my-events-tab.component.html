@@ -1,5 +1,5 @@
 <div *ngIf="!loggedIn" class="nologin">
-    <h1>You need to be logged in to view your events</h1>
+    <h3>You need to be logged in to view your events</h3>
     <div class=loginbuttons>
         <button mat-button routerLink="/login">LOGIN</button>
         <button mat-button routerLink="/signup">REGISTER</button>
@@ -9,7 +9,8 @@
 <ng-container *ngIf="loggedIn && (myResults$ | async) as results; else loading">
 
     <div *ngIf="results.length === 0" class=nodata>
-        No results or user avalaible. Add ecard number to your user details to automatically find your results
+        No results avalaible for user.  
+       <br> Add ecard number to your user details to automatically find your results
     </div>
 
     <div *ngIf="results.length > 0">

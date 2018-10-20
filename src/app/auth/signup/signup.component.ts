@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AngularFireAuth } from 'angularfire2/auth';
-import * as firebase from 'firebase';
 
 @Component({
     selector: 'app-signup',
@@ -29,8 +28,8 @@ export class SignupComponent {
         const p2 = g.get('confirmPassword');
         let ret: {[error: string]: any} = {};
 
-       if ( (p1.touched || p2.touched) && 
-            (p1.value !== p2.value)  && 
+       if ( (p1.touched || p2.touched) &&
+            (p1.value !== p2.value)  &&
             (p2 !== null) ) {
             ret = { passwordMissMatch: true };
         }

@@ -1,4 +1,6 @@
 /** Various utility functions for Splitsbrowser */
+import { uniqBy } from 'lodash';
+
 export class Utils {
 
     /** Async function to load a file from disk returning text string containing file contents */
@@ -21,18 +23,21 @@ export class Utils {
         });
     }
 
-    static padRight(str: string, length: number): string {
+    /** Pad a string to a specified length by adding char on the right of it.
+     * char defaults to - if it is not specified
+     */
+    static padRight(str: string, length: number, char = '-'): string {
         while (str.length < length) {
-            str = str + "-";
+            str = str + char;
         }
         return str;
     }
 
-    /** Remove duplicate items from an array */
-    static removeDuplicates<T>(array: Array<T>): Array<T> {
-        return array.filter((result, index) => {
-            return array.indexOf(result) === index;
-        });
+    /** Remove duplicate objects from an array based on the object property values*/
+    static removeDuplicates(array: Array<Object>): Array<Object> {
+        return uniqBy(array, function (object) {
+            return JSON.stringify(object);
+          });
     }
 
     /** Normalise a Firebase key */

@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { AngularFirestore, QueryFn } from "angularfire2/firestore";
+import { AngularFirestore, QueryFn } from "@angular/fire/firestore";
 import { Club, EventInfo, OEvent } from "../model";
 import { PaganationService } from "../shared";
 import { BehaviorSubject } from "rxjs/BehaviorSubject";

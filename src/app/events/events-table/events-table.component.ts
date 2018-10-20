@@ -18,4 +18,8 @@ export class EventsTableComponent implements OnInit {
   ngOnInit() {
   }
 
+  eventClicked(row) {
+    this.eventSelected.emit(row);
+  }
+
 }

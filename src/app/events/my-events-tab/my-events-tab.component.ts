@@ -1,8 +1,8 @@
 import { Component, OnInit, Output, EventEmitter } from "@angular/core";
 import { Observable } from "rxjs";
-import { UserResultData, OEvent } from "app/model";
+import { UserResult, OEvent } from "app/model";
 import { UserDataService } from "app/user/user-data.service";
-import { AngularFireAuth } from "angularfire2/auth";
+import { AngularFireAuth } from "@angular/fire/auth";
 import * as firebase from "firebase";
 
 @Component({
@@ -15,7 +15,7 @@ export class MyEventsTabComponent implements OnInit {
    eventSelected = new EventEmitter();
 
    loggedIn: boolean;
-   myResults$: Observable<UserResultData[]> = undefined;
+   myResults$: Observable<UserResult[]> = undefined;
 
    constructor(private us: UserDataService,
                private afAuth: AngularFireAuth ) {
@@ -27,9 +27,12 @@ export class MyEventsTabComponent implements OnInit {
    ngOnInit() {
 
     this.afAuth.authState.subscribe((user: firebase.User) => {
-        // If logged in then gf
+
+        this.loggedIn = (user !== null);
+
+        // Get the results for the user
         if (user !== null) {
-            this.myResults$ = this.us.getUser().map(userdata => {
+            this.myResults$ = this.us.userData().map(userdata => {
                 return userdata.results;
              });
         }

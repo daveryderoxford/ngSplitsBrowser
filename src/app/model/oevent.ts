@@ -27,6 +27,9 @@ export class EventTypes {
 }
 
 export type ControlCardType = "SI" | "Emit" | "Other";
+export class ControlCardTypes {
+    static types: Array<ControlCardType> = ["SI", "Emit" , "Other"];
+}
 
 export type SplitsFileFormat = "auto" | "IOFv3" |  "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML" ;
 
@@ -50,10 +53,11 @@ export interface EventInfo {
      discipline: EventDiscipline;
      webpage: string;
      email: string;
-     punchingType: ControlCardType;
+     controlCardType: ControlCardType;
 }
 
 export interface SplitsFileInfo {
+     uploadDate: Date;
      splitsFilename: string;
      splitsFileFormat: SplitsFileFormat;
      valid: boolean;

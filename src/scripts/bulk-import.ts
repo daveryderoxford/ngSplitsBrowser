@@ -3,9 +3,9 @@
  * ts-node bulk-inoirt.node
 */
 import { HttpClient } from "@angular/common/http";
-import { AngularFireAuth } from "angularfire2/auth";
-import { AngularFirestore } from "angularfire2/firestore";
-import { AngularFireStorage } from "angularfire2/storage";
+import { AngularFireAuth } from "@angular/fire/auth";
+import { AngularFirestore } from "@angular/fire/firestore";
+import { AngularFireStorage } from "@angular/fire/storage";
 import { EventAdminService, LargeBatch } from "app/event-admin/event-admin.service";
 import { EventGrades, OEvent, SplitsFileFormat, EventGrade } from "app/model";
 import * as data from "./importdata.node";
@@ -121,7 +121,7 @@ export class BulkImportService {
       legacyPassword: inputEvent.legacyPassword,
       yearIndex: new Date(inputEvent.eventdate * 1000).getFullYear(),
       gradeIndex: EventGrades.indexObject(grade),
-      punchingType: "Other"
+      controlCardType: "Other"
     };
 
     /** Set indices */
@@ -154,18 +154,20 @@ export class BulkImportService {
       event.splits = {
         splitsFilename: path,
         splitsFileFormat: fileFormat,
-        valid: true
+        valid: true,
+        uploadDate: new Date()
       };
 
       /* Update competitors in Firestore database.
          Existing competitors are deleted and new ones added in a batch */
       const batch = new LargeBatch(this.afs);
+      const dateAdded = new Date();
       try {
         await this.es.deleteEventResultsFromDB(event, fs, batch);
 
         // Save new results for the event in the database
         for (const comp of results.allCompetitors) {
-          const compDBData = this.cs.createNew(event, comp);
+          const compDBData = this.cs.createNew(event, comp, dateAdded);
           const compRef = fs.doc("/results/" + compDBData.key);
           await batch.set(compRef, compDBData);
         }

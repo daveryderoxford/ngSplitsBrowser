@@ -4,7 +4,6 @@ import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
 import { isNaNStrict, isNotNull } from "./util";
-import { isThisTypeNode } from "typescript";
 
 export type Genre = "M" | "F";
 
@@ -103,6 +102,7 @@ export class Competitor {
     courseClass: CourseClass | null = null;
     yearOfBirth: number | null = null;
     gender: Genre | null = null; // "M" or "F" for male or female.
+    birthDate: string;
     ecardId: string | null = null;
     route: string | null = null;
     nationalID: string | null = null;

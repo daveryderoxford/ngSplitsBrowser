@@ -3,9 +3,11 @@
  * for events without a ecardId the ecard is formed using class + position
 */
 export interface CompetitorSearchData {
+    key: string;
     eventKey: string;
     ecardId: string;
     first: string;
     surname: string;
     club: string;
+    added: Date;
 }

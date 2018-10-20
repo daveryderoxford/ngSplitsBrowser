@@ -46,7 +46,7 @@ exports.updateUser = functions.firestore
       // If samrtcard has changed then look for new samrtcards
 
       // if names or club has changed look for new name/club
-      if  ( !old || (updated.firstName !== old.firstName) || updated.surname !== old.surname) { } );
+      if  ( !old || (updated.firstname !== old.firstname) || updated.surname !== old.surname) { } );
       {
         // Query for results
       }

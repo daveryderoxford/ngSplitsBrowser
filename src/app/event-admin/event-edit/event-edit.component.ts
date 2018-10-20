@@ -3,9 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
 import { EventAdminService } from '../event-admin.service';
-import { Nations } from '../../model/nations';
-import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
-import { Club } from '../../model';
+import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent, ControlCardTypes } from '../../model/oevent';
+import { Club, Nations} from 'app/model';
 import { Observable } from 'rxjs/Observable';
 import { startWith, map, filter } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
@@ -26,8 +25,7 @@ export class EventEditComponent implements OnInit {
   nations = Nations.getNations();
   types = EventTypes.types;
   disciplines = EventDisciplines.disciplines;
-  email: string;
-
+  controlCardTypes = ControlCardTypes.types;
 
   clubs: Club[] = [];
   filteredClubs$: Observable<Club[]>;
@@ -50,6 +48,7 @@ export class EventEditComponent implements OnInit {
       grade: ["", Validators.required],
       type: ["", Validators.required],
       discipline: ["", Validators.required],
+      controlCardType: ["", Validators.required],
       webpage: ["", Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
     });
 
@@ -88,7 +87,7 @@ export class EventEditComponent implements OnInit {
     return ret;
   }
 
-  displayFn(club?: Club): string | undefined {
+  displayClub(club?: Club): string | undefined {
     return club ? club.name : undefined;
   }
 

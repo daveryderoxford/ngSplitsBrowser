@@ -3,9 +3,9 @@ import { NgModule } from "@angular/core";
 import { ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { AngularFireModule } from "angularfire2";
-import { AngularFirestoreModule } from "angularfire2/firestore";
-import { AngularFireStorageModule } from "angularfire2/storage";
+import { AngularFireModule } from "@angular/fire";
+import { AngularFirestoreModule } from "@angular/fire/firestore";
+import { AngularFireStorageModule } from "@angular/fire/storage";
 import { AboutComponent } from "./about/about.component";
 import { AppComponent } from "./app.component";
 import { firebaseConfig } from "./app.firebase-config";
@@ -32,6 +32,7 @@ import { AllEventsTabComponent } from './events/all-events-tab/all-events-tab.co
 import { ClubEventsTabComponent } from './events/club-events-tab/club-events-tab.component';
 import { MyEventsTabComponent } from './events/my-events-tab/my-events-tab.component';
 import { MyResultsTableComponent } from './events/my-results-table/my-results-table.component';
+import { ResultsFoundDialogComponent } from './user/results-found-dialog/results-found-dialog.component';
 
 @NgModule({
   declarations: [
@@ -54,6 +55,10 @@ import { MyResultsTableComponent } from './events/my-results-table/my-results-ta
     ClubEventsTabComponent,
     MyEventsTabComponent,
     MyResultsTableComponent,
+    ResultsFoundDialogComponent,
+  ],
+  entryComponents: [
+    ResultsFoundDialogComponent
   ],
   imports: [
     BrowserModule,

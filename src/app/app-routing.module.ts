@@ -12,6 +12,7 @@ import { ResultsResolver } from './results/results.resolver';
 import { UserComponent } from './user/user.component';
 import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { SplitsGridComponent } from './results/splits-grid/splits-grid.component';
+import { PendingChangesGuard } from './shared/services/pending-changes-guard-service.guard';
 
 const routes: Routes = [
     { path: "", component: MainComponent },
@@ -19,7 +20,7 @@ const routes: Routes = [
     { path: "signup", component: SignupComponent },
     { path: "recover", component: RecoverComponent },
     { path: "events", component:  EventsViewComponent },
-    { path: "user", component: UserComponent, canActivate: [AuthGuard] },
+    { path: "user", component: UserComponent, canActivate: [AuthGuard], canDeactivate: [PendingChangesGuard] },
     { path: "change-password", component: ChangePasswordComponent, canActivate: [AuthGuard] },
     { path: "about", component: AboutComponent },
     { path: "graph/:id",

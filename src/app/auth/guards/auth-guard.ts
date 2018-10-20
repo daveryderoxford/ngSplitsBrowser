@@ -5,7 +5,7 @@ import 'rxjs/add/operator/take';
 import { Injectable } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs/Observable';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 
 @Injectable({

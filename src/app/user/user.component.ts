@@ -1,193 +1,211 @@
 import { Component, OnInit } from "@angular/core";
-import { FormBuilder, FormGroup, Validators, FormArray } from "@angular/forms";
+import { AngularFireAuth } from "@angular/fire/auth";
+import { FormArray, FormBuilder, FormGroup } from "@angular/forms";
+import { MatDialog } from "@angular/material";
 import { Router } from "@angular/router";
-import { AngularFireAuth } from "angularfire2/auth";
-import { Nations } from "app/model/nations";
-import { UserDataService } from "app/user/user-data.service";
-import * as firebase from "firebase/app";
-import { UserData, CompetitorSearchData, UserResultData, OEvent } from "app/model";
-import { CompetitorDataService } from "../shared/services/competitor-data.service";
-import { Utils } from "app/shared";
-import { ResultsSelectionService } from "../results/results-selection.service";
 import { EventService } from "app/events/event.service";
-import { Results, Competitor } from "app/results/model";
-import { map, switchMap } from "rxjs/operators";
+import { ControlCardTypes, UserData } from "app/model";
+import { Nations } from "app/model/nations";
+import { Utils, DialogsService } from "app/shared";
+import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
+import { UserDataService } from "app/user/user-data.service";
+import { map, switchMap, tap, catchError } from "rxjs/operators";
+import { ResultsSelectionService } from "app/results/results-selection.service";
+import { UserResult } from "app/model/user";
+import * as _ from 'lodash';
+import { Observable } from "rxjs/Observable";
 
 @Component({
-   selector: "app-user",
-   templateUrl: "./user.component.html",
-   styleUrls: ["./user.component.scss"]
+  selector: "app-user",
+  templateUrl: "./user.component.html",
+  styleUrls: ["./user.component.scss"]
 })
 export class UserComponent implements OnInit {
-   originalUserData: UserData = null;
-   userForm: FormGroup;
-   error = "";
+  originalUserData: UserData = null;
+  userForm: FormGroup;
+  ecardTypes = ControlCardTypes.types;
 
-   showProgressBar = false;
+  error = "";
 
-   nations = Nations.getNations();
+  showProgressBar = false;
+  busy = false;
 
-   constructor(
-      private formBuilder: FormBuilder,
-      private afAuth: AngularFireAuth,
-      private router: Router,
-      private userdata: UserDataService,
-      private cds: CompetitorDataService,
-      private rs: ResultsSelectionService,
-      private es: EventService
-   ) {
-      this.userForm = this.formBuilder.group({
-         firstName: [""],
-         lastName: [""],
-         yearOfBirth: [
-            "",
-            [Validators.min(1900), Validators.max(new Date().getFullYear())]
-         ],
-         club: [""],
-         nationality: [""],
-         nationalId: [""],
-         ecardSI: [""],
-         ecardEmit: [""],
-         autoFind: [""]
+  nations = Nations.getNations();
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private afAuth: AngularFireAuth,
+    private router: Router,
+    private usd: UserDataService,
+    private rs: ResultsSelectionService,
+    private es: EventService,
+    private dialog: MatDialog,
+    private dialogService: DialogsService
+  ) {
+    this.userForm = this.formBuilder.group({
+      firstname: [""],
+      surname: [""],
+      club: [""],
+      nationality: [""],
+      nationalId: [""],
+      autoFind: [""],
+      ecards: this.formBuilder.array([])
+    });
+  }
+
+  ngOnInit() {
+    this.afAuth.authState.subscribe(loggedIn => this.loginChanged(loggedIn));
+    this.usd.userData().subscribe(userData => this.userChanged(userData));
+  }
+
+  private _ecardsControl(): FormArray {
+    return this.userForm.controls['ecards'] as FormArray;
+  }
+
+  loginChanged(loggedIn: firebase.User) {
+    if (!loggedIn) {
+      this.router.navigate(["/"]);
+    }
+  }
+
+  private userChanged(userData: UserData) {
+    this.originalUserData = userData;
+    if (userData) {
+
+      // Clear form by removing ecards and resetting
+      this.userForm.setControl('ecards', new FormArray([]));
+      this.userForm.reset();
+
+      this.userForm.setValue({
+        firstname: userData.firstname,
+        surname: userData.surname,
+        club: userData.club,
+        nationality: userData.nationality,
+        nationalId: userData.nationalId,
+        autoFind: userData.autoFind,
+        ecards: [],
       });
-   }
 
-   ngOnInit() {
-      // monitor login/out
-      this.afAuth.authState.subscribe(loggedIn => this.loginChanged(loggedIn));
-
-      this.userdata.getUser().subscribe(userData => this.userChanged(userData));
-
-      const t = this.userForm.controls["ecardEmit"].value;
-   }
-
-   async loginChanged(loggedIn: firebase.User) {
-      if (!loggedIn) {
-         this.router.navigate(["/"]);
+      for (const ecard of userData.ecards) {
+        this._ecardsControl().push(this._createEcard(ecard.id, ecard.type));
       }
-   }
+    }
+  }
 
-   userChanged(userData) {
-      this.originalUserData = userData;
-      if (userData) {
-         this.userForm.reset(userData);
+  private _createEcard(id: string, type: string): FormGroup {
+    return this.formBuilder.group({
+      id: id,
+      type: type,
+    });
+  }
+
+  addEcard(): void {
+    this._ecardsControl().push(this._createEcard('', ''));
+  }
+
+  removeEcard(i: number) {
+    // remove address from the list
+    this._ecardsControl().removeAt(i);
+  }
+
+
+  async save() {
+
+    let updatedUserData: UserData = null;
+
+    this.busy = true;
+
+    this.usd.updateDetails(this.userForm.value).pipe(
+      tap(userData => updatedUserData = userData),
+      switchMap(() => this.findUserResults(updatedUserData)),
+      map(foundResults => this.removeAlreadyInUserResults(foundResults, updatedUserData.results)),
+      switchMap((foundResults) => this.selectResultsToSave(foundResults)),
+      switchMap(selectedResults => this.saveCompetitorResults(selectedResults))
+    ).subscribe(
+      () => {
+        console.log('UserComponnet: User results saved');
+      },
+      (err) => {
+        console.log('UserComponnet: Error encountered saving user results' + err.message);
+        this.dialogService.message('Error saving user results', 'Error saving user results');
+      },
+      () => {
+        this.busy = false;
       }
-   }
+    );
+  }
 
-   async save() {
-      // Save the data
-      const updatedUserData = await this.userdata.updateDetails(
-         this.userForm.value
+  /** Returns found results that are not alreday in the users results based on ecardId and type  */
+  removeAlreadyInUserResults(foundResults: UserResult[], allResults: UserResult[]): UserResult[] {
+
+    for (const userResult of allResults) {
+      foundResults = foundResults.filter(found => {
+        const duplicate =
+          userResult.event.key === found.event.key &&
+          userResult.ecardId === found.ecardId;
+        return !duplicate;
+      });
+    }
+    return (foundResults);
+  }
+
+  /** Saves all competitor results emiting a value when all have been saved. */
+  saveCompetitorResults(userResults: UserResult[]): Observable<void> {
+    const requests: Observable<void>[] = [];
+    for (const found of userResults) {
+      requests.push(this.usd.addResult(found));
+    }
+
+    return Observable.forkJoin(requests).map(() => { });
+  }
+
+  /** Displays dialog with user results found and returns the results the user has selected */
+  selectResultsToSave(foundResults: UserResult[]): Observable<UserResult[]> {
+    if (foundResults.length > 0) {
+      const dialogRef = this.dialog.open(ResultsFoundDialogComponent, { width: '300px', data: foundResults });
+      return dialogRef.afterClosed();
+    } else {
+      return Observable.of([]);
+    }
+  }
+
+  /** Finds results based on any unchanged field.
+   *  Matches based on ecard
+   */
+  async findUserResults(updatedUser: UserData): Promise<UserResult[]> {
+    const originalUser = this.originalUserData;
+    let resultsFound: Array<UserResult> = [];
+
+    // Find results for any ecards that have changed.
+    for (const ecard of updatedUser.ecards) {
+      if (!originalUser || !originalUser.ecards.find(origEcard => _.isEqual(ecard, origEcard))) {
+        resultsFound = resultsFound.concat(await this.usd.findUserResults(ecard));
+      }
+    }
+
+    /** TO DO do we want to search by ecard as well?
+    if (
+      !originalUser ||
+      originalUser.firstName !== updatedUser.firstName ||
+      originalUser.lastName !== updatedUser.lastName ||
+      originalUser.club !== updatedUser.club
+    ) {
+      resultsFound = resultsFound.concat(
+        await this.cds.searchResultsByName(
+          updatedUser.firstName,
+          updatedUser.lastName,
+          updatedUser.club
+        )
       );
+    } */
 
-      let foundResults = await this.findUserResults(updatedUserData);
+    // Remove duplicated from found results as may have been found for ecard and name
+    Utils.removeDuplicates(resultsFound);
 
-      // Remove any results already in the users results
-      for (const userResult of updatedUserData.results) {
-         foundResults = foundResults.filter(found => {
-            const duplicate =
-               userResult.event.key === found.eventKey &&
-               userResult.ecardId === found.ecardId;
-            return !duplicate;
-         });
-      }
+    return resultsFound;
+  }
 
-      // Display list of results to the user for them to add
-      if (foundResults.length > 0) {
-        foundResults = this.displayFoundResults(foundResults);
-      }
-
-      //  Finally create competitor results for each result found. s
-      for (const found of foundResults) {
-           // get the event
-         let oevent: OEvent;
-         let comp: Competitor;
-         let user: UserData;
-
-         this.es.getEvent(found.eventKey).pipe(
-            map( oevent1 => oevent = oevent1),
-            switchMap( (oevent1) => {
-                return this.rs.downloadResultsFile(oevent1);
-           }),
-           switchMap( (file) => {
-               const results = this.rs.parseSplits(file);
-               comp = results.findCompetitorByECard(found.ecardId);
-
-               return this.userdata.getUser();
-           }),
-           map( user1 => (user = user1)
-
-           )). catch( error => {
-            return Rx.Observable.of(3);
-          });
-           .switch( (user) => {
-             this.userdata.addResult(user, comp, oevent ).then( () => {
-
-             });
-           })
-           .catch(error => {
-            return Rx.Observable.of(3);
-          });
-        }
-
-   }
-
-   displayFoundResults(foundResults:  CompetitorSearchData[]): CompetitorSearchData[] {
-       // TODO to implement
-       return [];
-   }
-
-   /** Finds results based on any unchanged field.
-    * Matches based on ecard and first name/surname/club
-    */
-   async findUserResults(
-      updatedUser: UserData
-   ): Promise<CompetitorSearchData[]> {
-      const originalUser = this.originalUserData;
-      let resultsFound: Array<CompetitorSearchData> = [];
-
-      // Find by ecard if it has changed
-      if (!originalUser || originalUser.ecardEmit !== updatedUser.ecardEmit) {
-         resultsFound = resultsFound.concat(
-            await this.cds.searchResultsByECard(updatedUser.ecardEmit)
-         );
-      }
-
-      if (!originalUser || originalUser.ecardSI !== updatedUser.ecardSI) {
-         resultsFound = resultsFound.concat(
-            await this.cds.searchResultsByECard(updatedUser.ecardSI)
-         );
-      }
-
-      if (
-         !originalUser ||
-         originalUser.firstName !== updatedUser.firstName ||
-         originalUser.lastName !== updatedUser.lastName ||
-         originalUser.club !== updatedUser.club
-      ) {
-         resultsFound = resultsFound.concat(
-            await this.cds.searchResultsByName(
-               updatedUser.firstName,
-               updatedUser.lastName,
-               updatedUser.club
-            )
-         );
-      }
-
-      // Remove duplicated from found results as may have been found for ecard and name
-      Utils.removeDuplicates(resultsFound);
-
-      return resultsFound;
-   }
-
-   createECard(): FormGroup {
-      return this.formBuilder.group({
-         id: "",
-         type: ""
-      });
-   }
-
-   addEcard() {}
-
-   removeECard() {}
+  canDeactivate(): boolean {
+    return !this.userForm.dirty;
+  }
 }

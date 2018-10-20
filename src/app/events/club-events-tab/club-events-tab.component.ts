@@ -18,13 +18,17 @@ export class ClubEventsTabComponent implements OnInit {
    clubNationalityFilter = new BehaviorSubject("");
    clubNameFilter = new BehaviorSubject("");
 
+   loading: Observable<boolean>;
+
    clubs$: Observable<Club[]> = undefined;
    clubEvents: Array<OEvent> = [];
 
    grades = EventGrades.grades;
    nations = Nations.getNations();
 
-   constructor(private es: EventService) {}
+   constructor(private es: EventService) {
+         this.loading = this.es.loading;
+   }
 
    ngOnInit() {
       // Club filter

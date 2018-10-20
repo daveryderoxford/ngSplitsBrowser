@@ -9,7 +9,5 @@ describe('PaganationService', () => {
     });
   });
 
-  it('should be created', inject([PaganationService], (service: PaganationService) => {
-    expect(service).toBeTruthy();
-  }));
+
 });

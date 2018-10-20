@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Component({
   selector: 'app-recover',
@@ -34,7 +34,7 @@ export class RecoverComponent implements OnInit {
       await auth.sendPasswordResetEmail(emailAddress);
     } catch (err) {
       console.log('RecoverComponent: Error requesting password reset for email');
-      this.error = 'Error requesting password reset for email;'
+      this.error = 'Error requesting password reset for email';
     }
   }
 }

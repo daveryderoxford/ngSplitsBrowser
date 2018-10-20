@@ -1,13 +1,12 @@
-import { Injectable } from "@angular/core";
-import { AngularFirestore } from "angularfire2/firestore";
-import { AngularFireStorage } from 'angularfire2/storage';
-import { Competitor, Course, CourseClass, Results, InvalidData } from "./model";
-import { BehaviorSubject, Observable } from "rxjs/Rx";
-import { OEvent } from "../model/oevent";
 import { HttpClient } from "@angular/common/http";
-import { parseEventData } from "./import";
-import { exceptionGuard } from "@firebase/database/dist/src/core/util/util";
+import { Injectable } from "@angular/core";
+import { AngularFirestore } from "@angular/fire/firestore";
+import { AngularFireStorage } from '@angular/fire/storage';
+import { OEvent } from "app/model/oevent";
 import { switchMap, tap } from "rxjs/operators";
+import { BehaviorSubject, Observable } from "rxjs/Rx";
+import { parseEventData } from "./import";
+import { Competitor, Course, CourseClass, InvalidData, Results } from "./model";
 
 /** Holds results selection state.
  * Selecting an event will load its results
@@ -24,12 +23,31 @@ export class ResultsSelectionService {
   private selectedCompetitors$: BehaviorSubject<Array<Competitor>> = new BehaviorSubject([]);
   private selectedControl$: BehaviorSubject<string> = new BehaviorSubject(null);
   private selectedCourse$: BehaviorSubject<Course> = new BehaviorSubject(null);
-  private selectedClasses$: BehaviorSubject<Array<CourseClass>> = new BehaviorSubject([]);
+  private selectedClass$: BehaviorSubject<CourseClass> = new BehaviorSubject(null);
+
+  // private displayedCompetitors$: BehaviorSubject<Array<Competitor>> = new BehaviorSubject([]);
+  private courseCompetitorsDisplayed$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+  //  Displayed competitors depends on te course, class and display option selected
+  // tslint:disable-next-line:max-line-length
+  private displayedCompetitors$ = Observable.combineLatest(this.selectedCourse$, this.selectedClass$, this.courseCompetitorsDisplayed$, (course: Course, oclass: CourseClass, displayCourse: boolean) => {
+    const comp = displayCourse ? course.competitors : oclass.competitors;
+    return comp;
+  });
 
   constructor(private afs: AngularFirestore,
     private storage: AngularFireStorage,
     private http: HttpClient
   ) { }
+
+  loadResults(event: OEvent): Observable<Results> {
+    const ret = this.downloadResultsFile(event)
+      .map(text => {
+        const results = this.parseSplits(text);
+        return results;
+      });
+    return ret;
+  }
 
   /**
    * Selects an event to view.
@@ -43,46 +61,36 @@ export class ResultsSelectionService {
       throw new InvalidData('ResultsSelection: Event not specified');
     }
 
-    const ret = this.downloadResultsFile(event)
-      .switchMap((text) => {
-        const results = this.parseSplits(text);
-        this.results$.next(results);
-        this.selectedCompetitors$.next([]);
+    const ret = this.loadResults(event).subscribe((results) => {
+      this.results$.next(results);
 
-        //  Select first course by default
-        if (results.courses.length > 0) {
-           this.selectedCourse$.next(results.courses[0]);
-        } else {
-          this.selectedCourse$.next(null);
-        }
+      // Clear selected competitors and control and set first class
+      this.selectedCompetitors$.next([]);
+      this.selectedControl$.next(null);
 
-        if (results.classes.length > 0) {
-          this.selectedClasses$.next([results.classes[0]]);
-        } else {
-          this.selectedClasses$.next([]);
-        }
+      if (results.classes.length > 0) {
+        this.selectClass(results.classes[0]);
+      } else {
+        this.selectedClass$.next(null);
+      }
 
-        this.selectedControl$.next(null);
+    });
 
-        this.selectedClasses$.next([]);
-        return this.results$.asObservable();
-      });
-
-    return ret;
+    return this.results$.asObservable();
   }
 
   /** Selects event based on the event key, loading the event results */
   setSelectedEventByKey(key: string): Observable<Results> {
     const obs = this.afs.doc<OEvent>("/events/" + key).valueChanges().pipe(
-        tap ( evt => {
-            if (evt) {
-              console.log("ResultsSelectionService: Loading Event for key: " + evt.key);
-            } else {
-              console.log("ResultsSelectionService::  Event not found. key:" + evt.key);
-            }
-        }),
-        switchMap( evt => this.setSelectedEvent(evt) )
-      );
+      tap(evt => {
+        if (evt) {
+          console.log("ResultsSelectionService: Loading Event for key: " + evt.key);
+        } else {
+          console.log("ResultsSelectionService::  Event not found. key:" + evt.key);
+        }
+      }),
+      switchMap(evt => this.setSelectedEvent(evt))
+    );
     return obs;
   }
 
@@ -111,7 +119,7 @@ export class ResultsSelectionService {
   }
 
   get selectedCompetitors(): Observable<Competitor[]> {
-    return this.selectedCompetitors$.asObservable();
+    return this.selectedCompetitors$.asObservable().distinctUntilChanged();
   }
 
   selectControl(code: string) {
@@ -119,10 +127,15 @@ export class ResultsSelectionService {
   }
 
   get selectedControl(): Observable<string> {
-    return this.selectedControl$.asObservable();
+    return this.selectedControl$.asObservable().distinctUntilChanged();
   }
 
   selectCourse(course: Course) {
+    // If course has changed then reset the selected competitors amd controls
+    if (course !== this.selectedCourse$.value) {
+      this.deselectAllCompetitors();
+      this.selectControl(null);
+    }
     this.selectedCourse$.next(course);
   }
 
@@ -131,20 +144,25 @@ export class ResultsSelectionService {
   }
 
   selectClass(courseclass: CourseClass) {
-    const oclasses = this.selectedClasses$.getValue().concat(courseclass);
-    oclasses.sort((a, b) => a.name.localeCompare(b.name));
-    this.selectedClasses$.next(oclasses);
+    this.selectCourse(courseclass.course);
+    this.selectedClass$.next(courseclass);
   }
 
-  /** Remove the specified course class */
-  removeClass(courseclass: CourseClass) {
-    const competitors = this.selectedClasses$.getValue();
-    this.selectedClasses$.next(competitors.filter(e => e !== courseclass));
+  /** Return observable of selected courseclasses */
+  get selectedClass(): Observable<CourseClass> {
+    return this.selectedClass$.asObservable().distinctUntilChanged();
   }
 
-  /** Return observable if selected courseclasses */
-  get selectedClasses(): Observable<CourseClass[]> {
-    return this.selectedClasses$.asObservable();
+  displayAllCourseCompetitors(showCourse: boolean) {
+    this.courseCompetitorsDisplayed$.next(showCourse);
+  }
+
+  get courseCompetitorsDisplayed(): Observable<boolean> {
+    return this.courseCompetitorsDisplayed$.distinctUntilChanged();
+  }
+
+  get displayedCompetitors(): Observable<Competitor[]> {
+    return this.displayedCompetitors$;
   }
 
   /** Parse splits file with logging */

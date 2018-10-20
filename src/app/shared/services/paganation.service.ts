@@ -1,12 +1,12 @@
 /** Service to paganate Firebase queries */
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from 'angularfire2/firestore';
-import * as firebase from 'firebase';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import * as firebase from 'firebase/app';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/take';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable } from 'rxjs/Observable';
 
 export interface QueryConfig {
   path: string; //  path to collection
