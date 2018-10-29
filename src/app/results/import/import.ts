@@ -1,12 +1,12 @@
 
 // Results imnput parser.
 
-import { parseIOFXMLEventData } from "./iof-xml-reader";
-import { parseOEEventData } from "./oe-reader";
+import { Results } from "../model";
+import { parseTripleColumnEventData } from "./alternative-cvs-reader";
 import { parseCSVEventData } from "./cvs-reader";
 import { parseHTMLEventData } from "./html-reader";
-import { parseTripleColumnEventData } from "./alternative-cvs-reader";
-import { Results } from "../model";
+import { parseIOFXMLEventData } from "./iof-xml-reader";
+import { parseOEEventData } from "./oe-reader";
 
 // All the parsers for parsing event data that are known about.
 const PARSERS = [
@@ -38,4 +38,4 @@ export function parseEventData(data: string): Results | null {
 
     // If we get here, none of the parsers succeeded.
     return null;
-};
+}

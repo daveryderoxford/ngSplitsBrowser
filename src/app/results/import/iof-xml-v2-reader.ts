@@ -1,10 +1,9 @@
 
 import * as $ from "jquery";
-import * as d3 from "d3";
-
 import { isUndefined } from "util";
 import { InvalidData, TimeUtilities, WrongFileFormat } from "../model";
 import { CourseDeatils, IOFXMLReader } from "./iof-xml-v3-reader";
+
 
 
 // Object that contains various functions for parsing bits of data from
@@ -148,6 +147,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {String} The competitors date of birth, as a string.
     */
     readDateOfBirth(element) {
+        // tslint:disable-next-line:radix
         return Number.parseInt($("> Person > BirthDate > Date", element).text());
     }
 

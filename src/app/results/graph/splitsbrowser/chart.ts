@@ -2,14 +2,20 @@
 
 import * as d3 from "d3";
 import * as $ from "jquery";
-
-import { Lang } from "./lang";
+import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
-import { TimeUtilities, Competitor, CourseClassSet, sbTime, Results } from "../../model";
-
 import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
-import { FastestSplitsPopupData, SplitsPopupData } from "./splits-popup-data";
+import { Lang } from "./lang";
+import { SplitsPopupData } from "./splits-popup-data";
+
+interface ChartDisplayData {
+    chartData: ChartData;
+    eventData: Results;
+    courseClassSet: CourseClassSet;
+    referenceCumTimes: sbTime[];
+    fastestCumTimes: sbTime[];
+}
 
 interface ChartData {
     chartData: ChartType;
@@ -24,8 +30,7 @@ interface ChartData {
 
 }
 
-
-// 'Imports'.
+// Local shorthand functions.
 const formatTime = TimeUtilities.formatTime;
 const getMessage = Lang.getMessage;
 
@@ -1249,7 +1254,8 @@ Chart.prototype.sortReferenceCumTimes = function (): void {
 *                                    certain statistics are visible.
 * @sb-param {Object} chartType - The type of chart being drawn.
 */
-Chart.prototype.drawChart = function (data, selectedIndexes: Array<number>, visibleStatistics: Array<boolean>, chartType: ChartType) {
+Chart.prototype.drawChart = function (data: ChartDisplayData, selectedIndexes: Array<number>,
+                            visibleStatistics: Array<boolean>, chartType: ChartType) {
     const chartData: ChartData = data.chartData;
     this.numControls = chartData.numControls;
     this.numLines = chartData.competitorNames.length;

@@ -1,11 +1,9 @@
-import { InvalidData } from "./exception";
-import { isNotNullNorNaN } from "./util";
-import { sbTime } from "./time";
 import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
+import { InvalidData } from "./exception";
 import { Results } from "./results";
-
-
+import { sbTime } from "./time";
+import { isNotNullNorNaN } from "./util";
 
 interface FirstNonAssendingIndices {
     first: number;
@@ -86,7 +84,7 @@ static transferCompetitorData(resultsData: Results): void {
      * Construct a Repairer, for repairing some data.
      * @constructor
     */
-    private constructor() { };
+    private constructor() { }
 
    /**
     * Remove, by setting to NaN, any cumulative time that is equal to the
@@ -103,7 +101,7 @@ static transferCompetitorData(resultsData: Results): void {
                 lastCumTime = cumTimes[index];
             }
         }
-    };
+    }
 
     /**
     * Remove from the cumulative times given any individual times that cause
@@ -177,7 +175,7 @@ static transferCompetitorData(resultsData: Results): void {
         }
 
         return cumTimes;
-    };
+    }
 
     /**
     * Removes the finish cumulative time from a competitor if it is absurd.
@@ -197,7 +195,7 @@ static transferCompetitorData(resultsData: Results): void {
             cumTimes[cumTimes.length - 1] = NaN;
             this.madeAnyChanges = true;
         }
-    };
+    }
 
     /**
     * Attempts to repair the cumulative times for a competitor.  The repaired
@@ -218,7 +216,7 @@ static transferCompetitorData(resultsData: Results): void {
         }
 
         competitor.setRepairedCumulativeTimes(cumTimes);
-    };
+    }
 
     /**
     * Attempt to repair all of the data within a course-class.
@@ -234,7 +232,7 @@ static transferCompetitorData(resultsData: Results): void {
         if (this.madeAnyChanges) {
             courseClass.recordHasDubiousData();
         }
-    };
+    }
 
     /**
     * Attempt to carry out repairs to the data in an event.
@@ -244,7 +242,7 @@ static transferCompetitorData(resultsData: Results): void {
         resultsData.classes.forEach(function (courseClass) {
             this.repairCourseClass(courseClass);
         }, this);
-    };
+    }
 }
 
 

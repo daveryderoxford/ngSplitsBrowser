@@ -19,22 +19,21 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 // tslint:disable:max-line-length
-import {} from "jasmine";
-import {} from "jasmine-expect";
-
-import {Course} from "./course";
-import {CourseClass} from "./course-class";
-import {TestSupport} from "../test-support.spec";
+import { Competitor } from "app/results/model";
+import { } from "jasmine";
+import { TestSupport } from "../test-support.spec";
+import { Course } from "./course";
+import { CourseClass } from "./course-class";
 
 const fromSplitTimes = TestSupport.fromSplitTimes;
 
 fdescribe("Course", () => {
 
-    function getCompetitor1() {
+    function getCompetitor1(): Competitor {
         return fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106]);
     }
 
-    function getCompetitor2() {
+    function getCompetitor2(): Competitor {
         return fromSplitTimes(2, "John Smith", "ABC", 10 * 3600, [65, 221, 184, 100]);
     }
 

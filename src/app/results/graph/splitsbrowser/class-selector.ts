@@ -1,12 +1,10 @@
 
 // file class-selector.js
 
-
 import * as d3 from "d3";
 import * as $ from "jquery";
-
-import { Lang } from "./lang";
 import { InvalidData } from "../../model";
+import { Lang } from "./lang";
 
 const getMessage = Lang.getMessage;
 

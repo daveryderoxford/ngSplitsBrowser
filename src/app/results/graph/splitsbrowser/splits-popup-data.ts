@@ -1,7 +1,5 @@
-
-
+import { Course, CourseClassSet, Results, TimeUtilities } from "../../model";
 import { Lang } from "./lang";
-import { TimeUtilities, CourseClassSet, Course, Results } from "../../model";
 
 export interface FastestSplitsPopupData {
     title: string;
@@ -12,9 +10,20 @@ export interface FastestSplitsPopupData {
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
+export interface NextControlDataArr {
+    course: Course;
+    nextControls: string[];
+}
+
+export interface NextControlDataStr {
+    course: Course;
+    nextControls: string;
+}
+
+
 export class SplitsPopupData {
 
-    constructor(public maxFastestSplits: number, public raceGraphWindow: number) {}
+    constructor(public maxFastestSplits: number, public raceGraphWindow: number) { }
 
     /**
     * Returns the fastest splits to a control.
@@ -37,7 +46,7 @@ export class SplitsPopupData {
             data: ret,
             placeholder: Lang.getMessage("SelectedClassesPopupPlaceholder")
         };
-    };
+    }
 
     /**
     * Returns the fastest splits for the currently-shown leg.  The list
@@ -71,7 +80,7 @@ export class SplitsPopupData {
             };
         });
         return { title: title, data: data, placeholder: null };
-    };
+    }
 
     /**
     * Returns an object containing an array of the competitors visiting a
@@ -119,7 +128,7 @@ export class SplitsPopupData {
             { "$$START$$": formatTime(intervalStart), "$$END$$": formatTime(intervalEnd), "$$CONTROL$$": controlName });
 
         return { title: title, data: competitorData, placeholder: getMessage("NoNearbyCompetitors") };
-    };
+    }
 
     /**
     * Compares two course names.
@@ -158,7 +167,7 @@ export class SplitsPopupData {
     * @sb-param {Array} nextControls - Array of next-control information objects.
     * @sb-return {String} Next-control information containing joined-up control names.
     */
-    private tidyNextControlsList(nextControls: Array<any>) {
+    private tidyNextControlsList(nextControls: Array<any>): NextControlDataStr[] {
         return nextControls.map((nextControlRec) => {
             const codes = nextControlRec.nextControls.slice(0);
             if (codes[codes.length - 1] === Course.FINISH) {
@@ -178,7 +187,8 @@ export class SplitsPopupData {
     * @sb-param {Number} controlIndex - The index of the control.
     * @sb-return {Object} Next-control data.
     */
-    public getNextControlData(course: Course, eventData: Results, controlIndex: number) {
+    // tslint:disable-next-line:max-line-length
+    public getNextControlData(course: Course, eventData: Results, controlIndex: number): { thisControl: string, nextControls: NextControlDataStr[] } {
 
         const controlIdx = Math.min(controlIndex, course.controls.length);
         const controlCode = course.getControlCode(controlIdx);
@@ -198,5 +208,5 @@ export class SplitsPopupData {
             thisControl: thisControlName,
             nextControls: this.tidyNextControlsList(nextControls)
         };
-    };
+    }
 }

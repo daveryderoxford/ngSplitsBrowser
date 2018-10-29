@@ -1,18 +1,15 @@
 // file query-string.js
 
 import * as d3 from "d3";
-import * as $ from "jquery";
+import { Competitor, CourseClassSet, Results } from "../../model";
+import { ChartType, ChartTypeClass } from "./chart-types";
 
-import { Lang } from "./lang";
-import { ChartTypeClass, ChartType } from "./chart-types";
-import { Results, CourseClassSet, Competitor } from "../../model";
-
-type ChartCompareTo = "TotalTime"| "SplitTime" | "BehindFastest" | "TimeLoss";
+type ChartCompareTo = "TotalTime" | "SplitTime" | "BehindFastest" | "TimeLoss";
 
 export interface ResultsURLOptions {
     classes: Array<number>;
     chartType: ChartType;
-    compareWith: boolean | null | {index: number; runner: Competitor};
+    compareWith: boolean | null | { index: number; runner: Competitor };
     selected: Array<number> | null;
     stats: ChartCompareTo; // from readSelectedStatistics(queryString),
     showOriginal: boolean;
@@ -140,7 +137,7 @@ const BUILTIN_COMPARISON_TYPES = ["Winner", "FastestTime", "FastestTimePlus5",
 * @sb-return {Object|null} Selected comparison type, or null if not
 *     recognised.
 */
-function readComparison(queryString: string, courseClassSet: CourseClassSet): boolean | null | {index: number, runner: Competitor} {
+function readComparison(queryString: string, courseClassSet: CourseClassSet): boolean | null | { index: number, runner: Competitor } {
     const comparisonMatch = COMPARE_WITH_REGEXP.exec(queryString);
     if (comparisonMatch === null) {
         return null;

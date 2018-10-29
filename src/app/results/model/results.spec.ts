@@ -20,14 +20,12 @@
  */
 // tslint:disable:max-line-length
 import { } from "jasmine";
-import { } from "jasmine-expect";
-
-import { Results } from "./results";
-import { Competitor } from "./competitor";
-import { CourseClass } from "./course-class";
-import { Course } from "./course";
-import { isNotNull } from "./util";
 import { TestSupport } from "../test-support.spec";
+import { Competitor } from "./competitor";
+import { Course } from "./course";
+import { CourseClass } from "./course-class";
+import { Results } from "./results";
+import { isNotNull } from "./util";
 
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 const fromSplitTimes = TestSupport.fromSplitTimes;

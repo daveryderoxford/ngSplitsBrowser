@@ -24,10 +24,9 @@
 import * as $ from "jquery";
 
 import { } from "jasmine";
-import { } from "jasmine-expect";
 
-import { isNaNStrict } from "./model/util"
-import { Competitor, sbTime } from "./model"
+import { isNaNStrict } from "./model/util";
+import { Competitor, sbTime } from "./model";
 import { FirstnameSurname } from "./model/competitor";
 
 export class TestSupport {
@@ -127,5 +126,5 @@ export class TestSupport {
 
         return ( Competitor.fromCumTimes(order, name, club, startTime, cumTimes) );
 
-    };
+    }
 }

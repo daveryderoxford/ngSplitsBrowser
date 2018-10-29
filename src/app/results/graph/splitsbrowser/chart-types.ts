@@ -11,9 +11,18 @@ export interface ChartType {
     indexesAroundDubiousTimesFunc: any;
 }
 
+export interface ChartTypes {
+    SplitsGraph: ChartType;
+    RaceGraph: ChartType;
+    PositionAfterLeg: ChartType;
+    SplitPosition: ChartType;
+    PercentBehind: ChartType;
+    ResultsTable: ChartType;
+}
+
 export class ChartTypeClass {
 
-    public static chartTypes = {
+    public static chartTypes: ChartTypes = {
         SplitsGraph: {
             nameKey: "SplitsGraphChartType",
             dataSelector: (comp, referenceCumTimes) => {
@@ -50,7 +59,7 @@ export class ChartTypeClass {
         },
         SplitPosition: {
             nameKey: "SplitPositionChartType",
-            dataSelector:  (comp) => { return comp.splitRanks; },
+            dataSelector: (comp) => { return comp.splitRanks; },
             skipStart: true,
             yAxisLabelKey: "PositionYAxisLabel",
             isRaceGraph: false,

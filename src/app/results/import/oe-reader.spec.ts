@@ -20,9 +20,7 @@
  */
 // tslint:disable:max-line-length
 import { } from "jasmine";
-import { } from "jasmine-expect";
-
-import { CourseClass, Course, Results, TimeUtilities } from "../model";
+import { Course, CourseClass, Results, TimeUtilities } from "../model";
 import { parseOEEventData } from "./oe-reader";
 
 const parseTime = TimeUtilities.parseTime;
@@ -50,11 +48,20 @@ const HEADER_60 = "OE0014;Stno;XStno;Chipno;Database Id;Surname;First name;YB;S;
 // Template for the row data that precedes the controls of the 60-column variation.
 const ROW_TEMPLATE_60 = "0;1;2;ecard;4;surname;forename;yearOfBirth;gender;9;nonComp;startTime;12;time;classifier;15;16;17;noOfClub;19;club;21;22;23;24;25;className;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;course;distance;climb;numControls;placing;startPunch;finish";
 
-const ALL_FORMATS = [
-    { name: "46-column", header: HEADER_46, template: ROW_TEMPLATE_46, combineName: false, hasGender: true },
-    { name: "44-column", header: HEADER_44, template: ROW_TEMPLATE_44, combineName: true, hasGender: false },
-    { name: "60-column", header: HEADER_60, template: ROW_TEMPLATE_60, combineName: false, hasGender: true }
-];
+interface OEFormat {
+    name: string;
+    header: string;
+    template: string;
+    combineName: boolean;
+    hasGender: boolean;
+}
+
+const ROW_FORMAT_46 =  { name: "46-column", header: HEADER_46, template: ROW_TEMPLATE_46, combineName: false, hasGender: true };
+const ROW_FORMAT_44 = { name: "44-column", header: HEADER_44, template: ROW_TEMPLATE_44, combineName: true, hasGender: false };
+const ROW_FORMAT_60 = { name: "60-column", header: HEADER_60, template: ROW_TEMPLATE_60, combineName: false, hasGender: true };
+
+const ALL_FORMATS: OEFormat[] = [ ROW_FORMAT_46 , ROW_FORMAT_44, ROW_FORMAT_60];
+
 
 /**
 * Generates a row of data for an OE-format file.
@@ -66,7 +73,7 @@ const ALL_FORMATS = [
 *     the row.
 * @return {String} Row of data.
 */
-function generateRow(data, controls: Array<any>, template: string): string {
+function generateRow(data: OECompetitorData, controls: Control[], template: string): string {
     if (typeof template === "undefined") {
         throw new Error("No template given");
     }
@@ -85,11 +92,34 @@ function generateRow(data, controls: Array<any>, template: string): string {
     return row + "\r\n";
 }
 
+interface OECompetitorData {
+    forename: string;
+    surname: string;
+    compno: string;
+    ecard: string;
+    club: string;
+    noOfClub: string;
+    startPunch: string;
+    startTime: string;
+    time: string;
+    finish: string;
+    className: string;
+    course: string;
+    distance: string;
+    climb: string;
+    numControls: string;
+    placing: string | number;
+    nonComp: string;
+    classifier: string;
+    gender: string;
+    yearOfBirth: string;
+}
+
 /**
 * Returns data for a test competitor.
 * @return {Object} Test competitor data.
 */
-function getCompetitor1() {
+function getCompetitor1(): OECompetitorData {
     return {
         forename: "John",
         surname: "Smith",
@@ -118,7 +148,7 @@ function getCompetitor1() {
 * Returns data for a second test competitor.
 * @return {Object} Test competitor data.
 */
-function getCompetitor2() {
+function getCompetitor2(): OECompetitorData {
     return {
         forename: "Fred",
         surname: "Baker",
@@ -160,7 +190,7 @@ function getCompetitor2OnLongerCourse() {
 * Returns data for a third test competitor.
 * @return {Object} Test competitor data.
 */
-function getCompetitor3() {
+function getCompetitor3(): OECompetitorData {
     return {
         forename: "Bill",
         surname: "Jones",
@@ -185,11 +215,16 @@ function getCompetitor3() {
     };
 }
 
+interface Control {
+    code: string;
+    time: string;
+}
+
 /**
 * Returns an array of test controls for competitor 1.
 * @return {Array} Test controls data.
 */
-function getControls1() {
+function getControls1(): Control[] {
     return [{ code: "208", time: "01:50" }, { code: "227", time: "03:38" }, { code: "212", time: "06:02" }];
 }
 
@@ -197,7 +232,7 @@ function getControls1() {
 * Returns an array of test controls for competitor 1, with one blank time.
 * @return {Array} Test controls data.
 */
-function getControls1WithBlankTimeForLast() {
+function getControls1WithBlankTimeForLast(): Control[] {
     return [{ code: "208", time: "01:50" }, { code: "227", time: "03:38" }, { code: "212", time: "" }];
 }
 
@@ -205,7 +240,7 @@ function getControls1WithBlankTimeForLast() {
 * Returns an array of test controls for competitor 1, with a non-numeric control code.
 * @return {Array} Test controls data.
 */
-function getControls1WithNonNumericControlCode() {
+function getControls1WithNonNumericControlCode(): Control[] {
     return [{ code: "208", time: "01:50" }, { code: "ST2", time: "03:38" }, { code: "212", time: "06:02" }];
 }
 
@@ -214,7 +249,7 @@ function getControls1WithNonNumericControlCode() {
 * missing.
 * @return {Array} Test controls data.
 */
-function getControls1AllMissed() {
+function getControls1AllMissed(): Control[] {
     return [{ code: "208", time: "-----" }, { code: "227", time: "-----" }, { code: "212", time: "-----" }];
 }
 
@@ -223,7 +258,7 @@ function getControls1AllMissed() {
 * with blank code and missing time.
 * @return {Array} Test controls data.
 */
-function getControls1WithBlankCodeAndMissingTimeAtTheEnd() {
+function getControls1WithBlankCodeAndMissingTimeAtTheEnd(): Control[] {
     return [{ code: "208", time: "01:50" }, { code: "227", time: "03:38" }, { code: "212", time: "06:02" }, { code: "", time: "-----" }];
 }
 
@@ -232,7 +267,7 @@ function getControls1WithBlankCodeAndMissingTimeAtTheEnd() {
 * with blank code and missing time, followed by an additional control.
 * @return {Array} Test controls data.
 */
-function getControls1WithBlankCodeAndMissingTimeAtTheEndFollowedByAdditionalControl() {
+function getControls1WithBlankCodeAndMissingTimeAtTheEndFollowedByAdditionalControl(): Control[] {
     return [{ code: "208", time: "01:50" }, { code: "227", time: "03:38" }, { code: "212", time: "06:02" }, { code: "", time: "-----" }, { code: "223", time: "04:11" }];
 }
 
@@ -240,7 +275,7 @@ function getControls1WithBlankCodeAndMissingTimeAtTheEndFollowedByAdditionalCont
 * Returns an array of test controls for competitor 2.
 * @return {Array} Test controls data.
 */
-function getControls2() {
+function getControls2(): Control[] {
     return [{ code: "208", time: "02:01" }, { code: "227", time: "04:06" }, { code: "212", time: "06:37" }];
 }
 
@@ -248,7 +283,7 @@ function getControls2() {
 * Returns a longer list of test controls for competitor 2.
 * @return {Array} Test controls data.
 */
-function getLongerControls2() {
+function getLongerControls2(): Control[] {
     return [{ code: "208", time: "02:01" }, { code: "222", time: "04:06" }, { code: "219", time: "06:37" }, { code: "213", time: "09:10" }];
 }
 
@@ -256,7 +291,7 @@ function getLongerControls2() {
 * Returns an array of test controls for competitor 3.
 * @return {Array} Test controls data.
 */
-function getControls3() {
+function getControls3(): Control[] {
     return [{ code: "208", time: "01:48" }, { code: "227", time: "03:46" }, { code: "212", time: "05:59" }];
 }
 
@@ -307,7 +342,7 @@ fdescribe("Input.OE", () => {
     *     immediately before it is passed to the parser.  If not specified,
     *     no preprocessing is done.
     */
-    function generateData(format, competitors, preprocessor) {
+    function generateData(format: OEFormat, competitors, preprocessor?) {
         let text = format.header;
         competitors.forEach(function (comp) {
             let row = generateRow(comp[0], comp[1], format.template);
@@ -325,6 +360,9 @@ fdescribe("Input.OE", () => {
         return text;
     }
 
+    interface TestFunc {
+        (eventData: Results, format: OEFormat);
+    }
     /**
     * Calls a test function for the result of formatting the given competitor
     * data using all formats.  The data is expected to be parsed successfully.
@@ -336,8 +374,8 @@ fdescribe("Input.OE", () => {
     *     immediately before it is passed to the parser.  If not specified,
     *     no preprocessing is done. Optional
     */
-    function runTestOverAllFormats(competitors: Array<any>, testFunc: any, preprocessor?: any) {
-        ALL_FORMATS.forEach(function (format) {
+    function runTestOverAllFormats(competitors: any, testFunc: TestFunc, preprocessor?: any) {
+        ALL_FORMATS.forEach(function (format: OEFormat) {
             const text = generateData(format, competitors, preprocessor);
             const eventData = parseEventData(text);
             testFunc(eventData, format);
@@ -345,7 +383,7 @@ fdescribe("Input.OE", () => {
     }
 
     it("Can parse a string that contains a single competitor's data in all formats", () => {
-        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData, format) {
+        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData: Results, format: OEFormat) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
 
@@ -363,7 +401,7 @@ fdescribe("Input.OE", () => {
 
             const competitor = eventData.classes[0].competitors[0];
             expect(competitor.name).toEqual("John Smith", "Should read correct name");
-            expect(competitor.ecard).toEqual("9876", "Should read correct ecard");
+            expect(competitor.ecardId).toEqual("9876", "Should read correct ecard");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(competitor.startTime).toEqual(11 * 3600 + 27 * 60 + 45, "Should read correct start time");
             expect(competitor.yearOfBirth).toEqual(1984, "Should read correct year of birth");
@@ -488,7 +526,7 @@ fdescribe("Input.OE", () => {
     it("Can parse a string that contains a single competitor's data with blank code and missing time", () => {
         const competitor1 = getCompetitor1();
         competitor1.placing = "";
-        runTestOverAllFormats([[competitor1, getControls1WithBlankCodeAndMissingTimeAtTheEnd()]], function (eventData) {
+        runTestOverAllFormats([[competitor1, getControls1WithBlankCodeAndMissingTimeAtTheEnd()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
@@ -499,7 +537,7 @@ fdescribe("Input.OE", () => {
     it("Can parse a string that contains a single competitor's data with blank code and missing time followed by an additional control", () => {
         const competitor1 = getCompetitor1();
         competitor1.placing = "";
-        runTestOverAllFormats([[competitor1, getControls1WithBlankCodeAndMissingTimeAtTheEndFollowedByAdditionalControl()]], function (eventData) {
+        runTestOverAllFormats([[competitor1, getControls1WithBlankCodeAndMissingTimeAtTheEndFollowedByAdditionalControl()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
@@ -510,7 +548,7 @@ fdescribe("Input.OE", () => {
     it("Can parse a string ignoring a blank year of birth", () => {
         const competitor1 = getCompetitor1();
         competitor1.yearOfBirth = "";
-        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData) {
+        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData: Results) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -521,7 +559,7 @@ fdescribe("Input.OE", () => {
     it("Can parse a string ignoring an invalid year of birth", () => {
         const competitor1 = getCompetitor1();
         competitor1.yearOfBirth = "This is not a valid year";
-        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData) {
+        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData: Results) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -533,7 +571,7 @@ fdescribe("Input.OE", () => {
         const competitor1 = getCompetitor1();
         competitor1.forename = "Freda";
         competitor1.gender = "F";
-        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData, format) {
+        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData: Results, format: OEFormat) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -546,7 +584,7 @@ fdescribe("Input.OE", () => {
     it("Can parse a string that contains a single competitor's data ignoring a blank gender", () => {
         const competitor1 = getCompetitor1();
         competitor1.gender = "";
-        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData, format) {
+        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData: Results, format: OEFormat) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -559,7 +597,7 @@ fdescribe("Input.OE", () => {
     it("Can parse a string that contains a single competitor's data ignoring an invalid gender", () => {
         const competitor1 = getCompetitor1();
         competitor1.gender = "This is not a valid gender";
-        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData, format) {
+        runTestOverAllFormats([[competitor1, getControls1()]], function (eventData: Results, format: OEFormat) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -570,7 +608,7 @@ fdescribe("Input.OE", () => {
     });
 
     it("Can parse a string that contains a single competitor's data with LF line-endings", () => {
-        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData) {
+        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
@@ -582,7 +620,7 @@ fdescribe("Input.OE", () => {
     });
 
     it("Can parse a string that contains a single competitor's data with CR line-endings", () => {
-        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData) {
+        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData: Results) {
             expect(eventData.courses.length).toEqual(1, "There should be one course");
         }, function (eventDataStr) {
             return eventDataStr.replace(/\r\n/g, "\r");
@@ -590,17 +628,19 @@ fdescribe("Input.OE", () => {
     });
 
     it("Can parse a string that contains a single competitor's data in 'nameless' column-60 variation", () => {
-        const competitor1 = getCompetitor1();
-        competitor1.forename = "";
-        competitor1.surname = "";
-        competitor1.club = "";
-        competitor1.ecard = "";
-        competitor1.time = "";
-        competitor1.className = "";
-        competitor1.startTime = competitor1.startPunch;
-        competitor1.startPunch = "";
+        const OEComp1 = getCompetitor1();
+        OEComp1.forename = "";
+        OEComp1.surname = "";
+        OEComp1.club = "";
+        OEComp1.ecard = "";
+        OEComp1.time = "";
+        OEComp1.className = "";
+        OEComp1.startTime = OEComp1.startPunch;
+        OEComp1.startPunch = "";
 
-        const eventData = parseEventData(HEADER_60 + generateRow(competitor1, getControls1(), ROW_TEMPLATE_60));
+        const text = generateData(ROW_FORMAT_60, [[[OEComp1], getControls1()]] );
+        const eventData = parseEventData(text);
+
         expect(eventData.classes.length).toEqual(1, "There should be one class");
         expect(eventData.classes[0].name).toEqual("Test course", "Class should have same name as course");
         expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -609,14 +649,14 @@ fdescribe("Input.OE", () => {
         expect(eventData.courses[0].name).toEqual("Test course", "Course name should be correct");
 
         const competitor = eventData.classes[0].competitors[0];
-        expect(competitor.name).toEqual(competitor1.compno, "Should read competitor name as ID");
-        expect(competitor.club).toEqual(competitor1.noOfClub, "Should read club name as ID");
-        expect(competitor.startTime).toEqual(parseTime(competitor1.startTime), "Should read correct start time");
+        expect(competitor.name).toEqual(OEComp1.compno, "Should read competitor name as ID");
+        expect(competitor.club).toEqual(OEComp1.noOfClub, "Should read club name as ID");
+        expect(competitor.startTime).toEqual(parseTime(OEComp1.startTime), "Should read correct start time");
         expect(competitor.totalTime).toEqual(393, "Should read correct total time");
     });
 
     it("Can parse a string that contains a single competitor's data with commas as column separators", () => {
-        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData) {
+        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
         }, function (eventDataStr) {
@@ -625,7 +665,7 @@ fdescribe("Input.OE", () => {
     });
 
     it("Can parse a string that contains a single competitor's data with tabs as column separators", () => {
-        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData) {
+        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
         }, function (eventDataStr) {
@@ -634,7 +674,7 @@ fdescribe("Input.OE", () => {
     });
 
     it("Can parse a string that contains a single competitor's data with backslash characters as column separators", () => {
-        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData) {
+        runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
         }, function (eventDataStr) {
@@ -722,7 +762,7 @@ fdescribe("Input.OE", () => {
         comp.placing = "mp";
         const controls = getControls1();
         controls[1].time = "-----";
-        runTestOverAllFormats([[comp, controls]], function (eventData) {
+        runTestOverAllFormats([[comp, controls]], function (eventData: Results) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -737,7 +777,7 @@ fdescribe("Input.OE", () => {
         const comp = getCompetitor1();
         comp.surname = "Smith n/c";
         comp.placing = "n/c";
-        runTestOverAllFormats([[comp, getControls1()]], function (eventData) {
+        runTestOverAllFormats([[comp, getControls1()]], function (eventData: Results) {
             expect(eventData instanceof Results).toBe(true, "Result of parsing should be an Event object");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
@@ -756,7 +796,7 @@ fdescribe("Input.OE", () => {
     it("Can parse a string that contains a single non-competitive competitor's data", () => {
         const comp = getCompetitor1();
         comp.nonComp = "1";
-        runTestOverAllFormats([[comp, getControls1()]], function (eventData) {
+        runTestOverAllFormats([[comp, getControls1()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
             const competitor = eventData.classes[0].competitors[0];
@@ -772,7 +812,7 @@ fdescribe("Input.OE", () => {
         const competitor1 = getCompetitor1();
         competitor1.time = "";
         competitor1.finish = "";
-        runTestOverAllFormats([[competitor1, getControls1AllMissed()]], function (eventData) {
+        runTestOverAllFormats([[competitor1, getControls1AllMissed()]], function (eventData: Results) {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
             const competitor = eventData.classes[0].competitors[0];

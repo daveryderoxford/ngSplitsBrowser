@@ -1,11 +1,9 @@
 // file results-table.js
 
 import * as d3 from "d3";
-import * as $ from "jquery";
-
-import { Lang } from "./lang";
-import { Competitor, TimeUtilities, CourseClass } from "../../model";
+import { Competitor, CourseClass, TimeUtilities } from "../../model";
 import { isNotNullNorNaN } from "../../model/util";
+import { Lang } from "./lang";
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;

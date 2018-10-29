@@ -20,34 +20,27 @@
  */
 
 // tslint:disable:max-line-length
-import * as $ from "jquery";
 import * as d3 from "d3";
-import { Lang } from "./lang";
+import * as $ from "jquery";
 
-// import
-import { parseEventData } from "../../import";
-
-// Model
-import { TimeUtilities, sbTime, Competitor, CourseClass, CourseClassSet, Course, Results, InvalidData } from "../../model";
-import { LanguageSelector } from "./lang-selection";
-import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
+import { CourseClassSet, Results } from "../../model";
 import { Repairer } from "../../model/repairer";
-
-// Controls
-import { parseQueryString, formatQueryString } from "./query-string";
-import { ChartTypeClass, ChartType } from "./chart-types";
-import { CompetitorSelection } from "./competitor-selection";
-import { ClassSelector } from "./class-selector";
+import { Chart } from "./chart";
 import { ChartTypeSelector } from "./chart-type-selector";
+import { ChartType, ChartTypeClass } from "./chart-types";
+import { ClassSelector } from "./class-selector";
 import { ComparisonSelector } from "./comparision-selection";
+import { CompetitorList } from "./competitor-list";
+import { CompetitorSelection } from "./competitor-selection";
+import { Lang } from "./lang";
+import { LanguageSelector } from "./lang-selection";
 import { OriginalDataSelector } from "./original-data-selector";
+import { formatQueryString, parseQueryString } from "./query-string";
+import { ResultsTable } from "./results-table";
 import { StatisticsSelector } from "./statistics-selection";
 import { WarningViewer } from "./warning-viewer";
-import { CompetitorList } from "./competitor-list";
-import { Chart } from "./chart";
-import { ResultsTable } from "./results-table";
 
-const Version = "4.0.0";
+const GraphVersion = "4.0.0";
 
 // file viewer.js
 export interface SplitsbrowserOptions {
@@ -215,7 +208,7 @@ Viewer.prototype.drawLogo = function () {
 */
 Viewer.prototype.setLogoMessages = function () {
     this.logoSvg.selectAll("title")
-        .text(getMessageWithFormatting("ApplicationVersion", { "$$VERSION$$": Version }));
+        .text(getMessageWithFormatting("ApplicationVersion", { "$$VERSION$$": GraphVersion }));
 };
 
 /**

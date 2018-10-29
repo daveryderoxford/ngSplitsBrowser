@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 import * as $ from "jquery";
-
 import { InvalidData } from "../../model/exception";
 
 export class CompetitorSelection {
@@ -65,7 +64,7 @@ export class CompetitorSelection {
         if (this.isSingleRunnerSelected()) {
             const refCompetitor = competitorDetails[this.currentIndexes[0]].competitor;
 
-            competitorDetails.forEach( (compDetails, idx) => {
+            competitorDetails.forEach((compDetails, idx) => {
                 if (compDetails.visible && compDetails.competitor.crosses(refCompetitor)) {
                     this.currentIndexes.push(idx);
                 }

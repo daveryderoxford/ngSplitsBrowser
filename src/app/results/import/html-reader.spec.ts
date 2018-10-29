@@ -21,12 +21,9 @@
 // tslint:disable:max-line-length
 // tslint:disable:quotemark
 
-import {} from "jasmine";
-import {} from "jasmine-expect";
-
+import { } from "jasmine";
+import { Competitor, CourseClass } from "../model";
 import { parseHTMLEventData } from "./html-reader";
-import { Course } from "../model/course";
-import { CourseClass, Competitor } from "../model";
 
 const parseEventData = parseHTMLEventData;
 

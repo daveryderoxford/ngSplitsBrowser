@@ -1,12 +1,9 @@
 import * as d3 from "d3";
-
-import { isNotNullNorNaN } from "./util";
-
-import {InvalidData} from "./exception";
-
-import { sbTime } from "./time";
 import { Competitor } from "./competitor";
 import { Course } from "./course";
+import { InvalidData } from "./exception";
+import { sbTime } from "./time";
+import { isNotNullNorNaN } from "./util";
 
 export interface FastestSplitInfo {
     name: string;

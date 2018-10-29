@@ -24,7 +24,7 @@ export function parseCourseLength(stringValue: string): number | null {
     }
 
     return courseLength;
-};
+}
 
 /**
 * Parses a course climb, specified as a whole number of metres.
@@ -39,7 +39,7 @@ export function parseCourseClimb(stringValue: string): number | null {
     } else {
         return courseClimb;
     }
-};
+}
 
 /**
 * Normalise line endings so that all lines end with LF, instead of
@@ -50,6 +50,6 @@ export function parseCourseClimb(stringValue: string): number | null {
 */
 export function normaliseLineEndings(stringValue: string): string {
     return stringValue.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-};
+}
 
 

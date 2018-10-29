@@ -1,6 +1,6 @@
 import { EventGrades } from '.';
 
-fdescribe('OEvent model object', () => {
+describe('OEvent model object', () => {
 
     it('grade index for properties for local event', () => {
 

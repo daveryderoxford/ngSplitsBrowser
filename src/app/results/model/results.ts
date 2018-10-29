@@ -1,10 +1,9 @@
 import * as d3 from "d3";
-
-import { CourseClass } from "./course-class";
-import { Course } from "./course";
+import { NextControlDataArr } from "../graph/splitsbrowser/splits-popup-data";
 import { Competitor } from "./competitor";
+import { Course } from "./course";
+import { CourseClass } from "./course-class";
 import { sbTime } from "./time";
-import { ECard, UserData } from "../../model/user";
 
 export class Results {
 
@@ -127,13 +126,15 @@ export class Results {
     * @sb-return {Array} Array of objects for each course using that control,
     *    with each object listing course name and next control.
     */
-    public getNextControlsAfter(controlCode: string) {
+    public getNextControlsAfter(controlCode: string): NextControlDataArr[] {
         let courses = this.courses;
         if (controlCode !== Course.START) {
             courses = courses.filter((course) => { return course.hasControl(controlCode); });
         }
 
-        return courses.map((course) => { return { course: course, nextControls: course.getNextControls(controlCode) }; });
+        return courses.map((course) => {
+            return { course: course, nextControls: course.getNextControls(controlCode) };
+        });
     }
 
     public findByKey(key: string): Competitor {

@@ -21,9 +21,8 @@
 
 // tslint:disable:max-line-length
 import {} from "jasmine";
-import {} from "jasmine-expect";
 
-import { Competitor, Course, CourseClassSet, Results, InvalidData, WrongFileFormat, CourseClass } from "../model"
+import { Competitor, Course, Results, InvalidData, WrongFileFormat, CourseClass } from "../model";
 import { parseCSVEventData } from "./cvs-reader";
 
 const fromCumTimes = Competitor.fromCumTimes;

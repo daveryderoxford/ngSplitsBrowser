@@ -1,6 +1,4 @@
 
-import * as d3 from "d3";
-
 import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
@@ -296,7 +294,7 @@ export class Course {
    * @sb-param {String} controlCode - The code of the control.
    * @sb-return {Array} The code of the next control
    */
-   public getNextControls(controlCode: string): Array<string> {
+   public getNextControls(controlCode: string): string[] {
       if (this.controls === null) {
          throw new InvalidData("Course has no controls");
       } else if (controlCode === Course.FINISH) {
@@ -331,7 +329,7 @@ export class Course {
    public get competitors(): Competitor[] {
       if (!this.competitors ) {
          for (const courseClass of this.classes) {
-            
+
          }
 
       }

@@ -2,182 +2,180 @@
 
 import * as d3 from "d3";
 import * as $ from "jquery";
-
-import { Lang } from "./lang";
 import { TimeUtilities } from "../../model";
 
-    const formatTime = TimeUtilities.formatTime;
+const formatTime = TimeUtilities.formatTime;
 
-    /**
-    * Creates a ChartPopup control.
-    * @constructor
-    * @sb-param {HTMLElement} parent - Parent HTML element.
-    * @sb-param {Object} handlers - Object that maps mouse event names to handlers.
-    */
-    export function ChartPopup(parent, handlers) {
+/**
+* Creates a ChartPopup control.
+* @constructor
+* @sb-param {HTMLElement} parent - Parent HTML element.
+* @sb-param {Object} handlers - Object that maps mouse event names to handlers.
+*/
+export function ChartPopup(parent, handlers) {
 
-        this.shown = false;
-        this.mouseIn = false;
-        this.popupDiv = d3.select(parent).append("div");
-        this.popupDiv.classed("chartPopup", true)
-            .style("display", "none")
-            .style("position", "absolute");
+    this.shown = false;
+    this.mouseIn = false;
+    this.popupDiv = d3.select(parent).append("div");
+    this.popupDiv.classed("chartPopup", true)
+        .style("display", "none")
+        .style("position", "absolute");
 
-        this.dataHeader = this.popupDiv.append("div")
-            .classed("chartPopupHeader", true)
-            .append("span");
+    this.dataHeader = this.popupDiv.append("div")
+        .classed("chartPopupHeader", true)
+        .append("span");
 
-        const tableContainer = this.popupDiv.append("div")
-            .classed("chartPopupTableContainer", true);
+    const tableContainer = this.popupDiv.append("div")
+        .classed("chartPopupTableContainer", true);
 
 
-        this.dataTable = tableContainer.append("table");
+    this.dataTable = tableContainer.append("table");
 
-        this.popupDiv.selectAll(".nextControls").style("display", "none");
+    this.popupDiv.selectAll(".nextControls").style("display", "none");
 
-        // At this point we need to pass through mouse events to the parent.
-        // This is solely for the benefit of IE < 11, as IE11 and other
-        // browsers support pointer-events: none, which means that this div
-        // receives no mouse events at all.
-        for (const eventName in handlers) {
-            if (handlers.hasOwnProperty(eventName)) {
-                $(this.popupDiv.node()).on(eventName, handlers[eventName]);
-            }
+    // At this point we need to pass through mouse events to the parent.
+    // This is solely for the benefit of IE < 11, as IE11 and other
+    // browsers support pointer-events: none, which means that this div
+    // receives no mouse events at all.
+    for (const eventName in handlers) {
+        if (handlers.hasOwnProperty(eventName)) {
+            $(this.popupDiv.node()).on(eventName, handlers[eventName]);
         }
-
-        const outerThis = this;
-        $(this.popupDiv.node()).mouseenter(function () { outerThis.mouseIn = true; });
-        $(this.popupDiv.node()).mouseleave(function () { outerThis.mouseIn = false; });
     }
 
-    /**
-    * Returns whether the popup is currently shown.
-    * @sb-return {boolean} True if the popup is shown, false otherwise.
-    */
-    ChartPopup.prototype.isShown = function () {
-        return this.shown;
-    };
+    const outerThis = this;
+    $(this.popupDiv.node()).mouseenter(function () { outerThis.mouseIn = true; });
+    $(this.popupDiv.node()).mouseleave(function () { outerThis.mouseIn = false; });
+}
 
-    /**
-    * Returns whether the mouse is currently over the popup.
-    * @sb-return {boolean} True if the mouse is over the popup, false otherwise.
-    */
-    ChartPopup.prototype.isMouseIn = function () {
-        return this.mouseIn;
-    };
+/**
+* Returns whether the popup is currently shown.
+* @sb-return {boolean} True if the popup is shown, false otherwise.
+*/
+ChartPopup.prototype.isShown = function () {
+    return this.shown;
+};
 
-    /**
-    * Populates the chart popup with data.
-    *
-    * 'competitorData' should be an object that contains a 'title', a 'data'
-    * and a 'placeholder' property.  The 'title' is a string used as the
-    * popup's title.  The 'data' property is an array where each element should
-    * be an object that contains the following properties:
-    * * time - A time associated with a competitor.  This may be a split time,
-    *   cumulative time or the time of day.
-    * * className (Optional) - Name of the competitor's class.
-    * * name - The name of the competitor.
-    * * highlight - A boolean value which indicates whether to highlight the
-    *   competitor.
-    * The 'placeholder' property is a placeholder string to show if there is no
-    * 'data' array is empty.  It can be null to show no such message.
-    * @sb-param {Object} competitorData - Array of data to show.
-    * @sb-param {boolean} includeClassNames - Whether to include class names.
-    */
-    ChartPopup.prototype.setData = function (competitorData, includeClassNames) {
-        this.dataHeader.text(competitorData.title);
+/**
+* Returns whether the mouse is currently over the popup.
+* @sb-return {boolean} True if the mouse is over the popup, false otherwise.
+*/
+ChartPopup.prototype.isMouseIn = function () {
+    return this.mouseIn;
+};
 
-        let rows = this.dataTable.selectAll("tr")
-            .data(competitorData.data);
+/**
+* Populates the chart popup with data.
+*
+* 'competitorData' should be an object that contains a 'title', a 'data'
+* and a 'placeholder' property.  The 'title' is a string used as the
+* popup's title.  The 'data' property is an array where each element should
+* be an object that contains the following properties:
+* * time - A time associated with a competitor.  This may be a split time,
+*   cumulative time or the time of day.
+* * className (Optional) - Name of the competitor's class.
+* * name - The name of the competitor.
+* * highlight - A boolean value which indicates whether to highlight the
+*   competitor.
+* The 'placeholder' property is a placeholder string to show if there is no
+* 'data' array is empty.  It can be null to show no such message.
+* @sb-param {Object} competitorData - Array of data to show.
+* @sb-param {boolean} includeClassNames - Whether to include class names.
+*/
+ChartPopup.prototype.setData = function (competitorData, includeClassNames) {
+    this.dataHeader.text(competitorData.title);
 
-        rows.enter().append("tr");
+    let rows = this.dataTable.selectAll("tr")
+        .data(competitorData.data);
 
-        rows = this.dataTable.selectAll("tr")
-            .data(competitorData.data);
-        rows.classed("highlighted", function (row) { return row.highlight; });
+    rows.enter().append("tr");
 
-        rows.selectAll("td").remove();
-        rows.append("td").text(function (row) { return TimeUtilities.formatTime(row.time); });
-        if (includeClassNames) {
-            rows.append("td").text(function (row) { return row.className; });
-        }
-        rows.append("td").text(function (row) { return row.name; });
+    rows = this.dataTable.selectAll("tr")
+        .data(competitorData.data);
+    rows.classed("highlighted", function (row) { return row.highlight; });
 
-        rows.exit().remove();
+    rows.selectAll("td").remove();
+    rows.append("td").text(function (row) { return TimeUtilities.formatTime(row.time); });
+    if (includeClassNames) {
+        rows.append("td").text(function (row) { return row.className; });
+    }
+    rows.append("td").text(function (row) { return row.name; });
 
-        if (competitorData.data.length === 0 && competitorData.placeholder !== null) {
-            this.dataTable.append("tr")
-                .append("td")
-                .text(competitorData.placeholder);
-        }
-    };
+    rows.exit().remove();
 
-    /**
-    * Sets the next-controls data.
-    *
-    * The next-controls data should be an object that contains two properties:
-    * * thisControl - The 'current' control.
-    * * nextControls - Array of objects, each with 'course' and 'nextControl'
-    *   properties.
-    *
-    * @sb-param {Object} nextControlsData - The next-controls data.
-    */
-    ChartPopup.prototype.setNextControlData = function (nextControlsData) {
-        this.dataHeader.text(nextControlsData.thisControl);
+    if (competitorData.data.length === 0 && competitorData.placeholder !== null) {
+        this.dataTable.append("tr")
+            .append("td")
+            .text(competitorData.placeholder);
+    }
+};
 
-        const rows = this.dataTable.selectAll("tr")
-            .data(nextControlsData.nextControls);
-        rows.enter().append("tr");
+/**
+* Sets the next-controls data.
+*
+* The next-controls data should be an object that contains two properties:
+* * thisControl - The 'current' control.
+* * nextControls - Array of objects, each with 'course' and 'nextControl'
+*   properties.
+*
+* @sb-param {Object} nextControlsData - The next-controls data.
+*/
+ChartPopup.prototype.setNextControlData = function (nextControlsData) {
+    this.dataHeader.text(nextControlsData.thisControl);
 
-        rows.selectAll("td").remove();
-        rows.classed("highlighted", false);
-        rows.append("td").text(function (nextControlData) { return nextControlData.course.name; });
-        rows.append("td").text("-->");
-        rows.append("td").text(function (nextControlData) { return nextControlData.nextControls; });
+    const rows = this.dataTable.selectAll("tr")
+        .data(nextControlsData.nextControls);
+    rows.enter().append("tr");
 
-        rows.exit().remove();
-    };
+    rows.selectAll("td").remove();
+    rows.classed("highlighted", false);
+    rows.append("td").text(function (nextControlData) { return nextControlData.course.name; });
+    rows.append("td").text("-->");
+    rows.append("td").text(function (nextControlData) { return nextControlData.nextControls; });
 
-    /**
-    * Adjusts the location of the chart popup.
-    *
-    * The location object should contain "x" and "y" properties.  The two
-    * coordinates are in units of pixels from top-left corner of the viewport.
-    *
-    * @sb-param {Object} location - The location of the chart popup.
-    */
-    ChartPopup.prototype.setLocation = function (location) {
-        this.popupDiv.style("left", location.x + "px")
-            .style("top", location.y + "px");
-    };
+    rows.exit().remove();
+};
 
-    /**
-    * Shows the chart popup.
-    *
-    * The location object should contain "x" and "y" properties.  The two
-    * coordinates are in units of pixels from top-left corner of the viewport.
-    *
-    * @sb-param {Object} location - The location of the chart popup.
-    */
-    ChartPopup.prototype.show = function (location) {
-        this.popupDiv.style("display", null);
-        this.shown = true;
-        this.setLocation(location);
-    };
+/**
+* Adjusts the location of the chart popup.
+*
+* The location object should contain "x" and "y" properties.  The two
+* coordinates are in units of pixels from top-left corner of the viewport.
+*
+* @sb-param {Object} location - The location of the chart popup.
+*/
+ChartPopup.prototype.setLocation = function (location) {
+    this.popupDiv.style("left", location.x + "px")
+        .style("top", location.y + "px");
+};
 
-    /**
-    * Hides the chart popup.
-    */
-    ChartPopup.prototype.hide = function () {
-        this.popupDiv.style("display", "none");
-        this.shown = false;
-    };
+/**
+* Shows the chart popup.
+*
+* The location object should contain "x" and "y" properties.  The two
+* coordinates are in units of pixels from top-left corner of the viewport.
+*
+* @sb-param {Object} location - The location of the chart popup.
+*/
+ChartPopup.prototype.show = function (location) {
+    this.popupDiv.style("display", null);
+    this.shown = true;
+    this.setLocation(location);
+};
 
-    /**
-    * Returns the height of the popup, in units of pixels.
-    * @sb-return {Number} Height of the popup, in pixels.
-    */
-    ChartPopup.prototype.height = function () {
-        return $(this.popupDiv.node()).height();
-    };
+/**
+* Hides the chart popup.
+*/
+ChartPopup.prototype.hide = function () {
+    this.popupDiv.style("display", "none");
+    this.shown = false;
+};
+
+/**
+* Returns the height of the popup, in units of pixels.
+* @sb-return {Number} Height of the popup, in pixels.
+*/
+ChartPopup.prototype.height = function () {
+    return $(this.popupDiv.node()).height();
+};
 

@@ -1,12 +1,9 @@
 
 import * as d3 from "d3";
-
-import { normaliseLineEndings, parseCourseLength, parseCourseClimb, } from "./util";
-import { isNaNStrict } from "../model/util";
-
-import { TimeUtilities, sbTime, Competitor, CourseClass, Course, Results } from "../model";
-import { InvalidData, WrongFileFormat } from "../model";
+import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
+import { isNaNStrict } from "../model/util";
+import { normaliseLineEndings, parseCourseClimb, parseCourseLength } from "./util";
 
 export function parseOEEventData(data: string): Results {
     const reader = new OEReader(data);
@@ -242,10 +239,10 @@ class OEReader {
     */
     private getNumControls(row: Array<string>, lineNumber: number): number | null {
         const className = this.getClassName(row);
-        let name: string | FirstnameSurname;
+        let fullname: string;
         if (className.trim() === "") {
-            name = this.getName(row) || "<name unknown>";
-            this.warnings.push("Could not find a class for competitor '" + name + "' (line " + lineNumber + ")");
+            fullname = this.getFullname(this.getName(row)) || "<name unknown>";
+            this.warnings.push("Could not find a class for competitor '" + fullname + "' (line " + lineNumber + ")");
             return null;
         } else if (this.classes.has(className)) {
             return this.classes.get(className).numControls;
@@ -254,9 +251,9 @@ class OEReader {
             if (isFinite(numControls)) {
                 return numControls;
             } else {
-                name = this.getName(row) || "<name unknown>";
+                fullname = this.getFullname(this.getName(row)) || "<name unknown>";
                 const err = "Could not read the control count '" +
-                    row[this.columnIndexes.controlCount] + "' for competitor '" + name + "' from line " + lineNumber;
+                    row[this.columnIndexes.controlCount] + "' for competitor '" + fullname + "' from line " + lineNumber;
                 this.warnings.push(err);
                 return null;
             }
@@ -349,18 +346,30 @@ class OEReader {
     * @sb-param {Array} row - Array of row data items.
     * @sb-return {String | FirstnameSurname} The name of the competitor.
     */
-    private getName(row: Array<string>): string | FirstnameSurname {
+    private getName(row: Array<string>): FirstnameSurname {
         // Default name to no name
-        let name: string | FirstnameSurname = "";
+        let name: FirstnameSurname = { firstname: "", surname: "" };
 
         if (this.columnIndexes.hasOwnProperty("forename") && this.columnIndexes.hasOwnProperty("surname")) {
             name = {
                 firstname: row[this.columnIndexes.forename],
                 surname: row[this.columnIndexes.surname]
             };
-        } else if (this.columnIndexes.hasOwnProperty("combinedName")) {
-            // 'Nameless' or 44-column variation.
-            name = row[this.columnIndexes.combinedName];
+        }
+
+        if (name.firstname === "" && name.surname === "" && this.columnIndexes.hasOwnProperty("combinedName")) {
+            // 'Nameless' or 44-column variation.   Singl;e column for firstname as surname
+           //  Treat first name as Firstname traeted as first word in name and surname the rest
+           const combined = row[this.columnIndexes.combinedName];
+           const index = combined.lastIndexOf(" ");
+           if (index === -1) {
+               name.firstname = "";
+               name.surname = combined;
+           } else {
+               name.firstname = combined.slice(0, index).trim();
+               name.surname = combined.slice(index).trim();
+           }
+
         }
 
         return name;
@@ -368,6 +377,10 @@ class OEReader {
 
     private getEcard(row: Array<string>): string | null {
         return row[this.columnIndexes.ecard];
+    }
+
+    private getFullname(name: FirstnameSurname): string {
+        return (name.firstname + " " + name.surname).trim();
     }
 
     /**
@@ -388,14 +401,13 @@ class OEReader {
 
         const startTime = this.getStartTime(row);
 
-        /// Handle variation wwhere the position is appended to the name
-        let name = this.getName(row);
+        const name = this.getName(row);
+
+        // Strip n/c or m/p off surname if it has been appended
         const isPlacingNonNumeric = (placing !== "" && isNaNStrict(parseInt(placing, 10)));
-        if (typeof name === "string") {
-            if (isPlacingNonNumeric && name.substring(name.length - placing.length) === placing) {
-                // trim the name to remove the palcing from it
-                name = name.substring(0, name.length - placing.length).trim();
-            }
+        if (isPlacingNonNumeric && name.surname.substring(name.surname.length - placing.length) === placing) {
+            // trim the name to remove the placing from it if it is appended
+            name.surname = name.surname.substring(0, name.surname.length - placing.length).trim();
         }
 
         const order = this.classes.get(className).competitors.length + 1;
@@ -548,9 +560,9 @@ class OEReader {
     * @sb-return {SplitsBrowser.Model.Course} - The created Course object.
     */
     private createCourseFromLinkedClassesAndCourses(initCourseName: string,
-                                                    manyToManyMaps,
-                                                    doneCourseNames: d3.Set,
-                                                    classesMap: d3.Map<any>): Course {
+        manyToManyMaps,
+        doneCourseNames: d3.Set,
+        classesMap: d3.Map<any>): Course {
 
         const courseNamesToDo = [initCourseName];
         const classNamesToDo = [];

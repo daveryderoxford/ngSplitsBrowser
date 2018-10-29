@@ -2,11 +2,10 @@
 
 import * as d3 from "d3";
 import * as $ from "jquery";
-
-import { Lang } from "./lang";
-import { ChartType } from "./chart-types";
 import { Competitor } from "../../model";
+import { ChartType } from "./chart-types";
 import { CompetitorSelection } from "./competitor-selection";
+import { Lang } from "./lang";
 
 // ID of the competitor list div.
 // Must match that used in styles.css.

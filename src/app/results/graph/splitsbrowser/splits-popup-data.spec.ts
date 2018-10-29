@@ -20,15 +20,18 @@
  */
 
 // tslint:disable:max-line-length
-import { } from "jasmine";
-import { } from "jasmine-expect";
-
 import * as d3 from "d3";
-
-import { SplitsPopupData } from "./splits-popup-data";
-import { CourseClass, CourseClassSet, Course, Results, TimeUtilities } from "../../model";
-import { Lang } from "./lang";
+import { } from "jasmine";
+import { Course, CourseClass, CourseClassSet, Results, TimeUtilities } from "../../model";
 import { TestSupport } from "../../test-support.spec";
+import { Lang } from "./lang";
+import { NextControlDataStr, SplitsPopupData } from "./splits-popup-data";
+
+
+interface ExpectedData {
+    nextControls: NextControlDataStr[];
+    thisControl: string;
+}
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
@@ -241,7 +244,8 @@ fdescribe("Splits popup data", () => {
 
         const eventData = new Results([], [course10, courseAfter, course5, course23, courseBefore, course8], []);
 
-        const expectedData = {
+
+        const expectedData: ExpectedData = {
             nextControls: [
                 { course: courseBefore, nextControls: "212" },
                 { course: course5, nextControls: "212" },
@@ -261,7 +265,7 @@ fdescribe("Splits popup data", () => {
         const course = new Course("Test course", [], null, null, ["235", "189", "241", "189", "212"]);
         const eventData = new Results([], [course], []);
 
-        const expectedData = {
+        const expectedData: ExpectedData = {
             nextControls: [{ course: course, nextControls: "241, 212" }],
             thisControl: getMessageWithFormatting("ControlName", { "$$CODE$$": "189" })
         };
@@ -287,7 +291,7 @@ fdescribe("Splits popup data", () => {
         const course = new Course("Test course", [], null, null, ["235", "189", "212"]);
         const eventData = new Results([], [course], []);
 
-        const expectedData = {
+        const expectedData: ExpectedData = {
             nextControls: [{ course: course, nextControls: getMessage("FinishName") }],
             thisControl: getMessageWithFormatting("ControlName", { "$$CODE$$": "212" })
         };

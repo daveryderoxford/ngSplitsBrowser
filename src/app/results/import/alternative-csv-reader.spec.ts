@@ -20,12 +20,12 @@
  */
 
 // tslint:disable:max-line-length
-import {} from "jasmine";
-import {} from "jasmine-expect";
-
+import { } from "jasmine";
+import { } from "jasmine-expect";
+import { TimeUtilities } from "../model";
+import { TestSupport } from "../test-support.spec";
 import { parseTripleColumnEventData } from "./alternative-cvs-reader";
-import {TimeUtilities} from "../model";
-import {TestSupport} from "../test-support.spec";
+
 
 const formatTime = TimeUtilities.formatTime;
 
@@ -48,9 +48,9 @@ const TRIPLE_COLUMN_HEADER = "RaceNumber,CardNumbers,MembershipNumbers,Name,AgeC
 function fabricateTripleColumnRow(name: string,
                                  club: string,
                                  courseName: string,
-                                 controls,
-                                 startTime,
-                                 cumTimes) {
+                                 controls: string[],
+                                 startTime: number | null,
+                                 cumTimes: number[]): string {
     if (controls.length !== cumTimes.length) {
         throw new Error("Controls and cumulative times must have the same length");
     }

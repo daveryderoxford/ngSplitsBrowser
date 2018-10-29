@@ -21,8 +21,7 @@
 // tslint:disable:max-line-length
 
 import { sbTime } from "./time";
-import { } from "jasmine";
-import { } from "jasmine-expect";
+import {} from "jasmine";
 import { Competitor } from "./competitor";
 import { isNaNStrict } from "./util";
 

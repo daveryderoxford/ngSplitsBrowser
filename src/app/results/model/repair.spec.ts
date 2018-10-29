@@ -18,18 +18,15 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-import { Repairer } from "./repairer";
+// tslint:disable:max-line-length
+import { } from "jasmine";
 import { TestSupport } from "../test-support.spec";
 import { Competitor } from "./competitor";
-
-
-
-// tslint:disable:max-line-length
-import {} from "jasmine";
-import { } from "jasmine-expect";
-import { CourseClass } from "./course-class";
 import { Course } from "./course";
+import { CourseClass } from "./course-class";
+import { Repairer } from "./repairer";
 import { Results } from "./results";
+
 
 fdescribe("Data Repair", () => {
 

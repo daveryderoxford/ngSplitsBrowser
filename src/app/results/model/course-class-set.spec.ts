@@ -20,16 +20,15 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 // tslint:disable:max-line-length
-import {} from "jasmine";
-import {} from "jasmine-expect";
-
-import {CourseClassSet} from "./course-class-set";
-import {Course} from "./course";
-import {CourseClass} from "./course-class";
-import {Competitor} from "./competitor";
-import {TestSupport} from "../test-support.spec";
-import { isNaNStrict } from "./util";
+import { } from "jasmine";
 import { ChartType } from "../graph/splitsbrowser/chart-types";
+import { TestSupport } from "../test-support.spec";
+import { Competitor } from "./competitor";
+import { Course } from "./course";
+import { CourseClass } from "./course-class";
+import { CourseClassSet } from "./course-class-set";
+import { isNaNStrict } from "./util";
+
 
 fdescribe("Course-class set", () => {
 

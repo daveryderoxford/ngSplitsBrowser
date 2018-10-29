@@ -1,9 +1,8 @@
-import * as d3 from "d3";
 import * as $ from "jquery";
-
-import { isNaNStrict } from "../model/util";
 import { isUndefined } from "util";
-import { InvalidData, WrongFileFormat, sbTime } from "../model";
+import { InvalidData, sbTime, WrongFileFormat } from "../model";
+import { isNaNStrict } from "../model/util";
+
 
 
 export interface CourseDeatils {

@@ -39,10 +39,5 @@ export class GraphComponent implements OnInit {
           displayGraph(results, { containerElement: "app-graph" });
         }
       });
-
-
-    /*  this.route.params
-            .switchMap( params => this.rs.setSelectedEventByKey(params["id"]) )
-            .subscribe( (results: Results) => this.selectedResultsUpdated(results)); */
   }
 }
