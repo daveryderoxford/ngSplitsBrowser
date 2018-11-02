@@ -2,7 +2,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular/core';
 
 @Component({
-  selector: 'mat-search-bar',
+  selector: 'app-search-bar',
   templateUrl: './mat-search-bar.component.html',
   styleUrls: ['./mat-search-bar.component.scss'],
   animations: [
