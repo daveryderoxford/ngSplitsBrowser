@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { AngularFireStorage } from '@angular/fire/storage';
 import { OEvent } from "app/model/oevent";
-import { switchMap, tap } from "rxjs/operators";
+import { switchMap, tap, map } from "rxjs/operators";
 import { BehaviorSubject, Observable } from "rxjs/Rx";
 import { parseEventData } from "./import";
 import { Competitor, Course, CourseClass, InvalidData, Results } from "./model";
@@ -25,7 +25,6 @@ export class ResultsSelectionService {
   private selectedCourse$: BehaviorSubject<Course> = new BehaviorSubject(null);
   private selectedClass$: BehaviorSubject<CourseClass> = new BehaviorSubject(null);
 
-  // private displayedCompetitors$: BehaviorSubject<Array<Competitor>> = new BehaviorSubject([]);
   private courseCompetitorsDisplayed$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   //  Displayed competitors depends on te course, class and display option selected
@@ -40,6 +39,9 @@ export class ResultsSelectionService {
     private http: HttpClient
   ) { }
 
+  /** Loads results for a specified event returning an observable of the results.
+   * This just loads the results file from storage and does not clear any current selections.
+   */
   loadResults(event: OEvent): Observable<Results> {
     const ret = this.downloadResultsFile(event)
       .map(text => {
@@ -51,7 +53,7 @@ export class ResultsSelectionService {
 
   /**
    * Selects an event to view.
-   * This will load results for the event
+   * This will load results from storage clearing any selections relivant to the previous event
    */
   setSelectedEvent(event: OEvent): Observable<Results> {
     this.event$.next(event);
@@ -103,19 +105,29 @@ export class ResultsSelectionService {
     return this.results$.asObservable();
   }
 
-  selectCompetitor(comp: Competitor) {
+  /** Select a competitor or array of competitors */
+  selectCompetitor(...comp: Competitor[]) {
     const competitors = this.selectedCompetitors$.getValue().concat(comp);
     competitors.sort((a, b) => a.totalTime - b.totalTime);
     this.selectedCompetitors$.next(competitors);
   }
 
-  removeCompetitor(comp: Competitor) {
+  deselectCompetitors(...comp: Competitor[]) {
     const competitors = this.selectedCompetitors$.getValue();
     this.selectedCompetitors$.next(competitors.filter(e => e !== comp));
   }
 
   deselectAllCompetitors() {
     this.selectedCompetitors$.next([]);
+  }
+
+  /** Returns an observable of selected competitors filtered to those that in the currently displayed course/class as appropriate */
+  get selectedCompetitorsDisplayed(): Observable<Competitor[]> {
+    return Observable.combineLatest( this.selectedCompetitors, this.selectedCourse, this.selectedClass, this.courseCompetitorsDisplayed$,
+      (selectedComps: Competitor[], course: Course, oclass: CourseClass, displayCourse: boolean) => {
+        return selectedComps.filter( comp =>
+          displayCourse ? comp.courseClass.course.name === course.name : comp.courseClass.name === oclass.name);
+      });
   }
 
   get selectedCompetitors(): Observable<Competitor[]> {
@@ -131,9 +143,8 @@ export class ResultsSelectionService {
   }
 
   selectCourse(course: Course) {
-    // If course has changed then reset the selected competitors amd controls
+    // If course has changed then reset the selected control
     if (course !== this.selectedCourse$.value) {
-      this.deselectAllCompetitors();
       this.selectControl(null);
     }
     this.selectedCourse$.next(course);
@@ -153,14 +164,17 @@ export class ResultsSelectionService {
     return this.selectedClass$.asObservable().distinctUntilChanged();
   }
 
+  /** Display all competitors for the course or just the selected class */
   displayAllCourseCompetitors(showCourse: boolean) {
     this.courseCompetitorsDisplayed$.next(showCourse);
   }
 
+  /** Are competitors for class or course displayed */
   get courseCompetitorsDisplayed(): Observable<boolean> {
     return this.courseCompetitorsDisplayed$.distinctUntilChanged();
   }
 
+  /* Get ordered list of competitors to be displayed */
   get displayedCompetitors(): Observable<Competitor[]> {
     return this.displayedCompetitors$;
   }

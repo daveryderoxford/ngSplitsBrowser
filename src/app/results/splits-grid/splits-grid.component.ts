@@ -56,8 +56,6 @@ export class SplitsGridComponent implements OnInit {
       this.courseToggle.valueChanges.distinctUntilChanged().subscribe( (showCourses: boolean) => {
          this.rs.displayAllCourseCompetitors(showCourses);
       });
-
-
    }
 
    private selectedResultsUpdated(results: Results) {
