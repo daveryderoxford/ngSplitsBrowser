@@ -56,16 +56,16 @@ const resultsfile2 = [
 
 
 describe("EventAdminService", () => {
-  beforeEach(() => {
+  beforeEach( () => {
     TestBed.configureTestingModule({
-      providers: [EventAdminService],
       imports: [
         AngularFireModule.initializeApp(testFirebaseConfig),
         AngularFirestoreModule,
         AngularFireStorageModule,
         HttpClient,
         CompetitorDataService
-      ]
+      ],
+      providers: [EventAdminService],
     });
   });
 
@@ -128,9 +128,6 @@ it("should update a results file that has already been downloaded once", inject(
   await eventAdmin.uploadResults(eventresult, file);
 
   // Read all search results and check them
-
-
-
 
 }));
 

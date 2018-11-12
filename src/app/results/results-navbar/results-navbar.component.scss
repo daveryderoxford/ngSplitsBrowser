@@ -1,18 +1,10 @@
+
+
 .fill-remaining-space {
   // This fills the remaining space, by using flexbox. 
   // Every toolbar row uses a flexbox row layout.
   flex: 1 1 auto;
 }
-
-mat-button-toggle-group {
-	-webkit-box-shadow: none;
-	-moz-box-shadow: none;
-	box-shadow: none;
-  border-color: rgb(200,200,200);
-  border-width: 1px;
-  border-style: solid;
-}
-
 
 .displayOptions {
   font-size: 14px;
@@ -30,4 +22,9 @@ mat-button-toggle-group {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.mat-form-field.no-padding > .mat-form-field-wrapper {
+  margin-bottom: -1.25em;
+  margin-top: -1em;
 }

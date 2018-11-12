@@ -1,10 +1,10 @@
-import { Component, OnInit, EventEmitter, Output } from "@angular/core";
-import { Club, OEvent, Nations, EventGrades } from "app/model";
+
+import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { MatSelectChange } from "@angular/material";
-import { Observable } from "rxjs/Observable";
-import { BehaviorSubject, Subject } from "rxjs";
+import { Club, EventGrades, Nations, OEvent, Nation } from "app/model";
+import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { EventService } from "../event.service";
-import { map } from "rxjs/operators";
 
 @Component({
    selector: "app-club-events-tab",
@@ -14,56 +14,53 @@ import { map } from "rxjs/operators";
 export class ClubEventsTabComponent implements OnInit {
    @Output() eventSelected = new EventEmitter();
 
-   selctedClub = new Subject<Club>();
-   clubNationalityFilter = new BehaviorSubject("");
-   clubNameFilter = new BehaviorSubject("");
+   clubNationalityFilter$ = new BehaviorSubject<string>("");
+   clubNameFilter$ = new BehaviorSubject<string>("");
 
-   loading: Observable<boolean>;
+   loading$: Observable<boolean>;
 
    clubs$: Observable<Club[]> = undefined;
    clubEvents: Array<OEvent> = [];
 
-   grades = EventGrades.grades;
-   nations = Nations.getNations();
+   grades: EventGrades[];
+   nations: Nation[];
 
    constructor(private es: EventService) {
-         this.loading = this.es.loading;
+      this.loading$ = this.es.loading;
+
+      this.grades = EventGrades.grades;
+      this.nations = Nations.getNations();
+      this.nations.unshift(Nations.nullNation);
    }
 
    ngOnInit() {
       // Club filter
-      this.clubs$ = Observable.combineLatest(
-         this.es.getClubs(),
-         this.clubNationalityFilter,
-         this.clubNameFilter
-      ).pipe(map(obs => this.filterClubs(obs[0], obs[1], obs[2])));
-
-      this.selctedClub
-         .filter(club => club !== null)
-         .switchMap(club => this.es.getEventsForClub(club))
-         .subscribe(events => (this.clubEvents = events));
+      this.clubs$ = combineLatest(this.es.getClubs(), this.clubNationalityFilter$, this.clubNameFilter$).pipe(
+         map(([clubs, nat, name]) => this.filterClubs(clubs, nat, name))
+      );
    }
 
    clubNationalFilterChange(event: MatSelectChange) {
-      this.clubNationalityFilter.next(event.value);
+      this.clubNationalityFilter$.next(event.value);
    }
 
    filterClubs(clubs: Club[], natFilter: string, nameFilter: string) {
       return clubs
          .filter(club => natFilter === "" || club.nationality === natFilter)
-         .filter(
-            club =>
-               nameFilter === "" || club.name.includes(nameFilter.toUpperCase())
+         .filter(club => nameFilter === "" || club.name.includes(nameFilter.toUpperCase())
          );
    }
 
    setSelectedClub(club: Club) {
-      const c = club;
-      this.selctedClub.next(c);
+      if (club !== null) {
+         this.es.getEventsForClub(club).pipe(
+            tap(events => console.log(JSON.stringify(events)))
+         ).subscribe(events => this.clubEvents = events);
+      }
    }
 
    clubNameFilterChange(event: any) {
-      this.clubNameFilter.next(event.target.value);
+      this.clubNameFilter$.next(event.target.value);
    }
 
    eventClicked(event: OEvent) {

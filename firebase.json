@@ -1,9 +1,9 @@
 {
-  "database": {
+  "firebase ionit ": {
     "rules": "firebase/database.rules.json"
   },
-   "functions": {
-  	"source": "firebase/functions"
+  "functions": {
+    "source": "firebase/functions"
   },
   "hosting": {
     "public": "dist",
@@ -13,5 +13,9 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "firestore": {
+    "rules": "firebase/firestore.rules",
+    "indexes": "firebase/firestore.indexes.json"
   }
 }

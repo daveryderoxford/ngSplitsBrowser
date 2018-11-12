@@ -1,3 +1,5 @@
+
+import {take} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { CompetitorSearchData, OEvent } from '../../model';
@@ -39,7 +41,7 @@ export class CompetitorDataService {
         .where("firstname" , "==", firstname)
         .orderBy('date', 'desc')
         .where('date', '>', start.toLocaleString());
-    }).valueChanges().take(1);
+    }).valueChanges().pipe(take(1));
 
     return query.toPromise();
   }
@@ -59,9 +61,9 @@ export class CompetitorDataService {
         return ref.where("ecard", "==", ecardId)
           .orderBy('date', 'desc')
           .where('date', '>', start.toDateString());
-      }).valueChanges().take(1);
+      }).valueChanges().pipe(take(1));
 
-      return query.take(1).toPromise();
+      return query.pipe(take(1)).toPromise();
   }
 }
 

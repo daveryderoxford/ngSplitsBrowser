@@ -1,38 +1,39 @@
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
-import { ReactiveFormsModule } from "@angular/forms";
-import { BrowserModule } from "@angular/platform-browser";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AngularFireStorageModule } from "@angular/fire/storage";
+import { ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from 'environments/environment';
+import "hammerjs";
 import { AboutComponent } from "./about/about.component";
+import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { firebaseConfig } from "./app.firebase-config";
+import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { LoginComponent } from "./auth/login/login.component";
 import { RecoverComponent } from "./auth/recover/recover.component";
 import { SignupComponent } from "./auth/signup/signup.component";
 import { EventAdminModule } from "./event-admin/event-admin.module";
+import { AllEventsTabComponent } from './events/all-events-tab/all-events-tab.component';
+import { ClubEventsTabComponent } from './events/club-events-tab/club-events-tab.component';
+import { EventsTableComponent } from './events/events-table/events-table.component';
 import { EventsViewComponent } from "./events/eventsview/events-view.component";
+import { MyEventsTabComponent } from './events/my-events-tab/my-events-tab.component';
+import { MyResultsTableComponent } from './events/my-results-table/my-results-table.component';
 import { MainComponent } from "./main/main.component";
 import { GraphComponent } from "./results/graph/graph.component";
 import { ResultsNavbarComponent } from "./results/results-navbar/results-navbar.component";
 import { ResultsSearchComponent } from "./results/results-search/results-search.component";
 import { ResultsViewComponent } from "./results/results-view/results-view.component";
-import { SharedModule } from "./shared/shared.module";
-import { UserComponent } from "./user/user.component";
-import "hammerjs";
-import { AppRoutingModule } from "./app-routing.module";
-import { ChangePasswordComponent } from './auth/change-password/change-password.component';
-import { ServiceWorkerModule } from '@angular/service-worker';
-import { environment } from 'environments/environment';
 import { SplitsGridComponent } from './results/splits-grid/splits-grid.component';
-import { EventsTableComponent } from './events/events-table/events-table.component';
-import { AllEventsTabComponent } from './events/all-events-tab/all-events-tab.component';
-import { ClubEventsTabComponent } from './events/club-events-tab/club-events-tab.component';
-import { MyEventsTabComponent } from './events/my-events-tab/my-events-tab.component';
-import { MyResultsTableComponent } from './events/my-results-table/my-results-table.component';
+import { SharedModule } from "./shared/shared.module";
 import { ResultsFoundDialogComponent } from './user/results-found-dialog/results-found-dialog.component';
+import { UserComponent } from "./user/user.component";
+import { ResultsViewButtonComponent } from './results/results-navbar/results-view-button.component';
 
 @NgModule({
   declarations: [
@@ -56,6 +57,7 @@ import { ResultsFoundDialogComponent } from './user/results-found-dialog/results
     MyEventsTabComponent,
     MyResultsTableComponent,
     ResultsFoundDialogComponent,
+    ResultsViewButtonComponent,
   ],
   entryComponents: [
     ResultsFoundDialogComponent

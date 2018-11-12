@@ -20,7 +20,7 @@ export class PendingChangesGuard implements CanDeactivate<ComponentCanDeactivate
       return true;
     } else {
       return this.ds.confirm(' Unsaved changes',
-        'You have unsaved changes. Press Cancel to go back and save these changes, or OK to lose these changes.');
+        'You have unsaved changes.  \n Press Cancel to go back and save these changes, or OK to lose these changes.');
     }
   }
 }

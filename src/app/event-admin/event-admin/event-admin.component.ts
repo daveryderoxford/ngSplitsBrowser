@@ -3,7 +3,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
 import { DialogsService } from "../../shared/dialogs/dialogs.service";
 import { OEvent } from "../../model/oevent";
 import { EventAdminService } from "../event-admin.service";
-import { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs";
 
 
 @Component({
@@ -36,7 +36,13 @@ export class EventAdminComponent implements OnInit {
       this.loading = true;
       const splitsFile = files[0];
       try {
-        await this.eventAdmin.uploadResults(this.selectedEvent, splitsFile);
+        const results = await this.eventAdmin.uploadResults(this.selectedEvent, splitsFile);
+        if (results.warnings && results.warnings.length > 0 ) {
+          const msg = results.warnings.reduce( (acc = '', warn) => acc + '\n'  + warn);
+          console.log("EventAdminComponnet: Splits uploaded with warnings\n Event key: " + this.selectedEvent.key + '\n' + msg );
+          await this.dialogsService.message("Warnings uploading splits",
+                                            "Splits uploaded sucessfully with the following warning messages\n" + msg);
+        }
       } catch (err) {
         console.log("EventAdminComponnet: Error uploading splits" + err);
         this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);

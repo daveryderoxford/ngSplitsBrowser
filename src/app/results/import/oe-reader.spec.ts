@@ -295,7 +295,7 @@ function getControls3(): Control[] {
     return [{ code: "208", time: "01:48" }, { code: "227", time: "03:46" }, { code: "212", time: "05:59" }];
 }
 
-fdescribe("Input.OE", () => {
+describe("Input.OE", () => {
 
     /**
     * Runs a test for parsing invalid data that should fail.

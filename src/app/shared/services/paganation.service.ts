@@ -1,12 +1,10 @@
+
 /** Service to paganate Firebase queries */
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import * as firebase from 'firebase/app';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/scan';
-import 'rxjs/add/operator/take';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { take, tap } from 'rxjs/operators';
 
 export interface QueryConfig {
   path: string; //  path to collection
@@ -90,8 +88,8 @@ export class PaganationService<T> {
     this._loading.next(true);
 
     // Map snapshot with doc ref (needed for cursor)
-    return col.snapshotChanges()
-      .do(arr => {
+    return col.snapshotChanges().pipe(
+      tap(arr => {
          let values = arr.map(snap =>  snap.payload.doc.data() as T );
 
         if (arr.length > 0) {
@@ -115,8 +113,8 @@ export class PaganationService<T> {
         if (!values.length) {
           this._done.next(true);
         }
-      })
-      .take(1)
+      }),
+      take(1) )
       .subscribe();
   }
 }

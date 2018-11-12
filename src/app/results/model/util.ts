@@ -5,7 +5,7 @@
  */
 export function isTrue(x: any): any {
     return x;
-};
+}
 
 /**
 * Utility function that returns whether a value is not null.
@@ -14,7 +14,7 @@ export function isTrue(x: any): any {
 */
 export function isNotNull(x: any): boolean {
     return x !== null;
-};
+}
 
 /**
 * Returns whether the value given is the numeric value NaN.
@@ -30,7 +30,7 @@ export function isNotNull(x: any): boolean {
 */
 export function isNaNStrict(x): boolean {
     return x !== x;
-};
+}
 
 /**
 * Returns whether the value given is neither null nor NaN.
@@ -40,4 +40,4 @@ export function isNaNStrict(x): boolean {
 */
 export function isNotNullNorNaN(x): boolean {
     return x !== null && x === x;
-};
+}

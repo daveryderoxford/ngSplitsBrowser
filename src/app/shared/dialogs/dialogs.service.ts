@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
-import 'rxjs/add/operator/toPromise';
+
 import { ConfirmDialogComponent } from './confirm-dialog.component';
 import { MessageDialogComponent } from "./message-dialog.component";
 

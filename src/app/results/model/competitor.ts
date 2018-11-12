@@ -19,16 +19,7 @@ export interface FirstnameSurname {
 
 const NUMBER_TYPE = typeof 0;
 
-/**
-* Returns the sum of two numbers, or null if either is null.
-* @sb-param {?Number} a - One number, or null, to add.
-* @sb-param {?Number} b - The other number, or null, to add.
-* @sb-return {?Number} null if at least one of a or b is null,
-*      otherwise a + b.
-*/
-function addIfNotNull(a: number | null, b: number | null): number | null {
-    return (a === null || b === null) ? null : (a + b);
-}
+
 
 /**
 * Returns the difference of two numbers, or null if either is null.
@@ -514,6 +505,17 @@ export class Competitor {
         return adjustedTimes;
     }
 
+        /**
+    * Returns the sum of two numbers, or null if either is null.
+    * @sb-param {?Number} a - One number, or null, to add.
+    * @sb-param {?Number} b - The other number, or null, to add.
+    * @sb-return {?Number} null if at least one of a or b is null,
+    *      otherwise a + b.
+    */
+    private _addIfNotNull(a: number | null, b: number | null): number | null {
+        return (a === null || b === null) ? null : (a + b);
+    }
+
     /**
     * Returns the cumulative times of this competitor with the start time added on.
     * @sb-param {Array} referenceCumTimes - The reference cumulative-split-time data to adjust by.
@@ -522,7 +524,7 @@ export class Competitor {
     public getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes: Array<sbTime>): Array<sbTime> {
         const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
         const startTime = this.startTime;
-        return adjustedTimes.map((adjTime) => { return addIfNotNull(adjTime, startTime); });
+        return adjustedTimes.map((adjTime) => { return this._addIfNotNull(adjTime, startTime); });
     }
 
     /**

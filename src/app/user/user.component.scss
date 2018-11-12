@@ -1,13 +1,12 @@
 .ecardgroup {
    padding-left: 10px;
-   padding-right: 10px;
-   padding-bottom: 20;
+   padding-right: 20px;
+   padding-bottom: 20px;
 }
 
-.formrow {
+.with-icon {
    display: flex;
-   align-content: space-between;
+   align-items: center;
 }
-
 
 mat-card{ max-width: 400px }; 

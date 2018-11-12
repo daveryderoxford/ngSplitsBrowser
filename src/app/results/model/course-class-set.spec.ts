@@ -30,7 +30,7 @@ import { CourseClassSet } from "./course-class-set";
 import { isNaNStrict } from "./util";
 
 
-fdescribe("Course-class set", () => {
+describe("Course-class set", () => {
 
     const fromCumTimes = Competitor.fromCumTimes;
     const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;

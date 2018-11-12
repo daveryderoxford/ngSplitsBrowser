@@ -30,7 +30,7 @@ import { isNotNull } from "./util";
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 const fromSplitTimes = TestSupport.fromSplitTimes;
 
-fdescribe("Results", () => {
+describe("Results", () => {
 
     function getCompetitor1() {
         const comp = fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106]);

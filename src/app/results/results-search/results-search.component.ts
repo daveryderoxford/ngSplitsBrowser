@@ -70,7 +70,7 @@ export class ResultsSearchComponent implements OnInit {
   onOptionSelected(event: MatAutocompleteSelectedEvent) {
     const val = event.option.value;
     this.updateSelections(val);
-    console.log('Item selected ' + val.name);
+    console.log('Search: Item selected ' + val.name);
     this.searchForm.get('searchControl').setValue('');
   }
 

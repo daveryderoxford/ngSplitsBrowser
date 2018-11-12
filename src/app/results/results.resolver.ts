@@ -1,7 +1,9 @@
+
 import { Injectable } from "@angular/core";
 import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
-import { Results } from "./model";
 import { Observable } from "rxjs";
+import { take } from 'rxjs/operators';
+import { Results } from "./model";
 import { ResultsSelectionService } from "./results-selection.service";
 
 @Injectable({
@@ -20,7 +22,7 @@ export class ResultsResolver implements Resolve<Results> {
         if (!id) {
             return this.rs.selectedResults;
         } else {
-            return this.rs.setSelectedEventByKey(id).take(1);
+            return this.rs.setSelectedEventByKey(id).pipe(take(1));
         }
     }
 }

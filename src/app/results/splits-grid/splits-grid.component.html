@@ -5,15 +5,13 @@
 
       <mat-form-field>
          <mat-select placeholder="Class" [formControl]="classSelect">
-            <mat-option *ngFor="let oclass of results.classes" [value]="oclass">
+            <mat-option *ngFor="let oclass of results?.classes" [value]="oclass">
                {{oclass.name}}
             </mat-option>
          </mat-select>
       </mat-form-field>
 
-      <mat-slide-toggle *ngIf="course.classes.length > 1" [formControl]="courseToggle">Course</mat-slide-toggle>
-
-      <mat-slide-toggle [formControl]="courseToggle">By Course</mat-slide-toggle>
+      <mat-slide-toggle *ngIf="course && course.classes.length > 1" [formControl]="courseToggle">Course</mat-slide-toggle>
 
       <mat-slide-toggle [formControl]="colorToggle">Color</mat-slide-toggle>
 
@@ -46,7 +44,7 @@
          <!-- Splits times columns -->
          <ng-container *ngFor="let split of splitsColumns; let i index">
             <ng-container [matColumnDef]="split">
-               <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} </th>
+               <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} <br> test</th>
                <td mat-cell [ngStyle]="{'background': cellColor(colorToggle.value, i, competitor)}" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor) }"*matCellDef="let competitor">
                   <span [ngClass]="{ 'fastest': (competitor.splitRanks[i]===1) }"> {{ formatTime(competitor.splitTimes[i]) }} ({{competitor.splitRanks[i]}}) </span>
                   <br>

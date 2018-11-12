@@ -1,16 +1,11 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { ResultsSelectionService } from "../results-selection.service";
-import {
-   Results,
-   Course,
-   Competitor,
-   CourseClass,
-   sbTime,
-   TimeUtilities
-} from "../model";
+
 import { SelectionModel } from "@angular/cdk/collections";
-import { MatSort, MatTableDataSource } from "@angular/material";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
+import { MatSort, MatTableDataSource } from "@angular/material";
+import { distinctUntilChanged } from 'rxjs/operators';
+import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
+import { ResultsSelectionService } from "../results-selection.service";
 
 @Component({
    selector: "app-splits-grid",
@@ -46,15 +41,16 @@ export class SplitsGridComponent implements OnInit {
       // Subecribed to updates from results selection
       this.rs.selectedResults.subscribe(results => this.selectedResultsUpdated(results));
       this.rs.selectedCourse.subscribe(course => this.selectedCourseUpdated(course));
-      this.rs.selectedClass.subscribe(oclass => this.selectedClassesUpdated(oclass));
+      this.rs.selectedClass.subscribe(oclass => this.selectedClassUpdated(oclass));
 
-      /// Update resukts seelction when user changed form controls
-      this.classSelect.valueChanges.distinctUntilChanged().subscribe( (courseClass: CourseClass) => {
+
+      /// Update results seelction when user changed form controls
+      this.classSelect.valueChanges.subscribe( (courseClass: CourseClass) => {
          this.rs.selectClass(courseClass);
       });
 
-      this.courseToggle.valueChanges.distinctUntilChanged().subscribe( (showCourses: boolean) => {
-         this.rs.displayAllCourseCompetitors(showCourses);
+      this.courseToggle.valueChanges.subscribe( (courseDisplayed: boolean) => {
+         this.rs.displayAllCourseCompetitors(courseDisplayed);
       });
    }
 
@@ -75,18 +71,15 @@ export class SplitsGridComponent implements OnInit {
       }
    }
 
-   selectedClassesUpdated(classes) {
-      // When lass is updated then set the
+   selectedClassUpdated(oclass) {
+      // When class is updated then set the
+      this.oclass = oclass;
 
+      if (oclass) {
 
-      if (this.results && this.results.classes && this.results.classes.length > 0) {
-         this.dataSource = new MatTableDataSource(this.results.classes[0].competitors);
+         this.dataSource = new MatTableDataSource(oclass.competitors);
          this.dataSource.sort = this.sort;
 
-         this.oclass = this.results.classes[0];
-
-         //  const oclass = this.results.classes.find(c => c.name === classes[0].name);
-         //  this.dataSource = oclass.competitors;
       } else {
          this.dataSource = new MatTableDataSource([]);
       }
@@ -131,16 +124,20 @@ export class SplitsGridComponent implements OnInit {
       this.selectedCompetitors.toggle(competitor);
    }
 
-
    /** Format title for split time */
    splitTitle(indexStr: string): string {
+      // tslint:disable-next-line:radix
       const index = Number.parseInt(indexStr);
       if (index === 0) {
          return 'S-1';
       } else if (index === this.course.numSplits) {
          return (indexStr + '-F');
       } else {
-         return (index + 1).toString();
+         let ret = (index + 1).toString();
+         if ( this.course.hasControls ) {
+            ret = ret + ' (' + this.course.controls[index].toString() + ')';
+         }
+         return ret;
       }
    }
 

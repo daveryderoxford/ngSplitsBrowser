@@ -5,28 +5,22 @@
   <mat-tab-group backgroundColor="primary">
     <mat-tab #tabAll label="ALL">
       <ng-template matTabContent>
-        <app-all-events-tab (eventSelected)="eventClicked($event)" [matMenuTriggerFor]="appMenu"></app-all-events-tab>
+        <app-all-events-tab (eventSelected)="eventClicked($event)"></app-all-events-tab>
       </ng-template>
     </mat-tab>
 
     <mat-tab #tabClub label="CLUB">
       <ng-template matTabContent>
-        <app-club-events-tab (eventSelected)="eventClicked($event)" [matMenuTriggerFor]="appMenu"></app-club-events-tab>
+        <app-club-events-tab (eventSelected)="eventClicked($event)"></app-club-events-tab>
       </ng-template>
     </mat-tab>
 
     <mat-tab #tabMyEvents label="MY RESULTS">
       <ng-template matTabContent>
-        <app-my-events-tab (eventSelected)="eventClicked($event)" [matMenuTriggerFor]="appMenu"></app-my-events-tab>
+        <app-my-events-tab (eventSelected)="eventClicked($event)"></app-my-events-tab>
       </ng-template>
     </mat-tab>
 
   </mat-tab-group>
 
 </div>
-
-<mat-menu #appMenu="matMenu" xPosition="before">
-  <button (click)="graphMenuSelected(selectedEvent)" mat-menu-item>Graph</button>
-  <button (click)="summaryMenuSelected(selectedEvent)" mat-menu-item>Summary</button>
-  <button *ngIf="eventEditable(selectedEvent)" (click)="adminMenuSelected(selectedEvent)" mat-menu-item>Admin</button>
-</mat-menu>

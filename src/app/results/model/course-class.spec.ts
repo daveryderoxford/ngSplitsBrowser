@@ -27,7 +27,7 @@ import { CourseClass } from "./course-class";
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 const fromSplitTimes = TestSupport.fromSplitTimes;
 
-fdescribe("Course-class", () => {
+describe("Course-class", () => {
 
     function getCompetitor1(): Competitor {
         return fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106]);

@@ -1,20 +1,14 @@
 import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
-import {
-  AngularFirestore,
-  AngularFirestoreDocument
-} from "@angular/fire/firestore";
-import { OEvent } from "../model/oevent";
-import { UserData, UserInfo, UserResult, ECard } from "app/model/user";
-import { Competitor, Course, InvalidData, Results } from "../results/model";
-import { Observable } from "rxjs/Observable";
-import { BehaviorSubject } from "rxjs";
-import * as firebase from "firebase";
-import { CompetitorDataService } from "app/shared/services/competitor-data.service";
+import { AngularFirestore, AngularFirestoreDocument } from "@angular/fire/firestore";
 import { EventService } from "app/events/event.service";
-import { CompetitorSearchData } from "app/model";
+import { CompetitorSearchData, ECard, OEvent, UserData, UserInfo, UserResult } from "app/model";
+import { Competitor, Course, InvalidData, Results } from "app/results/model";
 import { ResultsSelectionService } from "app/results/results-selection.service";
-import { map, switchMap, tap } from "rxjs/operators";
+import { CompetitorDataService } from "app/shared/services/competitor-data.service";
+import * as firebase from "firebase";
+import { BehaviorSubject, Observable, of as observableOf } from 'rxjs';
+import { map, switchMap, take, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: "root"
@@ -22,7 +16,6 @@ import { map, switchMap, tap } from "rxjs/operators";
 export class UserDataService {
 
   private _currentUserData = new BehaviorSubject<UserData>(null);
-
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -61,21 +54,21 @@ export class UserDataService {
 
   private _getUserDataObservable(): Observable<UserData | null> {
     const user = this._getUserDoc()
-      .snapshotChanges()
-      .map(ret => {
+      .snapshotChanges().pipe(
+      map(ret => {
         const snapshot = ret.payload;
         if (!snapshot.exists) {
           this.createUser();
         }
         return snapshot.data() as UserData;
-      });
+      }));
     return user;
   }
 
   /** Update the user info.  Returning the modified user details */
   updateDetails(details: Partial<UserInfo>): Observable<UserData> {
 
-    return Observable.of(this._getUserDoc().update(details)).pipe(
+    return observableOf(this._getUserDoc().update(details)).pipe(
       switchMap( () => this._getUserDoc().valueChanges() )
     );
 
@@ -114,10 +107,7 @@ export class UserDataService {
   /** Add userResult to the user results list, populating detail from the results data.
    * The user defaults to the current user
   */
-   addResult(
-    userResult: UserResult,
-    user = this.currentUserData,
-  ): Observable<void> {
+   addResult( userResult: UserResult, user = this.currentUserData ): Observable<void> {
 
     const obs = this.rs.loadResults(userResult.event).pipe(
       tap( results =>  this._processResults(user.results, results, userResult) ),
@@ -206,16 +196,15 @@ export class UserDataService {
     // Get the event for each search result
     const userResults: UserResult[] = [];
     for (const compSearch of searchResults) {
-      const oevent = await this.es.getEvent(compSearch.eventKey).take(1).toPromise();
+      const oevent = await this.es.getEvent(compSearch.eventKey).pipe(take(1)).toPromise();
       const userResult = this._createUserResult(compSearch, oevent);
       userResults.push(userResult);
     }
 
     // Sort by time
+  //  userResults.sort( (a: UserResult, b) => new Date(a.event.date) - new Date (b.event.date) );
 
     return userResults;
-
-
   }
 
   private _createUserResult(comp: CompetitorSearchData, event: OEvent): UserResult {

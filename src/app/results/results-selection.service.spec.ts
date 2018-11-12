@@ -1,68 +1,75 @@
-import { TestBed, inject } from "@angular/core/testing";
 
+import { eventA, resultsa } from "app/test/testdata.spec";
+import { of, zip } from "rxjs";
 import { ResultsSelectionService } from "./results-selection.service";
-import { HttpClient } from "@angular/common/http";
-import { Results, CourseClass, Course, Competitor } from "./model";
-import { EventTypes } from "app/model";
 
-type EventType = "results" | "control" | "competitor" | "course";
+let httpClientSpy: { get: jasmine.Spy };
 
-let selectedResult: Results;
-let selectedConpetitors: Competitor[];
-let selectedControl: string;
-let selectedClass: CourseClass;
-let selectedCourse: Course;
-let eventsRecieved: EventType[];
-let eventcount;
+let angularFirestoreSpy: {
+  doc: jasmine.Spy,
+  collection: jasmine.Spy,
+ };
 
+let angularFireStorageSpy: {
+  ref: jasmine.Spy;
+};
 
-function checkState( eventOrdering: EventType[]) {
-
-}
-
-function eventRecieved(eventType: EventType, actual: any, expected: any) {
-  // Check the event order
-  eventcount++;
-  expect(eventType).toBe(eventsRecieved[eventcount]);
-  // Check the event contents
-  expect(actual).toBe(expected);
-}
-
-/** */
-function registerListeners(service: ResultsSelectionService) {
-  service.selectedResults.subscribe( res => eventRecieved( 'results', res, selectedResult));
-  service.selectedCompetitors.subscribe( res => selectedConpetitors = res);
-  service.selectedCompetitors.subscribe( res => selectedConpetitors = res);
-  service.selectedClass.subscribe( res => selectedConpetitors = res);
-  
-  eventcount = 0;
-}
-
+let service: ResultsSelectionService;
 
 describe("ResultsSelectionService", () => {
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        ResultsSelectionService,
-        AngularFireStorage,
-        HttpClient
-      ]
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get']);
+    angularFireStorageSpy = jasmine.createSpyObj('AngularFireStorage', ['ref']);
+    angularFirestoreSpy = jasmine.createSpyObj('AngularFirestore', ['doc']);
+
+    service = new ResultsSelectionService(<any> angularFirestoreSpy, <any> angularFireStorageSpy, <any> httpClientSpy );
+
+  });
+
+  it("should be created", () => {
+    expect(service).toBeTruthy();
+  });
+
+  it("should load results for an event", (done: DoneFn) => {
+
+    spyOn(service, "downloadResultsFile").and.returnValue(of(resultsa));
+
+    service.loadResults(eventA).subscribe(results => {
+      expect(results.classes.length).toEqual(4);
+      expect(results.allCompetitors.length).toEqual(7);
+      done();
+    });
+
+  });
+
+  it("should set selected event and emit the relivant events", (done: DoneFn) => {
+
+    const selectedResult = null;
+
+    spyOn(service, "downloadResultsFile").and.returnValue(of(resultsa));
+
+    /* Zip waits for for all expected observables to emit then emits array of value obtained */
+    zip([
+      service.selectedResults,
+      service.selectedCompetitors,
+      service.selectedControl,
+      service.selectedClass,
+      service.selectedCourse],
+      (result, comps, control, oclass, çourse) => {
+        expect(result).toEqual(selectedResult);
+        expect(comps).toBe([]);
+        expect(control).toBe('');
+        expect(oclass).toEqual(selectedResult.classes[0]);
+        expect(çourse).toBe(null);
+        done();
+      });
+
+    service.setSelectedEvent(eventA).subscribe(oevent => {
+      expect(oevent).toBe(selectedResult);
     });
   });
 
-  it("should be created", inject([ResultsSelectionService], (service: ResultsSelectionService) => {
-    expect(service).toBeTruthy();
-  }));
-
-  it("should load results from file", inject([ResultsSelectionService], (service: ResultsSelectionService) => {
-    registerListeners(service);
-
-
- 
-    service.loadResults
-    await checkSele
-    
-    expect(service).toBeTruthy();
-  }));
+  it("should raise an error is selected result does not exist", (done: DoneFn) => {
+  });
 
 });

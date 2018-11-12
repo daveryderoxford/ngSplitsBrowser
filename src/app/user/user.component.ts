@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { FormArray, FormBuilder, FormGroup } from "@angular/forms";
@@ -6,14 +7,14 @@ import { Router } from "@angular/router";
 import { EventService } from "app/events/event.service";
 import { ControlCardTypes, UserData } from "app/model";
 import { Nations } from "app/model/nations";
-import { Utils, DialogsService } from "app/shared";
+import { UserResult } from "app/model/user";
+import { ResultsSelectionService } from "app/results/results-selection.service";
+import { DialogsService, Utils } from "app/shared";
 import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
 import { UserDataService } from "app/user/user-data.service";
-import { map, switchMap, tap, catchError } from "rxjs/operators";
-import { ResultsSelectionService } from "app/results/results-selection.service";
-import { UserResult } from "app/model/user";
 import * as _ from 'lodash';
-import { Observable } from "rxjs/Observable";
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: "app-user",
@@ -109,7 +110,7 @@ export class UserComponent implements OnInit {
   }
 
 
-  async save() {
+  save() {
 
     let updatedUserData: UserData = null;
 
@@ -156,7 +157,7 @@ export class UserComponent implements OnInit {
       requests.push(this.usd.addResult(found));
     }
 
-    return Observable.forkJoin(requests).map(() => { });
+    return forkJoin(requests).pipe(map(() => { }));
   }
 
   /** Displays dialog with user results found and returns the results the user has selected */
@@ -165,7 +166,7 @@ export class UserComponent implements OnInit {
       const dialogRef = this.dialog.open(ResultsFoundDialogComponent, { width: '300px', data: foundResults });
       return dialogRef.afterClosed();
     } else {
-      return Observable.of([]);
+      return of([]);
     }
   }
 

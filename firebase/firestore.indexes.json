@@ -1,0 +1,110 @@
+{
+  "indexes": [
+    {
+      "collectionId": "events",
+      "state": "READY",
+      "fields": [
+        {
+          "fieldPath": "date",
+          "mode": "DESCENDING"
+        },
+        {
+          "fieldPath": "name",
+          "mode": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionId": "events",
+      "state": "READY",
+      "fields": [
+        {
+          "fieldPath": "club",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "mode": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionId": "clubs",
+      "state": "READY",
+      "fields": [
+        {
+          "fieldPath": "name",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "nationality",
+          "mode": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionId": "events",
+      "state": "READY",
+      "fields": [
+        {
+          "fieldPath": "user",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "mode": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionId": "events",
+      "state": "READY",
+      "fields": [
+        {
+          "fieldPath": "club",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "splits.valid",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "mode": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionId": "events",
+      "state": "READY",
+      "fields": [
+        {
+          "fieldPath": "splits.valid",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "mode": "DESCENDING"
+        },
+        {
+          "fieldPath": "name",
+          "mode": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionId": "events",
+      "state": "READY",
+      "fields": [
+        {
+          "fieldPath": "nationality",
+          "mode": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "mode": "DESCENDING"
+        }
+      ]
+    }
+  ]
+}

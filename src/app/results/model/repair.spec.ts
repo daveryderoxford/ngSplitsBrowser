@@ -28,7 +28,7 @@ import { Repairer } from "./repairer";
 import { Results } from "./results";
 
 
-fdescribe("Data Repair", () => {
+describe("Data Repair", () => {
 
     const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 

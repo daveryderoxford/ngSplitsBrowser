@@ -37,7 +37,7 @@ const V2_HEADER = '<?xml version="1.0" ?>\n<!DOCTYPE ResultList SYSTEM "IOFdata.
 
 const V3_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0">\n';
 
-fdescribe("Input.IOFXml", () => {
+describe("Input.IOFXml", () => {
 
     /**
     * Returns a person object with the forename, surname, club, startTime,

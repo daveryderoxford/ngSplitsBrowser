@@ -6,6 +6,8 @@ export interface Nation {
 }
 export class Nations {
 
+    static nullNation: Nation = {abrievation: "", fullname: "--Any--"};
+
     static getNations(): Array<Nation> {
 
         const nations = [

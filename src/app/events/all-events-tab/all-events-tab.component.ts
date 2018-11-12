@@ -1,8 +1,10 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+
+import { DataSource } from '@angular/cdk/table';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { EventService } from 'app/events/event.service';
 import { EventGrades, Nations, OEvent } from 'app/model';
 import { Observable } from 'rxjs';
-import { EventService } from 'app/events/event.service';
-import { DataSource } from '@angular/cdk/table';
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'app-all-events-tab',
@@ -23,7 +25,7 @@ export class AllEventsTabComponent implements OnInit {
   constructor(private es: EventService) { }
 
   ngOnInit() {
-    this.loading = this.es.loading.delay(0);
+    this.loading = this.es.loading.pipe(delay(0));
     this.dataSource = new EventDataSource(this.es);
   }
 

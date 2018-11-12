@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { OEvent, UserResult } from 'app/model';
+import { TimeUtilities, sbTime } from 'app/results/model';
 
 @Component({
   selector: 'app-my-results-table',
@@ -32,6 +33,10 @@ export class MyResultsTableComponent implements OnInit {
      } else {
       return (res.result.totalTime / res.result.distance * 60).toString(2);
      }
+  }
+
+  formatTime(time: sbTime): string {
+    return TimeUtilities.formatTime(time);
   }
 
   eventClicked(event: OEvent) {

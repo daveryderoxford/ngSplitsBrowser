@@ -43,7 +43,7 @@ const MAX_FASTEST_SPLITS = 10;
 const RACE_GRAPH_COMPETITOR_WINDOW = 240;
 const splitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
 
-fdescribe("Splits popup data", () => {
+describe("Splits popup data", () => {
 
     function getTestCourseClassSet() {
         const competitors = d3.range(0, 11).map(function (num) {

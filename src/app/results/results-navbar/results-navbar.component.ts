@@ -1,5 +1,6 @@
-import { Component, OnInit } from "@angular/core";
-import { Results } from "../model";
+import { Component, OnInit, Input } from "@angular/core";
+import { OEvent } from "app/model";
+import { resultsViews, ResultsView } from "../model/results-view";
 
 @Component({
   selector: "app-results-navbar",
@@ -8,15 +9,24 @@ import { Results } from "../model";
 })
 export class ResultsNavbarComponent implements OnInit {
 
+  @Input() oevent: OEvent;
+
   displayOptions: Array<string> = [];
 
-  constructor() { }
+  resultsViews: ResultsView[];
+
+  constructor() {
+    this.resultsViews = resultsViews;
+  }
 
   ngOnInit() {
   }
 
   displayEvents() {
-
+ 
   }
 
+  viewSelected(view: ResultsView) {
+    console.log('Results navbar.  view seleted ' + view.name);
+  }
 }

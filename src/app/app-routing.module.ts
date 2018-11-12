@@ -15,29 +15,33 @@ import { SplitsGridComponent } from './results/splits-grid/splits-grid.component
 import { PendingChangesGuard } from './shared/services/pending-changes-guard-service.guard';
 
 const routes: Routes = [
-    { path: "", component: MainComponent },
-    { path: "login", component: LoginComponent },
-    { path: "signup", component: SignupComponent },
-    { path: "recover", component: RecoverComponent },
-    { path: "events", component:  EventsViewComponent },
-    { path: "user", component: UserComponent, canActivate: [AuthGuard], canDeactivate: [PendingChangesGuard] },
-    { path: "change-password", component: ChangePasswordComponent, canActivate: [AuthGuard] },
-    { path: "about", component: AboutComponent },
-    { path: "graph/:id",
-     component: GraphComponent,
-    resolve: {
-      results: ResultsResolver
-    }},
-    { path: "table/:id",
-    component: SplitsGridComponent,
-   resolve: {
-     results: ResultsResolver
-   }},
+   { path: "", component: MainComponent },
+   { path: "login", component: LoginComponent },
+   { path: "signup", component: SignupComponent },
+   { path: "recover", component: RecoverComponent },
+   { path: "events", component: EventsViewComponent },
+   { path: "user", component: UserComponent, canActivate: [AuthGuard], canDeactivate: [PendingChangesGuard] },
+   { path: "change-password", component: ChangePasswordComponent, canActivate: [AuthGuard] },
+   { path: "about", component: AboutComponent },
+   {
+      path: "graph/:id",
+      component: GraphComponent,
+      resolve: {
+         results: ResultsResolver
+      }
+   },
+   {
+      path: "table/:id",
+      component: SplitsGridComponent,
+      resolve: {
+         results: ResultsResolver
+      }
+   },
    { path: "table", component: SplitsGridComponent },
-  ];
+];
 
 @NgModule({
-  imports: [ RouterModule.forRoot(routes) ],
-  exports: [ RouterModule ]
+   imports: [RouterModule.forRoot(routes)],
+   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

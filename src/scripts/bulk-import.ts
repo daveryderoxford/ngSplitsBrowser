@@ -1,4 +1,6 @@
 
+import {switchMap} from 'rxjs/operators';
+
 /** Node script to import JSON
  * ts-node bulk-inoirt.node
 */
@@ -195,10 +197,10 @@ export class BulkImportService {
 
   private async readFromGoogle(path: string): Promise<string> {
 
-    const obs = this.storage.ref(path).getDownloadURL()
-      .switchMap(url => {
+    const obs = this.storage.ref(path).getDownloadURL().pipe(
+      switchMap(url => {
         return this.http.get(url, { responseType: 'text' });
-      });
+      }));
 
     return obs.toPromise();
   }

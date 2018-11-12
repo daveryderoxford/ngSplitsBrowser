@@ -327,11 +327,19 @@ export class Course {
 
    /** Returns an ordered list of results for the course */
    public get competitors(): Competitor[] {
-      if (!this.competitors ) {
+      if (!this.competitors) {
          for (const courseClass of this.classes) {
-
+            this.competitors.concat(courseClass.competitors);
          }
-
+         this.competitors.sort( (a: Competitor, b: Competitor) => {
+            if (a.completed && b.completed) {
+            return a.totalTime - b.totalTime;
+            } else if (a.completed) {
+               return 1;
+            } else {
+               return -1;
+            }
+         });
       }
       return this.competitors;
    }

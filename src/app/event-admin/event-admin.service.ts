@@ -1,3 +1,5 @@
+
+import {take} from 'rxjs/operators';
 import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore } from "@angular/fire/firestore";
@@ -6,7 +8,7 @@ import { parseEventData } from "app/results/import";
 import { Results } from "app/results/model/results";
 import { Utils } from "app/shared";
 import { firestore } from "firebase";
-import { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs";
 import { Club, CompetitorSearchData } from "../model";
 import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/model/oevent";
 import { CompetitorDataService } from "../shared/services/competitor-data.service";
@@ -30,7 +32,7 @@ export class EventAdminService {
   /** Get observable for event key */
   getEvent(key: string): Observable<OEvent> {
     const eventDoc = this.afs.doc<OEvent>('/events/' + key);
-    return eventDoc.valueChanges().take(1);
+    return eventDoc.valueChanges().pipe(take(1));
   }
 
   /** Create new event specifying event info
@@ -136,7 +138,7 @@ export class EventAdminService {
    *  - competitor index lookup
    *  - club index lookup
   */
-  async uploadResults(event: OEvent, file: File, fileFormat: SplitsFileFormat = "auto"): Promise<void> {
+  async uploadResults(event: OEvent, file: File, fileFormat: SplitsFileFormat = "auto"): Promise<Results> {
 
     const fs = this.afs.firestore;
 
@@ -161,7 +163,6 @@ export class EventAdminService {
         valid: true,
         uploadDate: new Date()
       };
-
 
       /* Update competitors in Firestore database.
          Existing competitors are deleted and new ones added in a batch */
@@ -196,6 +197,8 @@ export class EventAdminService {
 
     console.log("EventAdminService: Results file uploaded " + file + " to " + event.splits.splitsFilename);
 
+    return results;
+
   }
 
   /** Gets events created by the current user ordered by date */
@@ -220,7 +223,7 @@ export class EventAdminService {
     const promise = this.afs.collection('/events')
           .doc(event.key)
           .collection<CompetitorSearchData>('results')
-          .valueChanges().take(1).toPromise();
+          .valueChanges().pipe(take(1)).toPromise();
 
     return promise;
   }
@@ -340,7 +343,7 @@ class ClubListManager {
 
   /** Read event object - Not part of the transaction  */
   private async _readEvent(key: string): Promise<OEvent | undefined> {
-    return this.afs.doc<OEvent>('/events/' + key).valueChanges().take(1).toPromise();
+    return this.afs.doc<OEvent>('/events/' + key).valueChanges().pipe(take(1)).toPromise();
   }
 
   /** Add a reference to a club in a transaction, creating club if required */

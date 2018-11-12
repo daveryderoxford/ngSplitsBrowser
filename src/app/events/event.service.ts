@@ -1,10 +1,10 @@
+
 import { Injectable } from "@angular/core";
 import { AngularFirestore, QueryFn } from "@angular/fire/firestore";
+import { BehaviorSubject, merge, Observable } from "rxjs";
+import { finalize, take } from 'rxjs/operators';
 import { Club, EventInfo, OEvent } from "../model";
 import { PaganationService } from "../shared";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
-import { Observable } from "rxjs/Observable";
-
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
@@ -46,7 +46,7 @@ export class EventService {
 
   /** Observable if query is loading */
   get loading(): Observable<boolean> {
-    return Observable.merge(this.ps.loading, this._loading);
+    return merge(this.ps.loading, this._loading);
   }
 
   /** Observable if reached end of events */
@@ -64,9 +64,9 @@ export class EventService {
             .orderBy('date', 'desc')
     );
 
-    const clubs$ = query.valueChanges().take(1);
+    const clubs$ = query.valueChanges().pipe(take(1));
 
-    clubs$.finally( () => this._loading.next(false));
+    clubs$.pipe(finalize( () => this._loading.next(false)));
 
     return clubs$;
   }

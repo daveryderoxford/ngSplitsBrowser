@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { OEvent } from "../model/oevent";
-import { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs";
 import { AngularFirestore } from "@angular/fire/firestore";
 
 @Component({

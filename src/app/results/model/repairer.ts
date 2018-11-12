@@ -14,7 +14,6 @@ interface FirstNonAssendingIndices {
 // competitors have sensible finish splits.
 const MAX_FINISH_SPLIT_MINS_ADDED = 5;
 
-
 /**
  * Returns the positions at which the first pair of non-ascending cumulative
  * times are found.  This is returned as an object with 'first' and 'second'
@@ -54,31 +53,30 @@ export class Repairer {
 
     madeAnyChanges = false;
 
+    /**
+    * Attempt to carry out repairs to the data in an event.
+    * @sb-param {Results} eventData - The event data to repair.
+    */
+    static repairEventData(resultsData: Results): void {
+        const repairer = new Repairer();
+        repairer.repairEventData(resultsData);
+    }
 
     /**
-* Attempt to carry out repairs to the data in an event.
-* @sb-param {Results} eventData - The event data to repair.
-*/
-static repairEventData(resultsData: Results): void {
-    const repairer = new Repairer();
-    repairer.repairEventData(resultsData);
-}
-
-/**
-* Transfer the 'original' data for each competitor to the 'final' data.
-*
-* This is used if the input data has been read in a format that requires
-* the data to be checked, but the user has opted not to perform any such
-* reparations and wishes to view the raw data
-* @sb-param {Event} eventData - The event data to repair.
-*/
-static transferCompetitorData(resultsData: Results): void {
-    resultsData.classes.forEach(function (courseClass) {
-        courseClass.competitors.forEach(function (competitor) {
-            competitor.setRepairedCumulativeTimes(competitor.getAllOriginalCumulativeTimes());
+    * Transfer the 'original' data for each competitor to the 'final' data.
+    *
+    * This is used if the input data has been read in a format that requires
+    * the data to be checked, but the user has opted not to perform any such
+    * reparations and wishes to view the raw data
+    * @sb-param {Event} eventData - The event data to repair.
+    */
+    static transferCompetitorData(resultsData: Results): void {
+        resultsData.classes.forEach(function (courseClass) {
+            courseClass.competitors.forEach(function (competitor) {
+                competitor.setRepairedCumulativeTimes(competitor.getAllOriginalCumulativeTimes());
+            });
         });
-    });
-}
+    }
 
     /**
      * Construct a Repairer, for repairing some data.
@@ -86,11 +84,11 @@ static transferCompetitorData(resultsData: Results): void {
     */
     private constructor() { }
 
-   /**
-    * Remove, by setting to NaN, any cumulative time that is equal to the
-    * previous cumulative time.
-    * @sb-param {Array} cumTimes - Array of cumulative times.
-    */
+    /**
+     * Remove, by setting to NaN, any cumulative time that is equal to the
+     * previous cumulative time.
+     * @sb-param {Array} cumTimes - Array of cumulative times.
+     */
     private removeCumulativeTimesEqualToPrevious(cumTimes: Array<number>) {
         let lastCumTime = cumTimes[0];
         for (let index = 1; index + 1 < cumTimes.length; index += 1) {

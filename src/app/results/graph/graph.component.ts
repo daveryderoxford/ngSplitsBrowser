@@ -2,9 +2,9 @@ import { ChangeDetectionStrategy, Component, ViewEncapsulation, OnInit } from "@
 import { ActivatedRoute, Params } from "@angular/router";
 import { DialogsService } from '../../shared';
 import { displayGraph } from "./splitsbrowser/splitsbrowser";
-import { Results } from "../model";
+import { Results } from "app/results/model";
 import { ResultsSelectionService } from "../results-selection.service";
-
+import { OEvent } from "app/model";
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -23,6 +23,7 @@ interface SplitsBrowserOptions {
 export class GraphComponent implements OnInit {
 
   results: Results;
+  oevent: OEvent;
 
   constructor(private route: ActivatedRoute,
     private rs: ResultsSelectionService,
@@ -31,13 +32,24 @@ export class GraphComponent implements OnInit {
 
 
   ngOnInit() {
+    this.rs.selectedEvent.subscribe( oevent => this.oevent = oevent );
 
+    this.rs.selectedResults.subscribe( results  => {
+      if (results) {
+        console.log('Graph First comp ' + results.allCompetitors[0].name);
+        displayGraph(results, { containerElement: "app-graph" });
+      } else {
+        console.log('graph componennt null results');
+      }
+    });
+/*
     this.route.data
       .subscribe((data: { results: Results }) => {
         const results = data.results;
         if (results) {
+          console.log('Graph First comp ' + results.allCompetitors[0].name);
           displayGraph(results, { containerElement: "app-graph" });
         }
-      });
+      }); */
   }
 }

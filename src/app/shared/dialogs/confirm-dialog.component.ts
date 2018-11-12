@@ -6,10 +6,8 @@ import { Component } from '@angular/core';
     template: `
         <p>{{ title }}</p>
         <p>{{ message }}</p>
-        <button type="button" mat-raised-button
-            (click)="dialogRef.close(true)">OK</button>
-        <button type="button" mat-button
-            (click)="dialogRef.close()">Cancel</button>
+        <button type="button" mat-raised-button (click)="dialogRef.close(true)">OK</button>
+        <button type="button" mat-button (click)="dialogRef.close()">Cancel</button>
     `,
 })
 export class ConfirmDialogComponent {

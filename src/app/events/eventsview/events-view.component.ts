@@ -1,9 +1,7 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatTab } from "@angular/material";
+import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { OEvent } from "app/model/oevent";
 import { DialogsService } from "app/shared";
-import { UserDataService } from "app/user/user-data.service";
 import { EventService } from "../event.service";
 
 @Component({

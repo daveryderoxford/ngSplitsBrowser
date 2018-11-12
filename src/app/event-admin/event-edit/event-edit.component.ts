@@ -2,12 +2,12 @@ import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
-import { EventAdminService } from '../event-admin.service';
-import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent, ControlCardTypes } from '../../model/oevent';
-import { Club, Nations} from 'app/model';
-import { Observable } from 'rxjs/Observable';
-import { startWith, map, filter } from 'rxjs/operators';
+import { Club, Nations } from 'app/model';
+import { combineLatest, Observable } from 'rxjs';
+import { filter, map, startWith } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
+import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
+import { EventAdminService } from '../event-admin.service';
 
 @Component({
   selector: 'app-event-edit',
@@ -51,14 +51,13 @@ export class EventEditComponent implements OnInit {
       controlCardType: ["", Validators.required],
       webpage: ["", Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
     });
-
   }
 
   ngOnInit() {
 
-    this.filteredClubs$ = Observable.combineLatest(this.es.getClubs(),
-                                                    this.f.controls.club.valueChanges.startWith(''),
-                                                    this.f.controls.nationality.valueChanges.startWith(''))
+    this.filteredClubs$ = combineLatest(this.es.getClubs(),
+                                        this.f.controls.club.valueChanges.pipe(startWith('')),
+                                        this.f.controls.nationality.valueChanges.pipe(startWith('')))
       .pipe(
         filter(club => (club !== null || club !== [])),
         map(([clubs, name, nat]) => this.filterClubs(clubs, name, nat))

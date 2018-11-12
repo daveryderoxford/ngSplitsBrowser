@@ -6,12 +6,6 @@ describe("ResultsSearchComponent", () => {
   let component: ResultsSearchComponent;
   let fixture: ComponentFixture<ResultsSearchComponent>;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [ ResultsSearchComponent ]
-    })
-    .compileComponents();
-  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ResultsSearchComponent);
@@ -23,3 +17,4 @@ describe("ResultsSearchComponent", () => {
     expect(component).toBeTruthy();
   });
 });
+

@@ -34,7 +34,7 @@ function signum(n) {
     return (n < 0) ? -1 : ((n > 0) ? 1 : 0);
 }
 
-fdescribe("Competitor", () => {
+describe("Competitor", () => {
 
     function assertSplitTimes(competitor: Competitor, expectedSplitTimes: Array<sbTime>) {
         expectedSplitTimes.forEach((splitTime, controlIdx) => {

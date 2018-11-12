@@ -10,7 +10,7 @@
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput #clubNameFilter placeholder="Name" (keyup)="clubNameFilterChange($event)">    
+      <input matInput #clubNameFilter placeholder="Name" (keyup)="clubNameFilterChange($event)">
     </mat-form-field>
   </div>
 
@@ -18,12 +18,10 @@
 
     <mat-accordion multi="false">
 
-      <div *ngFor="let club of clubs$ | async">
-
-      <mat-expansion-panel (opened)="setSelectedClub(club)">
+      <mat-expansion-panel (opened)="setSelectedClub(club)" *ngFor="let club of clubs$ | async">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <b> {{club.name}} &nbsp;&nbsp;&nbsp; {{club.nationality}} </b>
+            <b> {{club.name}}  <span *ngIf="(clubNationalityFilter$ | async) === ''"> &nbsp;&nbsp;&nbsp; {{club.nationality}} </span></b>
           </mat-panel-title>
           <mat-panel-description>
             {{club.numEvents}} events &nbsp;&nbsp;&nbsp; Last event {{club.lastEvent | date}}
@@ -31,16 +29,15 @@
         </mat-expansion-panel-header>
 
         <ng-template matExpansionPanelContent>
-
-            <app-events-table [dataSource]="clubEvents" [displayedColumns] = " ['date', 'name', 'nationality', 'grade', 'discipline', 'type', 'website', 'actions']"
+          <app-events-table [dataSource]="clubEvents" [displayedColumns]=" ['date', 'name', 'grade', 'discipline', 'type']"
             (eventSelected)="eventClicked($event)"></app-events-table>
-          </ng-template>
+        </ng-template>
 
-        </mat-expansion-panel>
-      </div>
-      <mat-progress-bar *ngIf="loading | async" mode="indeterminate"></mat-progress-bar>
+      </mat-expansion-panel>
 
-      </mat-accordion>
+      <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
 
-    </div>
+    </mat-accordion>
+
   </div>
+</div>

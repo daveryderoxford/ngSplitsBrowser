@@ -27,7 +27,7 @@ import { parseHTMLEventData } from "./html-reader";
 
 const parseEventData = parseHTMLEventData;
 
-fdescribe("Input.Html", () => {
+describe("Input.Html", () => {
 
     /**
     * Runs a test for parsing invalid data that should fail.
