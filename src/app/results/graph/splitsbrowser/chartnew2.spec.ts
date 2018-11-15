@@ -1,4 +1,5 @@
 // file chart.js
+
 import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
 import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
 import { map as d3_map } from "d3-collection";
@@ -13,7 +14,7 @@ import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
 import { FastestSplitsPopupData, SplitsPopupData } from "./splits-popup-data";
 
-export interface ChartDisplayData {
+interface ChartDisplayData {
    chartData: ChartData;
    eventData: Results;
    courseClassSet: CourseClassSet;
@@ -21,7 +22,7 @@ export interface ChartDisplayData {
    fastestCumTimes: sbTime[];
 }
 
-export interface ChartData {
+interface ChartData {
    chartData: ChartType;
    eventData: Results;
    courseClassSet: CourseClassSet;
@@ -31,21 +32,6 @@ export interface ChartData {
    competitorNames?: string[];
    datacolumns?: any;
    dubiousTimesInfo?: any;
-}
-
-export interface StatsVisibilityFlags {
-   TotalTime: boolean;
-   SplitTime: boolean;
-   BehindFastest: boolean;
-   TimeLoss: boolean;
-}
-
-interface CurrentCompetitorData {
-   label: string;
-   textHeight: number;
-   y: number | null;
-   colour: string;
-   index: number;
 }
 
 // Local shorthand functions.
@@ -155,14 +141,14 @@ function getSuffix(competitor: Competitor): string {
    }
 }
 
-/**
-* Returns the maximum value from the given array, not including any null or
-* NaN values.  If the array contains no non-null, non-NaN values, zero is
-* returned.
-* @sb-param {Array} values - Array of values.
-* @sb-return {Number} Maximum non-null or NaN value.
-*/
-function maxNonNullNorNaNValue(values: Array<number | null>): number {
+   /**
+   * Returns the maximum value from the given array, not including any null or
+   * NaN values.  If the array contains no non-null, non-NaN values, zero is
+   * returned.
+   * @sb-param {Array} values - Array of values.
+   * @sb-return {Number} Maximum non-null or NaN value.
+   */
+  function maxNonNullNorNaNValue(values: Array<number | null>): number {
    const nonNullNorNaNValues: Array<number> = values.filter(isNotNullNorNaN);
    return (nonNullNorNaNValues.length > 0) ? d3_max(nonNullNorNaNValues) : 0;
 }
@@ -200,12 +186,12 @@ export class Chart {
 
    controlLine = null;  // SVG line running the lenght of the control
 
-   currentChartTime: number | null = null;
+   currentChartTime: number = null;
 
    hasData = false;
    numControls = -1;
    selectedIndexes: number[] = [];
-   currentCompetitorData: CurrentCompetitorData[] = [];
+   currentCompetitorData = null;
 
    maxStartTimeLabelWidth = 0;
    maxStatisticTextWidth: number;
@@ -224,8 +210,8 @@ export class Chart {
    courseClassSet: CourseClassSet;
    hasControls: boolean;
    isRaceGraph: boolean;
-   minViewableControl: number;
-   visibleStatistics: StatsVisibilityFlags;
+   minViewableControl;
+   visibleStatistics;
    currentLeftMargin: number;
    xScaleMinutes: d3.ScaleLinear<number, number>;
 
@@ -237,24 +223,25 @@ export class Chart {
    constructor(parent: HTMLElement) {
       this.parent = parent;
 
+
       this.svg = d3_select(this.parent).append("svg").attr("id", CHART_SVG_ID);
 
       this.svgGroup = this.svg.append("g");
       this.setLeftMargin(MARGIN.left);
 
-      const mousemoveHandler = event => this.onMouseMove(event);
-      const mouseupHandler = event => this.onMouseUp(event);
-      const mousedownHandler = event => this.onMouseDown(event);
-      $(this.svg.node()).mouseenter(event => this.onMouseEnter(<JQueryEventObject>event))
+      const outerThis = this;
+      const mousemoveHandler = function (event) { outerThis.onMouseMove(event); };
+      const mouseupHandler = function (event) { outerThis.onMouseUp(event); };
+      const mousedownHandler = function (event) { outerThis.onMouseDown(event); };
+      $(this.svg.node()).mouseenter(function (event) { outerThis.onMouseEnter(<JQueryEventObject>event); })
          .mousemove(mousemoveHandler)
-         .mouseleave(() => this.onMouseLeave())
+         .mouseleave(function (event) { outerThis.onMouseLeave(); })
          .mousedown(mousedownHandler)
          .mouseup(mouseupHandler);
 
-
       // Disable the context menu on the chart, so that it doesn't open when
       // showing the right-click popup.
-      $(this.svg.node()).contextmenu(e => e.preventDefault());
+      $(this.svg.node()).contextmenu(function (e) { e.preventDefault(); });
 
       // Add an invisible text element used for determining text size.
       this.textSizeElement = this.svg.append("text").attr("fill", "transparent")
@@ -263,7 +250,7 @@ export class Chart {
       const handlers = { "mousemove": mousemoveHandler, "mousedown": mousedownHandler, "mouseup": mouseupHandler };
       this.popup = new ChartPopup(parent, handlers);
 
-      $(document).mouseup(() => { this.popup.hide(); });
+      $(document).mouseup(function () { outerThis.popup.hide(); });
    }
 
    /**
@@ -296,6 +283,7 @@ export class Chart {
       return this.popupData.getFastestSplitsPopupData(this.courseClassSet, this.currentControlIndex);
    }
 
+
    /**
    * Returns the fastest splits for the currently-shown leg.  The list
    * returned contains the fastest splits for the current leg for each class.
@@ -305,6 +293,7 @@ export class Chart {
    getFastestSplitsForCurrentLegPopupData() {
       return this.popupData.getFastestSplitsForLegPopupData(this.courseClassSet, this.eventData, this.currentControlIndex);
    }
+
 
    /**
    * Stores the current time the mouse is at, on the race graph.
@@ -365,6 +354,7 @@ export class Chart {
    * Handle the mouse leaving the chart.
    */
    onMouseLeave() {
+      const outerThis = this;
       // Check that the mouse hasn't entered the popup.
       // It seems that the mouseleave event for the chart is sent before the
       // mouseenter event for the popup, so we use a timeout to check a short
@@ -377,10 +367,10 @@ export class Chart {
       // clear it if the mouse subsequently re-enters.  This happens a lot
       // more often than might be expected for a function with a timeout of
       // only a single millisecond.
-      this.mouseOutTimeout = setTimeout(() => {
-         if (!this.popup.isMouseIn()) {
-            this.isMouseIn = false;
-            this.removeControlLine();
+      this.mouseOutTimeout = setTimeout(function () {
+         if (!outerThis.popup.isMouseIn()) {
+            outerThis.isMouseIn = false;
+            outerThis.removeControlLine();
          }
       }, 1);
    }
@@ -390,10 +380,11 @@ export class Chart {
    * @sb-param {jQuery.Event} event - jQuery event object.
    */
    onMouseDown(event: JQueryEventObject) {
+      const outerThis = this;
       // Use a timeout to open the dialog as we require other events
       // (mouseover in particular) to be processed first, and the precise
       // order of these events is not consistent between browsers.
-      setTimeout(() => this.showPopupDialog(event), 1);
+      setTimeout(function () { outerThis.showPopupDialog(event); }, 1);
    }
 
    /**
@@ -413,20 +404,21 @@ export class Chart {
    showPopupDialog(event: JQueryEventObject) {
       if (this.isMouseIn && this.currentControlIndex !== null) {
          let showPopup = false;
+         const outerThis = this;
          if (this.isRaceGraph && (event.which === JQUERY_EVENT_LEFT_BUTTON || event.which === JQUERY_EVENT_RIGHT_BUTTON)) {
             if (this.hasControls) {
                this.setCurrentChartTime(event);
                // tslint:disable-next-line:max-line-length
-               this.popupUpdateFunc = () => this.popup.setData(this.getCompetitorsVisitingCurrentControlPopupData(), true);
+               this.popupUpdateFunc = function () { outerThis.popup.setData(outerThis.getCompetitorsVisitingCurrentControlPopupData(), true); };
                showPopup = true;
             }
          } else if (event.which === JQUERY_EVENT_LEFT_BUTTON) {
-            this.popupUpdateFunc = () => this.popup.setData(this.getFastestSplitsPopupData(), false);
+            this.popupUpdateFunc = function () { outerThis.popup.setData(outerThis.getFastestSplitsPopupData(), false); };
             showPopup = true;
          } else if (event.which === JQUERY_EVENT_RIGHT_BUTTON) {
             if (this.hasControls) {
                // tslint:disable-next-line:max-line-length
-               this.popupUpdateFunc = () => this.popup.setData(this.getFastestSplitsForCurrentLegPopupData(), true);
+               this.popupUpdateFunc = function () { outerThis.popup.setData(outerThis.getFastestSplitsForCurrentLegPopupData(), true); };
                showPopup = true;
             }
          }
@@ -566,9 +558,9 @@ export class Chart {
    *     behind the fastest time.
    */
    getTimesBehindFastest(controlIndex: number, indexes: Array<number>): Array<number | null> {
-      const selectedCompetitors = indexes.map(index => this.courseClassSet.allCompetitors[index]);
+      const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
       const fastestSplit = this.fastestCumTimes[controlIndex] - this.fastestCumTimes[controlIndex - 1];
-      const timesBehind = selectedCompetitors.map(comp => {
+      const timesBehind = selectedCompetitors.map(function (comp) {
          const compSplit = comp.getSplitTimeTo(controlIndex);
          return (compSplit === null) ? null : compSplit - fastestSplit;
       });
@@ -584,8 +576,8 @@ export class Chart {
    *     deemed to have lost at the given control.
    */
    getTimeLosses(controlIndex: number, indexes: Array<number>): Array<number | null> {
-      const selectedCompetitors = indexes.map(index => this.courseClassSet.allCompetitors[index]);
-      const timeLosses = selectedCompetitors.map(comp => comp.getTimeLossAt(controlIndex));
+      const selectedCompetitors = indexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
+      const timeLosses = selectedCompetitors.map(function (comp) { return comp.getTimeLossAt(controlIndex); });
       return timeLosses;
    }
 
@@ -593,45 +585,51 @@ export class Chart {
    * Updates the statistics text shown after the competitors.
    */
    updateCompetitorStatistics(): void {
-      const selectedCompetitors = this.selectedIndexesOrderedByLastYValue.map(index => this.courseClassSet.allCompetitors[index]);
-      let labelTexts = selectedCompetitors.map(comp => formatNameAndSuffix(comp.name, getSuffix(comp)));
+      const selectedCompetitors = this.selectedIndexesOrderedByLastYValue.map(function (index) {
+         return this.courseClassSet.allCompetitors[index];
+      }, this);
+      let labelTexts = selectedCompetitors.map(function (comp) { return formatNameAndSuffix(comp.name, getSuffix(comp)); });
 
       if (this.currentControlIndex !== null && this.currentControlIndex > 0) {
          if (this.visibleStatistics.TotalTime) {
-            const cumTimes = selectedCompetitors.map(comp => comp.getCumulativeTimeTo(this.currentControlIndex));
-            const cumRanks = selectedCompetitors.map(comp => comp.getCumulativeRankTo(this.currentControlIndex));
-            labelTexts = d3_zip<string | number>(labelTexts, cumTimes, cumRanks)
-               .map(triple => triple[0] + formatTimeAndRank(triple[1], triple[2]));
+            const cumTimes = selectedCompetitors.map(function (comp) {
+               return comp.getCumulativeTimeTo(this.currentControlIndex);
+            }, this);
+            const cumRanks = selectedCompetitors.map(function (comp) {
+               return comp.getCumulativeRankTo(this.currentControlIndex);
+            }, this);
+            labelTexts = d3_zip(labelTexts, cumTimes, cumRanks)
+               .map(function (triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
          }
 
          if (this.visibleStatistics.SplitTime) {
-            const splitTimes = selectedCompetitors.map(comp => comp.getSplitTimeTo(this.currentControlIndex));
-            const splitRanks = selectedCompetitors.map(comp => comp.getSplitRankTo(this.currentControlIndex));
-            labelTexts = d3_zip<string | number>(labelTexts, splitTimes, splitRanks)
-               .map(triple => triple[0] + formatTimeAndRank(triple[1], triple[2]));
+            const splitTimes = selectedCompetitors.map(function (comp) { return comp.getSplitTimeTo(this.currentControlIndex); }, this);
+            const splitRanks = selectedCompetitors.map(function (comp) { return comp.getSplitRankTo(this.currentControlIndex); }, this);
+            labelTexts = d3_zip(labelTexts, splitTimes, splitRanks)
+               .map(function (triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
          }
 
          if (this.visibleStatistics.BehindFastest) {
             const timesBehind = this.getTimesBehindFastest(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
-            labelTexts = d3_zip<string | number>(labelTexts, timesBehind)
-               .map(pair => pair[0] + SPACER + formatTime(pair[1] as number));
+            labelTexts = d3_zip<any>(labelTexts, timesBehind)
+               .map( (lab, behind) => lab + SPACER + formatTime(behind) );
 
          }
 
          if (this.visibleStatistics.TimeLoss) {
             const timeLosses = this.getTimeLosses(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
-            labelTexts = d3_zip<string | number>(labelTexts, timeLosses)
-               .map(pair => pair[0] + SPACER + formatTime(pair[1] as number));
+            labelTexts = d3_zip<any>(labelTexts, timeLosses)
+               .map( (lab, loss) =>  lab + SPACER + formatTime(loss) );
          }
       }
 
       // Update the current competitor data.
       if (this.hasData) {
-         this.currentCompetitorData.forEach((data, index: number) => data.label = labelTexts[index]);
+         this.currentCompetitorData.forEach(function (data, index) { data.label = labelTexts[index]; });
       }
 
       // This data is already joined to the labels; just update the text.
-      d3_selectAll("text.competitorLabel").text((data: any) => data.label);
+      d3_selectAll("text.competitorLabel").text(function (data: any) { return data.label; });
    }
 
    /**
@@ -643,9 +641,10 @@ export class Chart {
    * @sb-returns {function} Tick-formatting function.
    */
    getTickFormatter() {
-      return (value, idx) => {
+      const outerThis = this;
+      return function (value, idx) {
          return (idx === 0) ? getMessage("StartNameShort") :
-            ((idx === this.numControls + 1) ? getMessage("FinishNameShort") : idx.toString());
+            ((idx === outerThis.numControls + 1) ? getMessage("FinishNameShort") : idx.toString());
       };
    }
 
@@ -681,7 +680,7 @@ export class Chart {
          // find the maximum of an empty array.
          return 0;
       } else {
-         const nameWidths = this.selectedIndexes.map((index: number) => {
+         const nameWidths = this.selectedIndexes.map(function (index: number) {
             const comp = this.courseClassSet.allCompetitors[index];
             return this.getTextWidth(formatNameAndSuffix(comp.name, getSuffix(comp)));
          }, this);
@@ -702,13 +701,13 @@ export class Chart {
       let maxTime = 0;
       let maxRank = 0;
 
-      const selectedCompetitors = this.selectedIndexes.map(index => this.courseClassSet.allCompetitors[index]);
+      const selectedCompetitors = this.selectedIndexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
 
-      d3_range(1, this.numControls + 2).forEach(controlIndex => {
-         const times: Array<number> = selectedCompetitors.map((comp): number => comp[timeFuncName](controlIndex));
+      d3_range(1, this.numControls + 2).forEach(function (controlIndex) {
+         const times: Array<number> = selectedCompetitors.map(function (comp): number { return comp[timeFuncName](controlIndex); });
          maxTime = Math.max(maxTime, maxNonNullNorNaNValue(times));
 
-         const ranks = selectedCompetitors.map(comp => comp[rankFuncName](controlIndex));
+         const ranks = selectedCompetitors.map(function (comp) { return comp[rankFuncName](controlIndex); });
          maxRank = Math.max(maxRank, maxNonNullNorNaNValue(ranks));
       });
 
@@ -803,7 +802,7 @@ export class Chart {
    determineMaxStartTimeLabelWidth(chartData): number {
       let maxWidth;
       if (chartData.competitorNames.length > 0) {
-         maxWidth = d3_max(chartData.competitorNames.map(name => this.getTextWidth("00:00:00 " + name)));
+         maxWidth = d3_max(chartData.competitorNames.map(function (name) { return this.getTextWidth("00:00:00 " + name); }, this));
       } else {
          maxWidth = 0;
       }
@@ -843,6 +842,7 @@ export class Chart {
          }
       }
 
+      const outerThis = this;
 
       let rects = this.svgGroup.selectAll("rect")
          .data(d3_range(refCumTimesSorted.length - 1));
@@ -851,11 +851,11 @@ export class Chart {
 
       rects = this.svgGroup.selectAll("rect")
          .data(d3_range(refCumTimesSorted.length - 1));
-      rects.attr("x", i => this.xScale(refCumTimesSorted[i]))
+      rects.attr("x", function (i) { return outerThis.xScale(refCumTimesSorted[i]); })
          .attr("y", 0)
-         .attr("width", i => this.xScale(refCumTimesSorted[i + 1]) - this.xScale(refCumTimesSorted[i]))
+         .attr("width", function (i) { return outerThis.xScale(refCumTimesSorted[i + 1]) - outerThis.xScale(refCumTimesSorted[i]); })
          .attr("height", this.contentHeight)
-         .attr("class", i => (i % 2 === 0) ? "background1" : "background2");
+         .attr("class", function (i) { return (i % 2 === 0) ? "background1" : "background2"; });
 
       rects.exit().remove();
    }
@@ -881,14 +881,14 @@ export class Chart {
          const startTimes = (chartData.dataColumns.length === 0) ? [] : chartData.dataColumns[0].ys;
          if (startTimes.length === 0) {
             // No start times - draw all tick marks.
-            return time => formatTime(time * 60);
+            return function (time) { return formatTime(time * 60); };
          } else {
             // Some start times are to be drawn - only draw tick marks if
             // they are far enough away from competitors.
 
             const yScale = this.yScale;
-            return time => {
-               const yarray: Array<number> = startTimes.map((startTime) => {
+            return function (time) {
+               const yarray: Array<number> = startTimes.map(function (startTime) {
                   return Math.abs(yScale(startTime) - yScale(time));
                });
                const nearestOffset = d3_min(yarray);
@@ -957,8 +957,9 @@ export class Chart {
    * @sb-param {Array} chartData - Array of chart data.
    */
    drawChartLines(chartData) {
-      const lineFunctionGenerator = selCompIdx => {
-         if (!chartData.dataColumns.some(col => isNotNullNorNaN(col.ys[selCompIdx]))) {
+      const outerThis = this;
+      const lineFunctionGenerator = function (selCompIdx) {
+         if (!chartData.dataColumns.some(function (col) { return isNotNullNorNaN(col.ys[selCompIdx]); })) {
             // This competitor's entire row is null/NaN, so there's no data
             // to draw.  WebKit will report an error ('Error parsing d=""')
             // if no points on the line are defined, as will happen in this
@@ -966,12 +967,12 @@ export class Chart {
             return d3_line()
                .x(0)
                .y(0)
-               .defined((d, i) => i === 0);
+               .defined(function (d, i) { return i === 0; });
          } else {
             return d3_line<any>()
-               .x(d => this.xScale(d.x))
-               .y(d => this.yScale(d.ys[selCompIdx]))
-               .defined(d => isNotNullNorNaN(d.ys[selCompIdx]));
+               .x(function (d) { return outerThis.xScale(d.x); })
+               .y(function (d) { return outerThis.yScale(d.ys[selCompIdx]); })
+               .defined(function (d) { return isNotNullNorNaN(d.ys[selCompIdx]); });
          }
       };
 
@@ -979,10 +980,10 @@ export class Chart {
 
       this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
 
-      d3_range(this.numLines).forEach(selCompIdx => {
+      d3_range(this.numLines).forEach(function (selCompIdx) {
          const strokeColour = colours[this.selectedIndexes[selCompIdx] % colours.length];
-         const highlighter = () => this.highlight(this.selectedIndexes[selCompIdx]);
-         const unhighlighter = () => this.unhighlight();
+         const highlighter = function () { outerThis.highlight(outerThis.selectedIndexes[selCompIdx]); };
+         const unhighlighter = function () { outerThis.unhighlight(); };
 
          this.svgGroup.append("path")
             .attr("d", lineFunctionGenerator(selCompIdx)(chartData.dataColumns))
@@ -993,7 +994,7 @@ export class Chart {
             .append("title")
             .text(chartData.competitorNames[selCompIdx]);
 
-         chartData.dubiousTimesInfo[selCompIdx].forEach(dubiousTimeInfo => {
+         chartData.dubiousTimesInfo[selCompIdx].forEach(function (dubiousTimeInfo) {
             this.svgGroup.append("line")
                .attr("x1", this.xScale(chartData.dataColumns[dubiousTimeInfo.start].x))
                .attr("y1", this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[selCompIdx]))
@@ -1005,8 +1006,8 @@ export class Chart {
                .on("mouseleave", unhighlighter)
                .append("title")
                .text(chartData.competitorNames[selCompIdx]);
-         });
-      });
+         }, this);
+      }, this);
    }
 
    /**
@@ -1038,6 +1039,7 @@ export class Chart {
    */
    drawCompetitorStartTimeLabels(chartData) {
       const startColumn = chartData.dataColumns[0];
+      const outerThis = this;
 
       let startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
 
@@ -1046,14 +1048,14 @@ export class Chart {
 
       startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
       startLabels.attr("x", -7)
-         .attr("y", (_compIndex, selCompIndex) => {
-            return this.yScale(startColumn.ys[selCompIndex])
-               + this.getTextHeight(chartData.competitorNames[selCompIndex]) / 4;
+         .attr("y", function (_compIndex, selCompIndex) {
+            return outerThis.yScale(startColumn.ys[selCompIndex])
+               + outerThis.getTextHeight(chartData.competitorNames[selCompIndex]) / 4;
          })
-         .attr("class", compIndex => "startLabel competitor" + compIndex)
-         .on("mouseenter", compIndex => this.highlight(compIndex))
-         .on("mouseleave", () => this.unhighlight())
-         .text((_compIndex, selCompIndex) => {
+         .attr("class", function (compIndex) { return "startLabel competitor" + compIndex; })
+         .on("mouseenter", function (compIndex) { outerThis.highlight(compIndex); })
+         .on("mouseleave", function () { outerThis.unhighlight(); })
+         .text(function (_compIndex, selCompIndex) {
             return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + " "
                + chartData.competitorNames[selCompIndex];
          });
@@ -1123,7 +1125,7 @@ export class Chart {
          this.currentCompetitorData = [];
       } else {
          const finishColumn = chartData.dataColumns[chartData.dataColumns.length - 1];
-         this.currentCompetitorData = d3_range(this.numLines).map(i => {
+         this.currentCompetitorData = d3_range(this.numLines).map(function (i) {
             const competitorIndex = this.selectedIndexes[i];
             const name = this.courseClassSet.allCompetitors[competitorIndex].name;
             const textHeight = this.getTextHeight(name);
@@ -1153,9 +1155,9 @@ export class Chart {
 
       // Sort by the y-offset values, which doesn't always agree with the end
       // positions of the competitors.
-      this.currentCompetitorData.sort((a, b) => a.y - b.y);
+      this.currentCompetitorData.sort(function (a, b) { return a.y - b.y; });
 
-      this.selectedIndexesOrderedByLastYValue = this.currentCompetitorData.map(comp => comp.index);
+      this.selectedIndexesOrderedByLastYValue = this.currentCompetitorData.map(function (comp) { return comp.index; });
 
       this.adjustCompetitorLegendLabelsDownwardsIfNecessary();
 
@@ -1164,15 +1166,16 @@ export class Chart {
       let legendLines = this.svgGroup.selectAll("line.competitorLegendLine").data(this.currentCompetitorData);
       legendLines.enter().append("line").classed("competitorLegendLine", true);
 
+      const outerThis = this;
       legendLines = this.svgGroup.selectAll("line.competitorLegendLine").data(this.currentCompetitorData);
       legendLines.attr("x1", this.contentWidth + 1)
-         .attr("y1", data => data.y)
+         .attr("y1", function (data) { return data.y; })
          .attr("x2", this.contentWidth + LEGEND_LINE_WIDTH + 1)
-         .attr("y2", data => data.y)
-         .attr("stroke", data => data.colour)
-         .attr("class", data => "competitorLegendLine competitor" + data.index)
-         .on("mouseenter", data => this.highlight(data.index))
-         .on("mouseleave", () => this.unhighlight());
+         .attr("y2", function (data) { return data.y; })
+         .attr("stroke", function (data) { return data.colour; })
+         .attr("class", function (data) { return "competitorLegendLine competitor" + data.index; })
+         .on("mouseenter", function (data) { outerThis.highlight(data.index); })
+         .on("mouseleave", function () { outerThis.unhighlight(); });
 
       legendLines.exit().remove();
 
@@ -1181,11 +1184,11 @@ export class Chart {
 
       labels = this.svgGroup.selectAll("text.competitorLabel").data(this.currentCompetitorData);
       labels.attr("x", this.contentWidth + LEGEND_LINE_WIDTH + 2)
-         .attr("y", data => data.y + data.textHeight / 4)
-         .attr("class", data => "competitorLabel competitor" + data.index)
-         .on("mouseenter", data => this.highlight(data.index))
-         .on("mouseleave", () => this.unhighlight())
-         .text(data => data.label);
+         .attr("y", function (data) { return data.y + data.textHeight / 4; })
+         .attr("class", function (data) { return "competitorLabel competitor" + data.index; })
+         .on("mouseenter", function (data) { outerThis.highlight(data.index); })
+         .on("mouseleave", function () { outerThis.unhighlight(); })
+         .text(function (data) { return data.label; });
 
       labels.exit().remove();
    }
@@ -1238,16 +1241,16 @@ export class Chart {
    * This sorted list is used by the chart to find which control the cursor
    * is closest to.
    */
-   sortReferenceCumTimes(): void {
-      // Put together a map that maps cumulative times to the first split to
-      // register that time.
-      const cumTimesToControlIndex = d3_map<number>();
-      this.referenceCumTimes.forEach((cumTime, index) => {
-         const cumTimeKey = cumTime.toString();
-         if (!cumTimesToControlIndex.has(cumTimeKey)) {
-            cumTimesToControlIndex.set(cumTimeKey, index);
-         }
-      });
+  sortReferenceCumTimes(): void {
+   // Put together a map that maps cumulative times to the first split to
+   // register that time.
+   const cumTimesToControlIndex = d3_map<number>();
+   this.referenceCumTimes.forEach((cumTime, index) => {
+      const cumTimeKey = cumTime.toString();
+      if (!cumTimesToControlIndex.has(cumTimeKey)) {
+         cumTimesToControlIndex.set(cumTimeKey, index);
+      }
+   });
 
       // Sort and deduplicate the reference cumulative times.
       this.referenceCumTimesSorted = this.referenceCumTimes.slice(0);
@@ -1258,7 +1261,7 @@ export class Chart {
          }
       }
 
-      this.referenceCumTimeIndexes = this.referenceCumTimesSorted.map(cumTime => {
+      this.referenceCumTimeIndexes = this.referenceCumTimesSorted.map(function (cumTime) {
          return cumTimesToControlIndex.get(cumTime.toString());
       });
    }
@@ -1282,7 +1285,8 @@ export class Chart {
    * @sb-param {Object} chartType - The type of chart being drawn.
    */
    drawChart(data: ChartDisplayData, selectedIndexes: Array<number>,
-      visibleStatistics: StatsVisibilityFlags, chartType: ChartType) {
+      visibleStatistics: Array<boolean>, chartType: ChartType) {
+      console.log("Drawing Chart");
       const chartData: ChartData = data.chartData;
       this.numControls = chartData.numControls;
       this.numLines = chartData.competitorNames.length;
@@ -1314,3 +1318,4 @@ export class Chart {
       }
    }
 }
+
