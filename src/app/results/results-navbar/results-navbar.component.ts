@@ -1,6 +1,9 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { OEvent } from "app/model";
 import { resultsViews, ResultsView } from "../model/results-view";
+import { ResultsSelectionService } from "../results-selection.service";
+import { HighlightSpanKind } from "typescript";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "app-results-navbar",
@@ -15,18 +18,15 @@ export class ResultsNavbarComponent implements OnInit {
 
   resultsViews: ResultsView[];
 
-  constructor() {
+  constructor(private rs: ResultsSelectionService) {
     this.resultsViews = resultsViews;
   }
 
   ngOnInit() {
   }
 
-  displayEvents() {
- 
-  }
-
   viewSelected(view: ResultsView) {
     console.log('Results navbar.  view seleted ' + view.name);
+    this.rs.setResultsView(view);
   }
 }

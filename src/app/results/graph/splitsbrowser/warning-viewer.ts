@@ -1,7 +1,6 @@
 import * as $ from "jquery";
 import { Lang } from "./lang";
 
-
 const getMessage = Lang.getMessage;
 
 const CONTAINER_DIV_ID = "warningViewerContainer";

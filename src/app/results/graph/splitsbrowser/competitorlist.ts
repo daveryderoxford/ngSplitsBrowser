@@ -1,9 +1,10 @@
-import * as d3 from "d3";
 import * as $ from "jquery";
 import { Competitor } from "../../model";
 import { ChartType } from "./chart-types";
 import { CompetitorSelection } from "./competitor-selection";
 import { Lang } from "./lang";
+import { select as d3_select, mouse as d3_mouse, event as d3_event, selectAll as d3_selectAll} from "d3-selection";
+import { range as d3_range} from "d3-array";
 
 
 // ID of the competitor list div.
@@ -46,7 +47,7 @@ export function CompetitorList(parent: HTMLElement, alerter) {
 
     this.changeHandlers = [];
 
-    this.containerDiv = d3.select(parent).append("div")
+    this.containerDiv = d3_select(parent).append("div")
         .attr("id", COMPETITOR_LIST_CONTAINER_ID);
 
     this.buttonsPanel = this.containerDiv.append("div");
@@ -94,7 +95,7 @@ export function CompetitorList(parent: HTMLElement, alerter) {
         .on("mousemove", function () { outerThis.mouseMove(CONTAINER_COMPETITOR_INDEX); })
         .on("mouseup", function () { outerThis.stopDrag(); });
 
-    d3.select(document.body).on("mouseup", function () { outerThis.stopDrag(); });
+    d3_select(document.body).on("mouseup", function () { outerThis.stopDrag(); });
 
     this.setMessages();
 }
@@ -164,7 +165,7 @@ CompetitorList.prototype.fireChangeHandlers = function () {
 *     if not.
 */
 CompetitorList.prototype.isMouseOffBottomOfCompetitorList = function () {
-    return this.lastVisibleDiv === null || d3.mouse(this.lastVisibleDiv)[1] >= $(this.lastVisibleDiv).height();
+    return this.lastVisibleDiv === null || d3_mouse(this.lastVisibleDiv)[1] >= $(this.lastVisibleDiv).height();
 };
 
 /**
@@ -182,13 +183,13 @@ CompetitorList.prototype.getDragClassName = function () {
 *     over, or COMPETITOR_CONTAINER_INDEX if below the list of competitors.
 */
 CompetitorList.prototype.startDrag = function (index) {
-    if (d3.event.which === LEFT_BUTTON) {
+    if (d3_event.which === LEFT_BUTTON) {
         this.dragStartCompetitorIndex = index;
         this.currentDragCompetitorIndex = index;
         this.allCompetitorDivs = $("div.competitor");
         const visibleDivs = this.allCompetitorDivs.filter(":visible");
         this.lastVisibleDiv = (visibleDivs.length === 0) ? null : visibleDivs[visibleDivs.length - 1];
-        this.inverted = d3.event.shiftKey;
+        this.inverted = d3_event.shiftKey;
         if (index === CONTAINER_COMPETITOR_INDEX) {
             // Drag not starting on one of the competitors.
             if (!this.isMouseOffBottomOfCompetitorList()) {
@@ -196,10 +197,10 @@ CompetitorList.prototype.startDrag = function (index) {
                 return;
             }
         } else {
-            d3.select(this.allCompetitorDivs[index]).classed(this.getDragClassName(), true);
+            d3_select(this.allCompetitorDivs[index]).classed(this.getDragClassName(), true);
         }
 
-        d3.event.stopPropagation();
+        d3_event.stopPropagation();
         this.dragging = true;
     }
 };
@@ -211,10 +212,10 @@ CompetitorList.prototype.startDrag = function (index) {
 */
 CompetitorList.prototype.mouseMove = function (dragIndex) {
     if (this.dragging) {
-        d3.event.stopPropagation();
+        d3_event.stopPropagation();
         if (dragIndex !== this.currentDragCompetitorIndex) {
             const dragClassName = this.getDragClassName();
-            d3.selectAll("div.competitor." + dragClassName).classed(dragClassName, false);
+            d3_selectAll("div.competitor." + dragClassName).classed(dragClassName, false);
 
             if (this.dragStartCompetitorIndex === CONTAINER_COMPETITOR_INDEX && dragIndex === CONTAINER_COMPETITOR_INDEX) {
                 // Drag is currently all off the list, so do nothing further.
@@ -241,7 +242,7 @@ CompetitorList.prototype.mouseMove = function (dragIndex) {
                 }
             }
 
-            d3.selectAll(selectedCompetitors).classed(dragClassName, true);
+            d3_selectAll(selectedCompetitors).classed(dragClassName, true);
             this.currentDragCompetitorIndex = dragIndex;
         }
     }
@@ -269,9 +270,9 @@ CompetitorList.prototype.stopDrag = function () {
         }
     }
 
-    d3.selectAll("div.competitor." + dragClassName).classed(dragClassName, false);
+    d3_selectAll("div.competitor." + dragClassName).classed(dragClassName, false);
 
-    if (d3.event.currentTarget === document) {
+    if (d3_event.currentTarget === document) {
         // Drag ended outside the list.
     } else if (this.currentDragCompetitorIndex === CONTAINER_COMPETITOR_INDEX && !this.isMouseOffBottomOfCompetitorList()) {
         // Drag ended in the scrollbar.
@@ -287,7 +288,7 @@ CompetitorList.prototype.stopDrag = function () {
     this.dragStartCompetitorIndex = null;
     this.currentDragCompetitorIndex = null;
 
-    d3.event.stopPropagation();
+    d3_event.stopPropagation();
 };
 
 /**
@@ -312,7 +313,7 @@ CompetitorList.prototype.setHeight = function (height) {
 * @sb-returns {Array} Array of indexes of visible competitors.
 */
 CompetitorList.prototype.getAllVisibleIndexes = function () {
-    return d3.range(this.allCompetitorDetails.length).filter(function (index) {
+    return d3_range(this.allCompetitorDetails.length).filter(function (index) {
         return this.allCompetitorDetails[index].visible;
     }, this);
 };
@@ -385,7 +386,7 @@ CompetitorList.prototype.setChartType = function (chartType: ChartType) {
 CompetitorList.prototype.selectionChanged = function () {
     const outerThis = this;
     this.listDiv.selectAll("div.competitor")
-        .data(d3.range(this.competitorSelection.count))
+        .data(d3_range(this.competitorSelection.count))
         .classed("selected", function (comp, index) { return outerThis.isSelected(index); });
 };
 

@@ -1,6 +1,11 @@
 // file chart.js
 
-import * as d3 from "d3";
+import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
+import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
+import { map as d3_map } from "d3-collection";
+import { scaleLinear as d3_scaleLinear } from "d3-scale";
+import { select as d3_select, selectAll as d3_selectAll } from "d3-selection";
+import { line as d3_line } from "d3-shape";
 import * as $ from "jquery";
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
@@ -8,6 +13,7 @@ import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
 import { SplitsPopupData } from "./splits-popup-data";
+
 
 interface ChartDisplayData {
     chartData: ChartData;
@@ -187,7 +193,7 @@ export function Chart(parent: HTMLElement) {
 
     this.currentChartTime = null;
 
-    this.svg = d3.select(this.parent).append("svg")
+    this.svg = d3_select(this.parent).append("svg")
         .attr("id", CHART_SVG_ID);
 
     this.svgGroup = this.svg.append("g");
@@ -455,7 +461,7 @@ Chart.prototype.updateControlLineLocation = function (event: JQueryEventObject) 
         // In the chart.
         // Get the time offset that the mouse is currently over.
         const chartX = this.xScale.invert(xOffset - this.currentLeftMargin);
-        const bisectIndex = d3.bisect(this.referenceCumTimesSorted, chartX);
+        const bisectIndex = d3_bisect(this.referenceCumTimesSorted, chartX);
 
         // bisectIndex is the index at which to insert chartX into
         // referenceCumTimes in order to keep the array sorted.  So if
@@ -506,7 +512,7 @@ Chart.prototype.removeControlLine = function () {
     this.actualControlIndex = null;
     this.updateCompetitorStatistics();
     if (this.controlLine !== null) {
-        d3.select(this.controlLine).remove();
+        d3_select(this.controlLine).remove();
         this.controlLine = null;
     }
 };
@@ -560,26 +566,26 @@ Chart.prototype.updateCompetitorStatistics = function (): void {
             const cumRanks = selectedCompetitors.map(function (comp) {
                 return comp.getCumulativeRankTo(this.currentControlIndex);
             }, this);
-            labelTexts = d3.zip(labelTexts, cumTimes, cumRanks)
+            labelTexts = d3_zip(labelTexts, cumTimes, cumRanks)
                 .map(function (triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
         }
 
         if (this.visibleStatistics.SplitTime) {
             const splitTimes = selectedCompetitors.map(function (comp) { return comp.getSplitTimeTo(this.currentControlIndex); }, this);
             const splitRanks = selectedCompetitors.map(function (comp) { return comp.getSplitRankTo(this.currentControlIndex); }, this);
-            labelTexts = d3.zip(labelTexts, splitTimes, splitRanks)
+            labelTexts = d3_zip(labelTexts, splitTimes, splitRanks)
                 .map(function (triple) { return triple[0] + formatTimeAndRank(triple[1], triple[2]); });
         }
 
         if (this.visibleStatistics.BehindFastest) {
             const timesBehind = this.getTimesBehindFastest(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
-            labelTexts = d3.zip(labelTexts, timesBehind)
+            labelTexts = d3_zip(labelTexts, timesBehind)
                 .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1] as number); });
         }
 
         if (this.visibleStatistics.TimeLoss) {
             const timeLosses = this.getTimeLosses(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
-            labelTexts = d3.zip(labelTexts, timeLosses)
+            labelTexts = d3_zip(labelTexts, timeLosses)
                 .map(function (pair) { return pair[0] + SPACER + formatTime(pair[1] as number); });
         }
     }
@@ -590,7 +596,7 @@ Chart.prototype.updateCompetitorStatistics = function (): void {
     }
 
     // This data is already joined to the labels; just update the text.
-    d3.selectAll("text.competitorLabel").text(function (data: any) { return data.label; });
+    d3_selectAll("text.competitorLabel").text(function (data: any) { return data.label; });
 };
 
 /**
@@ -645,7 +651,7 @@ Chart.prototype.getMaxGraphEndTextWidth = function (): number {
             const comp = this.courseClassSet.allCompetitors[index];
             return this.getTextWidth(formatNameAndSuffix(comp.name, getSuffix(comp)));
         }, this);
-        return d3.max<number>(nameWidths) + this.determineMaxStatisticTextWidth();
+        return d3_max<number>(nameWidths) + this.determineMaxStatisticTextWidth();
     }
 };
 
@@ -658,7 +664,7 @@ Chart.prototype.getMaxGraphEndTextWidth = function (): number {
 */
 function maxNonNullNorNaNValue(values: Array<number | null>): number {
     const nonNullNorNaNValues: Array<number> = values.filter(isNotNullNorNaN);
-    return (nonNullNorNaNValues.length > 0) ? d3.max(nonNullNorNaNValues) : 0;
+    return (nonNullNorNaNValues.length > 0) ? d3_max(nonNullNorNaNValues) : 0;
 }
 
 /**
@@ -676,7 +682,7 @@ Chart.prototype.getMaxTimeAndRankTextWidth = function (timeFuncName, rankFuncNam
 
     const selectedCompetitors = this.selectedIndexes.map(function (index) { return this.courseClassSet.allCompetitors[index]; }, this);
 
-    d3.range(1, this.numControls + 2).forEach(function (controlIndex) {
+    d3_range(1, this.numControls + 2).forEach(function (controlIndex) {
         const times: Array<number> = selectedCompetitors.map(function (comp): number { return comp[timeFuncName](controlIndex); });
         maxTime = Math.max(maxTime, maxNonNullNorNaNValue(times));
 
@@ -735,8 +741,8 @@ Chart.prototype.getMaxTimeLossWidth = function (): number {
         const timeLosses = this.getTimeLosses(controlIndex, this.selectedIndexes);
         const nonNullTimeLosses: Array<number> = timeLosses.filter(isNotNullNorNaN);
         if (nonNullTimeLosses.length > 0) {
-            maxTimeLoss = Math.max(maxTimeLoss, d3.max(nonNullTimeLosses));
-            minTimeLoss = Math.min(minTimeLoss, d3.min(nonNullTimeLosses));
+            maxTimeLoss = Math.max(maxTimeLoss, d3_max(nonNullTimeLosses));
+            minTimeLoss = Math.min(minTimeLoss, d3_min(nonNullTimeLosses));
         }
     }
 
@@ -775,7 +781,7 @@ Chart.prototype.determineMaxStatisticTextWidth = function (): number {
 Chart.prototype.determineMaxStartTimeLabelWidth = function (chartData): number {
     let maxWidth;
     if (chartData.competitorNames.length > 0) {
-        maxWidth = d3.max(chartData.competitorNames.map(function (name) { return this.getTextWidth("00:00:00 " + name); }, this));
+        maxWidth = d3_max(chartData.competitorNames.map(function (name) { return this.getTextWidth("00:00:00 " + name); }, this));
     } else {
         maxWidth = 0;
     }
@@ -788,9 +794,9 @@ Chart.prototype.determineMaxStartTimeLabelWidth = function (chartData): number {
 * @sb-param {object} chartData - Chart data object.
 */
 Chart.prototype.createScales = function (chartData) {
-    this.xScale = d3.scaleLinear().domain(chartData.xExtent).range([0, this.contentWidth]);
-    this.yScale = d3.scaleLinear().domain(chartData.yExtent).range([0, this.contentHeight]);
-    this.xScaleMinutes = d3.scaleLinear().domain([chartData.xExtent[0] / 60, chartData.xExtent[1] / 60]).range([0, this.contentWidth]);
+    this.xScale = d3_scaleLinear().domain(chartData.xExtent).range([0, this.contentWidth]);
+    this.yScale = d3_scaleLinear().domain(chartData.yExtent).range([0, this.contentHeight]);
+    this.xScaleMinutes = d3_scaleLinear().domain([chartData.xExtent[0] / 60, chartData.xExtent[1] / 60]).range([0, this.contentWidth]);
 };
 
 /**
@@ -803,7 +809,7 @@ Chart.prototype.drawBackgroundRectangles = function (): void {
     // ascending order, but we need such a list of times in order to draw
     // the rectangles.  So, sort the reference cumulative times.
     const refCumTimesSorted = this.referenceCumTimes.slice(0);
-    refCumTimesSorted.sort(d3.ascending);
+    refCumTimesSorted.sort(d3_ascending);
 
     // Now remove any duplicate times.
     let index = 1;
@@ -818,12 +824,12 @@ Chart.prototype.drawBackgroundRectangles = function (): void {
     const outerThis = this;
 
     let rects = this.svgGroup.selectAll("rect")
-        .data(d3.range(refCumTimesSorted.length - 1));
+        .data(d3_range(refCumTimesSorted.length - 1));
 
     rects.enter().append("rect");
 
     rects = this.svgGroup.selectAll("rect")
-        .data(d3.range(refCumTimesSorted.length - 1));
+        .data(d3_range(refCumTimesSorted.length - 1));
     rects.attr("x", function (i) { return outerThis.xScale(refCumTimesSorted[i]); })
         .attr("y", 0)
         .attr("width", function (i) { return outerThis.xScale(refCumTimesSorted[i + 1]) - outerThis.xScale(refCumTimesSorted[i]); })
@@ -864,7 +870,7 @@ Chart.prototype.determineYAxisTickFormatter = function (chartData) {
                 const yarray: Array<number> = startTimes.map(function (startTime) {
                     return Math.abs(yScale(startTime) - yScale(time));
                 });
-                const nearestOffset = d3.min(yarray);
+                const nearestOffset = d3_min(yarray);
                 return (nearestOffset >= MIN_COMPETITOR_TICK_MARK_DISTANCE) ? formatTime(Math.round(time * 60)) : "";
             };
         }
@@ -883,16 +889,16 @@ Chart.prototype.drawAxes = function (yAxisLabel: number, chartData) {
 
     const tickFormatter = this.determineYAxisTickFormatter(chartData);
 
-    const xAxis = d3.axisTop(d3.scaleLinear())
+    const xAxis = d3_axisTop(d3_scaleLinear())
         .scale(this.xScale)
         .tickFormat(this.getTickFormatter())
         .tickValues(this.referenceCumTimes);
 
-    const yAxis = d3.axisLeft(d3.scaleLinear())
+    const yAxis = d3_axisLeft(d3_scaleLinear())
         .scale(this.yScale)
         .tickFormat(tickFormatter);
 
-    const lowerXAxis = d3.axisBottom(d3.scaleLinear())
+    const lowerXAxis = d3_axisBottom(d3_scaleLinear())
         .scale(this.xScaleMinutes);
 
     this.svgGroup.selectAll("g.axis").remove();
@@ -937,12 +943,12 @@ Chart.prototype.drawChartLines = function (chartData) {
             // to draw.  WebKit will report an error ('Error parsing d=""')
             // if no points on the line are defined, as will happen in this
             // case, so we substitute a single zero point instead.
-            return d3.line()
+            return d3_line()
                 .x(0)
                 .y(0)
                 .defined(function (d, i) { return i === 0; });
         } else {
-            return d3.line<any>()
+            return d3_line<any>()
                 .x(function (d) { return outerThis.xScale(d.x); })
                 .y(function (d) { return outerThis.yScale(d.ys[selCompIdx]); })
                 .defined(function (d) { return isNotNullNorNaN(d.ys[selCompIdx]); });
@@ -953,7 +959,7 @@ Chart.prototype.drawChartLines = function (chartData) {
 
     this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
 
-    d3.range(this.numLines).forEach(function (selCompIdx) {
+    d3_range(this.numLines).forEach(function (selCompIdx) {
         const strokeColour = colours[this.selectedIndexes[selCompIdx] % colours.length];
         const highlighter = function () { outerThis.highlight(outerThis.selectedIndexes[selCompIdx]); };
         const unhighlighter = function () { outerThis.unhighlight(); };
@@ -1098,7 +1104,7 @@ Chart.prototype.drawCompetitorLegendLabels = function (chartData): void {
         this.currentCompetitorData = [];
     } else {
         const finishColumn = chartData.dataColumns[chartData.dataColumns.length - 1];
-        this.currentCompetitorData = d3.range(this.numLines).map(function (i) {
+        this.currentCompetitorData = d3_range(this.numLines).map(function (i) {
             const competitorIndex = this.selectedIndexes[i];
             const name = this.courseClassSet.allCompetitors[competitorIndex].name;
             const textHeight = this.getTextHeight(name);
@@ -1217,7 +1223,7 @@ Chart.prototype.clearGraph = function () {
 Chart.prototype.sortReferenceCumTimes = function (): void {
     // Put together a map that maps cumulative times to the first split to
     // register that time.
-    const cumTimesToControlIndex = d3.map();
+    const cumTimesToControlIndex = d3_map();
     this.referenceCumTimes.forEach(function (cumTime, index) {
         if (!cumTimesToControlIndex.has(cumTime)) {
             cumTimesToControlIndex.set(cumTime, index);
@@ -1226,7 +1232,7 @@ Chart.prototype.sortReferenceCumTimes = function (): void {
 
     // Sort and deduplicate the reference cumulative times.
     this.referenceCumTimesSorted = this.referenceCumTimes.slice(0);
-    this.referenceCumTimesSorted.sort(d3.ascending);
+    this.referenceCumTimesSorted.sort(d3_ascending);
     for (let index = this.referenceCumTimesSorted.length - 1; index > 0; index -= 1) {
         if (this.referenceCumTimesSorted[index] === this.referenceCumTimesSorted[index - 1]) {
             this.referenceCumTimesSorted.splice(index, 1);

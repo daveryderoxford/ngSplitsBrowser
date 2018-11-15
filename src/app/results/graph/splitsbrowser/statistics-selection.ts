@@ -1,7 +1,6 @@
 
 
-
-import * as d3 from "d3";
+import { select as d3_select} from "d3-selection";
 import * as $ from "jquery";
 import { Lang } from "./lang";
 
@@ -30,7 +29,7 @@ const DEFAULT_SELECTED_STATISTICS = ["SplitTime", "TimeLoss"];
 * @sb-param {HTMLElement} parent - The parent element.
 */
 export function StatisticsSelector(parent) {
-    this.div = d3.select(parent).append("div")
+    this.div = d3_select(parent).append("div")
         .classed("topRowEnd", true)
         .attr("id", STATISTIC_SELECTOR_ID);
 

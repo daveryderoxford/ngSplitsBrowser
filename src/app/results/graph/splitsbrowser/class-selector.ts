@@ -1,7 +1,9 @@
 
 // file class-selector.js
 
-import * as d3 from "d3";
+import { ascending } from "d3-array";
+import { set } from "d3-collection";
+import { select } from "d3-selection";
 import * as $ from "jquery";
 import { InvalidData } from "../../model";
 import { Lang } from "./lang";
@@ -16,7 +18,7 @@ export function ClassSelector(parent) {
     this.changeHandlers = [];
     this.otherClassesEnabled = true;
 
-    const div = d3.select(parent).append("div")
+    const div = select(parent).append("div")
         .classed("topRowStart", true);
 
     this.labelSpan = div.append("span");
@@ -24,11 +26,11 @@ export function ClassSelector(parent) {
     const outerThis = this;
     this.dropDown = div.append("select").node();
     $(this.dropDown).bind("change", function () {
-        outerThis.updateOtherClasses(d3.set());
+        outerThis.updateOtherClasses(set());
         outerThis.onSelectionChanged();
     });
 
-    this.otherClassesContainer = d3.select(parent).append("div")
+    this.otherClassesContainer = select(parent).append("div")
         .attr("id", "otherClassesContainer")
         .classed("topRowStart", true)
         .style("display", "none");
@@ -42,7 +44,7 @@ export function ClassSelector(parent) {
 
     this.otherClassesSpan = this.otherClassesSelector.append("span");
 
-    this.otherClassesList = d3.select(parent).append("div")
+    this.otherClassesList = select(parent).append("div")
         .classed("otherClassList", true)
         .classed("transient", true)
         .style("position", "absolute")
@@ -53,7 +55,7 @@ export function ClassSelector(parent) {
     this.setClasses([]);
 
     // Indexes of the selected 'other classes'.
-    this.selectedOtherClassIndexes = d3.set();
+    this.selectedOtherClassIndexes = set();
 
     // Ensure that a click outside of the drop-down list or the selector
     // box closes it.
@@ -111,16 +113,16 @@ ClassSelector.prototype.setClasses = function (classes) {
             options = classes.map(function (courseClass) { return courseClass.name; });
         }
 
-        let optionsList = d3.select(this.dropDown).selectAll("option").data(options);
+        let optionsList = select(this.dropDown).selectAll("option").data(options);
         optionsList.enter().append("option");
 
-        optionsList = d3.select(this.dropDown).selectAll("option").data(options);
+        optionsList = select(this.dropDown).selectAll("option").data(options);
         optionsList.attr("value", function (_value, index) { return index.toString(); })
             .text(function (value: string): string { return value; });
 
         optionsList.exit().remove();
 
-        this.updateOtherClasses(d3.set());
+        this.updateOtherClasses(set());
     } else {
         throw new InvalidData("ClassSelector.setClasses: classes is not an array");
     }
@@ -152,7 +154,7 @@ ClassSelector.prototype.selectClasses = function (selectedIndexes) {
         return 0 <= index && index < this.dropDown.options.length;
     }, this)) {
         this.dropDown.selectedIndex = selectedIndexes[0];
-        this.updateOtherClasses(d3.set(selectedIndexes.slice(1)));
+        this.updateOtherClasses(set(selectedIndexes.slice(1)));
         this.onSelectionChanged();
     }
 };
@@ -187,7 +189,7 @@ ClassSelector.prototype.onSelectionChanged = function () {
 */
 ClassSelector.prototype.updateOtherClassText = function () {
     const classIdxs = this.selectedOtherClassIndexes.values();
-    classIdxs.sort(d3.ascending);
+    classIdxs.sort(ascending);
     let text;
     if (classIdxs.length === 0) {
         text = getMessage("NoAdditionalClassesSelectedPlaceholder");
@@ -273,7 +275,7 @@ ClassSelector.prototype.toggleOtherClass = function (classIdx) {
         this.selectedOtherClassIndexes.add(classIdx);
     }
 
-    d3.select("div#courseClassIdx_" + classIdx).classed("selected", this.selectedOtherClassIndexes.has(classIdx));
+    select("div#courseClassIdx_" + classIdx).classed("selected", this.selectedOtherClassIndexes.has(classIdx));
     this.updateOtherClassText();
     this.onSelectionChanged();
 };
@@ -284,7 +286,7 @@ ClassSelector.prototype.toggleOtherClass = function (classIdx) {
 ClassSelector.prototype.retranslate = function () {
     this.setMessages();
     if (this.classes.length === 0) {
-        d3.select(this.dropDown.options[0]).text(getMessage("NoClassesLoadedPlaceholder"));
+        select(this.dropDown.options[0]).text(getMessage("NoClassesLoadedPlaceholder"));
     }
     if (this.selectedOtherClassIndexes.values().length === 0) {
         this.otherClassesSpan.text(getMessage("NoAdditionalClassesSelectedPlaceholder"));

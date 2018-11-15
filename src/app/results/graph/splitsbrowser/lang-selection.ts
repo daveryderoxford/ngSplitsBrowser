@@ -1,6 +1,6 @@
 // file language-selector.js
 
-import * as d3 from "d3";
+import { select as d3_select} from "d3-selection";
 import * as $ from "jquery";
 import { Lang } from "./lang";
 
@@ -27,10 +27,10 @@ export function LanguageSelector(parent) {
         return;
     }
 
-    d3.select(parent).append("div")
+    d3_select(parent).append("div")
         .classed("topRowStartSpacer", true);
 
-    const div = d3.select(parent).append("div")
+    const div = d3_select(parent).append("div")
         .classed("topRowStart", true);
 
     this.label = div.append("span");
@@ -39,10 +39,10 @@ export function LanguageSelector(parent) {
     this.dropDown = div.append("select").node();
     $(this.dropDown).bind("change", function () { outerThis.onLanguageChanged(); });
 
-    let optionsList = d3.select(this.dropDown).selectAll("option").data(this.allLanguages);
+    let optionsList = d3_select(this.dropDown).selectAll("option").data(this.allLanguages);
     optionsList.enter().append("option");
 
-    optionsList = d3.select(this.dropDown).selectAll("option").data(this.allLanguages);
+    optionsList = d3_select(this.dropDown).selectAll("option").data(this.allLanguages);
     optionsList.attr("value", function (language: string): string { return language; })
         .text(function (language: string) { return getLanguageName(language); });
 

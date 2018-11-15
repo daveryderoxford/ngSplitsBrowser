@@ -20,9 +20,9 @@
  */
 
 // tslint:disable:max-line-length
-import * as d3 from "d3";
+import { version as d3_version } from "d3";
+import { select as d3_select, selectAll as d3_selectAll } from "d3-selection";
 import * as $ from "jquery";
-
 import { CourseClassSet, Results } from "../../model";
 import { Repairer } from "../../model/repairer";
 import { Chart } from "./chart";
@@ -39,6 +39,8 @@ import { formatQueryString, parseQueryString } from "./query-string";
 import { ResultsTable } from "./results-table";
 import { StatisticsSelector } from "./statistics-selection";
 import { WarningViewer } from "./warning-viewer";
+
+
 
 const GraphVersion = "4.0.0";
 
@@ -69,12 +71,8 @@ const ChartTypes = ChartTypeClass.chartTypes;
 *     or a version of D3 older version 4 was found.
 */
 function checkD3Version4(): boolean {
-    // DKR d3 imported rather than on the window object
-    if (!d3) {
-        alert("D3 was not found.  SplitsBrowser requires D3 version 4 or later.");
-        return false;
-    } else if (parseFloat(d3.version) < 4) {
-        alert("D3 version " + d3.version + " was found.  SplitsBrowser requires D3 version 4 or later.");
+if (parseFloat(d3_version) < 4) {
+        alert("D3 version " + d3_version + " was found.  SplitsBrowser requires D3 version 4 or later.");
         return false;
     } else {
         return true;
@@ -325,16 +323,16 @@ Viewer.prototype.buildUi = function (options: SplitsbrowserOptions) {
     let rootElement: any;
     // DKR Attach the D3 output to a div with ID of SB container
     if (options && options.containerElement) {
-        rootElement = d3.select(options.containerElement);
+        rootElement = d3_select(options.containerElement);
     } else {
-        rootElement = d3.select("body");
+        rootElement = d3_select("body");
     }
 
     rootElement.style("overflow", "hidden");
 
     this.container = rootElement.append("div")
         .attr("id", "sbContainer");
-    //     this.container == d3.select('.sb');
+    //     this.container == d3_select('.sb');
     //  this.container.append("Hi Dave");
 
     this.topPanel = this.container.append("div");
@@ -426,7 +424,7 @@ Viewer.prototype.postResizeHook = function () {
 * Hides all transient elements that happen to be open.
 */
 Viewer.prototype.hideTransientElements = function () {
-    d3.selectAll(".transient").style("display", "none");
+    d3_selectAll(".transient").style("display", "none");
 };
 
 /**
@@ -662,13 +660,13 @@ Viewer.prototype.selectChartType = function (chartType: ChartType) {
         // to scroll if the results table is too wide or too tall and also
         // adjust size if one or both scrollbars appear.
         this.container.style("width", null).style("height", null);
-        d3.select("body").style("overflow", null);
+        d3_select("body").style("overflow", null);
 
         this.resultsTable.show();
     } else {
         this.resultsTable.hide();
         // TODO Should be root to application
-        d3.select("body").style("overflow", "hidden");
+        d3_select("body").style("overflow", "hidden");
         this.mainPanel.style("display", null);
         this.setChartSize();
     }
@@ -790,7 +788,7 @@ Viewer.prototype.setDefaultSelectedClass = function () {
 * @sb-param {Object} params - Object mapping parameter names to values.
 */
 function showLoadFailureMessage(key: string, params) {
-    const errorDiv = d3.select("body")
+    const errorDiv = d3_select("body")
         .append("div")
         .classed("sbErrors", true);
 

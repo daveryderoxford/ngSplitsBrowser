@@ -143,12 +143,10 @@ export class Results {
 
     /** Search for a competior in the results.
      *  Matches on firstname, surname or club (case independent)
-     *  Requires exact match if search string is 2 characters or less or match on start if >1 characters
      */
     public findCompetitors(searchstring: string): Array<Competitor> {
         if (!searchstring || searchstring.trim().length === 0) { return []; }
 
-        const onechar = searchstring.length > 1;
         const ss = searchstring.toLocaleLowerCase();
 
         let filtered = this.allCompetitors.filter((comp) => {
@@ -156,9 +154,7 @@ export class Results {
             const firstname = comp.firstname.toLowerCase();
             const club = comp.club.toLowerCase();
 
-            return ((surname === ss) || (onechar && surname.startsWith(ss)) ||
-                (firstname === ss) || (onechar && firstname.startsWith(ss)) ||
-                (club === ss) || (onechar && club.startsWith(ss)));
+            return  surname.startsWith(ss) ||  firstname.startsWith(ss) ||  club.startsWith(ss);
         });
 
         // Sort into name order
@@ -205,12 +201,11 @@ export class Results {
 
         if (!searchstring || searchstring.trim().length === 0) { return []; }
 
-        const onechar = searchstring.length > 1;
         const ss = searchstring.toLowerCase();
 
         const found = this.courses.filter((course) => {
             const name = course.name.toLowerCase();
-            return ((name === ss) || (onechar && name.startsWith(ss)));
+            return  name.startsWith(ss);
         });
         return (found);
     }

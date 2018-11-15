@@ -1,5 +1,5 @@
 
-type ResultsViewType = 'Splits' | 'Race' | 'Table' | 'SplitPos' | 'RacePos' | 'Simple';
+type ResultsViewType = 'Splits' | 'Race' | 'Table' | 'SplitPos' | 'RacePos' | 'Simple' | 'PercentBehind';
 
 export interface ResultsView {
    type: ResultsViewType;
@@ -13,5 +13,6 @@ export const resultsViews: ResultsView[] = [
    { type: 'Table', name: 'Table', primary: true },
    { type: 'SplitPos', name: 'Split position', primary: false },
    { type: 'RacePos', name: 'Race Position', primary: false },
+   { type: 'PercentBehind', name: 'Percent behind', primary: false },
    { type: 'Simple', name: 'Simple results', primary: false },
 ];

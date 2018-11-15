@@ -20,12 +20,12 @@
  */
 
 // tslint:disable:max-line-length
-import * as d3 from "d3";
 import { } from "jasmine";
 import { Course, CourseClass, CourseClassSet, Results, TimeUtilities } from "../../model";
 import { TestSupport } from "../../test-support.spec";
 import { Lang } from "./lang";
 import { NextControlDataStr, SplitsPopupData } from "./splits-popup-data";
+import { range } from "d3-array";
 
 
 interface ExpectedData {
@@ -46,7 +46,7 @@ const splitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPE
 describe("Splits popup data", () => {
 
     function getTestCourseClassSet() {
-        const competitors = d3.range(0, 11).map(function (num) {
+        const competitors = range(0, 11).map(function (num) {
             const timeOffset = (num * 7) % 11;
             return fromSplitTimes(1, "Name" + num, "Club" + num, 10 * 3600 + 127 * num, [65 + 10 * timeOffset, 221 + 20 * timeOffset, 209 + 15 * timeOffset, 100 + 5 * timeOffset]);
         });
@@ -61,7 +61,7 @@ describe("Splits popup data", () => {
 
         const expectedData = {
             title: getMessage("SelectedClassesPopupHeader"),
-            data: d3.range(0, 10).map(function (num) {
+            data: range(0, 10).map(function (num) {
                 // 8 is the multiplicative inverse of 7 modulo 11,
                 // so we multiply by 8 to reverse the effect of
                 // multiplying by 7 modulo 11.

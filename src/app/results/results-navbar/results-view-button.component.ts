@@ -9,7 +9,8 @@ import { ResultsView } from '../model';
   template: `
   <mat-button-toggle-group>
 
-    <mat-button-toggle class="toggelebutton" (click)="buttonClicked(view)"  *ngFor="let view of primaryViews">
+    <mat-button-toggle class="toggelebutton" [checked]="selectedView.type === view.type"
+                     (click)="buttonClicked(view)"  *ngFor="let view of primaryViews">
        {{ view.name }}
     </mat-button-toggle>
 
@@ -44,7 +45,7 @@ export class ResultsViewButtonComponent implements OnInit {
       If the primary propery is not set it will be displayed in the 'More' menu
   */
   @Input() views: ResultsView[] = [];
-  @Input() oevent: OEvent;
+  @Input() selectedView: ResultsView;
 
   @Output() viewSelected = new EventEmitter<ResultsView>();
 

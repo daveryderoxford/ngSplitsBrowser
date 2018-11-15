@@ -7,7 +7,8 @@ import { OEvent } from "app/model/oevent";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { parseEventData } from "./import";
-import { Competitor, Course, CourseClass, InvalidData, Results } from "./model";
+import { Competitor, Course, CourseClass, InvalidData, Results, ResultsView } from "./model";
+import { resultsViews } from "./model/results-view";
 
 /** Holds results selection state.
  * Selecting an event will load its results
@@ -27,6 +28,7 @@ export class ResultsSelectionService {
    private _selectedCourse$: BehaviorSubject<Course> = new BehaviorSubject(null);
    private _selectedClass$: BehaviorSubject<CourseClass> = new BehaviorSubject(null);
    private _courseCompetitorsDisplayed$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+   private _resultsView$: BehaviorSubject<ResultsView> = new BehaviorSubject(resultsViews[0]);
 
    constructor(private afs: AngularFirestore,
       private storage: AngularFireStorage,
@@ -191,6 +193,14 @@ export class ResultsSelectionService {
             return comp;
          });
       return obs;
+   }
+
+   get resultsView(): Observable<ResultsView> {
+      return this._resultsView$.asObservable().pipe(distinctUntilChanged());
+   }
+
+   setResultsView(view: ResultsView) {
+      this._resultsView$.next(view);
    }
 
    /** Parse splits file with logging */

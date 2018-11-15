@@ -1,10 +1,8 @@
 // file chart-popup.js
 
-import * as d3 from "d3";
+import { select as d3_select} from "d3-selection";
 import * as $ from "jquery";
 import { TimeUtilities } from "../../model";
-
-const formatTime = TimeUtilities.formatTime;
 
 /**
 * Creates a ChartPopup control.
@@ -16,7 +14,7 @@ export function ChartPopup(parent, handlers) {
 
     this.shown = false;
     this.mouseIn = false;
-    this.popupDiv = d3.select(parent).append("div");
+    this.popupDiv = d3_select(parent).append("div");
     this.popupDiv.classed("chartPopup", true)
         .style("display", "none")
         .style("position", "absolute");

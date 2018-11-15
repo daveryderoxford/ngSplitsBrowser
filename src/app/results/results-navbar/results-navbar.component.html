@@ -1,8 +1,8 @@
 <div class="container">
 
-  <mat-icon (onClick)="displayEvents()">arrow_back</mat-icon>
+  <mat-icon routerLInk="" >arrow_back</mat-icon>
 
-  <app-results-view-button [views]="resultsViews" (viewSelected)="viewSelected($event)"> </app-results-view-button>
+  <app-results-view-button [views]="resultsViews" [selectedView]="rs.resultsView | async" (viewSelected)="viewSelected($event)"> </app-results-view-button>
 
   <app-results-search class="align-baseline, flex-item"> </app-results-search>
 

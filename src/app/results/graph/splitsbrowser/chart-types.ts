@@ -1,14 +1,14 @@
-import { Competitor, DubiousTimeInfo } from "../../model";
+import { Competitor, DubiousTimeInfo, sbTime } from "../../model";
 
 export interface ChartType {
     nameKey: string;
-    dataSelector: any;
+    dataSelector: (c: Competitor, t?: sbTime[]) => number[];
     skipStart: boolean;
     yAxisLabelKey: string;
     isRaceGraph: boolean;
     isResultsTable: boolean;
     minViewableControl: number;
-    indexesAroundDubiousTimesFunc: any;
+    indexesAroundDubiousTimesFunc: (c: Competitor) => DubiousTimeInfo[];
 }
 
 export interface ChartTypes {
