@@ -196,7 +196,6 @@ export class Chart {
 
    currentChartTime: number = null;
 
-
    hasData = false;
    numControls = -1;
    selectedIndexes: number[] = [];
