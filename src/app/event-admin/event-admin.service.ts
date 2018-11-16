@@ -41,7 +41,7 @@ export class EventAdminService {
   async saveNew(eventInfo: EventInfo): Promise<string> {
     const event = <OEvent>eventInfo;
 
-    // Reformat the date to an ISO date.  I should not need to do this.
+    // Ensure date is an ISO date string
     event.date = new Date(event.date).toISOString();
     event.user = this.afAuth.auth.currentUser.uid;
     event.key = this.afs.createId();
@@ -70,6 +70,8 @@ export class EventAdminService {
 
     const eventsDoc = this.afs.doc<OEvent>("/events/" + key);
     const update: PartialEvent = Object.assign(eventInfo);
+
+    update.date = new Date(update.date).toISOString();
 
     this.setIndexProperties(update);
 
@@ -161,7 +163,7 @@ export class EventAdminService {
         splitsFilename: path,
         splitsFileFormat: fileFormat,
         valid: true,
-        uploadDate: new Date()
+        uploadDate: new Date().toISOString()
       };
 
       /* Update competitors in Firestore database.

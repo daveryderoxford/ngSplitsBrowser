@@ -157,7 +157,7 @@ export class BulkImportService {
         splitsFilename: path,
         splitsFileFormat: fileFormat,
         valid: true,
-        uploadDate: new Date()
+        uploadDate: new Date().toISOString()
       };
 
       /* Update competitors in Firestore database.

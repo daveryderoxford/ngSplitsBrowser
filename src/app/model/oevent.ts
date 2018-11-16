@@ -1,3 +1,4 @@
+import { ISODateString } from "./date";
 
 export type EventGrade = "IOF" | "International" | "National" | "Regional"| "Club" | "Local";
 
@@ -46,7 +47,7 @@ export interface OEvent extends EventInfo {
 export interface EventInfo {
      name: string;
      nationality: string;
-     date: string;
+     date: ISODateString;
      club: string;
      grade: EventGrade;
      type: EventType;
@@ -57,7 +58,7 @@ export interface EventInfo {
 }
 
 export interface SplitsFileInfo {
-     uploadDate: Date;
+     uploadDate: ISODateString;
      splitsFilename: string;
      splitsFileFormat: SplitsFileFormat;
      valid: boolean;

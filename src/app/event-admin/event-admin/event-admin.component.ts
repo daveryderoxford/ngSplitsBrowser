@@ -19,8 +19,7 @@ export class EventAdminComponent implements OnInit {
   new = false;
   loading = false;
 
-  constructor(private afAuth: AngularFireAuth,
-    private eventAdmin: EventAdminService,
+  constructor( private eventAdmin: EventAdminService,
     private dialogsService: DialogsService) { }
 
   ngOnInit() {

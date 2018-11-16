@@ -23,7 +23,7 @@ export class CompetitorDataService {
       first: comp.firstname,
       surname: comp.surname,
       club: comp.club,
-      added: dateAdded,
+      added: dateAdded.toISOString(),
     };
   }
 
