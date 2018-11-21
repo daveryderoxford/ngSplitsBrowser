@@ -1,5 +1,5 @@
 
-import * as d3 from "d3";
+import { map as d3_map } from "d3-collection";
 import * as $ from "jquery";
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
@@ -36,7 +36,7 @@ export function parseIOFXMLEventData(data: string): Results {
     // to the temporary course with that ID and controls.
     // (We expect that all classes with the same course ID have consistent
     // controls, but we don't assume that.)
-    const coursesMap = d3.map<any>();
+    const coursesMap = d3_map<any>();
 
     const warnings: Array<string> = [];
 

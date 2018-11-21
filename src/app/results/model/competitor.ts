@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { ascending as d3_ascending } from "d3-array";
 import * as $ from "jquery";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
@@ -591,7 +591,7 @@ export class Competitor {
                     return splitTime / fastestSplitTimes[index];
                 });
 
-                splitRatios.sort(d3.ascending);
+                splitRatios.sort(d3_ascending);
 
                 let medianSplitRatio;
                 if (splitRatios.length % 2 === 1) {

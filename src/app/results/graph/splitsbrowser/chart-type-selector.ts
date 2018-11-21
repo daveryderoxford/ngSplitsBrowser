@@ -1,10 +1,9 @@
 // file chart-type-selector.js
 
-
-import * as d3 from "d3";
 import * as $ from "jquery";
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
+import { select as d3_select } from "d3-selection";
 
 const getMessage = Lang.getMessage;
 
@@ -19,7 +18,7 @@ export function ChartTypeSelector(parent: HTMLElement, chartTypes: Array<ChartTy
     this.raceGraphDisabledNotifier = null;
     this.lastSelectedIndex = 0;
 
-    const div = d3.select(parent).append("div")
+    const div = d3_select(parent).append("div")
         .classed("topRowStart", true);
 
     this.labelSpan = div.append("span");
@@ -28,10 +27,10 @@ export function ChartTypeSelector(parent: HTMLElement, chartTypes: Array<ChartTy
     this.dropDown = div.append("select").node();
     $(this.dropDown).bind("change", function () { outerThis.onSelectionChanged(); });
 
-    this.optionsList = d3.select(this.dropDown).selectAll("option").data(chartTypes);
+    this.optionsList = d3_select(this.dropDown).selectAll("option").data(chartTypes);
     this.optionsList.enter().append("option");
 
-    this.optionsList = d3.select(this.dropDown).selectAll("option").data(chartTypes);
+    this.optionsList = d3_select(this.dropDown).selectAll("option").data(chartTypes);
     this.optionsList.attr("value", function (_value, index) { return index.toString(); });
 
     this.optionsList.exit().remove();

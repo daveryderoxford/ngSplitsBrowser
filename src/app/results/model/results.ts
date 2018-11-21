@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { ascending as d3_ascending } from "d3-array";
 import { NextControlDataArr } from "../graph/splitsbrowser/splits-popup-data";
 import { Competitor } from "./competitor";
 import { Course } from "./course";
@@ -88,7 +88,7 @@ export class Results {
             }
         });
 
-        fastestSplits.sort((a, b) => { return d3.ascending(a.split, b.split); });
+        fastestSplits.sort((a, b) => { return d3_ascending(a.split, b.split); });
 
         return fastestSplits;
     }
@@ -115,7 +115,7 @@ export class Results {
             });
         });
 
-        competitors.sort((a, b) => { return d3.ascending(a.time, b.time); });
+        competitors.sort((a, b) => { return d3_ascending(a.time, b.time); });
 
         return competitors;
     }

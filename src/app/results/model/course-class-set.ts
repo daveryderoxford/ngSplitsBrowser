@@ -1,4 +1,6 @@
-import * as d3 from "d3";
+import { ascending as d3_ascending, max as d3_max, min as d3_min, range as d3_range,
+         transpose as d3_transpose, zip as d3_zip } from "d3-array";
+import { map as d3_map } from "d3-collection";
 import { Course } from ".";
 import { ChartType } from "../graph/splitsbrowser/chart-types";
 import { Competitor } from "./competitor";
@@ -237,7 +239,7 @@ export class CourseClassSet {
          cumRanksByCompetitor.push([]);
       });
 
-      d3.range(1, this.numControls + 2).forEach((control) => {
+      d3_range(1, this.numControls + 2).forEach((control) => {
          const splitsByCompetitor = this.allCompetitors.map((comp) => {
             return comp.getSplitTimeTo(control);
          });
@@ -247,7 +249,7 @@ export class CourseClassSet {
          });
       }, this);
 
-      d3.range(1, this.numControls + 2).forEach((control) => {
+      d3_range(1, this.numControls + 2).forEach((control) => {
          // We want to null out all subsequent cumulative ranks after a
          // competitor mispunches.
          const cumSplitsByCompetitor = this.allCompetitors.map((comp, idx) => {
@@ -298,7 +300,7 @@ export class CourseClassSet {
          const comparator = (compA: Competitor, compB: Competitor) => {
             const compASplit = compA.getSplitTimeTo(controlIdx);
             const compBSplit = compB.getSplitTimeTo(controlIdx);
-            return (compASplit === compBSplit) ? d3.ascending(compA.totalTime, compB.totalTime) : d3.ascending(compASplit, compBSplit);
+            return (compASplit === compBSplit) ? d3_ascending(compA.totalTime, compB.totalTime) : d3_ascending(compASplit, compBSplit);
          };
 
          const competitors = this.allCompetitors.filter((comp) => {
@@ -339,8 +341,8 @@ export class CourseClassSet {
          return competitorData[index];
       });
 
-      const xMin = d3.min(referenceCumTimes);
-      const xMax = d3.max(referenceCumTimes);
+      const xMin = d3_min(referenceCumTimes);
+      const xMax = d3_max(referenceCumTimes);
       let yMin;
       let yMax;
       if (currentIndexes.length === 0) {
@@ -352,12 +354,12 @@ export class CourseClassSet {
          } else {
             // Set yMin and yMax to the boundary values of the first competitor.
             const firstCompetitorTimes = competitorData[0];
-            yMin = d3.min(firstCompetitorTimes);
-            yMax = d3.max(firstCompetitorTimes);
+            yMin = d3_min(firstCompetitorTimes);
+            yMax = d3_max(firstCompetitorTimes);
          }
       } else {
-         yMin = d3.min(selectedCompetitorData.map((values) => { return d3.min(values); }));
-         yMax = d3.max(selectedCompetitorData.map((values) => { return d3.max(values); }));
+         yMin = d3_min(selectedCompetitorData.map((values) => { return d3_min(values); }));
+         yMax = d3_max(selectedCompetitorData.map((values) => { return d3_max(values); }));
       }
 
       if (yMax === yMin) {
@@ -377,9 +379,9 @@ export class CourseClassSet {
             });
       }, this);
 
-      const cumulativeTimesByControl = d3.transpose(selectedCompetitorData);
+      const cumulativeTimesByControl = d3_transpose(selectedCompetitorData);
       const xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
-      const zippedData = d3.zip<any>(xData, cumulativeTimesByControl);
+      const zippedData = d3_zip<any>(xData, cumulativeTimesByControl);
       const competitorNames = currentIndexes.map((index) => { return this.allCompetitors[index].name; }, this);
       return {
          dataColumns: zippedData.map((data) => { return { x: data[0], ys: data[1] }; }),
@@ -428,11 +430,11 @@ export class CourseClassSet {
    private getRanks(sourceData: Array<number>): Array<number> {
       // First, sort the source data, removing nulls.
       const sortedData = sourceData.filter(isNotNullNorNaN);
-      sortedData.sort(d3.ascending);
+      sortedData.sort(d3_ascending);
 
       // Now construct a map that maps from source value to rank.
-      // TODO - Check this section DKR was  var rankMap = new d3.map();
-      const rankMap = d3.map() as d3.Map<number>;
+      // TODO - Check this section DKR was  var rankMap = new d3_map();
+      const rankMap = d3_map() as d3.Map<number>;
       sortedData.forEach((value: number, index: number) => {
          if (!rankMap.has(value.toString())) {
             rankMap.set(value.toString(), index + 1);

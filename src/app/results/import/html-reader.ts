@@ -1,5 +1,5 @@
 
-import * as d3 from "d3";
+import { map as d3_map } from "d3-collection";
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { isNotNull } from "../model/util";
 import { normaliseLineEndings, parseCourseLength } from "./util";
@@ -1129,7 +1129,7 @@ HtmlFormatParser.prototype.readCompetitorLines = function (firstLine) {
 *     different classes, false otherwise.
 */
 HtmlFormatParser.prototype.areClassesUniqueWithinCourses = function () {
-    const classesToCoursesMap = d3.map();
+    const classesToCoursesMap = d3_map();
     for (let courseIndex = 0; courseIndex < this.courses.length; courseIndex += 1) {
         const course = this.courses[courseIndex];
         for (let competitorIndex = 0; competitorIndex < course.competitors.length; competitorIndex += 1) {
@@ -1167,7 +1167,7 @@ HtmlFormatParser.prototype.createOverallEventObject = function () {
 
     this.courses.forEach(function (course) {
         // Firstly, sort competitors by class.
-        const classToCompetitorsMap = <any>d3.map();
+        const classToCompetitorsMap = <any>d3_map();
         course.competitors.forEach(function (competitor) {
             const className = (competitorsHaveClasses && classesUniqueWithinCourses) ? competitor.className : course.name;
             if (classToCompetitorsMap.has(className)) {

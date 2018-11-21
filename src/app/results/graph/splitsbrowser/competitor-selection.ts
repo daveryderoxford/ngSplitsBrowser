@@ -1,6 +1,7 @@
-import * as d3 from "d3";
 import * as $ from "jquery";
 import { InvalidData } from "../../model/exception";
+import { ascending as d3_ascending, range as d3_range } from "d3-array";
+import { set as d3_set } from "d3-collection";
 
 export class CompetitorSelection {
 
@@ -70,7 +71,7 @@ export class CompetitorSelection {
                 }
             });
 
-            this.currentIndexes.sort(d3.ascending);
+            this.currentIndexes.sort(d3_ascending);
             this.fireChangeHandlers();
         }
     }
@@ -79,7 +80,7 @@ export class CompetitorSelection {
   * Select all of the competitors.
   */
     public selectAll(): void {
-        this.currentIndexes = d3.range(this.count);
+        this.currentIndexes = d3_range(this.count);
         this.fireChangeHandlers();
     }
 
@@ -162,7 +163,7 @@ export class CompetitorSelection {
                 const position = this.currentIndexes.indexOf(index);
                 if (position === -1) {
                     this.currentIndexes.push(index);
-                    this.currentIndexes.sort(d3.ascending);
+                    this.currentIndexes.sort(d3_ascending);
                 } else {
                     this.currentIndexes.splice(position, 1);
                 }
@@ -189,12 +190,12 @@ export class CompetitorSelection {
         }
 
         // Remove from the set of indexes given any that are already selected.
-        const currentIndexSet = d3.set(this.currentIndexes);
+        const currentIndexSet = d3_set(this.currentIndexes);
         indexes = indexes.filter(function (index) { return !currentIndexSet.has(index); });
 
         if (indexes.length > 0) {
             this.currentIndexes = this.currentIndexes.concat(indexes);
-            this.currentIndexes.sort(d3.ascending);
+            this.currentIndexes.sort(d3_ascending);
             this.fireChangeHandlers();
         }
     }
@@ -212,7 +213,7 @@ export class CompetitorSelection {
         }
 
         // Remove from the set of indexes given any that are not already selected.
-        const currentIndexSet = d3.set(this.currentIndexes);
+        const currentIndexSet = d3_set(this.currentIndexes);
         let anyRemoved = false;
         for (let i = 0; i < indexes.length; i += 1) {
             if (currentIndexSet.has(indexes[i])) {
@@ -223,7 +224,7 @@ export class CompetitorSelection {
 
         if (anyRemoved) {
             this.currentIndexes = currentIndexSet.values().map(function (index) { return parseInt(index, 10); });
-            this.currentIndexes.sort(d3.ascending);
+            this.currentIndexes.sort(d3_ascending);
             this.fireChangeHandlers();
         }
     }
