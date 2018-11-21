@@ -76,19 +76,17 @@ export class UserDataService {
 
   /** Creates new user data and saves it to the database */
   private createUser(): Promise<void> {
-    const userdata = {
+    const userdata: UserData = {
       key: this.afAuth.auth.currentUser.uid,
       firstname: "",
       surname: "",
       club: "",
       nationality: "",
       nationalId: "",
-      ecardEmit: "",
-      ecardSI: "",
       autoFind: true,
       results: [],
       ecards: [],
-      resultsLastupDated: new Date()
+      resultsLastupDated: new Date().toISOString()
     };
     const user = this._getUserDoc().set(userdata);
 

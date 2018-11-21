@@ -20,7 +20,7 @@ export const userdata1: UserData = {
    nationalId: 'GBR12345',
    ecards: [{ id: '11111', type: 'SI' }, { id: '55555', type: "Emit" }],
    autoFind: true,
-   resultsLastupDated: new Date('2018-10-21')
+   resultsLastupDated: new Date('2018-10-21').toISOString()
 };
 export const userdata2: UserData = {
    /** All the user data stored for the user */
@@ -33,7 +33,7 @@ export const userdata2: UserData = {
    nationalId: 'NOR12345',
    ecards: [{ id: '22222', type: 'SI' }, { id: '66666', type: "Emit" }],
    autoFind: false,
-   resultsLastupDated: new Date('2018-10-21')
+   resultsLastupDated: new Date('2018-10-21').toISOString()
 };
 export const userdata3: UserData = {
    /** All the user data stored for the user */
@@ -46,9 +46,9 @@ export const userdata3: UserData = {
    nationalId: 'GBR12345',
    ecards: [{ id: '33333', type: 'SI' }],
    autoFind: true,
-   resultsLastupDated: new Date('2018-10-21')
+   resultsLastupDated: new Date('2018-10-21').toISOString()
 };
-export const userdata = [userdata1, userdata2, userdata3];
+export const test_userdata = [userdata1, userdata2, userdata3];
 
 
 /** OEvents
@@ -57,9 +57,6 @@ export const userdata = [userdata1, userdata2, userdata3];
 export const eventA: OEvent = {
    key: 'eventkey1',
    user: 'user1',
-   splits: null,
-   summary: null,
-   legacyPassword: null,
    yearIndex: 2018,
    gradeIndex: { Regional: true, Local: true },
    name: 'Event A',
@@ -71,15 +68,12 @@ export const eventA: OEvent = {
    discipline: 'Long',
    webpage: 'www.webpage1.co.uk',
    email: 'user1.@mydomain.co.uk',
-   controlCardType: 'SI',
+   controlCardType: 'SI'
 };
 
 export const eventB: OEvent = {
    key: 'eventkeyA',
    user: 'user2',
-   splits: null,
-   summary: null,
-   legacyPassword: null,
    yearIndex: 2018,
    gradeIndex: { National: true, Regional: true, Local: true },
    name: 'Event B',
@@ -97,8 +91,6 @@ export const eventB: OEvent = {
 export const eventC: OEvent = {
    key: 'eventkeyC',
    user: 'user2',
-   splits: null,
-   summary: null,
    legacyPassword: 'Joe',
    yearIndex: 2017,
    gradeIndex: { Local: true },
@@ -113,16 +105,15 @@ export const eventC: OEvent = {
    email: 'user2.@mydomain.co.uk',
    controlCardType: 'Emit',
 };
-export const events = [eventA, eventB, eventC];
+export const test_events = [eventA, eventB, eventC];
 
 /* Results Event A
    Event has 2 courses. one with one class and one with 2 classes */
 export const splitsInfoA: SplitsFileInfo = {
-   uploadDate: new Date('2018-10-23'),
+   uploadDate: new Date('2018-10-23').toISOString(),
    splitsFilename: 'resultsa',
    splitsFileFormat: 'SICSV',
    valid: true,
-   failurereason: null,
 };
 eventA.splits = splitsInfoA;
 
@@ -130,7 +121,7 @@ export const eventSummaryA: EventSummary = {
    numcompetitors: 7,
    courses: [
       { name: 'Course 1', length: 4.1, climb: 35, numcompetitors: 3, classes: ['Class A'] },
-      { name: 'Course 2', length: 12.3, climb: 22, numcompetitors: 4, classes: ['Class B', 'Class C', , 'Class D'] },
+      { name: 'Course 2', length: 12.3, climb: 22, numcompetitors: 4, classes: ['Class B', 'Class C', 'Class D'] },
    ]
 };
 eventA.summary = eventSummaryA;
@@ -146,14 +137,14 @@ Stno;SI card;Database Id;Name;YB;Block;nc;Start;Finish;Time;Classifier;Club no.;
  ;23; ;Runner D1; ; ; ;11:30:00; ;13:32; ; ; ;GHI; ; ;Class D; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 2;2.3;22;3;3;11:00:00;11:30:32;212;03:01;999;07:05;998;09:59;
  `;
 
- export const results = [
+ export const test_results = [
 
  ];
 
- export const clubs = [
+ export const test_clubs = [
     { key: 'GBR-TVOC', name: 'TVOC', nationality: 'GBR', numEvents: 1, lastEvent: '2018-10-21' },
     { key: 'GBR-SN', name: 'SN', nationality: 'GBR', numEvents: 1, lastEvent: '2018-10-21' },
-    { key: 'NOR-SN', name: 'SN', nationality: 'GBR', numEvents: 1, lastEvent: '2017-01-10' }
+    { key: 'NOR-SN', name: 'SN', nationality: 'NOR', numEvents: 1, lastEvent: '2017-01-10' }
  ];
 /* Results Event B */
 

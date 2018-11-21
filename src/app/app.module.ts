@@ -12,7 +12,7 @@ import "hammerjs";
 import { AboutComponent } from "./about/about.component";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { firebaseConfig } from "./app.firebase-config";
+import { firebaseConfig, testFirebaseConfig } from "./app.firebase-config";
 import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { LoginComponent } from "./auth/login/login.component";
 import { RecoverComponent } from "./auth/recover/recover.component";
@@ -67,7 +67,8 @@ import { ResultsViewButtonComponent } from './results/results-navbar/results-vie
     BrowserAnimationsModule,
     ReactiveFormsModule,
     AppRoutingModule,
-    AngularFireModule.initializeApp(firebaseConfig),
+   // AngularFireModule.initializeApp(firebaseConfig),
+     AngularFireModule.initializeApp(testFirebaseConfig),
     AngularFirestoreModule,
     AngularFireStorageModule,
     EventAdminModule,

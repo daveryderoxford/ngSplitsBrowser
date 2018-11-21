@@ -2,7 +2,7 @@
 import { Injectable } from "@angular/core";
 import { AngularFirestore, QueryFn } from "@angular/fire/firestore";
 import { BehaviorSubject, merge, Observable } from "rxjs";
-import { finalize, take } from 'rxjs/operators';
+import { finalize, take, tap } from 'rxjs/operators';
 import { Club, EventInfo, OEvent } from "../model";
 import { PaganationService } from "../shared";
 
@@ -71,10 +71,13 @@ export class EventService {
     return clubs$;
   }
 
-  /** Get a list if club namees for all events */
+  /** Get a list if club namees for all events ordered by name and nationality */
   getClubs(): Observable<Club[]> {
-    return this.afs.collection<Club>("/clubs/", ref =>
+    const obs =  this.afs.collection<Club>("/clubs/", ref =>
       ref.orderBy("name").orderBy("nationality"))
-      .valueChanges();
+      .valueChanges().pipe(
+        tap( clubs => console.log("EventService:  Clubs list returned.  Num clubs" + clubs.length.toString() ))
+      );
+    return obs;
   }
 }

@@ -18,7 +18,7 @@ export class ResultsNavbarComponent implements OnInit {
 
   resultsViews: ResultsView[];
 
-  constructor(private rs: ResultsSelectionService) {
+  constructor(public rs: ResultsSelectionService) {
     this.resultsViews = resultsViews;
   }
 

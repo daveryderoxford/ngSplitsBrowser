@@ -2,7 +2,7 @@
 /** data associated with a user */
 import { sbTime } from "app/results/model";
 import { ControlCardType, OEvent } from "./oevent";
-
+import { ISODateString } from "./date";
 
 export interface ECard {
     id: string;
@@ -21,10 +21,10 @@ export interface UserInfo {
     surname: string;
     club: string;
     nationality: string;  // short nationality code
-    nationalId: string;   //
+    nationalId: string;
     ecards: ECard[];
     autoFind: boolean;
-    resultsLastupDated: Date;
+    resultsLastupDated: ISODateString;
 }
 
 /** Information on the results for a user.
@@ -50,5 +50,3 @@ export interface UserResult {
         classWinningTime: sbTime;
     };
 }
-
-

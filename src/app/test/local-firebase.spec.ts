@@ -2,7 +2,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore, QueryDocumentSnapshot } from "@angular/fire/firestore";
 import { testUser1Password } from "app/app.firebase-config";
 import { Observable, Observer, from } from "rxjs";
-import { events, results, userdata } from './testdata.spec';
+import { test_events, test_results, test_userdata, test_clubs } from './testdata.spec';
 import { TestBed } from "@angular/core/testing";
 import { concatMap, bufferCount } from "rxjs/operators";
 
@@ -15,13 +15,23 @@ export class FirestoreTestUtil {
 
    constructor() {
       this.afAuth = TestBed.get(AngularFireAuth);
+      if (!this.afAuth) {
+         throw new Error("Auth service reference no found");
+      }
+
       this.afs = TestBed.get(AngularFirestore);
+      if (!this.afs) {
+         throw new Error("Firestore service reference no found");
+      }
 
    }
 
    /** Login to test database */
    async logon(): Promise<firebase.auth.UserCredential> {
-      return this.afAuth.auth.signInWithEmailAndPassword('user1', testUser1Password);
+      const user = 'michelle@theryderclan.co.uk';
+      const password = testUser1Password;
+      const p = this.afAuth.auth.signInWithEmailAndPassword(user, password);
+      return p;
    }
 
    /** Clean all collections from test database */
@@ -33,22 +43,26 @@ export class FirestoreTestUtil {
    async loadDefaultData(): Promise<void> {
 
       // set user data
-      for (const ud of userdata) {
+      console.log('Setting default user data');
+      for (const ud of test_userdata) {
          await this.afs.doc('users/' + ud.key).set(ud);
       }
 
       // set events
-      for (const event of events) {
+      console.log('Setting default event data');
+      for (const event of test_events) {
          await this.afs.doc('events/' + event.key).set(event);
       }
 
       // set results
-      for (const result of results) {
-         await this.afs.doc('events/' + result.key).set(result);
+      console.log('Setting default result data');
+      for (const result of test_results) {
+         await this.afs.doc('results/' + result.key).set(result);
       }
 
       // clubs
-      for (const club of results) {
+      console.log('Setting default club data');
+      for (const club of test_clubs) {
          await this.afs.doc('clubs/' + club.key).set(club);
       }
    }
