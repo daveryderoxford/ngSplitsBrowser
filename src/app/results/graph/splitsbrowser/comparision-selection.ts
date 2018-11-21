@@ -1,9 +1,9 @@
 
 
-
-import * as d3 from "d3";
 import * as $ from "jquery";
 import { Lang } from "./lang";
+import { select as d3_select } from "d3-selection";
+import { range as d3_range } from "d3-array";
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
@@ -68,7 +68,7 @@ export function ComparisonSelector(parent, alerter) {
     this.hasWinner = false;
     this.previousSelectedIndex = -1;
 
-    const div = d3.select(parent).append("div")
+    const div = d3_select(parent).append("div")
         .classed("topRowStart", true);
 
     this.comparisonSelectorLabel = div.append("span")
@@ -82,17 +82,17 @@ export function ComparisonSelector(parent, alerter) {
 
     $(this.dropDown).bind("change", function () { outerThis.onSelectionChanged(); });
 
-    this.optionsList = d3.select(this.dropDown).selectAll("option")
+    this.optionsList = d3_select(this.dropDown).selectAll("option")
         .data(ALL_COMPARISON_OPTIONS);
     this.optionsList.enter().append("option");
 
-    this.optionsList = d3.select(this.dropDown).selectAll("option")
+    this.optionsList = d3_select(this.dropDown).selectAll("option")
         .data(ALL_COMPARISON_OPTIONS);
     this.optionsList.attr("value", function (_opt, index) { return index.toString(); });
 
     this.optionsList.exit().remove();
 
-    this.runnerDiv = d3.select(parent).append("div")
+    this.runnerDiv = d3_select(parent).append("div")
         .classed("topRowStart", true)
         .style("display", "none")
         .style("padding-left", "20px");
@@ -159,16 +159,16 @@ ComparisonSelector.prototype.setCourseClassSet = function (courseClassSet) {
 */
 ComparisonSelector.prototype.setRunners = function () {
     const competitors = this.courseClassSet.allCompetitors;
-    const completingCompetitorIndexes = d3.range(competitors.length).filter(function (idx) { return competitors[idx].completed(); });
+    const completingCompetitorIndexes = d3_range(competitors.length).filter(function (idx) { return competitors[idx].completed(); });
     const completingCompetitors = competitors.filter(function (comp) { return comp.completed(); });
 
     this.hasWinner = (completingCompetitors.length > 0);
 
-    let optionsList = d3.select(this.runnerDropDown).selectAll("option")
+    let optionsList = d3_select(this.runnerDropDown).selectAll("option")
         .data(completingCompetitors);
 
     optionsList.enter().append("option");
-    optionsList = d3.select(this.runnerDropDown).selectAll("option")
+    optionsList = d3_select(this.runnerDropDown).selectAll("option")
         .data(completingCompetitors);
     optionsList.attr("value", function (_comp, complCompIndex) { return completingCompetitorIndexes[complCompIndex].toString(); })
         .text(function (comp: any) { return comp.name; });
@@ -199,7 +199,7 @@ ComparisonSelector.prototype.setRunners = function () {
 *      disabled.
 */
 ComparisonSelector.prototype.setEnabled = function (isEnabled) {
-    d3.select(this.parent).selectAll("span.comparisonSelectorLabel")
+    d3_select(this.parent).selectAll("span.comparisonSelectorLabel")
         .classed("disabled", !isEnabled);
 
     this.dropDown.disabled = !isEnabled;

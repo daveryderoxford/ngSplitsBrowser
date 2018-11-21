@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { range as d3_range } from "d3-array";
 import { Competitor } from "./competitor";
 import { Course } from "./course";
 import { InvalidData } from "./exception";
@@ -40,7 +40,7 @@ export class CourseClass {
     * Determines the time losses for the competitors in this course-class.
     */
     public determineTimeLosses(): void {
-        const fastestSplitTimes = d3.range(1, this.numControls + 2).map( (controlIdx) => {
+        const fastestSplitTimes = d3_range(1, this.numControls + 2).map( (controlIdx) => {
             const splitRec = this.getFastestSplitTo(controlIdx);
             return (splitRec === null) ? null : splitRec.split;
         }, this);
