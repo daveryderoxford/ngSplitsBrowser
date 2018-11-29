@@ -7,6 +7,13 @@ import { testFirebaseConfig } from 'app/app.firebase-config';
 import { PaganationService } from 'app/shared';
 import { AngularFireAuthModule, AngularFireAuth } from '@angular/fire/auth';
 import { test_clubs, test_events, test_results } from 'app/test/testdata.spec';
+import { Club } from 'app/model';
+import { filter } from 'rxjs/operators';
+
+function checkClub(club: Club, name: string, nat: string, msg?: string) {
+  expect(club.name).toEqual(name, 'check of name for ' + msg);
+  expect(club.nationality).toEqual(nat, 'check of nationality for ' + msg);
+}
 
 let fstest: FirestoreTestUtil;
 let service: EventService;
@@ -20,7 +27,8 @@ fdescribe('EventService', () => {
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(testFirebaseConfig),
-        AngularFirestoreModule
+        AngularFirestoreModule,
+        AngularFireAuthModule
       ],
       providers: [EventService, AngularFireAuth, AngularFirestore, PaganationService]
     });
@@ -45,6 +53,7 @@ fdescribe('EventService', () => {
     done();
   });
 
+
   it('shall get clubs ordered by name/nationality', async (done) => {
 
     fstest = new FirestoreTestUtil();
@@ -52,28 +61,32 @@ fdescribe('EventService', () => {
 
     service.getClubs().subscribe((clubs) => {
       expect(clubs.length).toBe(3);
-      expect(clubs[0].name).toEqual('SN');
-      expect(clubs[0].nationality).toEqual('NOR');
-      expect(clubs[1].name).toEqual('SN');
-      expect(clubs[2].name).toEqual('TVOC');
-      done();
-    });
-  }, 10000 );
-
-  it('shall get events for club ordered by date', (done) => {
-
-    service.getEventsForClub(test_clubs[0]).subscribe(oevents => {
-      expect(oevents.length).toEqual(1);
-      expect(oevents[0].name).toEqual(test_events[0].name);
+      checkClub(clubs[0], 'SN', 'GBR', 'first club');
+      checkClub(clubs[1], 'SN', 'NOR', 'second club');
+      checkClub(clubs[2], 'TVOC', 'GBR', 'third club');
       done();
     });
   });
 
+  it('shall get events for club ordered by date', async (done) => {
+    await fstest.logon();
+
+    service.getEventsForClub(test_clubs[0]).subscribe(oevents => {
+      expect(oevents.length).toEqual(1);
+      expect(oevents[0].name).toEqual('Event B');
+      done();
+    });
+  }, 10000);
+
   it('shall search for events with no search criteria', (done) => {
 
     service.search('date', null, 1).subscribe(oevents => {
-
-      done();
+      // Wait for first event to be reported, Initially we will get null.
+      if (oevents.length === 1) {
+        expect(oevents.length).toEqual(1);
+        expect(oevents[0].name).toEqual('Event B');
+        done();
+      }
     });
   });
 
@@ -84,8 +97,12 @@ fdescribe('EventService', () => {
     service.extendSearch();
 
     obs.subscribe(oevents => {
-      expect(oevents.length).toEqual(2);
-      service.extendSearch();
+      if (oevents.length === 2) {
+        expect(oevents.length).toEqual(2);
+        expect(oevents[0].name).toEqual('Event B');
+        expect(oevents[1].name).toEqual('Event A');
+        done();
+      }
     });
 
   });

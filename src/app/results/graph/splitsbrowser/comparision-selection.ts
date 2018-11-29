@@ -4,52 +4,18 @@ import * as $ from "jquery";
 import { Lang } from "./lang";
 import { select as d3_select } from "d3-selection";
 import { range as d3_range } from "d3-array";
+import { ALL_COMPARISON_OPTIONS} from "./comparision-options";
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
-const ALL_COMPARISON_OPTIONS = [
-    {
-        nameKey: "CompareWithWinner",
-        selector: function (courseClassSet) { return courseClassSet.getWinnerCumTimes(); },
-        requiresWinner: true,
-        percentage: ""
-    },
-    {
-        nameKey: "CompareWithFastestTime",
-        selector: function (courseClassSet) { return courseClassSet.getFastestCumTimes(); },
-        requiresWinner: false,
-        percentage: ""
-    }
-];
-
-// All 'Fastest time + N %' values (not including zero).
-const FASTEST_PLUS_PERCENTAGES = [5, 25, 50, 100];
-
-FASTEST_PLUS_PERCENTAGES.forEach(function (percent) {
-    ALL_COMPARISON_OPTIONS.push({
-        nameKey: "CompareWithFastestTimePlusPercentage",
-        selector: function (courseClassSet) { return courseClassSet.getFastestCumTimesPlusPercentage(percent); },
-        requiresWinner: false,
-        percentage: percent.toString()
-    });
-});
-
-ALL_COMPARISON_OPTIONS.push({
-    nameKey: "CompareWithAnyRunner",
-    selector: null,
-    requiresWinner: true,
-    percentage: ""
-});
-
 // Default selected index of the comparison function.
-const DEFAULT_COMPARISON_INDEX = 1; // 1 = fastest time.
+export const DEFAULT_COMPARISON_INDEX = 1; // 1 = fastest time.
 
 // The id of the comparison selector.
-const COMPARISON_SELECTOR_ID = "comparisonSelector";
-
+export const COMPARISON_SELECTOR_ID = "comparisonSelector";
 // The id of the runner selector
-const RUNNER_SELECTOR_ID = "runnerSelector";
+export const RUNNER_SELECTOR_ID = "runnerSelector";
 
 /**
 * A control that wraps a drop-down list used to choose what to compare

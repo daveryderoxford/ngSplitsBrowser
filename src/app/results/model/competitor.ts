@@ -1,5 +1,4 @@
 import { ascending as d3_ascending } from "d3-array";
-import * as $ from "jquery";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
@@ -43,7 +42,7 @@ function subtractIfNotNull(a: number | null, b: number | null) {
 * @sb-return {Array} Corresponding array of split times.
 */
 function splitTimesFromCumTimes(cumTimes: Array<number>): Array<number> {
-    if (!$.isArray(cumTimes)) {
+    if (!Array.isArray(cumTimes)) {
         throw new TypeError("Cumulative times must be an array - got " + typeof cumTimes + " instead");
     } else if (cumTimes.length === 0) {
         throw new InvalidData("Array of cumulative times must not be empty");

@@ -1,10 +1,13 @@
 import { Competitor, DubiousTimeInfo, sbTime } from "../../model";
 
+type YAxisLabelKey = "SplitsGraphYAxisLabel" | "RaceGraphYAxisLabel" | "PositionYAxisLabel" | "PercentBehindYAxisLabel" | null;
+
+/**  Data defing an individual chart type*/
 export interface ChartType {
     nameKey: string;
     dataSelector: (c: Competitor, t?: sbTime[]) => number[];
     skipStart: boolean;
-    yAxisLabelKey: string;
+    yAxisLabelKey: YAxisLabelKey;
     isRaceGraph: boolean;
     isResultsTable: boolean;
     minViewableControl: number;
@@ -22,6 +25,7 @@ export interface ChartTypes {
 
 export class ChartTypeClass {
 
+    /** Static Object containing all chart types */
     public static chartTypes: ChartTypes = {
         SplitsGraph: {
             nameKey: "SplitsGraphChartType",

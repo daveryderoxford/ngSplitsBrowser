@@ -12,7 +12,7 @@ import "hammerjs";
 import { AboutComponent } from "./about/about.component";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { firebaseConfig, testFirebaseConfig } from "./app.firebase-config";
+import { firebaseConfig } from "./app.firebase-config";
 import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { LoginComponent } from "./auth/login/login.component";
 import { RecoverComponent } from "./auth/recover/recover.component";
@@ -34,6 +34,8 @@ import { SharedModule } from "./shared/shared.module";
 import { ResultsFoundDialogComponent } from './user/results-found-dialog/results-found-dialog.component';
 import { UserComponent } from "./user/user.component";
 import { ResultsViewButtonComponent } from './results/results-navbar/results-view-button.component';
+import { CompareWithComponent } from './results/results-navbar/compare-with.component';
+import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-button.component';
 
 @NgModule({
   declarations: [
@@ -58,6 +60,8 @@ import { ResultsViewButtonComponent } from './results/results-navbar/results-vie
     MyResultsTableComponent,
     ResultsFoundDialogComponent,
     ResultsViewButtonComponent,
+    CompareWithComponent,
+    ClassMenuButtonComponent,
   ],
   entryComponents: [
     ResultsFoundDialogComponent
@@ -67,8 +71,7 @@ import { ResultsViewButtonComponent } from './results/results-navbar/results-vie
     BrowserAnimationsModule,
     ReactiveFormsModule,
     AppRoutingModule,
-   // AngularFireModule.initializeApp(firebaseConfig),
-     AngularFireModule.initializeApp(testFirebaseConfig),
+    AngularFireModule.initializeApp(firebaseConfig),
     AngularFirestoreModule,
     AngularFireStorageModule,
     EventAdminModule,

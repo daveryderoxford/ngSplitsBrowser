@@ -44,7 +44,7 @@ export class SplitsGridComponent implements OnInit {
       this.rs.selectedClass.subscribe(oclass => this.selectedClassUpdated(oclass));
 
 
-      /// Update results seelction when user changed form controls
+      // Update results seelction when user changed form controls
       this.classSelect.valueChanges.subscribe( (courseClass: CourseClass) => {
          this.rs.selectClass(courseClass);
       });
@@ -61,7 +61,7 @@ export class SplitsGridComponent implements OnInit {
    private selectedCourseUpdated(course: Course) {
       this.course = course;
 
-      // Created a column for each control for the course
+      // Create a column for each control for the course
       if (course) {
          this.splitsColumns = Array.from({ length: course.numSplits }, (x, i) =>
             i.toString()
@@ -72,14 +72,12 @@ export class SplitsGridComponent implements OnInit {
    }
 
    selectedClassUpdated(oclass) {
-      // When class is updated then set the
+
       this.oclass = oclass;
 
       if (oclass) {
-
          this.dataSource = new MatTableDataSource(oclass.competitors);
          this.dataSource.sort = this.sort;
-
       } else {
          this.dataSource = new MatTableDataSource([]);
       }

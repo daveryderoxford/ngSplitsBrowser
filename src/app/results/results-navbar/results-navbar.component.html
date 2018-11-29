@@ -1,23 +1,19 @@
-<div class="container">
+<nav class="results-navbar-container">
 
-  <mat-icon routerLInk="" >arrow_back</mat-icon>
+   <mat-icon routerLink="/events" class="results-navbar-icon">arrow_back</mat-icon>
 
-  <app-results-view-button [views]="resultsViews" [selectedView]="rs.resultsView | async" (viewSelected)="viewSelected($event)"> </app-results-view-button>
+   <ng-container *ngIf='(rs.selectedResults| async) as results'>
+      <app-class-menu-button [selectedClass]='rs.selectedClass | async' [oclasses]='results.classes' (onSelect)='rs.selectClass($event)'></app-class-menu-button>
+   </ng-container>
 
-  <app-results-search class="align-baseline, flex-item"> </app-results-search>
+   <app-results-view-button [views]="resultsViews" [selectedView]="rs.resultsView | async" (viewSelected)="viewSelected($event)"></app-results-view-button>
 
-  <span class="fill-remaining-space"></span>
+   <app-compare-with [selected]='compareWith' (onSelect)='onCompareWith($event)'></app-compare-with>
 
-  <mat-form-field appearance="fill" floatLabel="false" class="no-padding, flex-item">
-  <mat-select placeholder="Display" [(value)]="displayOptions" multiple class="displayOptions">
-    <mat-option *ngFor="let option of ['Total time','Splits','Poisition','Split position','Time Loss']" [value]="option">{{option}}</mat-option>
-  </mat-select>
-</mat-form-field>
+   <span class="fill-remaining-space"></span>
 
-  <mat-icon class="flex-item">settings</mat-icon>
-</div>
+   <app-results-search class="align-baseline, flex-item"></app-results-search>
 
-<mat-menu >
+   <mat-icon class="docs-button results-navbar-icon flex-item">settings</mat-icon>
 
-
-</mat-menu>
+</nav>

@@ -13,8 +13,8 @@ import { EventAdminService } from "./event-admin.service";
 const testEventInfo1: EventInfo = {
   name: "test name 1",
   date: "01/02/2003",
-  nationality: "GBR",
-  club: "SN",
+  nationality: "SWE",
+  club: "TVOC",
   grade: "Regional",
   type: "Foot",
   discipline: "Long",
@@ -44,7 +44,6 @@ const resultsfile = [
   "; ; ;Fourth Runner; ; ; ;10:00:00; ;12:14; ; ; ;GHI; ; ;Class 2; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 2;4.1;35;3;3;11:00:00;11:13:32;212;03:01;229;07:05;208;09:59;",
   "; ; ;Fith Runner; ; ; ;11:00:00; ;14:12; ; ; ;GHI; ; ;Class 2; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 2;4.1;35;3;3;11:00:00;11:13:32;212;03:01;229;07:05;208;09:59;",
   "; ; ;Sith Runner; ; ; ;12:00:00; ;13:32; ; ; ;GHI; ; ;Class 3; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 2;4.1;35;3;3;11:00:00;11:13:32;212;03:01;229;07:05;208;09:59;",
-
 ];
 
 const resultsfile2 = [
@@ -54,9 +53,11 @@ const resultsfile2 = [
   "; ; ;Z Runner; ; ; ;11:00:00; ;13:32; ; ; ;GHI; ; ;Class 1; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course C;4.1;35;3;3;11:00:00;11:13:32;212;03:01;229;07:05;208;09:59;",
 ];
 
+let eventAdmin: EventAdminService;
 
 describe("EventAdminService", () => {
   beforeEach( () => {
+    TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       imports: [
         AngularFireModule.initializeApp(testFirebaseConfig),
@@ -67,13 +68,15 @@ describe("EventAdminService", () => {
       ],
       providers: [EventAdminService],
     });
+
+    eventAdmin = TestBed.get(EventAdminService);
   });
 
-  it("should create event admin service", inject([EventAdminService], (eventAdmin: EventAdminService) => {
+  it("should create event admin service", () => {
     expect(eventAdmin).toBeTruthy();
-  }));
+  }); );
 
-  it("should save new event data", inject([EventAdminService], async (eventAdmin: EventAdminService) => {
+  it("should save new event data", inject([EventAdminService], async (done) => {
     const key = await eventAdmin.saveNew(testEventInfo1);
     expect(key).toBeDefined();
 
@@ -87,9 +90,11 @@ describe("EventAdminService", () => {
 
     const eventresult1 = await eventAdmin.getEvent(key).toPromise();
 
+    done();
+
   }));
 
-  it("should update event info properties", inject([EventAdminService], async (eventAdmin: EventAdminService) => {
+  it("should update event info properties", inject([EventAdminService], async (done) => {
     const key = await eventAdmin.saveNew(testEventInfo1);
 
     await eventAdmin.updateEventInfo(key, testEventInfo2);
@@ -97,9 +102,11 @@ describe("EventAdminService", () => {
     const eventresult = await eventAdmin.getEvent(key).toPromise();
     expect(eventresult).toEqual(jasmine.objectContaining(testEventInfo2));
 
+    done();
+
   }));
 
-  it("should save a results and update summary etc", inject([EventAdminService], async (eventAdmin: EventAdminService) => {
+  it("should save a results and update summary etc", async (done) => {
     const key = await eventAdmin.saveNew(testEventInfo1);
     const eventresult = await eventAdmin.getEvent(key).toPromise();
 
@@ -115,12 +122,11 @@ describe("EventAdminService", () => {
 
     // Read competitor array
 
+    done();
 
-  }));
-});
+  });
 
-
-it("should update a results file that has already been downloaded once", inject([EventAdminService], async (eventAdmin: EventAdminService) => {
+it("should update a results file that has already been downloaded once", async (done) => {
   const key = await eventAdmin.saveNew(testEventInfo1);
   const eventresult = await eventAdmin.getEvent(key).toPromise();
 
@@ -129,9 +135,9 @@ it("should update a results file that has already been downloaded once", inject(
 
   // Read all search results and check them
 
-}));
+});
 
-it("should delate the datbase entry and file when the event is deleted", inject([EventAdminService], async (eventAdmin: EventAdminService) => {
+it("should delate the datbase entry and file when the event is deleted", async (done) => {
   const key = await eventAdmin.saveNew(testEventInfo1);
   const eventresult = await eventAdmin.getEvent(key).toPromise();
 
@@ -141,9 +147,8 @@ it("should delate the datbase entry and file when the event is deleted", inject(
   await eventAdmin.delete(eventresult);
 
 
-}));
+});
 
-
-it("should rollback when db transaction fails", inject([EventAdminService], (eventAdmin: EventAdminService) => {
-  // TODO not sure how to test this.
-}));
+it("should rollback when db transaction fails", async (done) => {
+  done();
+});

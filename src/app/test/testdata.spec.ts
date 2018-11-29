@@ -55,7 +55,7 @@ export const test_userdata = [userdata1, userdata2, userdata3];
  * User 1 has 1 event user 2 has 2 events
  */
 export const eventA: OEvent = {
-   key: 'eventkey1',
+   key: 'eventkeyA',
    user: 'user1',
    yearIndex: 2018,
    gradeIndex: { Regional: true, Local: true },
@@ -72,13 +72,13 @@ export const eventA: OEvent = {
 };
 
 export const eventB: OEvent = {
-   key: 'eventkeyA',
+   key: 'eventkeyB',
    user: 'user2',
    yearIndex: 2018,
    gradeIndex: { National: true, Regional: true, Local: true },
    name: 'Event B',
    nationality: 'GBR',
-   date: '2018-10-21',
+   date: '2018-10-22',
    club: 'TVOC',
    grade: 'National',
    type: 'Foot',

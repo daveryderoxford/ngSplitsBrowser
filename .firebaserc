@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "splitsbrowser-b5948"
+    "default": "splitsbrowser-b5948",
+    "splitsbrowsertest": "splitsbrowsertest-94938"
   }
 }

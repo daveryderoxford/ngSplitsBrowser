@@ -4,7 +4,7 @@ import { Injectable } from "@angular/core";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { AngularFireStorage } from '@angular/fire/storage';
 import { OEvent } from "app/model/oevent";
-import { BehaviorSubject, combineLatest, Observable, of } from "rxjs";
+import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { parseEventData } from "./import";
 import { Competitor, Course, CourseClass, InvalidData, Results, ResultsView } from "./model";
@@ -52,17 +52,16 @@ export class ResultsSelectionService {
     * This will load results from storage clearing any selections relivant to the previous event
     * The first class is selected if one exists.
     */
-   setSelectedEvent(event: OEvent): Observable<void> {
+   setSelectedEvent(event: OEvent): Observable<Results> {
 
       if (!event) {
          throw new InvalidData('ResultsSelection: Event not specified');
       }
 
-      // Do not load events if the event has not changed
-      if (!this._event$.value || (event.key !== this._event$.value.key) )  {
+      if (!this._event$.value || event.key !== this._event$.value.key) {
 
          const ret = this.loadResults(event).pipe(
-            map(results => {
+            tap(results => {
                this._selectedCompetitors$.next([]);
                this._selectedControl$.next(null);
 
@@ -79,14 +78,13 @@ export class ResultsSelectionService {
 
          return ret;
       } else {
-         return of();
+         return this._results$.asObservable();
       }
+
    }
 
-   /** Selects event based on the event key, loading the event results
-    *  Returns promise when event are loaded
-   */
-   setSelectedEventByKey(key: string): Observable<void> {
+   /** Selects event based on the event key, loading the event results */
+   setSelectedEventByKey(key: string): Observable<Results> {
       if (!this._event$.value || key !== this._event$.value.key) {
 
          const obs = this.afs.doc<OEvent>("/events/" + key).valueChanges().pipe(
@@ -101,7 +99,7 @@ export class ResultsSelectionService {
          );
          return obs;
       } else {
-         return of();
+         return this._results$.asObservable();
       }
    }
 

@@ -1,9 +1,9 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { OEvent } from "app/model";
+import { OEvent,  } from "app/model";
 import { resultsViews, ResultsView } from "../model/results-view";
 import { ResultsSelectionService } from "../results-selection.service";
-import { HighlightSpanKind } from "typescript";
-import { Observable } from "rxjs";
+import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
+
 
 @Component({
   selector: "app-results-navbar",
@@ -14,13 +14,10 @@ export class ResultsNavbarComponent implements OnInit {
 
   @Input() oevent: OEvent;
 
-  displayOptions: Array<string> = [];
+  resultsViews: ResultsView[] = resultsViews;
+  compareWith: ComparisionOption;
 
-  resultsViews: ResultsView[];
-
-  constructor(public rs: ResultsSelectionService) {
-    this.resultsViews = resultsViews;
-  }
+  constructor(public rs: ResultsSelectionService) {}
 
   ngOnInit() {
   }
@@ -29,4 +26,9 @@ export class ResultsNavbarComponent implements OnInit {
     console.log('Results navbar.  view seleted ' + view.name);
     this.rs.setResultsView(view);
   }
+
+  onCompareWith(option: ComparisionOption) {
+    // TODO
+  }
+
 }
