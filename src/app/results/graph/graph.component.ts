@@ -31,7 +31,6 @@ export class GraphComponent implements OnInit {
     private dialog: DialogsService) {
   }
 
-
   ngOnInit() {
     this.rs.selectedEvent.subscribe( oevent => this.oevent = oevent );
 

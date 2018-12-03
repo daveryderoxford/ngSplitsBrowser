@@ -53,7 +53,7 @@ export class ChartTypeClass {
         },
         PositionAfterLeg: {
             nameKey: "PositionAfterLegChartType",
-            dataSelector: (comp) => { return comp.cumRanks; },
+            dataSelector: (comp) => comp.cumRanks,
             skipStart: true,
             yAxisLabelKey: "PositionYAxisLabel",
             isRaceGraph: false,
@@ -63,7 +63,7 @@ export class ChartTypeClass {
         },
         SplitPosition: {
             nameKey: "SplitPositionChartType",
-            dataSelector: (comp) => { return comp.splitRanks; },
+            dataSelector: (comp) => comp.splitRanks,
             skipStart: true,
             yAxisLabelKey: "PositionYAxisLabel",
             isRaceGraph: false,
@@ -73,7 +73,7 @@ export class ChartTypeClass {
         },
         PercentBehind: {
             nameKey: "PercentBehindChartType",
-            dataSelector: (comp, referenceCumTimes) => { return comp.getSplitPercentsBehindReferenceCumTimes(referenceCumTimes); },
+            dataSelector: (comp, referenceCumTimes) => comp.getSplitPercentsBehindReferenceCumTimes(referenceCumTimes),
             skipStart: false,
             yAxisLabelKey: "PercentBehindYAxisLabel",
             isRaceGraph: false,

@@ -1,9 +1,15 @@
+// Import theming functions
+@import '~@angular/material/_theming';
+
+// Include non-theme styles for core.
+@include mat-core();
 
 .results-navbar-container {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   padding: 8px 16px;
+  background: blue;
 
   > .mat-button {
     &:last-child {

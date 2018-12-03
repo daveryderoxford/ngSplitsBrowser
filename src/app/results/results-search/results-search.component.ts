@@ -1,10 +1,12 @@
 /** Componnet to results for club class or */
 // tslint:disable:quotemark
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { Component, OnInit, HostBinding, ViewChild } from '@angular/core';
+import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
+import {MatAutocompleteTrigger} from '@angular/material';
+import {Subscription} from 'rxjs/Subscription';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 
@@ -16,16 +18,22 @@ interface FilterPanelGroup {
 @Component({
   selector: 'app-results-search',
   templateUrl: './results-search.component.html',
-  styleUrls: ['./results-search.component.scss']
+  styleUrls: ['./results-search.component.scss'],
 })
 export class ResultsSearchComponent implements OnInit {
+
+  @HostBinding('class.docs-expanded') _isExpanded: boolean;
+
+  @ViewChild(MatAutocompleteTrigger)
+  private _autocompleteTrigger: MatAutocompleteTrigger;
 
   results: Results;
 
   // Filter panel contents consisting of groups for courses, classes and competitors
   filterPanelContents: Array<FilterPanelGroup> = [];
 
-  searchForm: FormGroup;
+  searchControl: FormControl = new FormControl('');
+  subscription: Subscription;
 
   constructor(private rs: ResultsSelectionService) { }
 
@@ -34,12 +42,9 @@ export class ResultsSearchComponent implements OnInit {
       this.results = results;
     });
 
-    this.searchForm = new FormGroup({
-      searchControl: new FormControl()
-    });
-
     // When the search input control changes update the panel contents
-    this.searchForm.get('searchControl').valueChanges.subscribe((val) => this.updateSearchPanelContents(val));
+    this.searchControl.valueChanges.subscribe((val) => this.updateSearchPanelContents(val));
+
   }
 
   private updateSearchPanelContents(searchstring: string | SearchSelectedItem) {
@@ -71,7 +76,7 @@ export class ResultsSearchComponent implements OnInit {
     const val = event.option.value;
     this.updateSelections(val);
     console.log('Search: Item selected ' + val.name);
-    this.searchForm.get('searchControl').setValue('');
+    this.searchControl.setValue('');
   }
 
   private updateSelections(selection: SearchSelectedItem) {
@@ -91,4 +96,33 @@ export class ResultsSearchComponent implements OnInit {
   displayFn(value?: SearchSelectedItem): string | undefined {
     return value ? value.name : undefined;
   }
+
+  toggleIsExpanded(evt?: any) {
+    if (!this._isExpanded && evt === null || evt && evt.tagName === 'MD-OPTION') {
+      // input not expanded and blurring || input is expanded and we clicked on an option
+      return;
+    } else if (this._isExpanded && evt === undefined) {
+      // input is expanded and we are not blurring
+      this._delayDropdown(false);
+    } else {
+      // defualt behaviour: not expanded and focusing || expanded and blurring
+      this._delayDropdown(this._isExpanded);
+      this._isExpanded = !this._isExpanded;
+    }
+  }
+
+  _delayDropdown(isExpanded: boolean) {
+    if (isExpanded) {
+      this._autocompleteTrigger.closePanel();
+    } else {
+      this._autocompleteTrigger.closePanel();
+      setTimeout(() => this._autocompleteTrigger.openPanel(), 210);
+    }
+  }
+
+  _resetSearch() {
+    this.searchControl.reset();
+    this.searchControl.setValue('');
+  }
 }
+

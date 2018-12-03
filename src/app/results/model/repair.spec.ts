@@ -20,6 +20,7 @@
  */
 // tslint:disable:max-line-length
 import { } from "jasmine";
+import 'jasmine-expect';
 import { TestSupport } from "../test-support.spec";
 import { Competitor } from "./competitor";
 import { Course } from "./course";

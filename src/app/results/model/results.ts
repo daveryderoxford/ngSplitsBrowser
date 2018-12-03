@@ -88,7 +88,7 @@ export class Results {
             }
         });
 
-        fastestSplits.sort((a, b) => { return d3_ascending(a.split, b.split); });
+        fastestSplits.sort((a, b) => d3_ascending(a.split, b.split));
 
         return fastestSplits;
     }
@@ -115,7 +115,7 @@ export class Results {
             });
         });
 
-        competitors.sort((a, b) => { return d3_ascending(a.time, b.time); });
+        competitors.sort((a, b) => d3_ascending(a.time, b.time));
 
         return competitors;
     }
@@ -129,7 +129,7 @@ export class Results {
     public getNextControlsAfter(controlCode: string): NextControlDataArr[] {
         let courses = this.courses;
         if (controlCode !== Course.START) {
-            courses = courses.filter((course) => { return course.hasControl(controlCode); });
+            courses = courses.filter((course) => course.hasControl(controlCode));
         }
 
         return courses.map((course) => {

@@ -1,5 +1,6 @@
 // tslint:disable:max-line-length
 
+// tslint:disable:quotemark
 import { HttpClient } from "@angular/common/http";
 import { inject, TestBed } from "@angular/core/testing";
 import { AngularFireModule } from "@angular/fire";
@@ -8,6 +9,7 @@ import { AngularFireStorageModule } from "@angular/fire/storage";
 import { testFirebaseConfig } from "app/app.firebase-config";
 import { EventInfo } from "app/model";
 import { CompetitorDataService } from "app/shared/services/competitor-data.service";
+import 'jasmine-expect';
 import { EventAdminService } from "./event-admin.service";
 
 const testEventInfo1: EventInfo = {
@@ -56,7 +58,7 @@ const resultsfile2 = [
 let eventAdmin: EventAdminService;
 
 describe("EventAdminService", () => {
-  beforeEach( () => {
+  beforeEach(() => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       imports: [
@@ -74,7 +76,7 @@ describe("EventAdminService", () => {
 
   it("should create event admin service", () => {
     expect(eventAdmin).toBeTruthy();
-  }); );
+  });
 
   it("should save new event data", inject([EventAdminService], async (done) => {
     const key = await eventAdmin.saveNew(testEventInfo1);
@@ -126,29 +128,31 @@ describe("EventAdminService", () => {
 
   });
 
-it("should update a results file that has already been downloaded once", async (done) => {
-  const key = await eventAdmin.saveNew(testEventInfo1);
-  const eventresult = await eventAdmin.getEvent(key).toPromise();
+  it("should update a results file that has already been downloaded once", async (done) => {
+    const key = await eventAdmin.saveNew(testEventInfo1);
+    const eventresult = await eventAdmin.getEvent(key).toPromise();
 
-  const file = new File(resultsfile, 'test');
-  await eventAdmin.uploadResults(eventresult, file);
+    const file = new File(resultsfile, 'test');
+    await eventAdmin.uploadResults(eventresult, file);
 
-  // Read all search results and check them
+    // Read all search results and check them
 
-});
+  });
 
-it("should delate the datbase entry and file when the event is deleted", async (done) => {
-  const key = await eventAdmin.saveNew(testEventInfo1);
-  const eventresult = await eventAdmin.getEvent(key).toPromise();
+  it("should delate the datbase entry and file when the event is deleted", async (done) => {
+    const key = await eventAdmin.saveNew(testEventInfo1);
+    const eventresult = await eventAdmin.getEvent(key).toPromise();
 
-  const file = new File(resultsfile, 'test');
-  await eventAdmin.uploadResults(eventresult, file);
+    const file = new File(resultsfile, 'test');
+    await eventAdmin.uploadResults(eventresult, file);
 
-  await eventAdmin.delete(eventresult);
+    await eventAdmin.delete(eventresult);
 
 
-});
+  });
 
-it("should rollback when db transaction fails", async (done) => {
-  done();
+  it("should rollback when db transaction fails", async (done) => {
+    done();
+  });
+
 });

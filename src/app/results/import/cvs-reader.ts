@@ -128,12 +128,12 @@ export function parseCSVEventData(data: string): Results {
     // Remove trailing commas.
     data = data.replace(/,+\n/g, "\n").replace(/,+$/, "");
 
-    const classSections = data.split(/\n\n/).map( (s) => { return s.trim(); }).filter(isTrue);
+    const classSections = data.split(/\n\n/).map( (s) => s.trim()).filter(isTrue);
     const warnings = [] as Array<string>;
 
-    let classes = classSections.map( (section) => { return parseCourseClass(section, warnings); });
+    let classes = classSections.map( (section) => parseCourseClass(section, warnings));
 
-    classes = classes.filter( (courseClass) => { return !courseClass.isEmpty(); });
+    classes = classes.filter( (courseClass) => !courseClass.isEmpty());
 
     if (classes.length === 0) {
         throw new InvalidData("No competitor data was found");
@@ -141,7 +141,7 @@ export function parseCSVEventData(data: string): Results {
 
     // Nulls are for the course length, climb and controls, which aren't in
     // the source data files, so we can't do anything about them.
-    const courses = classes.map( (cls) => { return new Course(cls.name, [cls], null, null, null); });
+    const courses = classes.map( (cls) => new Course(cls.name, [cls], null, null, null));
 
     for (let i = 0; i < classes.length; i += 1) {
         classes[i].setCourse(courses[i]);

@@ -20,141 +20,142 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 // tslint:disable:max-line-length
-import { } from "jasmine";
-import { ChartType } from "../graph/splitsbrowser/chart-types";
-import { TestSupport } from "../test-support.spec";
-import { Competitor } from "./competitor";
-import { Course } from "./course";
-import { CourseClass } from "./course-class";
-import { CourseClassSet } from "./course-class-set";
-import { isNaNStrict } from "./util";
+import { } from 'jasmine';
+import 'jasmine-expect';
+import { ChartType } from '../graph/splitsbrowser/chart-types';
+import { TestSupport } from '../test-support.spec';
+import { Competitor } from './competitor';
+import { Course } from './course';
+import { CourseClass } from './course-class';
+import { CourseClassSet } from './course-class-set';
+import { isNaNStrict } from './util';
 
 
-describe("Course-class set", () => {
+describe('Course-class set', () => {
 
     const fromCumTimes = Competitor.fromCumTimes;
     const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
     const fromSplitTimes = TestSupport.fromSplitTimes;
 
     const _DUMMY_CHART_TYPE: ChartType = {
-        nameKey: "dummy",
+        nameKey: 'SplitsGraphYAxisLabel',
         dataSelector: function (comp, referenceCumTimes) { return comp.getCumTimesAdjustedToReference(referenceCumTimes); },
         skipStart: false,
         indexesAroundDubiousTimesFunc: function (comp) { return comp.getControlIndexesAroundDubiousCumulativeTimes(); },
 
-        yAxisLabelKey: "xx",
+        yAxisLabelKey: 'SplitsGraphYAxisLabel',
         isRaceGraph: false,
         isResultsTable: false,
         minViewableControl: 0
     };
 
     const DUMMY_CHART_TYPE_SKIP: ChartType = {
-        nameKey: "dummy",
+        nameKey: 'dummy',
         dataSelector: function (comp, referenceCumTimes) { return comp.getCumTimesAdjustedToReference(referenceCumTimes); },
         skipStart: true,
         indexesAroundDubiousTimesFunc: function (comp) { return comp.getControlIndexesAroundDubiousCumulativeTimes(); },
 
-        yAxisLabelKey: "xx",
+        yAxisLabelKey: 'SplitsGraphYAxisLabel',
         isRaceGraph: false,
         isResultsTable: false,
         minViewableControl: 0
     };
 
     function getCompetitor1() {
-        return fromSplitTimes(1, "John Smith", "ABC", 10 * 3600, [65, 221, 209, 100]);
+        return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, 209, 100]);
     }
 
     function getFasterCompetitor1() {
-        return fromSplitTimes(1, "John Smith", "ABC", 10 * 3600, [65, 221, 184, 100]);
+        return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, 184, 100]);
     }
 
     function getCompetitor1WithNullSplitForControl2() {
-        return fromSplitTimes(1, "John Smith", "ABC", 10 * 3600, [65, null, 184, 100]);
+        return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, null, 184, 100]);
     }
 
     function getCompetitor1WithDubiousSplitForControl1() {
-        const competitor = fromOriginalCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 0, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
+        const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 0, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         competitor.setRepairedCumulativeTimes([0, NaN, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         return competitor;
     }
 
     function getCompetitor1WithDubiousSplitForControl2() {
-        const competitor = fromOriginalCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 - 10, 65 + 221 + 184, 65 + 221 + 184 + 100]);
+        const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 - 10, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         competitor.setRepairedCumulativeTimes([0, 65, NaN, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         return competitor;
     }
 
     function getCompetitor1WithDubiousFinishTime() {
-        const competitor = fromOriginalCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184]);
+        const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184]);
         competitor.setRepairedCumulativeTimes([0, 65, 65 + 221, 65 + 221 + 184, NaN]);
         return competitor;
     }
 
     function getCompetitor1WithDubiousTimeToLastControlAndFinish() {
-        const competitor = fromOriginalCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221, 65 + 221]);
+        const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 + 221, 65 + 221, 65 + 221]);
         competitor.setRepairedCumulativeTimes([0, 65, 65 + 221, NaN, NaN]);
         return competitor;
     }
 
     function getCompetitor1WithNullSplitForControl3() {
-        return fromSplitTimes(1, "John Smith", "ABC", 10 * 3600, [65, 221, null, 100]);
+        return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, null, 100]);
     }
 
     function getCompetitor1WithNullFinishSplit() {
-        return fromSplitTimes(1, "John Smith", "ABC", 10 * 3600, [65, 221, 184, null]);
+        return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, 184, null]);
     }
 
     function getCompetitor1WithSameControl2SplitAsThatOfCompetitor2() {
-        return fromSplitTimes(1, "John Smith", "ABC", 10 * 3600, [65, 197, 209, 100]);
+        return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 197, 209, 100]);
     }
 
     function getNonStartingCompetitor1() {
-        const competitor = fromSplitTimes(1, "John Smith", "ABC", 10 * 3600, [null, null, null, null]);
+        const competitor = fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [null, null, null, null]);
         competitor.setNonStarter();
         return competitor;
     }
 
     function getCompetitor2() {
-        return fromSplitTimes(2, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106]);
+        return fromSplitTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [81, 197, 212, 106]);
     }
 
     function getCompetitor2WithNullSplitForControl2() {
-        return fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, null, 212, 106]);
+        return fromSplitTimes(1, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [81, null, 212, 106]);
     }
 
     function getCompetitor2WithNullFinishSplit() {
-        return fromSplitTimes(2, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, null]);
+        return fromSplitTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [81, 197, 212, null]);
     }
 
     function getCompetitor2WithFinishCumTimeNotTheLargest() {
-        return fromCumTimes(2, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 - 73]);
+        return fromCumTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 - 73]);
     }
 
     function getCompetitor2WithFirstControlLargerThanAllOthers() {
-        return fromCumTimes(2, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [0, 4103, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106]);
+        return fromCumTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [0, 4103, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106]);
     }
 
     function getCompetitor3() {
-        return fromSplitTimes(3, "Bill Baker", "GHI", 11 * 3600, [78, 209, 199, 117]);
+        return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, 199, 117]);
     }
 
     function getCompetitor3WithSameTotalTimeAsCompetitor1() {
-        return fromSplitTimes(3, "Bill Baker", "GHI", 11 * 3600, [78, 209, 199, 109]);
+        return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, 199, 109]);
     }
 
     function getCompetitor3WithNullSplitForControl2() {
-        return fromSplitTimes(3, "Bill Baker", "GHI", 11 * 3600, [78, null, 199, 117]);
+        return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, null, 199, 117]);
     }
 
     function getCompetitor3WithNullSplitForControl3() {
-        return fromSplitTimes(3, "Bill Baker", "GHI", 11 * 3600, [78, 209, null, 117]);
+        return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, null, 117]);
     }
 
     function getCompetitor3WithNullFinishSplit() {
-        return fromSplitTimes(3, "Bill Baker", "GHI", 11 * 3600, [78, 209, 199, null]);
+        return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, 199, null]);
     }
 
-    it("Can create a CourseClassSet from an empty array of course-classes", () => {
+    it('Can create a CourseClassSet from an empty array of course-classes', () => {
         const emptySet = new CourseClassSet([]);
         expect(emptySet.isEmpty()).toBe(true);
         expect(emptySet.getCourse()).toEqual(null);
@@ -163,223 +164,223 @@ describe("Course-class set", () => {
         expect(emptySet.getFastestCumTimes()).toEqual(null);
     });
 
-    it("Can create a CourseClassSet from a single course-class", () => {
-        const courseClass = new CourseClass("Test", 3, [getCompetitor1(), getCompetitor2(), getCompetitor3()]);
+    it('Can create a CourseClassSet from a single course-class', () => {
+        const courseClass = new CourseClass('Test', 3, [getCompetitor1(), getCompetitor2(), getCompetitor3()]);
         const courseClassSet = new CourseClassSet([courseClass]);
-        expect(courseClassSet.allCompetitors).toEqual(courseClass.competitors,  "A CourseClassSet created from one course-class should contain the only the competitors of that class");
+        expect(courseClassSet.allCompetitors).toEqual(courseClass.competitors,  'A CourseClassSet created from one course-class should contain the only the competitors of that class');
     });
 
-    it("Can create a CourseClassSet from a single course-class, ignoring non-starting competitor", () => {
-        const courseClass = new CourseClass("Test", 3, [getNonStartingCompetitor1(), getCompetitor2(), getCompetitor3()]);
+    it('Can create a CourseClassSet from a single course-class, ignoring non-starting competitor', () => {
+        const courseClass = new CourseClass('Test', 3, [getNonStartingCompetitor1(), getCompetitor2(), getCompetitor3()]);
         const courseClassSet = new CourseClassSet([courseClass]);
-        expect(courseClassSet.allCompetitors).toEqual(courseClass.competitors.slice(1),  "A CourseClassSet created from one course-class should contain the only the competitors of that class that started");
+        expect(courseClassSet.allCompetitors).toEqual(courseClass.competitors.slice(1),  'A CourseClassSet created from one course-class should contain the only the competitors of that class that started');
     });
 
-    it("Can create a CourseClassSet from a single course-class and get the course", () => {
-        const courseClass = new CourseClass("Test", 3, [getCompetitor1()]);
-        const course = new Course("Test course", [courseClass], null, null, null);
+    it('Can create a CourseClassSet from a single course-class and get the course', () => {
+        const courseClass = new CourseClass('Test', 3, [getCompetitor1()]);
+        const course = new Course('Test course', [courseClass], null, null, null);
         courseClass.setCourse(course);
         const courseClassSet = new CourseClassSet([courseClass]);
         expect(courseClassSet.getCourse()).toEqual(course);
     });
 
-    it("Can create a CourseClassSet from a single course-class and get the primary class name as that of the given class", () => {
-        const courseClass = new CourseClass("Test", 3, [getCompetitor1()]);
+    it('Can create a CourseClassSet from a single course-class and get the primary class name as that of the given class', () => {
+        const courseClass = new CourseClass('Test', 3, [getCompetitor1()]);
         const courseClassSet = new CourseClassSet([courseClass]);
         expect(courseClassSet.getPrimaryClassName()).toEqual(courseClass.name);
     });
 
-    it("Can create a CourseClassSet from a multiple course-class and get the primary class name as that of the first class", () => {
-        const courseClass1 = new CourseClass("Test class 1", 3, [getCompetitor1()]);
-        const courseClass2 = new CourseClass("Test class 2", 3, [getCompetitor2()]);
+    it('Can create a CourseClassSet from a multiple course-class and get the primary class name as that of the first class', () => {
+        const courseClass1 = new CourseClass('Test class 1', 3, [getCompetitor1()]);
+        const courseClass2 = new CourseClass('Test class 2', 3, [getCompetitor2()]);
         const courseClassSet = new CourseClassSet([courseClass1, courseClass2]);
         expect(courseClassSet.getPrimaryClassName()).toEqual(courseClass1.name);
     });
 
-    it("Can create a CourseClassSet from a single course-class, sorting competitors into order", () => {
+    it('Can create a CourseClassSet from a single course-class, sorting competitors into order', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClass = new CourseClass("Test", 3, [competitor3, competitor1, competitor2]);
+        const courseClass = new CourseClass('Test', 3, [competitor3, competitor1, competitor2]);
         const courseClassSet = new CourseClassSet([courseClass]);
         const expectedCompetitors = [competitor1, competitor2, competitor3];
-        expect(courseClassSet.allCompetitors).toEqual(expectedCompetitors,  "A CourseClassSet created from one course-class should contain the only the competitors of that class");
+        expect(courseClassSet.allCompetitors).toEqual(expectedCompetitors,  'A CourseClassSet created from one course-class should contain the only the competitors of that class');
     });
 
-    it("Can create a CourseClassSet from two course-classes", () => {
+    it('Can create a CourseClassSet from two course-classes', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClass1 = new CourseClass("Test", 3, [competitor3, competitor1]);
-        const courseClass2 = new CourseClass("Test", 3, [competitor2]);
+        const courseClass1 = new CourseClass('Test', 3, [competitor3, competitor1]);
+        const courseClass2 = new CourseClass('Test', 3, [competitor2]);
         const courseClassSet = new CourseClassSet([courseClass1, courseClass2]);
         const expectedCompetitors = [competitor1, competitor2, competitor3];
-        expect(courseClassSet.allCompetitors).toEqual(expectedCompetitors,  "Merging one course-class should return the only the competitors of that class");
+        expect(courseClassSet.allCompetitors).toEqual(expectedCompetitors,  'Merging one course-class should return the only the competitors of that class');
     });
 
-    it("Cannot create a CourseClassSet from two course-classes with different numbers of controls", () => {
-        const competitor2 = fromSplitTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [81, 197, 212, 106, 108]);
-        const courseClass1 = new CourseClass("Test", 3, [getCompetitor1()]);
-        const courseClass2 = new CourseClass("Test", 4, [competitor2]);
+    it('Cannot create a CourseClassSet from two course-classes with different numbers of controls', () => {
+        const competitor2 = fromSplitTimes(1, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [81, 197, 212, 106, 108]);
+        const courseClass1 = new CourseClass('Test', 3, [getCompetitor1()]);
+        const courseClass2 = new CourseClass('Test', 4, [competitor2]);
         TestSupport.assertInvalidData( () => {
             const dummy = new CourseClassSet([courseClass1, courseClass2]);
         });
     });
 
-    it("CourseClassSet created from two course-classes has two course-classes", () => {
-        const courseClass1 = new CourseClass("Test class 1", 3, [getCompetitor1()]);
-        const courseClass2 = new CourseClass("Test class 2", 3, [getCompetitor2()]);
+    it('CourseClassSet created from two course-classes has two course-classes', () => {
+        const courseClass1 = new CourseClass('Test class 1', 3, [getCompetitor1()]);
+        const courseClass2 = new CourseClass('Test class 2', 3, [getCompetitor2()]);
         const courseClassSet = new CourseClassSet([courseClass1, courseClass2]);
-        expect(courseClassSet.getNumClasses()).toEqual(2,  "Course-class set should have two classes");
+        expect(courseClassSet.getNumClasses()).toEqual(2,  'Course-class set should have two classes');
     });
 
-    it("Cumulative times of the winner of an empty course-class set is null", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [])]);
-        expect(courseClassSet.getWinnerCumTimes()).toEqual(null,  "There should be no winner if there are no competitors");
+    it('Cumulative times of the winner of an empty course-class set is null', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [])]);
+        expect(courseClassSet.getWinnerCumTimes()).toEqual(null,  'There should be no winner if there are no competitors');
     });
 
-    it("Course-class set made up of course-class without dubious data that should itself not have dubious data", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [])]);
+    it('Course-class set made up of course-class without dubious data that should itself not have dubious data', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [])]);
         expect(!courseClassSet.hasDubiousData()).toBe(true);
     });
 
-    it("Course-class set made up of course-class with dubious data should also have dubious data", () => {
-        const courseClass = new CourseClass("Test", 3, []);
+    it('Course-class set made up of course-class with dubious data should also have dubious data', () => {
+        const courseClass = new CourseClass('Test', 3, []);
         courseClass.recordHasDubiousData();
         const courseClassSet = new CourseClassSet([courseClass]);
         expect(courseClassSet.hasDubiousData()).toBe(true);
     });
 
-    it("Course-class set made up of two course-classes, one with dubious data and one without, should have dubious data", () => {
-        const courseClass1 = new CourseClass("Test 1", 3, []);
+    it('Course-class set made up of two course-classes, one with dubious data and one without, should have dubious data', () => {
+        const courseClass1 = new CourseClass('Test 1', 3, []);
         courseClass1.recordHasDubiousData();
-        const courseClass2 = new CourseClass("Test 2", 3, []);
+        const courseClass2 = new CourseClass('Test 2', 3, []);
         const courseClassSet = new CourseClassSet([courseClass1, courseClass2]);
         expect(courseClassSet.hasDubiousData()).toBe(true);
     });
 
-    it("Cumulative times of the winner of a course-class set with only mispunchers is null", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [
+    it('Cumulative times of the winner of a course-class set with only mispunchers is null', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [
             getCompetitor1WithNullFinishSplit(),
             getCompetitor2WithNullSplitForControl2()
         ])]);
-        expect(courseClassSet.getWinnerCumTimes()).toEqual(null,  "There should be no winner if there are no competitors that completed the course");
+        expect(courseClassSet.getWinnerCumTimes()).toEqual(null,  'There should be no winner if there are no competitors that completed the course');
     });
 
-    it("Cumulative times of the winner of a single-class set are those with quickest time", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor2(), getFasterCompetitor1()])]);
+    it('Cumulative times of the winner of a single-class set are those with quickest time', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor2(), getFasterCompetitor1()])]);
         const winTimes = courseClassSet.getWinnerCumTimes();
-        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100],  "John Smith (second competitor) should be the winner");
+        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100],  'John Smith (second competitor) should be the winner');
     });
 
-    it("Cumulative times of the winner of a multiple-class set are those with quickest time", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor2()]), new CourseClass("Test 2", 3, [getFasterCompetitor1()])]);
+    it('Cumulative times of the winner of a multiple-class set are those with quickest time', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor2()]), new CourseClass('Test 2', 3, [getFasterCompetitor1()])]);
         const winTimes = courseClassSet.getWinnerCumTimes();
-        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100],  "John Smith (second competitor) from the second course should be the winner");
+        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100],  'John Smith (second competitor) from the second course should be the winner');
     });
 
-    it("Cumulative times of the winner of a class containing only a single competitor with a dubious cumulative time include a filled gap", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor1WithDubiousSplitForControl2()])]);
+    it('Cumulative times of the winner of a class containing only a single competitor with a dubious cumulative time include a filled gap', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor1WithDubiousSplitForControl2()])]);
         const winTimes = courseClassSet.getWinnerCumTimes();
-        expect(winTimes).toEqual([0, 65, 65 + (221 + 184) / 2, 65 + 221 + 184, 65 + 221 + 184 + 100],  "Cumulative times should have filled-in gap");
+        expect(winTimes).toEqual([0, 65, 65 + (221 + 184) / 2, 65 + 221 + 184, 65 + 221 + 184 + 100],  'Cumulative times should have filled-in gap');
     });
 
-    it("Cumulative times of the winner of a class containing only a single competitor with a dubious finish time include a filled gap", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor1WithDubiousFinishTime()])]);
+    it('Cumulative times of the winner of a class containing only a single competitor with a dubious finish time include a filled gap', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor1WithDubiousFinishTime()])]);
         const winTimes = courseClassSet.getWinnerCumTimes();
-        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 60],  "Cumulative times should have filled-in time to finish");
+        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 60],  'Cumulative times should have filled-in time to finish');
     });
 
-    it("Cumulative times of the winner of a class containing only a single competitor with dubious times to the last control and finish include a filled gap", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor1WithDubiousTimeToLastControlAndFinish()])]);
+    it('Cumulative times of the winner of a class containing only a single competitor with dubious times to the last control and finish include a filled gap', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor1WithDubiousTimeToLastControlAndFinish()])]);
         const winTimes = courseClassSet.getWinnerCumTimes();
-        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 180, 65 + 221 + 180 + 60],  "Cumulative times should have filled-in time to last control and finish");
+        expect(winTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 180, 65 + 221 + 180 + 60],  'Cumulative times should have filled-in time to last control and finish');
     });
 
-    it("Fastest cumulative times on course-class set with no competitors should have backpopulated dummy cumulative times", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [])]);
-        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 180, 360, 540, 600],  "Empty course-class set should have dummy fastest times");
+    it('Fastest cumulative times on course-class set with no competitors should have backpopulated dummy cumulative times', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [])]);
+        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 180, 360, 540, 600],  'Empty course-class set should have dummy fastest times');
     });
 
-    it("Fastest cumulative times on course-class set when both competitors have dubious time at one control has backpopulated value for missing control", () => {
-        const competitor1 = fromOriginalCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65, 65 + 221 + 209, 65 + 221 + 209 + 100]);
+    it('Fastest cumulative times on course-class set when both competitors have dubious time at one control has backpopulated value for missing control', () => {
+        const competitor1 = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65, 65 + 221 + 209, 65 + 221 + 209 + 100]);
         competitor1.setRepairedCumulativeTimes([0, 65, NaN, 65 + 221 + 209, 65 + 221 + 209 + 100]);
-        const competitor2 = fromOriginalCumTimes(2, "Fred Brown", "DEF", 10 * 3600 + 30, [0, 81, 81, 81 + 197 + 212, 81 + 197 + 212 + 106]);
+        const competitor2 = fromOriginalCumTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30, [0, 81, 81, 81 + 197 + 212, 81 + 197 + 212 + 106]);
         competitor2.setRepairedCumulativeTimes([0, 81, NaN, 81 + 197 + 212, 81 + 197 + 212 + 106]);
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2])]);
 
         expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + (197 + 212) / 2, 65 + 197 + 212, 65 + 197 + 212 + 100],
-                    "Class with one control mispunched by all should have dummy value for missing control");
+                    'Class with one control mispunched by all should have dummy value for missing control');
     });
 
-    it("Fastest cumulative times on course-class set when only competitor has missing time at last control has backpopulated values from that competitor", () => {
-        const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, null, 65 + 221 + 209 + 100]);
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor])]);
+    it('Fastest cumulative times on course-class set when only competitor has missing time at last control has backpopulated values from that competitor', () => {
+        const competitor = fromCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 + 221, null, 65 + 221 + 209 + 100]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor])]);
         expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + 221, 65 + 221 + (209 + 100) / 2, 65 + 221 + 209 + 100],
-                    "Class with penultimate control mispunched by only competitor should have correct dummy value for missing control");
+                    'Class with penultimate control mispunched by only competitor should have correct dummy value for missing control');
     });
 
-    it("Fastest cumulative times on course-class set with one control mispunched by all has dummy fastest split for missing control", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor1WithNullSplitForControl2(), getCompetitor2WithNullSplitForControl2()])]);
-        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 245, 429, 529],  "Class with one control mispunched by all should have dummy value for missing control");
+    it('Fastest cumulative times on course-class set with one control mispunched by all has dummy fastest split for missing control', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor1WithNullSplitForControl2(), getCompetitor2WithNullSplitForControl2()])]);
+        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 245, 429, 529],  'Class with one control mispunched by all should have dummy value for missing control');
     });
 
-    it("Fastest cumulative times on a single-class set should be made up of fastest times", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2()])]);
-        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + 197, 65 + 197 + 184, 65 + 197 + 184 + 100],  "Fastest cumulative time should be made up of fastest splits");
+    it('Fastest cumulative times on a single-class set should be made up of fastest times', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2()])]);
+        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + 197, 65 + 197 + 184, 65 + 197 + 184 + 100],  'Fastest cumulative time should be made up of fastest splits');
     });
 
-    it("Fastest cumulative times on a multiple-class set should be made up of fastest times from competitors from both classes", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1 ", 3, [getFasterCompetitor1()]), new CourseClass("Test 2", 3, [getCompetitor2()])]);
-        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + 197, 65 + 197 + 184, 65 + 197 + 184 + 100],  "Fastest cumulative time should be made up of fastest splits");
+    it('Fastest cumulative times on a multiple-class set should be made up of fastest times from competitors from both classes', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1 ', 3, [getFasterCompetitor1()]), new CourseClass('Test 2', 3, [getCompetitor2()])]);
+        expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + 197, 65 + 197 + 184, 65 + 197 + 184 + 100],  'Fastest cumulative time should be made up of fastest splits');
     });
 
-    it("Fastest cumulative times plus 75% on single-class set should be made up of fastest times with 75%", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2()])]);
+    it('Fastest cumulative times plus 75% on single-class set should be made up of fastest times with 75%', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2()])]);
         expect(courseClassSet.getFastestCumTimesPlusPercentage(75)).toEqual([0, 65 * 1.75, (65 + 197) * 1.75, (65 + 197 + 184) * 1.75, (65 + 197 + 184 + 100) * 1.75],
-                                "Fastest cumulative times + 75% should be made up of fastest cumulative splits with 75% added");
+                                'Fastest cumulative times + 75% should be made up of fastest cumulative splits with 75% added');
     });
 
-    it("Fastest cumulative times on single-class set should be made up of fastest split times ignoring nulls", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor1WithNullFinishSplit(), getCompetitor2WithNullSplitForControl2()])]);
+    it('Fastest cumulative times on single-class set should be made up of fastest split times ignoring nulls', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor1WithNullFinishSplit(), getCompetitor2WithNullSplitForControl2()])]);
         expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 106],
-                            "Fastest cumulative times should be made up of fastest splits where not null");
+                            'Fastest cumulative times should be made up of fastest splits where not null');
     });
 
-    it("Fastest cumulative times on single-class set should be made up of fastest split times ignoring dubious splits", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor1WithDubiousSplitForControl2(), getCompetitor2()])]);
+    it('Fastest cumulative times on single-class set should be made up of fastest split times ignoring dubious splits', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor1WithDubiousSplitForControl2(), getCompetitor2()])]);
         expect(courseClassSet.getFastestCumTimes()).toEqual([0, 65, 65 + 197, 65 + 197 + 212, 65 + 197 + 212 + 100],
-                            "Fastest cumulative times should be made up of fastest splits where not NaN");
+                            'Fastest cumulative times should be made up of fastest splits where not NaN');
     });
 
-    it("Cumulative times of the second competitor in a single-class set are those of the second competitor", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor2(), getFasterCompetitor1()])]);
+    it('Cumulative times of the second competitor in a single-class set are those of the second competitor', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor2(), getFasterCompetitor1()])]);
         const competitorTimes = courseClassSet.getCumulativeTimesForCompetitor(1);
-        expect(competitorTimes).toEqual([0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106],  "Fred Brown (first competitor) should be the second competitor");
+        expect(competitorTimes).toEqual([0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106],  'Fred Brown (first competitor) should be the second competitor');
     });
 
-    it("Cumulative times of the second competitor of a multiple-class set are those of the second competitor", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor2()]), new CourseClass("Test 2", 3, [getFasterCompetitor1()])]);
+    it('Cumulative times of the second competitor of a multiple-class set are those of the second competitor', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor2()]), new CourseClass('Test 2', 3, [getFasterCompetitor1()])]);
         const competitorTimes = courseClassSet.getCumulativeTimesForCompetitor(1);
-        expect(competitorTimes).toEqual([0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106],  "Fred Brown (first competitor) from the first course should be the second competitor");
+        expect(competitorTimes).toEqual([0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106],  'Fred Brown (first competitor) from the first course should be the second competitor');
     });
 
-    it("Cumulative times of the competitor in a class containing only a single competitor with a dubious cumulative time include a filled gap", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor1WithDubiousSplitForControl2()])]);
+    it('Cumulative times of the competitor in a class containing only a single competitor with a dubious cumulative time include a filled gap', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor1WithDubiousSplitForControl2()])]);
         const competitorTimes = courseClassSet.getCumulativeTimesForCompetitor(0);
-        expect(competitorTimes).toEqual([0, 65, 65 + (221 + 184) / 2, 65 + 221 + 184, 65 + 221 + 184 + 100],  "Cumulative times should have filled-in gap");
+        expect(competitorTimes).toEqual([0, 65, 65 + (221 + 184) / 2, 65 + 221 + 184, 65 + 221 + 184 + 100],  'Cumulative times should have filled-in gap');
     });
 
-    it("Cumulative times of the competitor in a class containing only a single competitor with a dubious finish time include a filled gap", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor1WithDubiousFinishTime()])]);
+    it('Cumulative times of the competitor in a class containing only a single competitor with a dubious finish time include a filled gap', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor1WithDubiousFinishTime()])]);
         const competitorTimes = courseClassSet.getCumulativeTimesForCompetitor(0);
-        expect(competitorTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 60],  "Cumulative times should have filled-in time to finish include a filled gap");
+        expect(competitorTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 60],  'Cumulative times should have filled-in time to finish include a filled gap');
     });
 
-    it("Cumulative times of the competitor in a class containing only a single competitor with dubious times to the last control and finish have the gap filled", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getCompetitor1WithDubiousTimeToLastControlAndFinish()])]);
+    it('Cumulative times of the competitor in a class containing only a single competitor with dubious times to the last control and finish have the gap filled', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getCompetitor1WithDubiousTimeToLastControlAndFinish()])]);
         const competitorTimes = courseClassSet.getCumulativeTimesForCompetitor(0);
-        expect(competitorTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 180, 65 + 221 + 180 + 60],  "Cumulative times should have filled-in time to last control and finish");
+        expect(competitorTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 180, 65 + 221 + 180 + 60],  'Cumulative times should have filled-in time to last control and finish');
     });
 
     function assertSplitRanks( competitor, expectedSplitRanks) {
@@ -407,90 +408,90 @@ describe("Course-class set", () => {
         assertCumulativeRanks( competitor, expectedCumulativeRanks);
     }
 
-    it("Can compute ranks of single competitor as all 1s", () => {
+    it('Can compute ranks of single competitor as all 1s', () => {
         const competitor = getCompetitor1();
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor])]);
         assertSplitAndCumulativeRanks( competitor, [1, 1, 1, 1], [1, 1, 1, 1]);
     });
 
-    it("Can compute ranks in single-class set when there are two competitors with no equal times", () => {
+    it('Can compute ranks in single-class set when there are two competitors with no equal times', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2])]);
 
         assertSplitAndCumulativeRanks( competitor1, [1, 2, 1, 1], [1, 2, 2, 1]);
         assertSplitAndCumulativeRanks( competitor2, [2, 1, 2, 2], [2, 1, 1, 2]);
     });
 
-    it("Can compute ranks in multiple-class set when there are two competitors with no equal times", () => {
+    it('Can compute ranks in multiple-class set when there are two competitors with no equal times', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
-        const dummy = new CourseClassSet([new CourseClass("Test 1", 3, [competitor1]), new CourseClass("Test 2", 3, [competitor2])]);
+        const dummy = new CourseClassSet([new CourseClass('Test 1', 3, [competitor1]), new CourseClass('Test 2', 3, [competitor2])]);
 
         assertSplitAndCumulativeRanks( competitor1, [1, 2, 1, 1], [1, 2, 2, 1]);
         assertSplitAndCumulativeRanks( competitor2, [2, 1, 2, 2], [2, 1, 1, 2]);
     });
 
-    it("Can compute ranks when there are three competitors with no equal times", () => {
+    it('Can compute ranks when there are three competitors with no equal times', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         assertSplitAndCumulativeRanks( competitor1, [1, 3, 2, 1], [1, 2, 3, 1]);
         assertSplitAndCumulativeRanks( competitor2, [3, 1, 3, 2], [3, 1, 2, 2]);
         assertSplitAndCumulativeRanks( competitor3, [2, 2, 1, 3], [2, 3, 1, 3]);
     });
 
-    it("Can compute ranks when there are three competitors with one pair of equal split times", () => {
+    it('Can compute ranks when there are three competitors with one pair of equal split times', () => {
         const competitor1 = getCompetitor1WithSameControl2SplitAsThatOfCompetitor2();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         assertSplitAndCumulativeRanks( competitor1, [1, 1, 2, 1], [1, 1, 1, 1]);
         assertSplitAndCumulativeRanks( competitor2, [3, 1, 3, 2], [3, 2, 3, 2]);
         assertSplitAndCumulativeRanks( competitor3, [2, 3, 1, 3], [2, 3, 2, 3]);
     });
 
-    it("Can compute ranks when there are three competitors with one pair of equal cumulative times", () => {
+    it('Can compute ranks when there are three competitors with one pair of equal cumulative times', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3WithSameTotalTimeAsCompetitor1();
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         assertSplitAndCumulativeRanks( competitor1, [1, 3, 2, 1], [1, 2, 3, 1]);
         assertSplitAndCumulativeRanks( competitor2, [3, 1, 3, 2], [3, 1, 2, 3]);
         assertSplitAndCumulativeRanks( competitor3, [2, 2, 1, 3], [2, 3, 1, 1]);
     });
 
-    it("Can compute ranks when there are three competitors with one missing split times", () => {
+    it('Can compute ranks when there are three competitors with one missing split times', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2WithNullSplitForControl2();
         const competitor3 = getCompetitor3();
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         assertSplitAndCumulativeRanks( competitor1, [1, 2, 2, 1], [1, 1, 2, 1]);
         assertSplitAndCumulativeRanks( competitor2, [3, null, 3, 2], [3, null, null, null]);
         assertSplitAndCumulativeRanks( competitor3, [2, 1, 1, 3], [2, 2, 1, 2]);
     });
 
-    it("Can compute ranks when there is one control that all three competitors mispunch", () => {
+    it('Can compute ranks when there is one control that all three competitors mispunch', () => {
         const competitor1 = getCompetitor1WithNullFinishSplit();
         const competitor2 = getCompetitor2WithNullFinishSplit();
         const competitor3 = getCompetitor3WithNullFinishSplit();
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         assertSplitAndCumulativeRanks( competitor1, [1, 3, 1, null], [1, 2, 1, null]);
         assertSplitAndCumulativeRanks( competitor2, [3, 1, 3, null], [3, 1, 3, null]);
         assertSplitAndCumulativeRanks( competitor3, [2, 2, 2, null], [2, 3, 2, null]);
     });
 
-    it("Can compute ranks when there are three competitors specified by cumulative times with one missing split times", () => {
-        const competitor1 = fromCumTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106]);
-        const competitor2 = fromCumTimes(2, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 209, 65 + 221 + 209 + 100]);
-        const competitor3 = fromCumTimes(2, "Bill Baker", "GHI", 11 * 3600, [0, 78, null,     78 + 209 + 199, 78 + 209 + 199 + 117]);
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+    it('Can compute ranks when there are three competitors specified by cumulative times with one missing split times', () => {
+        const competitor1 = fromCumTimes(1, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106]);
+        const competitor2 = fromCumTimes(2, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 209, 65 + 221 + 209 + 100]);
+        const competitor3 = fromCumTimes(2, 'Bill Baker', 'GHI', 11 * 3600, [0, 78, null,     78 + 209 + 199, 78 + 209 + 199 + 117]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         assertSplitAndCumulativeRanks( competitor1, [3, 1, 2, 2], [3, 1, 1, 2]);
         assertSplitAndCumulativeRanks( competitor2, [1, 2, 1, 1], [1, 2, 2, 1]);
@@ -501,12 +502,12 @@ describe("Course-class set", () => {
         assertSplitAndCumulativeRanks( competitor3, [2, null, null, 3], [2, null, null, null]);
     });
 
-    it("Can compute ranks when there are three competitors specified by cumulative times with one having a dubious split time", () => {
-        const competitor1 = fromCumTimes(1, "Fred Brown", "DEF", 10 * 3600 + 30 * 60, [0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106]);
-        const competitor2 = fromCumTimes(2, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 209, 65 + 221 + 209 + 100]);
-        const competitor3 = fromOriginalCumTimes(2, "Bill Baker", "GHI", 11 * 3600, [0, 78, 78 - 30, 78 + 209 + 199, 78 + 209 + 199 + 117]);
+    it('Can compute ranks when there are three competitors specified by cumulative times with one having a dubious split time', () => {
+        const competitor1 = fromCumTimes(1, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106]);
+        const competitor2 = fromCumTimes(2, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 209, 65 + 221 + 209 + 100]);
+        const competitor3 = fromOriginalCumTimes(2, 'Bill Baker', 'GHI', 11 * 3600, [0, 78, 78 - 30, 78 + 209 + 199, 78 + 209 + 199 + 117]);
         competitor3.setRepairedCumulativeTimes([0, 78, NaN, 78 + 209 + 199, 78 + 209 + 199 + 117]);
-        const dummy = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const dummy = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         assertSplitAndCumulativeRanks( competitor1, [3, 1, 2, 2], [3, 1, 2, 2]);
         assertSplitAndCumulativeRanks( competitor2, [1, 2, 1, 1], [1, 2, 3, 1]);
@@ -514,81 +515,81 @@ describe("Course-class set", () => {
         assertSplitAndCumulativeRanks( competitor3, [2, NaN, NaN, 3], [2, NaN, 1, 3]);
     });
 
-    it("Can get fastest two splits to control 3 from single-class set with three competitors", () => {
+    it('Can get fastest two splits to control 3 from single-class set with three competitors', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 209, name: competitor1.name}]);
     });
 
-    it("Can get fastest two splits to control 3 from multiple-class set with three competitors", () => {
+    it('Can get fastest two splits to control 3 from multiple-class set with three competitors', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [competitor1]), new CourseClass("Test 2", 3, [competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [competitor1]), new CourseClass('Test 2', 3, [competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 209, name: competitor1.name}]);
     });
 
-    it("Can get fastest two splits to finish from single-class set with three competitors", () => {
+    it('Can get fastest two splits to finish from single-class set with three competitors', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(2, 4);
         expect(fastestSplits).toEqual([{split: 100, name: competitor1.name}, {split: 106, name: competitor2.name}]);
     });
 
-    it("When getting fastest four splits to control 3 from single-class set with three competitors then three splits returned", () => {
+    it('When getting fastest four splits to control 3 from single-class set with three competitors then three splits returned', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(4, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 209, name: competitor1.name}, {split: 212, name: competitor2.name}]);
     });
 
-    it("When getting fastest two splits to control 3 from single-class set with three competitors with one mispunching control 3 then splits for other two competitors returned", () => {
+    it('When getting fastest two splits to control 3 from single-class set with three competitors with one mispunching control 3 then splits for other two competitors returned', () => {
         const competitor1 = getCompetitor1WithNullSplitForControl3();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 212, name: competitor2.name}]);
     });
 
-    it("When getting fastest two splits to control 3 from single-class set with three competitors with one mispunching a different control then splits for other two competitors returned", () => {
+    it('When getting fastest two splits to control 3 from single-class set with three competitors with one mispunching a different control then splits for other two competitors returned', () => {
         const competitor1 = getCompetitor1();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3WithNullSplitForControl2();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
         expect(fastestSplits).toEqual([{split: 209, name: competitor1.name}, {split: 212, name: competitor2.name}]);
     });
 
-    it("When getting fastest two splits to control 3 from single-class set with three competitors with two mispunching control 3 then one split returned", () => {
+    it('When getting fastest two splits to control 3 from single-class set with three competitors with two mispunching control 3 then one split returned', () => {
         const competitor1 = getCompetitor1WithNullSplitForControl3();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3WithNullSplitForControl3();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
         expect(fastestSplits).toEqual([{split: 212, name: competitor2.name}]);
     });
 
-    it("When getting fastest three splits to control 2 from single-class set with three competitors with one having a dubious split then competitor with dubious split omitted", () => {
+    it('When getting fastest three splits to control 2 from single-class set with three competitors with one having a dubious split then competitor with dubious split omitted', () => {
         const competitor1 = getCompetitor1WithDubiousSplitForControl2();
         const competitor2 = getCompetitor2();
         const competitor3 = getCompetitor3();
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [competitor1, competitor2, competitor3])]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
         const fastestSplits = courseClassSet.getFastestSplitsTo(3, 2);
         expect(fastestSplits).toEqual([{split: 197, name: competitor2.name}, {split: 209, name: competitor3.name}]);
@@ -603,34 +604,34 @@ describe("Course-class set", () => {
     * @param {Number} controlIdx - The index of the control.
     */
     function assertCannotGetFastestSplits( competitors, numSplits, controlIdx) {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, competitors)]);
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, competitors)]);
         TestSupport.assertInvalidData( () => {
             courseClassSet.getFastestSplitsTo(numSplits, controlIdx);
         });
     }
 
-    it("Cannot return fastest 0 splits to a control", () => {
+    it('Cannot return fastest 0 splits to a control', () => {
         assertCannotGetFastestSplits( [getCompetitor1()], 0, 3);
     });
 
-    it("Cannot return fastest splits to a control when the number of such splits is not numeric", () => {
-        assertCannotGetFastestSplits( [getCompetitor1()], "this is not a number", 3);
+    it('Cannot return fastest splits to a control when the number of such splits is not numeric', () => {
+        assertCannotGetFastestSplits( [getCompetitor1()], 'this is not a number', 3);
     });
 
-    it("Cannot return fastest splits to control zero", () => {
+    it('Cannot return fastest splits to control zero', () => {
         assertCannotGetFastestSplits( [getCompetitor1()], 1, 0);
     });
 
-    it("Cannot return fastest splits to control out of range", () => {
+    it('Cannot return fastest splits to control out of range', () => {
         assertCannotGetFastestSplits( [getCompetitor1()], 1, 5);
     });
 
-    it("Cannot return fastest splits to control that is not a number", () => {
-        assertCannotGetFastestSplits( [getCompetitor1()], 1, "this is not a number");
+    it('Cannot return fastest splits to control that is not a number', () => {
+        assertCannotGetFastestSplits( [getCompetitor1()], 1, 'this is not a number');
     });
 
-    it("Can return chart data for two competitors in same class", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2()])]);
+    it('Can return chart data for two competitors in same class', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
@@ -646,7 +647,7 @@ describe("Course-class set", () => {
             xExtent: [0, 65 + 197 + 184 + 100],
             yExtent: [0, 50],
             numControls: 3,
-            competitorNames: ["John Smith", "Fred Brown"],
+            competitorNames: ['John Smith', 'Fred Brown'],
             dubiousTimesInfo: [[], []]
         };
 
@@ -654,8 +655,8 @@ describe("Course-class set", () => {
     });
 
 
-    it("Can return chart data for two competitors where one of them has a dubious split", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor1WithDubiousSplitForControl2(), getCompetitor2()])]);
+    it('Can return chart data for two competitors where one of them has a dubious split', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor1WithDubiousSplitForControl2(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
@@ -671,15 +672,15 @@ describe("Course-class set", () => {
             xExtent: [0, 65 + 197 + 212 + 100],
             yExtent: [-4, 22],
             numControls: 3,
-            competitorNames: ["John Smith", "Fred Brown"],
+            competitorNames: ['John Smith', 'Fred Brown'],
             dubiousTimesInfo: [[{start: 1, end: 3}], []]
         };
 
         expect(chartData).toEqual(expectedChartData);
     });
 
-    it("Can return chart data for two competitors where one of them has a dubious split and chart type has skip-start", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor1WithDubiousSplitForControl2(), getCompetitor2()])]);
+    it('Can return chart data for two competitors where one of them has a dubious split and chart type has skip-start', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor1WithDubiousSplitForControl2(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], DUMMY_CHART_TYPE_SKIP);
@@ -694,7 +695,7 @@ describe("Course-class set", () => {
             xExtent: [0, 65 + 197 + 212 + 100],
             yExtent: [-4, 22],
             numControls: 3,
-            competitorNames: ["John Smith", "Fred Brown"],
+            competitorNames: ['John Smith', 'Fred Brown'],
             dubiousTimesInfo: [[{start: 0, end: 2}], []]
         };
 
@@ -702,8 +703,8 @@ describe("Course-class set", () => {
     });
 
     // If the start is being skipped, then we must ignore dubious times to control 1.
-    it("Can return chart data with no dubious time for two competitors where one of them has a dubious split to control 1 and chart type has skip-start", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getCompetitor1WithDubiousSplitForControl1(), getCompetitor2()])]);
+    it('Can return chart data with no dubious time for two competitors where one of them has a dubious split to control 1 and chart type has skip-start', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getCompetitor1WithDubiousSplitForControl1(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], DUMMY_CHART_TYPE_SKIP);
@@ -730,15 +731,15 @@ describe("Course-class set", () => {
             xExtent: [0, 81 + 197 + 184 + 100],
             yExtent: [0, 34],
             numControls: 3,
-            competitorNames: ["John Smith", "Fred Brown"],
+            competitorNames: ['John Smith', 'Fred Brown'],
             dubiousTimesInfo: [[/* none */], []]
         };
 
         expect(chartData).toEqual(expectedChartData);
     });
 
-    it("Can return chart data for two competitors in same class with correct X-extent when one competitor has cumulative times not in order", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2WithFinishCumTimeNotTheLargest()])]);
+    it('Can return chart data for two competitors in same class with correct X-extent when one competitor has cumulative times not in order', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2WithFinishCumTimeNotTheLargest()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
@@ -754,15 +755,15 @@ describe("Course-class set", () => {
             xExtent: [0, 65 + 197 + 184],
             yExtent: [0, 197],
             numControls: 3,
-            competitorNames: ["Fred Brown", "John Smith"],
+            competitorNames: ['Fred Brown', 'John Smith'],
             dubiousTimesInfo: [[], []]
         };
 
         expect(chartData).toEqual(expectedChartData);
     });
 
-    it("Can return chart data for two competitors in same class with correct X-extent when one competitor has the first cumulative time larger than all others", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2WithFirstControlLargerThanAllOthers()])]);
+    it('Can return chart data for two competitors in same class with correct X-extent when one competitor has the first cumulative time larger than all others', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2WithFirstControlLargerThanAllOthers()])]);
 
         const fastestTime = courseClassSet.getFastestCumTimes();
 
@@ -779,15 +780,15 @@ describe("Course-class set", () => {
             xExtent: [65 + (81 + 197 - 4103), 65],
             yExtent: [0, 4072],
             numControls: 3,
-            competitorNames: ["John Smith", "Fred Brown"],
+            competitorNames: ['John Smith', 'Fred Brown'],
             dubiousTimesInfo: [[], []]
         };
 
         expect(chartData).toEqual(expectedChartData);
     });
 
-    it("Can return chart data for two competitors in different classes of the set", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test 1", 3, [getFasterCompetitor1()]), new CourseClass("Test 2", 3, [getCompetitor2()])]);
+    it('Can return chart data for two competitors in different classes of the set', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [getFasterCompetitor1()]), new CourseClass('Test 2', 3, [getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
@@ -803,15 +804,15 @@ describe("Course-class set", () => {
             xExtent: [0, 65 + 197 + 184 + 100],
             yExtent: [0, 50],
             numControls: 3,
-            competitorNames: ["John Smith", "Fred Brown"],
+            competitorNames: ['John Smith', 'Fred Brown'],
             dubiousTimesInfo: [[], []]
         };
 
         expect(chartData).toEqual(expectedChartData);
     });
 
-    it("Can return chart data for first competitor only", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2()])]);
+    it('Can return chart data for first competitor only', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0], _DUMMY_CHART_TYPE);
@@ -827,15 +828,15 @@ describe("Course-class set", () => {
             xExtent: [0, 65 + 197 + 184 + 100],
             yExtent: [0, 24],
             numControls: 3,
-            competitorNames: ["John Smith"],
+            competitorNames: ['John Smith'],
             dubiousTimesInfo: [[]]
         };
 
         expect(chartData).toEqual(expectedChartData);
     });
 
-    it("Can return chart data for second competitor only", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2()])]);
+    it('Can return chart data for second competitor only', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [1], _DUMMY_CHART_TYPE);
@@ -851,15 +852,15 @@ describe("Course-class set", () => {
             xExtent: [0, 65 + 197 + 184 + 100],
             yExtent: [0, 50],
             numControls: 3,
-            competitorNames: ["Fred Brown"],
+            competitorNames: ['Fred Brown'],
             dubiousTimesInfo: [[]]
         };
 
         expect(chartData).toEqual(expectedChartData);
     });
 
-    it("Can return chart data for empty list of competitors", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [getFasterCompetitor1(), getCompetitor2()])]);
+    it('Can return chart data for empty list of competitors', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [], _DUMMY_CHART_TYPE);
@@ -875,11 +876,11 @@ describe("Course-class set", () => {
 
         expect(chartData).toEqual(expectedChartData);
 
-        expect(chartData.yExtent[0] < chartData.yExtent[1]).toBe(true, "The y-axis should have a positive extent: got values " + chartData.yExtent[0] + " and " + chartData.yExtent[1]);
+        expect(chartData.yExtent[0] < chartData.yExtent[1]).toBe(true, 'The y-axis should have a positive extent: got values ' + chartData.yExtent[0] + ' and ' + chartData.yExtent[1]);
     });
 
-    it("Can return empty chart data when no competitors", () => {
-        const courseClassSet = new CourseClassSet([new CourseClass("Test", 3, [])]);
+    it('Can return empty chart data when no competitors', () => {
+        const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [])]);
         const data = courseClassSet.getChartData([0, 87, 87 + 147, 87 + 147 + 92], [], _DUMMY_CHART_TYPE);
         const expectedChartData = {
             dataColumns: [],

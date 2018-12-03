@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { EventAdminComponent } from './event-admin.component';
+import 'jasmine-expect';
 
 xdescribe('EventAdminComponent', () => {
   let component: EventAdminComponent;

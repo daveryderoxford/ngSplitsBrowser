@@ -24,7 +24,7 @@ import { sbTime } from "./time";
 import {} from "jasmine";
 import { Competitor } from "./competitor";
 import { isNaNStrict } from "./util";
-
+import 'jasmine-expect';
 
 const fromCumTimes = Competitor.fromCumTimes;
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;

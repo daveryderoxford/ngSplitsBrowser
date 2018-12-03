@@ -20,7 +20,6 @@ export interface NextControlDataStr {
     nextControls: string;
 }
 
-
 export class SplitsPopupData {
 
     constructor(public maxFastestSplits: number, public raceGraphWindow: number) { }
@@ -195,7 +194,7 @@ export class SplitsPopupData {
         const nextControls = eventData.getNextControlsAfter(controlCode);
 
         // TODO - Should just order course names based on the order they are in the default list (eg distance or file order)
-        nextControls.sort((c1, c2) => { return this.compareCourseNames(c1.course.name, c2.course.name); });
+        nextControls.sort((c1, c2) => this.compareCourseNames(c1.course.name, c2.course.name));
 
         let thisControlName: string;
         if (controlCode === Course.START) {

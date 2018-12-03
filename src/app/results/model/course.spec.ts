@@ -21,6 +21,7 @@
 // tslint:disable:max-line-length
 import { Competitor } from "app/results/model";
 import { } from "jasmine";
+import 'jasmine-expect';
 import { TestSupport } from "../test-support.spec";
 import { Course } from "./course";
 import { CourseClass } from "./course-class";

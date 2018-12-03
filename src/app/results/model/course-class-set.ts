@@ -74,7 +74,7 @@ export class CourseClassSet {
    *     dubious data, false if none of them do.
    */
    public hasDubiousData(): boolean {
-      return this.classes.some((courseClass) => { return courseClass.hasDubiousData; });
+      return this.classes.some((courseClass) => courseClass.hasDubiousData);
    }
 
 
@@ -358,8 +358,8 @@ export class CourseClassSet {
             yMax = d3_max(firstCompetitorTimes);
          }
       } else {
-         yMin = d3_min(selectedCompetitorData.map((values) => { return d3_min(values); }));
-         yMax = d3_max(selectedCompetitorData.map((values) => { return d3_max(values); }));
+         yMin = d3_min(selectedCompetitorData.map((values) => d3_min(values)));
+         yMax = d3_max(selectedCompetitorData.map((values) => d3_max(values)));
       }
 
       if (yMax === yMin) {
@@ -371,7 +371,7 @@ export class CourseClassSet {
       const controlIndexAdjust = (chartType.skipStart) ? 1 : 0;
       const dubiousTimesInfo = currentIndexes.map((competitorIndex) => {
          const indexPairs = chartType.indexesAroundDubiousTimesFunc(this.allCompetitors[competitorIndex]);
-         return indexPairs.filter((indexPair) => { return indexPair.start >= controlIndexAdjust; })
+         return indexPairs.filter((indexPair) => indexPair.start >= controlIndexAdjust)
             .map((indexPair) => {
                return {
                   start: indexPair.start - controlIndexAdjust, end: indexPair.end - controlIndexAdjust
@@ -382,9 +382,9 @@ export class CourseClassSet {
       const cumulativeTimesByControl = d3_transpose(selectedCompetitorData);
       const xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
       const zippedData = d3_zip<any>(xData, cumulativeTimesByControl);
-      const competitorNames = currentIndexes.map((index) => { return this.allCompetitors[index].name; }, this);
+      const competitorNames = currentIndexes.map((index) => this.allCompetitors[index].name, this);
       return {
-         dataColumns: zippedData.map((data) => { return { x: data[0], ys: data[1] }; }),
+         dataColumns: zippedData.map((data) => ({ x: data[0], ys: data[1] })),
          competitorNames: competitorNames,
          numControls: this.numControls,
          xExtent: [xMin, xMax],

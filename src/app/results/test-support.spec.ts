@@ -21,13 +21,11 @@
 
 // tslint:disable:max-line-length
 
-import * as $ from "jquery";
-
 import { } from "jasmine";
-
-import { isNaNStrict } from "./model/util";
+import 'jasmine-expect';
+import * as $ from "jquery";
 import { Competitor, sbTime } from "./model";
-import { FirstnameSurname } from "./model/competitor";
+import { isNaNStrict } from "./model/util";
 
 export class TestSupport {
     /**

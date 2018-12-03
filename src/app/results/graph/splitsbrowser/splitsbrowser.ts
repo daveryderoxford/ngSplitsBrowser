@@ -40,8 +40,6 @@ import { ResultsTable } from "./results-table";
 import { StatisticsSelector } from "./statistics-selection";
 import { WarningViewer } from "./warning-viewer";
 
-
-
 const GraphVersion = "4.0.0";
 
 // file viewer.js

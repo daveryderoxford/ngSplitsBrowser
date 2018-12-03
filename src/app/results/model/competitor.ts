@@ -18,8 +18,6 @@ export interface FirstnameSurname {
 
 const NUMBER_TYPE = typeof 0;
 
-
-
 /**
 * Returns the difference of two numbers, or null if either is null.
 * @sb-param {?Number} a - One number, or null, to add.
@@ -221,7 +219,6 @@ export class Competitor {
         // tslint:disable-next-line:max-line-length
         this.totalTime = (originalCumTimes === null || originalCumTimes.indexOf(null) > -1) ? null : originalCumTimes[originalCumTimes.length - 1];
     }
-
 
     /** Returns a key to uniquly identify a competitor
      * This is the ecardId if present or class and position concateranted if not
@@ -500,7 +497,7 @@ export class Competitor {
             throw new InvalidData("Cannot adjust competitor times because a null value is in the reference data");
         }
 
-        const adjustedTimes = this.cumTimes.map((time, idx) => { return subtractIfNotNull(time, referenceCumTimes[idx]); });
+        const adjustedTimes = this.cumTimes.map((time, idx) => subtractIfNotNull(time, referenceCumTimes[idx]));
         return adjustedTimes;
     }
 
@@ -523,7 +520,7 @@ export class Competitor {
     public getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes: Array<sbTime>): Array<sbTime> {
         const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
         const startTime = this.startTime;
-        return adjustedTimes.map((adjTime) => { return this._addIfNotNull(adjTime, startTime); });
+        return adjustedTimes.map((adjTime) => this._addIfNotNull(adjTime, startTime));
     }
 
     /**
@@ -570,14 +567,14 @@ export class Competitor {
                 throw new InvalidData("Cannot determine time loss of competitor when there is a NaN value in the fastest splits");
             }
 
-            if (fastestSplitTimes.some((split) => { return split === 0; })) {
+            if (fastestSplitTimes.some((split) => split === 0)) {
                 // Someone registered a zero split on this course.  In this
                 // situation the time losses don't really make sense.
-                this.timeLosses = this.splitTimes.map(() => { return NaN; });
+                this.timeLosses = this.splitTimes.map(() => NaN);
             } else if (this.splitTimes.some(isNaNStrict)) {
                 // Competitor has some dubious times.  Unfortunately this
                 // means we cannot sensibly calculate the time losses.
-                this.timeLosses = this.splitTimes.map(() => { return NaN; });
+                this.timeLosses = this.splitTimes.map(() => NaN);
             } else {
                 // We use the same algorithm for calculating time loss as the
                 // original, with a simplification: we calculate split ratios

@@ -197,11 +197,11 @@ function parseCompetitor(element, number: number, reader, warnings: Array<string
     const route = reader.readRoute(resultElement);
 
     const splitTimes = $("> SplitTime", resultElement).toArray();
-    const splitData = splitTimes.filter((splitTime) => { return !reader.isAdditional($(splitTime)); })
-        .map((splitTime) => { return reader.readSplitTime($(splitTime)); });
+    const splitData = splitTimes.filter((splitTime) => !reader.isAdditional($(splitTime)))
+        .map((splitTime) => reader.readSplitTime($(splitTime)));
 
-    const controls = splitData.map((datum) => { return datum.code; });
-    const cumTimes = splitData.map((datum) => { return datum.time; });
+    const controls = splitData.map((datum) => datum.code);
+    const cumTimes = splitData.map((datum) => datum.time);
 
     cumTimes.unshift(0); // Prepend a zero time for the start.
     cumTimes.push(totalTime);

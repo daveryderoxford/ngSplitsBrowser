@@ -337,7 +337,7 @@ class OEReader {
         const className = this.getClassName(row);
         const courseName = row[this.columnIndexes.course];
 
-        if (!this.classCoursePairs.some((pair) => { return pair[0] === className && pair[1] === courseName; })) {
+        if (!this.classCoursePairs.some((pair) => pair[0] === className && pair[1] === courseName)) {
             this.classCoursePairs.push([className, courseName]);
         }
     }
@@ -470,7 +470,7 @@ class OEReader {
             return;
         }
 
-        const row = line.split(delimiter).map((s) => { return s.trim(); })
+        const row = line.split(delimiter).map((s) => s.trim())
             .map(this.dequote);
 
         // Check the row is long enough to have all the data besides the
