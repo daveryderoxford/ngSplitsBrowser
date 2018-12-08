@@ -14,6 +14,15 @@ export interface FatestSplitsData {
    split: sbTime;  // Split time
 }
 
+export interface ChartData {
+         dataColumns: {x: any, ys: any}[];
+         competitorNames: string[];
+         numControls: number;
+         xExtent: number[];
+         yExtent: number[];
+         dubiousTimesInfo: {start: number, end: number}[][];
+      }
+
 export class CourseClassSet {
    allCompetitors: Array<Competitor>;
    numControls: number;
@@ -325,7 +334,7 @@ export class CourseClassSet {
    * @sb-param {Object} chartType - The type of chart to draw.
    * @sb-returns {Object} Array of data.
    */
-   public getChartData(referenceCumTimes: Array<number>, currentIndexes: Array<number>, chartType: ChartType) {
+   public getChartData(referenceCumTimes: Array<number>, currentIndexes: Array<number>, chartType: ChartType): ChartData {
       if (typeof referenceCumTimes === "undefined") {
          throw new TypeError("referenceCumTimes undefined or missing");
       } else if (typeof currentIndexes === "undefined") {

@@ -14,7 +14,7 @@ const setLanguage = Lang.setLanguage;
 * A control that wraps a drop-down list used to choose the language to view.
 * @sb-param {HTMLElement} parent - The parent element to add the control to.
 */
-export function LanguageSelector(parent) {
+export function LanguageSelector( parent: HTMLElement) {
     this.changeHandlers = [];
     this.label = null;
     this.dropDown = null;

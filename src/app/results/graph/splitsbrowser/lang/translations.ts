@@ -39,7 +39,7 @@ export class Lang {
     */
     public static setMessageAlerter(alerter) {
         this.alertFunc = alerter;
-    };
+    }
 
     /**
     * Attempts to get a message, returning a default string if it does not
@@ -52,7 +52,7 @@ export class Lang {
     public static tryGetMessage(key: string, defaultValue: string): string {
         const currentLanguage = Lang.currentLanguage;
         return (currentLanguage !== null && messages[currentLanguage].hasOwnProperty(key)) ? Lang.getMessage(key) : defaultValue;
-    };
+    }
 
     /**
     * Returns the message with the given key.
@@ -79,7 +79,7 @@ export class Lang {
             this.warn("No messages found.  Has a language file been loaded?");
             return "?????";
         }
-    };
+    }
 
     /**
     * Returns the message with the given key, with some string formatting
@@ -106,7 +106,7 @@ export class Lang {
         }
 
         return message;
-    };
+    }
 
     /**
     * Returns an array of codes of languages that have been loaded.
@@ -114,7 +114,7 @@ export class Lang {
     */
     public static getAllLanguages(): Array<string> {
         return Lang.allLanguages.slice(0);
-    };
+    }
 
     /**
     * Returns the language code of the current language, e.g. "en_gb".
@@ -122,7 +122,7 @@ export class Lang {
     */
     public static getLanguage(): string {
         return Lang.currentLanguage;
-    };
+    }
 
     /**
     * Returns the name of the language with the given code.
@@ -135,7 +135,7 @@ export class Lang {
         } else {
             return "?????";
         }
-    };
+    }
 
     /**
     * Sets the current language.
@@ -145,7 +145,7 @@ export class Lang {
         if (messages.hasOwnProperty(language)) {
             Lang.currentLanguage = language;
         }
-    };
+    }
 
     /**
     * Initialises the messages from those read in.
@@ -153,7 +153,6 @@ export class Lang {
     * @sb-param {String} defaultLanguage - (Optional) The default language to choose.
     */
     public static initialiseMessages(defaultLanguage?: string) {
-        const currentLanguage = this.currentLanguage;
 
         this.allLanguages = [] as Array<string>;
 
@@ -170,5 +169,5 @@ export class Lang {
         } else {
             this.currentLanguage = this.allLanguages[0];
         }
-    };
+    }
 }

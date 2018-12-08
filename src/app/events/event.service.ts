@@ -55,7 +55,6 @@ export class EventService {
   }
   /** Gets all evenst for a club  */
   getEventsForClub(club: Club): Observable<OEvent[]> {
-    this._loading.next(true);
 
     const query = this.afs.collection<OEvent>("/events",
       res => res
@@ -64,9 +63,9 @@ export class EventService {
             .orderBy('date', 'desc')
     );
 
-    const clubs$ = query.valueChanges().pipe(take(1));
-
-    clubs$.pipe(finalize( () => this._loading.next(false)));
+    const clubs$ = query.valueChanges().pipe(
+      take(1)
+    );
 
     return clubs$;
   }

@@ -52,9 +52,15 @@ export class ClubEventsTabComponent implements OnInit {
    }
 
    setSelectedClub(club: Club) {
+      console.log("=================" + club.name + "=============");
       if (club !== null) {
+         this.clubEvents = [];
          this.es.getEventsForClub(club).pipe(
-            tap(events => console.log(JSON.stringify(events)))
+            tap(events => {
+               for (const e of events) {
+                  console.log(e.name + ' ' + e.club + '  ' + e.nationality);
+               }
+            })
          ).subscribe(events => this.clubEvents = events);
       }
    }
