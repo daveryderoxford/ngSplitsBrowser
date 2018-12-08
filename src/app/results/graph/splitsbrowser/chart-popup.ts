@@ -13,7 +13,6 @@ export class ChartPopup {
     private _dataHeader: any;
     private _dataTable: any;
 
-
     /**
     * Creates a ChartPopup control.
     * @constructor

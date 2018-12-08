@@ -13,7 +13,6 @@ export interface FatestSplitsData {
    name: string;  // full name of competitor
    split: sbTime;  // Split time
 }
-
 export interface ChartData {
          dataColumns: {x: any, ys: any}[];
          competitorNames: string[];

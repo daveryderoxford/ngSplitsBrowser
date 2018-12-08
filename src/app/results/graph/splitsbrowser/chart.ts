@@ -180,7 +180,7 @@ export class Chart {
    contentWidth = -1;
    contentHeight = -1;
 
-   popup; // ChartPopup object. Chart popup is currently implemenetd as a function
+   popup: ChartPopup;
    popupData: SplitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
    isPopupOpen = false;
    popupUpdateFunc: () => void = null;
@@ -1215,7 +1215,7 @@ export class Chart {
    * @sb-param {Number} overallWidth - Overall width
    * @sb-param {Number} overallHeight - Overall height
    */
-   private setSize(overallWidth: number, overallHeight: number) {
+   setSize(overallWidth: number, overallHeight: number) {
       this.overallWidth = overallWidth;
       this.overallHeight = overallHeight;
       $(this.svg.node()).width(overallWidth).height(overallHeight);

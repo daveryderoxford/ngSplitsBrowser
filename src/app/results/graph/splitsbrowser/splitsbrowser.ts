@@ -151,19 +151,19 @@ class Viewer {
     courseClassSet: CourseClassSet = null;
     languageSelector: any = null; // LanguageSelector
     classSelector: any = null; // ClassSelector
-    comparisonSelector: any = null;  // ComparisonSelector
+    comparisonSelector: ComparisonSelector;
     originalDataSelector: any = null; // OriginalDataSelector
     statisticsSelector: any = null;  // StatisticsSelector
     competitorList: any = null; // CompetitorList
     warningViewer: any = null; // WarningViewer
-    chart: any = Chart;
+    chart: Chart;
     topPanel: any = null;
     mainPanel: any = null;
     buttonsPanel: any = null;
     competitorListContainer: any = null;
     container: any = null;
     currentResizeTimeout: any;
-    chartTypeSelector: any = null;
+    chartTypeSelector: ChartTypeSelector;
     logoSvg: any = null;
     directLink: any = null;
     resultsTable: any = null;
@@ -292,9 +292,6 @@ class Viewer {
     */
     addComparisonSelector() {
         this.comparisonSelector = new ComparisonSelector( this.topPanel.node(), alerter );
-        if ( this.classes !== null ) {
-            this.comparisonSelector.setClasses( this.classes );
-        }
     }
 
     /**

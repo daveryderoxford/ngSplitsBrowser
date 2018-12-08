@@ -4,6 +4,7 @@ import { Lang } from "./lang";
 import { select as d3_select } from "d3-selection";
 import { range as d3_range } from "d3-array";
 import { ALL_COMPARISON_OPTIONS } from "./comparision-options";
+import { Competitor, CourseClassSet } from '../../model';
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
@@ -18,9 +19,9 @@ export const RUNNER_SELECTOR_ID = "runnerSelector";
 
 export class ComparisonSelector {
     changeHandlers: any[];
-    classes: any;
-    currentRunnerIndex: any;
-    previousCompetitorList: any;
+    currentRunnerIndex: number | null;
+    courseClassSet: CourseClassSet;
+    previousCompetitorList: Competitor[];
     parent: HTMLElement;
     alerter: any;
     hasWinner: boolean;
@@ -31,7 +32,7 @@ export class ComparisonSelector {
     runnerDiv: any;
     runnerSpan: any;
     runnerDropDown: any;
-    courseClassSet: any;
+
     /**
     * A control that wraps a drop-down list used to choose what to compare
     * times against.
@@ -41,7 +42,6 @@ export class ComparisonSelector {
     */
     constructor ( parent: HTMLElement, alerter ) {
         this.changeHandlers = [];
-        this.classes = null;
         this.currentRunnerIndex = null;
         this.previousCompetitorList = null;
         this.parent = parent;
@@ -130,7 +130,7 @@ export class ComparisonSelector {
     * Sets the course-class set to use.
     * @sb-param {CourseClassSet} courseClassSet - The course-class set to set.
     */
-    setCourseClassSet( courseClassSet ) {
+    setCourseClassSet( courseClassSet: CourseClassSet ) {
         this.courseClassSet = courseClassSet;
         this.setRunners();
     }
