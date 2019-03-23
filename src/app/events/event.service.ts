@@ -72,10 +72,11 @@ export class EventService {
 
   /** Get a list if club namees for all events ordered by name and nationality */
   getClubs(): Observable<Club[]> {
-    const obs =  this.afs.collection<Club>("/clubs/", ref =>
+    const obs =  this.afs.collection<Club>("/clubs", ref =>
       ref.orderBy("name").orderBy("nationality"))
       .valueChanges().pipe(
-        tap( clubs => console.log("EventService:  Clubs list returned.  Num clubs" + clubs.length.toString() ))
+        tap( clubs => console.log("EventService:  Clubs list returned.  Num clubs: " + clubs.length.toString() )),
+        take(1)
       );
     return obs;
   }

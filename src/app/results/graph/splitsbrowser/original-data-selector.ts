@@ -1,6 +1,7 @@
 // file original-data-selector.js
 
 import { Lang } from "./lang";
+import {  } from "d3-collection";
 
 // ID of the div used to contain the object.
 // Must match the name defined in styles.css.
@@ -11,7 +12,7 @@ const getMessage = Lang.getMessage;
 /**
 * Constructs a new OriginalDataSelector object.
 * @constructor
-* @sb-param {d3.selection} parent - d3 selection containing the parent to
+* @sb-param {d3_selection} parent - d3 selection containing the parent to
 *     insert the selector into.
 */
 export function OriginalDataSelector(parent) {

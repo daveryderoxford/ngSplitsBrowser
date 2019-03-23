@@ -2,8 +2,8 @@
 import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
 import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
 import { map as d3_map } from "d3-collection";
-import { scaleLinear as d3_scaleLinear, ScaleLinear } from "d3-scale";
-import { select as d3_select, selectAll as d3_selectAll, Selection } from "d3-selection";
+import { scaleLinear as d3_scaleLinear, ScaleLinear as d3_ScaleLinear } from "d3-scale";
+import { select as d3_select, selectAll as d3_selectAll, Selection, BaseType } from "d3-selection";
 import { line as d3_line } from "d3-shape";
 import * as $ from "jquery";
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
@@ -11,7 +11,7 @@ import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
 import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
-import { FastestSplitsPopupData, SplitsPopupData } from "./splits-popup-data";
+import { FastestSplitsPopupData, SplitsPopupData, NextControlData } from "./splits-popup-data";
 
 export interface GraphColData {
    x: number;
@@ -47,6 +47,9 @@ interface CurrentCompetitorData {
    colour: string;
    index: number;
 }
+
+type tickFormatterFunction = ( value: number ) => string | null;
+
 
 // Local shorthand functions.
 const formatTime = TimeUtilities.formatTime;
@@ -106,7 +109,7 @@ const RACE_GRAPH_COMPETITOR_WINDOW = 240;
 * @sb-param {?Number} rank - The rank, or null.
 * @sb-returns Time and rank formatted as a string.
 */
-function formatTimeAndRank(time, rank): string {
+function formatTimeAndRank(time: number, rank: number): string {
    let rankStr;
    if (rank === null) {
       rankStr = "-";
@@ -169,12 +172,12 @@ function maxNonNullNorNaNValue(values: Array<number | null>): number {
 
 export class Chart {
    parent: HTMLElement;
-   svg: Selection<any, any, any, any>;
-   svgGroup;
-   textSizeElement;
+   svg: Selection<BaseType, {}, null, undefined>;
+   svgGroup: Selection<BaseType, {}, null, undefined>;
+   textSizeElement: Selection<any, {}, null, undefined>;
 
-   xScale: ScaleLinear<number, number> = null;
-   yScale: ScaleLinear<number, number> = null;
+   xScale: d3_ScaleLinear<number, number> = null;
+   yScale: d3_ScaleLinear<number, number> = null;
    overallWidth = -1;
    overallHeight = -1;
    contentWidth = -1;
@@ -227,7 +230,7 @@ export class Chart {
    minViewableControl: number;
    visibleStatistics: StatsVisibilityFlags;
    currentLeftMargin: number;
-   xScaleMinutes: d3.ScaleLinear<number, number>;
+   xScaleMinutes: d3_ScaleLinear<number, number>;
 
    /**
    * A chart object in a window.
@@ -281,7 +284,7 @@ export class Chart {
    * @sb-param {jQuery.event} event - jQuery mouse-down or mouse-move event.
    * @sb-return {Object} Location of the popup.
    */
-   private getPopupLocation(event: JQueryEventObject) {
+   private getPopupLocation(event: JQueryEventObject): {x: number, y: number} {
       return {
          x: event.pageX + CHART_POPUP_X_OFFSET,
          y: Math.max(event.pageY - this.popup.height() / 2, 0)
@@ -302,7 +305,7 @@ export class Chart {
    * @sb-return {Object} Object that contains the title for the popup and the
    *     array of data to show within it.
    */
-   private getFastestSplitsForCurrentLegPopupData() {
+   private getFastestSplitsForCurrentLegPopupData(): FastestSplitsPopupData {
       return this.popupData.getFastestSplitsForLegPopupData(this.courseClassSet, this.eventData, this.currentControlIndex);
    }
 
@@ -320,7 +323,7 @@ export class Chart {
    * current time.
    * @sb-return {Array} Array of competitor data.
    */
-   private getCompetitorsVisitingCurrentControlPopupData() {
+   private getCompetitorsVisitingCurrentControlPopupData(): FastestSplitsPopupData {
       return this.popupData.getCompetitorsVisitingCurrentControlPopupData(this.courseClassSet,
          this.eventData,
          this.currentControlIndex,
@@ -331,7 +334,7 @@ export class Chart {
    * Returns next-control data to show on the chart popup.
    * @sb-return {Array} Array of next-control data.
    */
-   private getNextControlData() {
+   private getNextControlData(): NextControlData {
       return this.popupData.getNextControlData(this.courseClassSet.getCourse(), this.eventData, this.actualControlIndex);
    }
 
@@ -600,15 +603,15 @@ export class Chart {
          if (this.visibleStatistics.TotalTime) {
             const cumTimes = selectedCompetitors.map(comp => comp.getCumulativeTimeTo(this.currentControlIndex));
             const cumRanks = selectedCompetitors.map(comp => comp.getCumulativeRankTo(this.currentControlIndex));
-            labelTexts = d3_zip<string | number>(labelTexts, cumTimes, cumRanks)
-               .map(triple => triple[0] + formatTimeAndRank(triple[1], triple[2]));
+            labelTexts = d3_zip<number | string>(labelTexts, cumTimes, cumRanks)
+               .map(triple => triple[0] + formatTimeAndRank(triple[1] as number, triple[2] as number));
          }
 
          if (this.visibleStatistics.SplitTime) {
             const splitTimes = selectedCompetitors.map(comp => comp.getSplitTimeTo(this.currentControlIndex));
             const splitRanks = selectedCompetitors.map(comp => comp.getSplitRankTo(this.currentControlIndex));
             labelTexts = d3_zip<string | number>(labelTexts, splitTimes, splitRanks)
-               .map(triple => triple[0] + formatTimeAndRank(triple[1], triple[2]));
+               .map(triple => triple[0] + formatTimeAndRank(triple[1] as number, triple[2] as number));
          }
 
          if (this.visibleStatistics.BehindFastest) {
@@ -698,7 +701,7 @@ export class Chart {
                                     data.
    * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
    */
-   private getMaxTimeAndRankTextWidth(timeFuncName, rankFuncName): number {
+   private getMaxTimeAndRankTextWidth(timeFuncName: string, rankFuncName: string): number {
       let maxTime = 0;
       let maxRank = 0;
 
@@ -801,9 +804,9 @@ export class Chart {
    * @sb-return {Number} Maximum width of a start time label.
    */
    private determineMaxStartTimeLabelWidth(chartData): number {
-      let maxWidth;
+      let maxWidth: number;
       if (chartData.competitorNames.length > 0) {
-         maxWidth = d3_max(chartData.competitorNames.map(name => this.getTextWidth("00:00:00 " + name)));
+         maxWidth = d3_max<number>(chartData.competitorNames.map(name => this.getTextWidth("00:00:00 " + name)));
       } else {
          maxWidth = 0;
       }
@@ -874,14 +877,15 @@ export class Chart {
    * @sb-return {?Function} Tick formatter function, or null to use the default
    *     d3 formatter.
    */
-   private determineYAxisTickFormatter(chartData) {
+
+   private determineYAxisTickFormatter( chartData ): tickFormatterFunction {
       if (this.isRaceGraph) {
          // Assume column 0 of the data is the start times.
          // However, beware that there might not be any data.
          const startTimes = (chartData.dataColumns.length === 0) ? [] : chartData.dataColumns[0].ys;
          if (startTimes.length === 0) {
             // No start times - draw all tick marks.
-            return time => formatTime(time * 60);
+            return ( time => formatTime(time * 60) );
          } else {
             // Some start times are to be drawn - only draw tick marks if
             // they are far enough away from competitors.
@@ -1273,7 +1277,7 @@ export class Chart {
    *                                    certain statistics are visible.
    * @sb-param {Object} chartType - The type of chart being drawn.
    */
-   drawChart(data: ChartDisplayData, selectedIndexes: Array<number>, visibleStatistics: StatsVisibilityFlags, chartType: ChartType) {
+   drawChart(data: ChartDisplayData, selectedIndexes: Array<number>, visibleStatistics: StatsVisibilityFlags, chartType: ChartType): void {
 
       const chartData = data.chartData;
 

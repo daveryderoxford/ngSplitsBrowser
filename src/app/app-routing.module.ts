@@ -13,6 +13,7 @@ import { UserComponent } from './user/user.component';
 import { ChangePasswordComponent } from './auth/change-password/change-password.component';
 import { SplitsGridComponent } from './results/splits-grid/splits-grid.component';
 import { PendingChangesGuard } from './shared/services/pending-changes-guard-service.guard';
+import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
 
 const routes: Routes = [
    { path: "", component: MainComponent },
@@ -20,6 +21,7 @@ const routes: Routes = [
    { path: "signup", component: SignupComponent },
    { path: "recover", component: RecoverComponent },
    { path: "events", component: EventsViewComponent },
+   { path: "fixtures", component: FixturesComponent },
    { path: "user", component: UserComponent, canActivate: [AuthGuard], canDeactivate: [PendingChangesGuard] },
    { path: "change-password", component: ChangePasswordComponent, canActivate: [AuthGuard] },
    { path: "about", component: AboutComponent },

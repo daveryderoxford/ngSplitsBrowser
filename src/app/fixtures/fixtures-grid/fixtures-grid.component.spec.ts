@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MatSearchBarComponent } from './mat-search-bar.component';
+import { FixturesGridComponent } from './fixtures-grid.component';
 
-describe('MatSearchBarComponent', () => {
-  let component: MatSearchBarComponent;
-  let fixture: ComponentFixture<MatSearchBarComponent>;
+describe('FixturesGridComponent', () => {
+  let component: FixturesGridComponent;
+  let fixture: ComponentFixture<FixturesGridComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MatSearchBarComponent ]
+      declarations: [ FixturesGridComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MatSearchBarComponent);
+    fixture = TestBed.createComponent(FixturesGridComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -101,8 +101,6 @@ export function removeGraph() {
     $( '#sbContainer' ).remove();
 }
 
-
-
 // Delay in milliseconds between a resize event being triggered and the
 // page responding to it.
 // (Resize events tend to come more than one at a time; if a resize event

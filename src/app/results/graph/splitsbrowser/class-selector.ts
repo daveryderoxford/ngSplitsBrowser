@@ -204,7 +204,7 @@ ClassSelector.prototype.updateOtherClassText = function () {
 /**
 * Updates the other-classes selector div following a change of selected
 * 'main' class.
-* @sb-param {d3.set} selectedOtherClassIndexes - Array of selected other-class indexes.
+* @sb-param {d3 set} selectedOtherClassIndexes - Array of selected other-class indexes.
 */
 ClassSelector.prototype.updateOtherClasses = function (selectedOtherClassIndexes) {
     this.otherClassesList.style("display", "none");

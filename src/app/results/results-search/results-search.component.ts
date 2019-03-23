@@ -82,7 +82,7 @@ export class ResultsSearchComponent implements OnInit {
   private updateSelections(selection: SearchSelectedItem) {
     // Select the competitor and the courses and class of the competiror
     if (selection instanceof Competitor) {
-      this.rs.selectCompetitor(selection);
+      this.rs.selectCompetitors(selection);
       this.rs.selectClass(selection.courseClass);
       this.rs.selectCourse(selection.courseClass.course);
     } else if (selection instanceof CourseClass) {

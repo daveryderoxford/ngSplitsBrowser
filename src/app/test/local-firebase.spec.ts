@@ -5,6 +5,8 @@ import { Observable, Observer, from } from "rxjs";
 import { test_events, test_results, test_userdata, test_clubs } from './testdata.spec';
 import { TestBed } from "@angular/core/testing";
 import { concatMap, bufferCount } from "rxjs/operators";
+import { User } from "firebase";
+import { UserData } from "app/model";
 
 /** Local Firebase test database angular firestore */
 
@@ -23,7 +25,6 @@ export class FirestoreTestUtil {
       if (!this.afs) {
          throw new Error("Firestore service reference no found");
       }
-
    }
 
    /** Login to test database */
@@ -41,11 +42,12 @@ export class FirestoreTestUtil {
 
    /** Load default test data into test database */
    async loadDefaultData(): Promise<void> {
+    //  await this.cleanup();
 
       // set user data
       console.log('Setting default user data');
       for (const ud of test_userdata) {
-         await this.afs.doc('users/' + ud.key).set(ud);
+         await this.afs.doc<UserData>('users/' + ud.key).set(ud);
       }
 
       // set events

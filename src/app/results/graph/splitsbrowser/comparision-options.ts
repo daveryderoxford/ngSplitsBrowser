@@ -1,6 +1,8 @@
+import { CourseClassSet } from "app/results/model";
+
 export interface ComparisionOption {
     nameKey: string;
-    selector: (courseClassSet) => number;
+    selector: (c: CourseClassSet) => number[];
     requiresWinner: boolean;
     percentage: string;
 }

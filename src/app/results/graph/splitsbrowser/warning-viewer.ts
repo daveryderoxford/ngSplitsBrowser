@@ -8,7 +8,7 @@ const CONTAINER_DIV_ID = "warningViewerContainer";
 /**
 * Constructs a new WarningViewer object.
 * @constructor
-* @sb-param {d3.selection} parent - d3 selection containing the parent to
+* @sb-param {d3_selection} parent - d3 selection containing the parent to
 *     insert the selector into.
 */
 export function WarningViewer(parent) {

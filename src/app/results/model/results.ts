@@ -1,5 +1,5 @@
 import { ascending as d3_ascending } from "d3-array";
-import { NextControlDataArr } from "../graph/splitsbrowser/splits-popup-data";
+import { NextControlsDataArr } from "../graph/splitsbrowser/splits-popup-data";
 import { Competitor } from "./competitor";
 import { Course } from "./course";
 import { CourseClass } from "./course-class";
@@ -126,7 +126,7 @@ export class Results {
     * @sb-return {Array} Array of objects for each course using that control,
     *    with each object listing course name and next control.
     */
-    public getNextControlsAfter(controlCode: string): NextControlDataArr[] {
+    public getNextControlsAfter(controlCode: string): NextControlsDataArr[] {
         let courses = this.courses;
         if (controlCode !== Course.START) {
             courses = courses.filter((course) => course.hasControl(controlCode));

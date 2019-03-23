@@ -23,6 +23,15 @@
       "sourceMaps": true
     },
     {
+      "name": "Attach Test",
+      "type": "chrome",
+      "request": "attach",
+      "url": "http://localhost:9876/*",
+      "port": 9222,
+      "webRoot": "${workspaceRoot}",
+      "sourceMaps": true
+    },
+    {
       "name": "ng serve",
       "type": "chrome",
       "request": "launch",

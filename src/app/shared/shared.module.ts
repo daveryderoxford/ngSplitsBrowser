@@ -8,7 +8,7 @@ import { SpinnerModule } from './components/spinner.module';
 import { DialogsModule } from "./dialogs/dialogs.module";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AppRoutingModule } from "../app-routing.module";
-import { MatSearchBarComponent } from "./components/mat-search-bar/mat-search-bar.component";
+import { AngularSplitModule } from 'angular-split';
 
 @NgModule({
     imports: [
@@ -18,13 +18,13 @@ import { MatSearchBarComponent } from "./components/mat-search-bar/mat-search-ba
         AppMaterialModule,
         AppRoutingModule,
     ],
-    declarations: [NavbarComponent, MatSearchBarComponent],
+    declarations: [NavbarComponent],
     exports: [
         SpinnerModule,
         DialogsModule,
         AppMaterialModule,
         NavbarComponent,
-        MatSearchBarComponent,
+        AngularSplitModule
     ],
     providers: [AngularFireAuth]
 })

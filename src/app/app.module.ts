@@ -36,6 +36,9 @@ import { UserComponent } from "./user/user.component";
 import { ResultsViewButtonComponent } from './results/results-navbar/results-view-button.component';
 import { CompareWithComponent } from './results/results-navbar/compare-with.component';
 import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-button.component';
+import { FixturesMapComponent } from './fixtures/fixtures-map/fixtures-map.component';
+import { FixturesGridComponent } from './fixtures/fixtures-grid/fixtures-grid.component';
+import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
 
 @NgModule({
   declarations: [
@@ -62,6 +65,9 @@ import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-bu
     ResultsViewButtonComponent,
     CompareWithComponent,
     ClassMenuButtonComponent,
+    FixturesMapComponent,
+    FixturesGridComponent,
+    FixturesComponent,
   ],
   entryComponents: [
     ResultsFoundDialogComponent

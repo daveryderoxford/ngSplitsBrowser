@@ -3,8 +3,8 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular
 
 @Component({
   selector: 'app-search-bar',
-  templateUrl: './mat-search-bar.component.html',
-  styleUrls: ['./mat-search-bar.component.scss'],
+  templateUrl: './app-search-bar.component.html',
+  styleUrls: ['./app-search-bar.component.scss'],
   animations: [
     trigger('slideInOut', [
       state('true', style({ width: '*' })),
@@ -14,11 +14,11 @@ import { Component, ElementRef, EventEmitter, Output, ViewChild } from '@angular
     ])
   ]
 })
-export class MatSearchBarComponent {
+export class SearchBarComponent {
 
   @ViewChild('input') inputElement: ElementRef;
 
-  @Output() onBlur = new EventEmitter<string>();
+  @Output() blur = new EventEmitter<string>();
   @Output() onClose = new EventEmitter<void>();
   @Output() onEnter = new EventEmitter<string>();
   @Output() onFocus = new EventEmitter<string>();
@@ -42,7 +42,7 @@ export class MatSearchBarComponent {
     if (!searchValue) {
       this.searchVisible = false;
     }
-    this.onBlur.emit(searchValue);
+    this.blur.emit(searchValue);
   }
 
   onEnterring(searchValue: string) {

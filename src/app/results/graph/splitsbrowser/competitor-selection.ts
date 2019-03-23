@@ -2,14 +2,21 @@ import * as $ from "jquery";
 import { InvalidData } from "../../model/exception";
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
 import { set as d3_set } from "d3-collection";
+import { Competitor } from "app/results/model";
 
+export interface CompetitorDetails {
+    crosses: boolean;
+    visible: boolean;
+    competitor: Competitor;
+}
+export type  ChangeHandlerFunction = (indices: number[]) => void;
 export class CompetitorSelection {
 
     // tslint:disable-next-line:no-shadowed-variable
     private static NUMBER_TYPE = typeof 0;
 
-    currentIndexes = [] as Array<any>;
-    changeHandlers = [] as Array<any>;
+    currentIndexes: Array<number> = [];
+    changeHandlers: ChangeHandlerFunction[] = [];
 
     /**
     * Represents the currently-selected competitors, and offers a callback
@@ -61,11 +68,11 @@ export class CompetitorSelection {
     * @sb-param {Array} competitorDetails - Array of competitor details to
     *     check within.
     */
-    public selectCrossingRunners(competitorDetails): void {
+    public selectCrossingRunners( competitorDetails: CompetitorDetails[]): void {
         if (this.isSingleRunnerSelected()) {
             const refCompetitor = competitorDetails[this.currentIndexes[0]].competitor;
 
-            competitorDetails.forEach((compDetails, idx) => {
+            competitorDetails.forEach((compDetails, idx: number) => {
                 if (compDetails.visible && compDetails.competitor.crosses(refCompetitor)) {
                     this.currentIndexes.push(idx);
                 }
@@ -76,7 +83,7 @@ export class CompetitorSelection {
         }
     }
 
-    /**
+ /**
   * Select all of the competitors.
   */
     public selectAll(): void {
@@ -123,7 +130,7 @@ export class CompetitorSelection {
     *
     * @sb-param {Function} handler - The handler to register.
     */
-    public registerChangeHandler(handler) {
+    public registerChangeHandler( handler: ChangeHandlerFunction) {
         if (this.changeHandlers.indexOf(handler) === -1) {
             this.changeHandlers.push(handler);
         }
@@ -146,7 +153,7 @@ export class CompetitorSelection {
     *
     * @sb-param {Function} handler - The handler to register.
     */
-    public deregisterChangeHandler(handler) {
+    public deregisterChangeHandler( handler: ChangeHandlerFunction) {
         const index = this.changeHandlers.indexOf(handler);
         if (index > -1) {
             this.changeHandlers.splice(index, 1);
@@ -157,7 +164,7 @@ export class CompetitorSelection {
     * Toggles whether the competitor at the given index is selected.
     * @sb-param {Number} index - The index of the competitor.
     */
-    public toggle(index) {
+    public toggle(index: number) {
         if (typeof index === CompetitorSelection.NUMBER_TYPE) {
             if (0 <= index && index < this.count) {
                 const position = this.currentIndexes.indexOf(index);
@@ -182,7 +189,7 @@ export class CompetitorSelection {
     * end if any indexes were added.
     * @sb-param {Array} indexes - Array of indexes of competitors to select.
     */
-    private bulkSelect(indexes) {
+    private bulkSelect(indexes: number[]) {
         if (indexes.some(function (index) {
             return (typeof index !== CompetitorSelection.NUMBER_TYPE || index < 0 || index >= this.count);
         }, this)) {
@@ -205,7 +212,7 @@ export class CompetitorSelection {
     * end if any indexes were removed.
     * @sb-param {Array} indexes - Array of indexes of competitors to deselect.
     */
-    private bulkDeselect(indexes) {
+    private bulkDeselect( indexes: number[]) {
         if (indexes.some(function (index) {
             return (typeof index !== CompetitorSelection.NUMBER_TYPE || index < 0 || index >= this.count);
         }, this)) {
@@ -245,7 +252,7 @@ export class CompetitorSelection {
     * @sb-param {Array} newCompetitors - Array of Competitor objects for the new
     *      selection.  This array must not be empty.
     */
-    public migrate(oldCompetitors, newCompetitors) {
+    public migrate(oldCompetitors: Competitor[], newCompetitors: Competitor[]) {
         if (!$.isArray(oldCompetitors)) {
             throw new InvalidData("CompetitorSelection.migrate: oldCompetitors not an array");
         } else if (!$.isArray(newCompetitors)) {
@@ -261,7 +268,7 @@ export class CompetitorSelection {
 
         this.count = newCompetitors.length;
         this.currentIndexes = [];
-        newCompetitors.forEach(function (comp, idx) {
+        newCompetitors.forEach(function (comp, idx: number) {
             if (selectedCompetitors.indexOf(comp) >= 0) {
                 this.currentIndexes.push(idx);
             }

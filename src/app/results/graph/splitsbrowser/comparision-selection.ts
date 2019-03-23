@@ -23,7 +23,7 @@ export class ComparisonSelector {
     courseClassSet: CourseClassSet;
     previousCompetitorList: Competitor[];
     parent: HTMLElement;
-    alerter: any;
+    alerter: ( arg0: string ) => void;
     hasWinner: boolean;
     previousSelectedIndex: number;
     comparisonSelectorLabel: any;

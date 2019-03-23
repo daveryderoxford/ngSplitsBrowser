@@ -10,14 +10,19 @@ export interface FastestSplitsPopupData {
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
-export interface NextControlDataArr {
+export interface NextControlsDataArr {
     course: Course;
     nextControls: string[];
 }
 
-export interface NextControlDataStr {
+export interface NextControlsDataStr {
     course: Course;
     nextControls: string;
+}
+
+export interface NextControlData {
+    thisControl: string;
+    nextControls: NextControlsDataStr[];
 }
 
 export class SplitsPopupData {
@@ -166,7 +171,7 @@ export class SplitsPopupData {
     * @sb-param {Array} nextControls - Array of next-control information objects.
     * @sb-return {String} Next-control information containing joined-up control names.
     */
-    private tidyNextControlsList(nextControls: Array<any>): NextControlDataStr[] {
+    private tidyNextControlsList(nextControls: Array<any>): NextControlsDataStr[] {
         return nextControls.map((nextControlRec) => {
             const codes = nextControlRec.nextControls.slice(0);
             if (codes[codes.length - 1] === Course.FINISH) {
@@ -187,7 +192,7 @@ export class SplitsPopupData {
     * @sb-return {Object} Next-control data.
     */
     // tslint:disable-next-line:max-line-length
-    public getNextControlData(course: Course, eventData: Results, controlIndex: number): { thisControl: string, nextControls: NextControlDataStr[] } {
+    public getNextControlData(course: Course, eventData: Results, controlIndex: number): NextControlData {
 
         const controlIdx = Math.min(controlIndex, course.controls.length);
         const controlCode = course.getControlCode(controlIdx);

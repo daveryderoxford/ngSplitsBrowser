@@ -24,12 +24,12 @@ import { } from "jasmine";
 import { Course, CourseClass, CourseClassSet, Results, TimeUtilities } from "../../model";
 import { TestSupport } from "../../test-support.spec";
 import { Lang } from "./lang";
-import { NextControlDataStr, SplitsPopupData } from "./splits-popup-data";
+import { NextControlsDataStr, SplitsPopupData } from "./splits-popup-data";
 import { range } from "d3-array";
 
 
 interface ExpectedData {
-    nextControls: NextControlDataStr[];
+    nextControls: NextControlsDataStr[];
     thisControl: string;
 }
 

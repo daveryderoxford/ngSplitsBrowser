@@ -1,6 +1,6 @@
 
 import { range as d3_range } from "d3-array";
-import { map as d3_map, set as d3_set } from "d3-collection";
+import { map as d3_map, Map as d3_Map, set as d3_set, Set as d3_Set } from "d3-collection";
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
 import { isNaNStrict } from "../model/util";
@@ -553,7 +553,7 @@ class OEReader {
     * @sb-param {String} initCourseName - The name of the initial course.
     * @sb-param {Object} manyToManyMaps - Object that contains the two maps that
     *     map between class names and course names.
-    * @sb-param {d3.set} doneCourseNames - Set of all course names that have been
+    * @sb-param {d3 set} doneCourseNames - Set of all course names that have been
     *     'done', i.e. included in a Course object that has been returned from
     *     a call to this method.
     * @sb-param {d3_map} classesMap - Map that maps class names to CourseClass
@@ -562,8 +562,8 @@ class OEReader {
     */
     private createCourseFromLinkedClassesAndCourses(initCourseName: string,
         manyToManyMaps,
-        doneCourseNames: d3.Set,
-        classesMap: d3.Map<any>): Course {
+        doneCourseNames: d3_Set,
+        classesMap: d3_Map<any>): Course {
 
         const courseNamesToDo = [initCourseName];
         const classNamesToDo = [];

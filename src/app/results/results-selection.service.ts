@@ -68,11 +68,12 @@ export class ResultsSelectionService {
                if (results.classes.length > 0) {
                   this.selectClass(results.classes[0]);
                } else {
+                  this._selectedCourse$.next(null);
                   this._selectedClass$.next(null);
                }
 
                this._event$.next(event);
-               this._results$.next(results);
+               this._results$.next( results );
 
             }));
 
@@ -114,9 +115,9 @@ export class ResultsSelectionService {
    }
 
    /** Select a competitor or array of competitors */
-   selectCompetitor(...comp: Competitor[]) {
-      const competitors = this._selectedCompetitors$.getValue().concat(comp);
-      competitors.sort((a, b) => a.totalTime - b.totalTime);
+   selectCompetitors(...comp: Competitor[]) {
+      let competitors = this._selectedCompetitors$.getValue().concat(comp);
+      competitors = competitors.sort((a, b) => a.totalTime - b.totalTime);
       this._selectedCompetitors$.next(competitors);
    }
 
@@ -124,8 +125,8 @@ export class ResultsSelectionService {
     * If a competitor is not selected then it is ignored.
     */
    deselectCompetitors(...compToRemove: Competitor[]) {
-      const competitors = this._selectedCompetitors$.getValue();
-      competitors.filter(value => {
+      let competitors = this._selectedCompetitors$.getValue();
+      competitors = competitors.filter(value => {
          return compToRemove.includes(value);
       });
       this._selectedCompetitors$.next(competitors);

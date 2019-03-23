@@ -1,28 +1,30 @@
 # Splitsbrowser
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0-rc.2.
+Angular program for displaying orienteering results.
 
-## Development server
+Data is store on google cloud. 
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+It was originally written by Dave Ryder as a Java application many years ago and rewritten/emhanced probcipally by
 
-## Code scaffolding
+## Development 
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive/pipe/service/class/module`.
+## Supported file format
 
-## Build
+Splitsbrowser supports the following results file formats
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+* IOF XML version 3  https://orienteering.org/resources/it/data-standard-3-0/
+* IOF XML version 2  https://orienteering.org/resources/it/data-standard-2-0/
+* OE format
+CSV output from OE Results application.
+Variations supporting 44, 46 and 60 columns before the controls data are supported. 
 
-## Running unit tests
+* CSV Format
+Simple, fixed csv format with the following columns
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+* Alternate CVS format
+Alternative CSV formats, where each row defines a separate competitor, and includes course details such as name, controls and optionally distance and climb.
+There is presently one variation supported: one, distinguished by having three columns per control: control codecumulative time and 'points'.  
 
-## Running end-to-end tests
+ * HTML Format
+Attempt to parse 
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).

@@ -126,8 +126,8 @@ export const eventSummaryA: EventSummary = {
 };
 eventA.summary = eventSummaryA;
 
-export const resultsa = `
-Stno;SI card;Database Id;Name;YB;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;
+export const resultsa =
+`Stno;SI card;Database Id;Name;YB;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;
  ;11; ;Runner A1; ; ; ;10:00:00; ;12:14; ; ; ;ABC; ; ;Class A; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 1;4.1;35;4;1;10:00:00;10:12:14;212;01:48;229;06:14;208;08:43;222;08:43;
  ;12; ;Runner A2; ; ; ;10:30:00; ;14:12; ; ; ;DEF; ; ;Class A; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 1;4.1;35;4;2;10:30:00;10:44:12;212;03:37;229;07:56;208;10:32;222;08:43;
  ;13; ;Runner A3; ; ; ;11:00:00; ;13:32; ; ; ;GHI; ; ;Class A; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 1;4.1;35;4;3;11:00:00;11:13:32;212;03:01;229;07:05;208;09:59;222;08:43;

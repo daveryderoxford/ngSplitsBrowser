@@ -4,6 +4,7 @@ import * as d3 from "d3";
 import { Competitor, CourseClass, TimeUtilities } from "../../model";
 import { isNotNullNorNaN } from "../../model/util";
 import { Lang } from "./lang";
+import { select as d3_select, range as d3_range } from "d3";
 
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
@@ -31,7 +32,7 @@ export function ResultsTable(parent) {
 * Build the results table.
 */
 ResultsTable.prototype.buildTable = function (): void {
-    this.div = d3.select(this.parent).append("div")
+    this.div = d3_select(this.parent).append("div")
         .attr("id", "resultsTableContainer");
 
     this.headerSpan = this.div.append("div")
@@ -140,7 +141,7 @@ ResultsTable.prototype.populateTable = function () {
 
     const controls = this.courseClass.course.controls;
     if (controls === null) {
-        headerCellData = headerCellData.concat(d3.range(1, this.courseClass.numControls + 1).toString());
+        headerCellData = headerCellData.concat(d3_range(1, this.courseClass.numControls + 1).toString());
     } else {
         headerCellData = headerCellData.concat(controls.map(function (control, index) {
             return (index + 1) + NON_BREAKING_SPACE_CHAR + "(" + control + ")";
@@ -219,7 +220,7 @@ ResultsTable.prototype.populateTable = function () {
         addCell(competitor.name, competitor.club, false, false, false, false, false);
         addCell(getTimeOrStatus(competitor), NON_BREAKING_SPACE_CHAR, "time", false, false, false, false);
 
-        d3.range(1, this.courseClass.numControls + 2).forEach(function (controlNum) {
+        d3_range(1, this.courseClass.numControls + 2).forEach(function (controlNum) {
             const formattedCumTime = TimeUtilities.formatTime(competitor.getOriginalCumulativeTimeTo(controlNum), precision);
             const formattedSplitTime = TimeUtilities.formatTime(competitor.getOriginalSplitTimeTo(controlNum), precision);
             const isCumTimeFastest = (competitor.getCumulativeRankTo(controlNum) === 1);

@@ -19,7 +19,7 @@ export class ChartPopup {
     * @sb-param {HTMLElement} parent - Parent HTML element.
     * @sb-param {Object} handlers - Object that maps mouse event names to handlers.
     */
-    constructor( parent, handlers ) {
+    constructor( parent: HTMLElement, handlers ) {
 
         outerThis = this;
 
