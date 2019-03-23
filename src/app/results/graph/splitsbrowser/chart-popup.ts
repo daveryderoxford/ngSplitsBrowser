@@ -4,7 +4,19 @@ import { select as d3_select, Selection } from "d3-selection";
 import * as $ from "jquery";
 import { TimeUtilities } from "../../model";
 
-let outerThis;
+interface ChartPopupHandlers {
+   mousemove: any;
+   mousedown: any;
+   mouseup: any;
+}
+
+/**
+* Creates a ChartPopup control.
+* @constructor
+* @sb-param {HTMLElement} parent - Parent HTML element.
+* @sb-param {Object} handlers - Object that maps mouse event names to handlers.
+*/
+export function ChartPopup(parent: HTMLElement, handlers: ChartPopupHandlers) {
 
 export class ChartPopup {
     private _shown: boolean;
