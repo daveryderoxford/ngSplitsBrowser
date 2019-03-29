@@ -1,5 +1,4 @@
 "use strict";
-// import { OEvent } from '../../../src/app/model/oevent';
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -15,8 +14,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -37,34 +36,51 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
-///////////////////
-var functions = require("firebase-functions");
 var admin = require("firebase-admin");
+var functions = require("firebase-functions");
 admin.initializeApp(functions.config().firebase);
-exports.eventIndices = functions.database.ref('/events/{key}').onWrite(function (event) { return __awaiter(_this, void 0, void 0, function () {
-    var written, previous;
+exports.updateEvent = functions.firestore
+    .document('events/{eventId}')
+    .onWrite(function (change, context) { return __awaiter(_this, void 0, void 0, function () {
+    var written;
+    return __generator(this, function (_a) {
+        written = change.after.data();
+        return [2 /*return*/];
+    });
+}); });
+exports.updateEvent = functions.firestore
+    .document('events/{eventId}')
+    .onUpdate(function (change, context) { return __awaiter(_this, void 0, void 0, function () {
+    var newValue, previousValue, clubs;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                written = event.data.val();
-                previous = event.data.previous.val();
-                if (!((written.club !== previous.club) ||
-                    (written.eventdate !== previous.eventdate))) return [3 /*break*/, 2];
-                written.club_date_index = padRight(written.club.toLowerCase(), 10) + decreasingTimeIndex(written.eventdate);
-                written.date_club_index = decreasingTimeIndex(written.eventdate) + padRight(written.club.toLowerCase(), 10);
-                return [4 /*yield*/, event.data.ref.set(written)];
-            case 1: return [2 /*return*/, (_a.sent())];
-            case 2: return [2 /*return*/];
+                newValue = change.after.data();
+                previousValue = change.before.data();
+                if (!(newValue.club !== previousValue.club)) return [3 /*break*/, 4];
+                return [4 /*yield*/, readClubs()];
+            case 1:
+                clubs = _a.sent();
+                return [4 /*yield*/, removeClubReference(previousValue)];
+            case 2:
+                _a.sent();
+                return [4 /*yield*/, addClubReference(newValue)];
+            case 3:
+                _a.sent();
+                _a.label = 4;
+            case 4: return [2 /*return*/];
         }
     });
 }); });
-exports.eventClubReferencesUpdate = functions.database.ref('/events/{key}').onUpdate(function (event) { return __awaiter(_this, void 0, void 0, function () {
+exports.eventClubReferencesUpdate = functions.firestore
+    .document('events/{eventId}')
+    .onUpdate(function (change, context) { return __awaiter(_this, void 0, void 0, function () {
     var written, previous;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                written = event.data.val();
-                previous = event.data.previous.val();
+                written = change.after.data();
+                previous = change.before.data();
                 if (!((written.club !== previous.club) ||
                     (written.nationality !== previous.nationality))) return [3 /*break*/, 3];
                 return [4 /*yield*/, removeClubReference(previous)];
@@ -78,26 +94,57 @@ exports.eventClubReferencesUpdate = functions.database.ref('/events/{key}').onUp
         }
     });
 }); });
-exports.eventClubReferencesDelete = functions.database.ref('/events/{key}').onDelete(function (event) { return __awaiter(_this, void 0, void 0, function () {
+exports.eventClubReferencesDelete = functions.firestore
+    .document('events/{eventId}')
+    .onDelete(function (snapshot) { return __awaiter(_this, void 0, void 0, function () {
+    var event;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, removeClubReference(event.data.previous.val())];
+            case 0:
+                event = snapshot.data();
+                return [4 /*yield*/, removeClubReference(event)];
             case 1:
                 _a.sent();
                 return [2 /*return*/];
         }
     });
 }); });
-exports.eventClubReferencesCreate = functions.database.ref('/events/{key}').onCreate(function (event) { return __awaiter(_this, void 0, void 0, function () {
+exports.eventClubReferencesCreate = functions.firestore
+    .document('events/{eventId}')
+    .onCreate(function (snapshot) { return __awaiter(_this, void 0, void 0, function () {
+    var event;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, addClubReference(event.data.val())];
+            case 0:
+                event = snapshot.data();
+                return [4 /*yield*/, addClubReference(event)];
             case 1:
                 _a.sent();
                 return [2 /*return*/];
         }
     });
 }); });
+/** Read clubs object */
+function readClubs() {
+    return __awaiter(this, void 0, void 0, function () {
+        var doc;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, admin.firestore().doc('/clubs/clubs').get()];
+                case 1:
+                    doc = _a.sent();
+                    return [2 /*return*/, doc.data()];
+            }
+        });
+    });
+}
+function writeClubs(clubs) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            return [2 /*return*/];
+        });
+    });
+}
 function addClubReference(event) {
     return __awaiter(this, void 0, void 0, function () {
         var clubRef, clubSnapshot, club;
@@ -105,7 +152,7 @@ function addClubReference(event) {
             switch (_a.label) {
                 case 0:
                     clubRef = getClubRef(event);
-                    return [4 /*yield*/, clubRef.once('value')];
+                    return [4 /*yield*/, clubRef.once("value")];
                 case 1:
                     clubSnapshot = _a.sent();
                     club = clubSnapshot.val();
@@ -115,13 +162,13 @@ function addClubReference(event) {
                             nationality: event.nationality,
                             numEvents: 0
                         };
-                        console.log('Creating new club ' + club.name + '  ' + club.nationality);
+                        console.log("Creating new club " + club.name + "  " + club.nationality);
                     }
                     club.numEvents = club.numEvents + 1;
                     return [4 /*yield*/, clubRef.set(club)];
                 case 2:
                     _a.sent();
-                    console.log('Added club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents);
+                    console.log("Added club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents);
                     return [2 /*return*/];
             }
         });
@@ -134,12 +181,12 @@ function removeClubReference(event) {
             switch (_a.label) {
                 case 0:
                     clubRef = getClubRef(event);
-                    return [4 /*yield*/, clubRef.once('value')];
+                    return [4 /*yield*/, clubRef.once("value")];
                 case 1:
                     clubSnapshot = _a.sent();
                     club = clubSnapshot.val();
                     if (!club) {
-                        console.log('Removing reference club not found');
+                        console.log("Removing reference club not found");
                         return [2 /*return*/];
                     }
                     club.numEvents = club.numEvents - 1;
@@ -153,7 +200,7 @@ function removeClubReference(event) {
                     _a.sent();
                     _a.label = 5;
                 case 5:
-                    console.log('Removed club reference ' + club.name + '  ' + club.nationality + ' Num events' + club.numEvents);
+                    console.log("Removed club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents);
                     return [2 /*return*/];
             }
         });
@@ -162,30 +209,22 @@ function removeClubReference(event) {
 function getClubRef(event) {
     var key = padRight(event.club.toLowerCase(), 10) + event.nationality;
     key = encodeAsFirebaseKey(key);
-    var ref = admin.database().ref('clubs/' + key);
+    var ref = admin.database().ref("clubs/" + key);
     return (ref);
-}
-function decreasingTimeIndex(dateStr) {
-    var d1 = new Date('2050-01-01 00:00:00').getTime() / 1000;
-    var d2 = new Date(dateStr).getTime() / 1000;
-    var minusDate = d1 - d2;
-    var str = padRight(minusDate.toString(), 15);
-    return (str);
 }
 function padRight(str, length) {
     while (str.length < length) {
-        str = str + '-';
+        str = str + "-";
     }
     return str;
 }
 function encodeAsFirebaseKey(string) {
-    return string.replace(/\%/g, '%25')
-        .replace(/\./g, '%2E')
-        .replace(/\#/g, '%23')
-        .replace(/\$/g, '%24')
-        .replace(/\//g, '%2F')
-        .replace(/\[/g, '%5B')
-        .replace(/\]/g, '%5D');
+    return string.replace(/\%/g, "%25")
+        .replace(/\./g, "%2E")
+        .replace(/\#/g, "%23")
+        .replace(/\$/g, "%24")
+        .replace(/\//g, "%2F")
+        .replace(/\[/g, "%5B")
+        .replace(/\]/g, "%5D");
 }
-;
 //# sourceMappingURL=index.js.map

@@ -49,7 +49,7 @@ export class Course {
    * @sb-return {Array} Array of other course-classes.
    */
    public getOtherClasses(courseClass: CourseClass): Array<CourseClass> {
-      const otherClasses = this.classes.filter((cls) => { return cls !== courseClass; });
+      const otherClasses = this.classes.filter( (cls) => cls !== courseClass);
       if (otherClasses.length === this.classes.length) {
          // Given class not found.
          throw new InvalidData("Course.getOtherClasses: given class is not in this course");

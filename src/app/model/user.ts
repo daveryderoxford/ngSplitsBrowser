@@ -1,18 +1,12 @@
 
 /** data associated with a user */
-import { sbTime } from "app/results/model";
+import { sbTime } from "../results/model";
 import { ControlCardType, OEvent } from "./oevent";
 import { ISODateString } from "./date";
 
 export interface ECard {
     id: string;
     type: ControlCardType;
-}
-
-/** All the user data stored for the user */
-export interface UserData extends UserInfo {
-    key: string;  // Matches with the users Firebase reference
-    results: UserResult[];
 }
 
 /** Information set by the users abouth themselves */
@@ -26,6 +20,13 @@ export interface UserInfo {
     autoFind: boolean;
     resultsLastupDated: ISODateString;
 }
+
+/** All the user data stored for the user */
+export interface UserData extends UserInfo {
+    key: string;  // Matches with the users Firebase reference
+    results: UserResult[];
+}
+
 
 /** Information on the results for a user.
  * the event key plus the ecard +id uniqiely identifies the result
