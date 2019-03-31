@@ -1,5 +1,90 @@
 // tslint:disable:max-line-length
 
+/** Small BOF PDA tst data - Just contains 4 events with both postcode and grid referance, postcode only, grid referece only and neither */
+export const smalltestBOFPDAFile = `
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Fixture List</title>
+
+		<style type="text/css">
+			th {
+				text-align: left;
+			}
+			td{
+				font-size: 10px;
+				padding: 3px 0;
+			}
+			table{
+				width: 100%;
+			}
+			input{
+				margin-right: 10px;
+			}
+			select{
+				margin-right: 20px;
+			}
+		</style>
+	</head>
+
+	<body style="font-family: Arial; font-size: 10pt;">
+<div style="background-color: #eee; padding: 10px; margin-bottom: 30px;"><form method="get" action="/event_diary_pda.php"><input type="hidden" name="pg" value="" /><div class="filter"><div class="filter "><label for="filter_assoc">Association</label> <select class="form-control" id="filter_assoc" name="filter_assoc"><option>Select...</option><option value="14">BOF</option><option value="13">BSOA</option><option value="1">EAOA</option><option value="2">EMOA</option><option value="3">NEOA</option><option value="4">NIOA</option><option value="5">NWOA</option><option value="6">SCOA</option><option value="7">SEOA</option><option value="8">SOA</option><option value="9">SWOA</option><option value="10">WMOA</option><option value="11">WOA</option><option value="12">YHOA</option></select></span></div> &nbsp;&nbsp;
+
+			<div class="filter "><label for="filter_club" style="padding-left: 10px;">Club</label> <span id="filter_club_holder"><select class="form-control" id="filter_club" name="filter_club"><option>Select...</option><option value="23">AIRE</option><option value="147">AROS</option><option value="158">AUOC</option><option value="58">AYROC</option><option value="89">BADO</option><option value="117">BAOC</option><option value="62">BASOC</option><option value="91">BKO</option><option value="60">BL</option><option value="152">BOF</option><option value="44">BOK</option><option value="92">CHIG</option><option value="24">CLARO</option><option value="41">CLOK</option><option value="63">CLYDE</option><option value="38">COBOC</option><option value="112">CUOC</option><option value="61">DEE</option><option value="45">DEVON</option><option value="94">DFOK</option><option value="139">DRONGO</option><option value="134">DUOC</option><option value="21">DVO</option><option value="25">EBOR</option><option value="65">ECKO</option><option value="67">ELO</option><option value="26">EPOC</option><option value="53">ERYRI</option><option value="68">ESOC</option><option value="111">EUOC</option><option value="87">FERMO</option><option value="69">FVO</option><option value="120">GMOA</option><option value="95">GO</option><option value="71">GRAMP</option><option value="153">GUOC</option><option value="27">HALO</option><option value="32">HAVOC</option><option value="96">HH</option><option value="39">HOC</option><option value="72">INT</option><option value="73">INVOC</option><option value="121">JOK</option><option value="46">KERNO</option><option value="74">KFO</option><option value="29">LEI</option><option value="64">LOC</option><option value="30">LOG</option><option value="97">LOK</option><option value="157">LUOC</option><option value="151">LUUOC</option><option value="88">LVO</option><option value="75">MAROC</option><option value="161">Masterplan Adventure</option><option value="66">MDOC</option><option value="76">MOR</option><option value="99">MV</option><option value="54">MWOC</option><option value="50">NATO</option><option value="15">NGOC</option><option value="55">NN</option><option value="31">NOC</option><option value="33">NOR</option><option value="135">NUFOC</option><option value="47">NWO</option><option value="90">NWOC</option><option value="19">OD</option><option value="163">OROX</option><option value="114">OUOC</option><option value="78">PFO</option><option value="40">POTOC</option><option value="48">QO</option><option value="115">RAFO</option><option value="128">RNRMOC</option><option value="77">RR</option><option value="159">RSOC</option><option value="49">SARUM</option><option value="108">SAX</option><option value="56">SBOC</option><option value="79">SELOC</option><option value="129">SHUOC</option><option value="100">SLOW</option><option value="34">SMOC</option><option value="101">SN</option><option value="105">SO</option><option value="102">SOC</option><option value="103">SOFA</option><option value="80">SOLWAY</option><option value="35">SOS</option><option value="130">SPLOT</option><option value="81">SROC</option><option value="82">STAG</option><option value="36">SUFFOC</option><option value="57">SWOC</option><option value="28">SYO</option><option value="84">TAY</option><option value="86">TINTO</option><option value="104">TVOC</option><option value="132">UBOC</option><option value="37">WAOC</option><option value="83">WAROC</option><option value="42">WCH</option><option value="85">WCOC</option><option value="106">WIGHTO</option><option value="51">WIM</option><option value="43">WRE</option><option value="52">WSX</option><option value="136">WYE</option><option value="160">Xplorer</option></select></span></div> &nbsp;&nbsp;
+			<input type="hidden" id="evt_website" /></div><div class="filter"><label style="padding-left: 10px;" for="evt_postcode">Postcode</label> <input class="form-control" type="text" id="evt_postcode" name="evt_postcode" value="" /> </div><div class="filter"><label style="padding-left: 10px;" for="evt_radius">Radius</label> <select class="form-control" id="evt_radius" name="evt_radius">
+<option value="0">-</option>
+<option value="25">25</option>
+<option value="50">50</option>
+<option value="100">100</option>
+<option value="150">150</option>
+</select></div><div class="filter full radiogroup"><span class="radiogroup-label">Level</span>
+				<div class="radio-container">
+					<input class="" type="checkbox" name="evt_level[]" id="evt_level_act" value="-1" />
+					<label for="evt_level_act" class="optlabel">Activities</label>
+				</div><div class="radio-container">
+<input class="" type="checkbox" name="evt_level[]" id="evt_level_4" value="4" />
+<label for="evt_level_4" class="optlabel">Local</label>
+</div><div class="radio-container">
+<input class="" type="checkbox" name="evt_level[]" id="evt_level_3" value="3" />
+<label for="evt_level_3" class="optlabel">Regional</label>
+</div><div class="radio-container">
+<input class="" type="checkbox" name="evt_level[]" id="evt_level_2" value="2" />
+<label for="evt_level_2" class="optlabel">National</label>
+</div><div class="radio-container">
+<input class="" type="checkbox" name="evt_level[]" id="evt_level_1" value="1" />
+<label for="evt_level_1" class="optlabel">Major</label>
+</div><div class="radio-container">
+<input class="" type="checkbox" name="evt_level[]" id="evt_level_5" value="5" />
+<label for="evt_level_5" class="optlabel">International</label>
+</div></div>
+<div class="filter-buttons"><input class="btn btn-success" type="submit" name="bFilter" value="Filter" style="margin-left: 10px;" />
+<input class="btn btn-success" type="submit" name="bClear" value="Clear" /></div></form></div><div class="table-container listing"><table class="table standard standard smalltabletext"><tr><th style="width: 110px">Date</th><th>Event Name</th><th style="width: 65px">Level</th><th>Club</th><th>Ass.</th><th>Venue</th><th>Nearest Town<th>Grid Ref.</th></tr><tr style="background-color: #FFF"><td>Sun 24/03/19</td>
+				<td><a href="index.php?pg=event&amp;amp;event=72446&amp;bpg=">SROC Red Rose Classic</a></td>
+				<td>National</td>
+				<td><a href="http://www.sroc.org" target="_blank">SROC</a></td>
+				<td>NWOA</td>
+				<td><a href="http://www.streetmap.co.uk/newsearch.srf?name=SD393805&amp;z=126">Hampsfell</a></td>
+				<td>Grange over Sands</td>
+				<td><a href="http://www.streetmap.co.uk/newsearch.srf?name=SD393805&amp;z=126">SD393805</a></td></tr><tr style="background-color: #FFF"><td>Thu 28/03/19</td>
+				<td><a href="index.php?pg=event&amp;amp;event=76012&amp;bpg=">Spring series 4, Whitehaven</a></td>
+				<td>Local</td>
+				<td><a href="http://www.wcoc.co.uk" target="_blank">WCOC</a></td>
+				<td>NWOA</td>
+				<td></td>
+				<td>Whitehaven</td>
+				<td></td></tr><tr style="background-color: #EEE"><td>Sat 30/03/19</td>
+				<td><a href="index.php?pg=event&amp;amp;activity=26377&amp;bpg=">Postcode</a></td>
+				<td>Activity</td>
+				<td><a href="http://www.quantockorienteers.co.uk" target="_blank">QO</a></td>
+				<td>SWOA</td>
+				<td><a href="http://www.streetmap.co.uk/newsearch.srf?name=TA1 2RH&amp;z=126">Blackbrook and Holway</a></td>
+				<td>Taunton</td>
+				<td><a href="http://www.streetmap.co.uk/newsearch.srf?name=TA1 2RH&amp;z=126"></a></td></tr></table></div>	</body>
+</html>
+`;
+
+/** Example of full  BOF PDA fixtures data file (as per https://www.britishorienteering.org.uk/event_diary_pda.php) */
 export const testBOFPDAFile = `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

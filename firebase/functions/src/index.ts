@@ -1,11 +1,25 @@
+/** Splitsbrowser Goole clould functions exports */
 
 import { OEvent } from "../../../src/app/model/oevent";
 import { Club } from "../../../src/app/model/club";
+
+import { Fixtures } from "./fixtures/fixtures";
 
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 
 admin.initializeApp( functions.config().firebase );
+
+/** Run to perfrom maintenance tasks once/day */
+exports.maintenance = async ( event, callback ) => {
+   const pubsubMessage = event.data;
+
+   await new Fixtures().processFixtures();
+
+   console.log( Buffer.from( pubsubMessage.data, 'base64' ).toString() );
+   callback();
+};
+
 
 exports.updateEvent = functions.firestore
    .document( 'events/{eventId}' )
@@ -141,6 +155,7 @@ function encodeAsFirebaseKey( string ) {
       .replace( /\[/g, "%5B" )
       .replace( /\]/g, "%5D" );
 }
+
 
 
 

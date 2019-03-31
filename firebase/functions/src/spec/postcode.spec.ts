@@ -52,8 +52,6 @@ describe( 'Postcode conversion', () => {
 
       const results = await lookup.gridRefToPostcode( latlongs );
 
-      console.log( JSON.stringify( results ) );
-
       expect( results.length ).to.equal( 2 );
 
       expect( results ).to.deep.equal( expectedLocations );

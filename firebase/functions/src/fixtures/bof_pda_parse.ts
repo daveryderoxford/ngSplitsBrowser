@@ -1,4 +1,4 @@
-/** Parse out a BOF  PDA data fixtures data */
+/** Parse out a BOF  PDA data fixtures data (https://www.britishorienteering.org.uk/event_diary_pda.php) */
 import * as cheerio from "cheerio";
 import { URL } from "url";
 

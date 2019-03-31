@@ -1,6 +1,6 @@
 import * as request from "request-promise";
 
- require( 'request-debug' )( request );
+// require( 'request-debug' )( request );
 
 export interface Location {
    latitude: number;
@@ -21,37 +21,39 @@ export class PostCodeLookup {
 
       const data = { postcodes: postcodes };
 
-      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude,eastings,northings", data, );
+      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude,eastings,northings", data );
 
-      const locations = this.mapResult( response.result );
+      const locations = response.result.map( res => this.makeLocation( res.result ) );
 
       return locations;
    }
 
    /** Uses https://api.postcodes.io/ service to map lat/longs to postcodes */
-   public async gridRefToPostcode( latLongs: LatLong[] ): Promise<Location[]> {
+   public async gridRefToPostcode( latLongs: LatLong[], maxReturned: number = 1 ): Promise<Location[]> {
 
-      const data = { geolocations: latLongs };
+      const array = latLongs.map( l =>  {
+         return { latitude: l.latitude, longitude: l.longitude, limit: maxReturned };
+      });
+
+      const data = { geolocations: array};
 
       const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude,eastings,northings", data );
 
-      const locations = this.mapResult( response.result );
+      const locations = response.result.map( res => this.makeLocation( res.result[ 0 ] ) );
 
       return locations;
    }
 
    /** Maps result object to location object */
-   private mapResult( results: any[] ): Location[] {
-      return results.map( res => {
-          const loc: Location = {
-            postcode: res.result.postcode,
-            latitude: res.result.latitude,
-            longitude: res.result.longitude,
-            eastings: res.result.eastings,
-            northings: res.result.northings
-         };
-         return loc;
-      } );
+   private makeLocation( data: any ): Location {
+      const loc: Location = {
+         postcode: data.postcode,
+         latitude: data.latitude,
+         longitude: data.longitude,
+         eastings: data.eastings,
+         northings: data.northings
+      };
+      return loc;
    }
 
    private async makeRequest( method: string, inputObject: any ): Promise<any> {
@@ -68,7 +70,7 @@ export class PostCodeLookup {
       try {
          const result = await request( "https://api.postcodes.io/" + method, options );
 
-         outObject = JSON.parse(result);
+         outObject = JSON.parse( result );
 
          if ( outObject.status !== 200 ) {
             throw new Error( 'Postcode request return code not 200.  Value: ' + outObject.status + '  ' + outObject.error );

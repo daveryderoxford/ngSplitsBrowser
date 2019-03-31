@@ -3,36 +3,39 @@ import * as request from "request-promise";
 import { Fixture, SBPoint } from "../../../../src/app/model/fixture";
 import { EventGrade } from "../../../../src/app/model/oevent";
 import { BOFPDParseData, BOFPDParser } from "./bof_pda_parse";
-import { PostCodeLookup, Location } from "./postcode";
-import { GT_OSGB, GT_WGS84, GT_Irish } from "./geo_conversion";
+import { GT_Irish, GT_OSGB, GT_WGS84 } from "./geo_conversion";
+import { LocationLookup } from "./location_lookup";
 
-class Fixtures {
-   readonly BOFPDAURL =
-      "https://www.britishorienteering.org.uk/event_diary_pda.php";
+export class Fixtures {
 
+   readonly BOFPDAURL = "https://www.britishorienteering.org.uk/event_diary_pda.php";
 
-   constructor() {}
+   GT_OSGB = new GT_OSGB();
+   GT_WGS84 = new GT_WGS84();
+   GT_Irish = new GT_Irish();
 
-   // Read BOF PAD data form URL and parse it.
+   constructor () { }
 
-   async processFixtures() {
+   // Read BOF PDA data from URL and parse it.
+
+   public async processFixtures() {
       const text = await this.loadBOFPDA();
 
       const parser = new BOFPDParser();
-      const bofFixtures = parser.parseBOFPDAFile(text);
+      const bofFixtures = parser.parseBOFPDAFile( text );
 
-      const fixtures = await this.makeFixtures(bofFixtures);
+      const fixtures = await this.makeFixtures( bofFixtures );
 
-      await this.saveToStorage(fixtures);
+      await this.saveToStorage( fixtures );
    }
 
    /** Make fixtures arrafy for BOF fixturesd. */
-   async makeFixtures(bofFixtures: BOFPDParseData[]): Promise<Fixture[]> {
+   private async makeFixtures( bofFixtures: BOFPDParseData[] ): Promise<Fixture[]> {
 
-      const locationLookup = await new LocationLookup(bofFixtures);
+      const locationLookup = await LocationLookup.create( bofFixtures );
 
       //  Create fixture array
-      const fixtures: Fixture[] = bofFixtures.map(bof => {
+      const fixtures: Fixture[] = bofFixtures.map( bof => {
          const fixture: Fixture = {
             id: bof.id,
             date: bof.date,
@@ -41,54 +44,46 @@ class Fixtures {
             clubURL: bof.clubURL,
             association: bof.region,
             nearestTown: bof.nearestTown,
-            grade: this.mapGrade(bof.grade),
+            grade: this.mapGrade( bof.grade ),
             type: "Foot",
-            gridReference: this.getGridRef( bof.postcode, bof.gridRefStr,  locationLookup ),
-            latLong: this.getLatLong( bof.postcode, bof.gridRefStr,  locationLookup ),
-            postcode: 
+            latLong: this.getLatLong( bof.postcode, bof.gridRefStr, locationLookup ),
+            postcode: this.getPostCode( bof.postcode, bof.gridRefStr, locationLookup ),
          };
 
          return fixture;
-      });
-
-      //   gridReference: SBPoint;
-      //   latLong ? : SBPoint;
-      //    postcode
+      } );
 
       return fixtures;
    }
 
-   /** If grid reference is specified then obtain lat log from it otherwise use postcode */
-   getGridRef( postcode: string, gridRefStr: string,  locationLookup: LocationLookup): SBPoint {
-      if (gridRefStr !== '') {
-         return gridRefStr;
-      } else if (postcode !== '') {
-         const loc = locationLookup.findPostcodeLocation(postcode);
-         //change format 
+   /** Get lat/long for the event.  If grid reference is specified then obtain lat/log from it
+    * otherwise if postcode is avaialble use its lat/long */
+   private getLatLong( postcode: string, gridRefStr: string, locationLookup: LocationLookup ): SBPoint {
+      if ( gridRefStr !== '' ) {
+         this.GT_OSGB.parseGridRef( gridRefStr);
+         const wgs84 = this.GT_OSGB.getWGS84();
+         return { x: wgs84.longitude, y: wgs84.latitude };
+      } else if ( postcode !== '' ) {
+         const loc = locationLookup.findPostcodeLocation( postcode );
+         return { x: loc.longitude, y: loc.latitude };
+      } else {
+         return null;
+      }
+   }
 
+   /** if post code is specified then use it otherwise if grid reference is present look up value */
+   private getPostCode( postcode: string, gridRefStr: string, locationLookup: LocationLookup ): string {
+      if ( postcode !== '' ) {
+         return postcode;
+      } else if ( gridRefStr !== '' ) {
+        return locationLookup.findGridrefLocation(gridRefStr).postcode;
       } else {
          return '';
       }
    }
 
-   /** if grid reference is specified then obtain lat log from it otherwise use postcode */
-   getLatLong( postcode: string, gridRefStr: string,  locationLookup: LocationLookup ): SBPoint {
-      
-   }
-
-    /** if post code is specified then use it otherwise if grid reference is present look up value */
-    getPostCode( postcode: string, gridRefStr: string, locationLookup: LocationLookup ): string {
-       if (postcode !== '') {
-          return postcode;
-       } else if (gridRefStr !== '') {
-      //    return locationLookup.find(  loc => loc.gridRefStr === loc.)
-       } else {
-          return '';
-       }
-   }
-
-   mapGrade(bofGrade: string): EventGrade {
-      switch (bofGrade) {
+   private mapGrade( bofGrade: string ): EventGrade {
+      switch ( bofGrade ) {
          case "Activity":
             return "Local";
          case "Local":
@@ -100,23 +95,23 @@ class Fixtures {
          case "Major":
             return "International";
          default:
-            throw new Error("Unexpected bof grade encountered");
+            throw new Error( "Unexpected bof grade encountered" );
       }
    }
 
    /** Save fixtures Json file to Google Storage */
-   async saveToStorage(fixtures: Fixture[]): Promise<void> {
+   async saveToStorage( fixtures: Fixture[] ): Promise<void> {
       const storage = new Storage();
-      const bucket = storage.bucket(process.env.GCLOUD_STORAGE_BUCKET);
+      const bucket = storage.bucket( process.env.GCLOUD_STORAGE_BUCKET );
 
       const filename = "./fixtures/uk";
 
-      const file = bucket.file(filename);
+      const file = bucket.file( filename );
 
       try {
-         await file.save(JSON.stringify(fixtures));
-      } catch (e) {
-         console.log("Fixtures: Error saving fixtures to clould storage: " + e);
+         await file.save( JSON.stringify( fixtures ) );
+      } catch ( e ) {
+         console.log( "Fixtures: Error saving fixtures to clould storage: " + e );
          throw e;
       }
    }
@@ -124,53 +119,13 @@ class Fixtures {
    async loadBOFPDA(): Promise<string> {
       let response: string;
       try {
-         response = await request(this.BOFPDAURL, { method: "get" });
-      } catch (e) {
-         console.log("Fixtures: Error making HTTP request: " + e);
+         response = await request( this.BOFPDAURL, { method: "get" } );
+      } catch ( e ) {
+         console.log( "Fixtures: Error making HTTP request: " + e );
          throw e;
       }
       return response;
    }
 }
 
-/** Looks up postcode/grid ref/latlong mapping using postcode.io and provides APIs to search results  */
-class LocationLookup {
 
-   lookup = new PostCodeLookup();
-
-   postcodeLocations: Location [];
-   latlongLocations: Location[];
-
-   async constructor(bofFixtures: BOFPDParseData[]) {
-
-      const requiredPostcodes = bofFixtures
-         .filter(c => c.gridRefStr === "")
-         .filter(c => c.postcode !== "")
-         .map(c => c.postcode);
-
-      this.postcodeLocations = await this.lookup.postcodeToLocation( requiredPostcodes );
-
-      const requiredLatLogs = bofFixtures
-         .filter(c => c.postcode === "")
-         .filter(c => c.gridRefStr !== "")
-         .map(c => c.gridRefStr)
-         .map(g => {
-            const grid = new GT_OSGB();
-            grid.parseGridRef(g);
-            const wgs = grid.getWGS84();
-            return { latitude: wgs.latitude, longitude: wgs.longitude };
-         });
-
-      this.latlongLocations = await this.lookup.gridRefToPostcode(requiredLatLogs);
-
-   }
-
-   findPostcodeLocation(postcode: string): Location {
-      return this.postcodeLocations.find( loc => loc.postcode === postcode );
-   }
-
-   findGridrefLocation(gridRef: string): Location {
-
-   }
-
-}

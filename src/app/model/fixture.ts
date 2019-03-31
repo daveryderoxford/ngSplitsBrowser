@@ -12,7 +12,6 @@ export interface Fixture {
      name: string;
      club: string;
      clubURL?: string;
-     gridReference?: SBPoint;
      latLong?: SBPoint;
      grade?: EventGrade;
      type?: EventType;
