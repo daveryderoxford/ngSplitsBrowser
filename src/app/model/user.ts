@@ -19,6 +19,7 @@ export interface UserInfo {
     ecards: ECard[];
     autoFind: boolean;
     resultsLastupDated: ISODateString;
+    postcode: string;
 }
 
 /** All the user data stored for the user */

@@ -1,9 +1,9 @@
 import { ISODateString } from './date';
 import { EventGrade, EventType, EventDiscipline } from './oevent';
 
-export interface SBPoint {
-   x: number;
-   y: number;
+export interface LatLong {
+   lat: number;
+   lng: number;
 }
 
 export interface Fixture {
@@ -12,7 +12,7 @@ export interface Fixture {
      name: string;
      club: string;
      clubURL?: string;
-     latLong?: SBPoint;
+     latLong?: LatLong;
      grade?: EventGrade;
      type?: EventType;
      discipline?: EventDiscipline;

@@ -3,11 +3,11 @@
 
   <as-split direction="vertical">
 
-    <as-split-area size="50">
+    <as-split-area>
         <app-fixtures-map [fixtures]="fixtures" [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)"> </app-fixtures-map>
     </as-split-area>
 
-    <as-split-area size="50">
+    <as-split-area>
       <app-fixtures-grid [fixtures]="fixtures" [selectedFixture]="selectedFixture"
         (fixtureSelected)="onFeatureSelected($event)"></app-fixtures-grid>
     </as-split-area>

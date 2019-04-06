@@ -28,6 +28,6 @@
 
   <!-- Header and Row Declarations -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)=eventClicked(row)></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)=eventClicked(row) [ngClass]="{ 'selected': selected(row) }"></tr>
 </table>
 

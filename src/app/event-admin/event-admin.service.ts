@@ -1,16 +1,16 @@
 
-import {take} from 'rxjs/operators';
 import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore } from "@angular/fire/firestore";
 import { AngularFireStorage } from "@angular/fire/storage";
+import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/model/oevent";
 import { parseEventData } from "app/results/import";
 import { Results } from "app/results/model/results";
 import { Utils } from "app/shared";
 import { firestore } from "firebase";
 import { Observable } from "rxjs";
+import { take } from 'rxjs/operators';
 import { Club, CompetitorSearchData } from "../model";
-import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/model/oevent";
 import { CompetitorDataService } from "../shared/services/competitor-data.service";
 
 type PartialEvent = Partial<OEvent>;

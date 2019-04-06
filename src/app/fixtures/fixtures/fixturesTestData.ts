@@ -526,10 +526,11 @@ export function testFixtures(): Fixture[] {
     date.setTime( millseconds);
     const str = date.toISOString();
     const fixture: Fixture = {
+      id: point[ 0 ],
       name: 'Event ' + point[ 0 ],
       club: 'CLUB',
       date: str,
-      latLong: { x: point[ 1 ], y: point[ 2 ] }
+      latLong: { lat: point[ 1 ], lng: point[ 2 ] }
 
     };
     fixtures.push( fixture );

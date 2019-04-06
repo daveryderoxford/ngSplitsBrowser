@@ -1,234 +1,190 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Fixture, SBPoint } from 'app/model/fixture';
-
-import Feature from 'ol/Feature';
-import Point from 'ol/geom/Point';
-import Polygon from 'ol/geom/Polygon';
-import Select from 'ol/interaction/Select';
-import TileLayer from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
-import Map from 'ol/Map';
-import { fromLonLat } from 'ol/proj';
-import Projection from 'ol/proj/Projection';
-import OSM from 'ol/source/OSM';
-import VectorSource from 'ol/source/Vector';
-import View from 'ol/View';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import { Fixture, LatLong } from 'app/model/fixture';
+import { circle, Circle, CircleMarker, FeatureGroup, LayerGroup, Map, tileLayer, TooltipOptions } from "leaflet";
 
 @Component( {
    selector: 'app-fixtures-map',
    templateUrl: './fixtures-map.component.html',
-   styleUrls: [ './fixtures-map.component.scss' ]
+   styleUrls: [ './fixtures-map.component.scss' ],
+   encapsulation: ViewEncapsulation.None,
+   changeDetection: ChangeDetectionStrategy.OnPush
 } )
 /** Map of fixtures */
-export class FixturesMapComponent implements OnInit {
+export class FixturesMapComponent implements OnInit, AfterViewInit {
+
+   private _fixtures: Fixture[] = [];
+   private _selectedFixtureMarker: FixtureMarker = null;
+   private _fixtureMarkers = new FeatureGroup<FixtureMarker>();
 
    @Input() set fixtures( fixtures: Fixture[] ) {
-      this.createFixtureFeatures( fixtures );
+      this.setFixtures( fixtures );
    }
 
    @Input() set selectedFixture( selected: Fixture ) {
       this.selectFixture( selected );
    }
 
-   @Input() set homeLatLong( home: SBPoint ) {
+   @Input() set homeLatLong( home: LatLong ) {
       this.setHomeLocation( home );
    }
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
-   map: Map;
+   map: Map = null;
 
-   fixturesLayer: VectorLayer; // Layer containing fixture circles
-   homeLayer: VectorLayer;  // Layer containing home location with concentric circles
-   osmMapLayer: TileLayer; // Base OSM tile map layer
-
-   features = new Array<Feature>(); // Features displayed on fxtures
-   selection: Select;  // Selected features
-
-   private readonly DisplayProjection = new Projection( "EPSG:4326" );
-   private readonly OpenLayersProjection = new Projection( "EPSG:900913" );
-
-   constructor () {
-      // OpenLayers.ImgPath = "http://js.mapbox.com/theme/dark/"
-
-   }
+   constructor () { }
 
    ngOnInit() {
-      /* Layers */
-      this.homeLayer = this.createHomeLayer();
-      this.osmMapLayer = this.createOSMMapLayer();
-      this.fixturesLayer = this.createFixtureLayer();
 
-      const MaxExtend = 20037508.34;
+      const londonLatLng = { lat: 51.509865, lng: -0.118092 };
 
-      /*  this.map = new Map( "map",
-           {
-              maxExtent: new Extent( -1 * b, -1 * b, b, b ),
-              maxResolution: 156543.0399,
-              units: 'm',
-              projection: this.EPSG900913, // Open layers projection
-              displayProjection: this.EPSG4326  // WGS84 Projection
-           } ); */
+      this.map = new Map( 'map' ).setView( londonLatLng, 12 );
 
-      const londonLonLat = [ -0.118092, 51.509865];
+      tileLayer( 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+         opacity: 0.75
+      } ).addTo( this.map );
 
-      this.map = new Map( {
-         target: 'map',
-         layers: [ this.osmMapLayer ],
-         view: new View( {
-            projection: "EPSG:3857",
-            maxZoom: 50,
-            minZoom: 7,
-            zoom: 10,
-            center: fromLonLat( londonLonLat),
-       //     extent: theRestrictedExtent
-
-         } ),
-      } );
-
-      const defaultLatLong: SBPoint = { x: 51.502, y: -0.133 };  // Default long/lat in london
-      //   this.setHomeLocation( defaultLatLong );
-
-      this.selection = new Select( {
-         layers: [ this.fixturesLayer ],
-         // style: {
-         //    stroke: { width: 4 }
-         //   }
-      } );
-
-      this.map.addInteraction( this.selection );
-
-      this.selection.on( 'select', ( feat: Feature ) => {
-         this.fixtureSelected.emit( feat.get( 'Fixture' ) );
-      } );
+      this.setHomeLocation( londonLatLng ).addTo( this.map );
+      this.setFixtures( this._fixtures );
    }
 
-   private createFixtureFeatures( fixtures: Fixture[] ) {
+   ngAfterViewInit() {
+      // Leaflet calculkae the map sise before angular is full initialise so we need to invalidate it once the view is complete.
+      this.map.invalidateSize();
+   }
 
-      const source = new VectorSource();
+   setHomeLocation( latLng: LatLong ): LayerGroup {
 
-      return;
+      const markers = new FeatureGroup<Circle>();
 
-      for ( const fixture of fixtures ) {
+      const MileToMeter = 1609.34;
 
-         const point = new Point( fixture.latLong.x, fixture.latLong.y ).transform( this.DisplayProjection, this.OpenLayersProjection );
+      for ( const radius of [ 20, 40, 60, 80 ] ) {
+         markers.addLayer( circle( latLng, { radius: radius * MileToMeter } ) );
+      }
 
-         const feature = new Feature ( {
-          //  geometery:
-           // style:
-         }
+      const circleStyle = {
+         color: '#000000',
+         weight: 6,
+         opacity: 0.08,
+         fill: false
+      };
 
-         );
+      markers.setStyle( circleStyle );
 
-         feature.set( 'fixture', fixture );
+      return markers;
+   }
 
-         const weeks = ( new Date( fixture.date ).valueOf() - new Date().valueOf() ) / ( 7 * 24 * 60 * 60 * 1000 );
-     //    feature.attributes.fillColor = this.getColour( weeks );
+   setFixtures( fixtures: Fixture[] ) {
+
+      this._fixtures = fixtures;
+
+      if ( !this.map ) {
+         return;
+      }
+
+      for ( const fixture of fixtures.reverse() ) {
+         const weeks = this.weeksAhead( fixture.date );
 
          const MaxNumberedWeeks = 5;
          const MinRadius = 6;
 
+         let radius: number;
+         let label: string;
          if ( weeks <= MaxNumberedWeeks ) {
-      //      feature.attributes.pointRadius = MinRadius + ( MaxNumberedWeeks - weeks );
-     //       feature.attributes.label = weeks + 1;
+            radius = MinRadius + ( MaxNumberedWeeks - weeks );
+            label = ( weeks + 1 ).toString();
          } else {
-     //       feature.attributes.pointRadius = MinRadius;
-    //        feature.attributes.label = "";
+            radius = MinRadius;
+            label = "";
          }
 
-         feature.zOrder = 1000 - weeks;
+         const c = new FixtureMarker( fixture.latLong, {
+            radius: radius,
+            fillColor: this.getColour( weeks ),
+            color: "#000000"
+         } );
 
-         source.addFeature( feature );
+         c.fixture = fixture;
+
+         // Tooltip in centre of circle
+         if ( label !== "" ) {
+            const tooltipOptions: TooltipOptions = {
+               permanent: true,
+               direction: 'center',
+               className: 'text',
+            };
+            c.bindTooltip( label, tooltipOptions );
+         }
+
+         c.on( {
+            click: evt => {
+               const fixtureMarker: FixtureMarker = evt.target;
+
+               if ( fixtureMarker !== this._selectedFixtureMarker ) {
+                  this.selectFeature( fixtureMarker );
+                  this.fixtureSelected.emit( fixtureMarker.fixture );
+
+               }
+            }
+         } );
+
+         this._fixtureMarkers.addLayer( c );
       }
-      this.fixturesLayer.setSource( source );
+
+      const fixtureStyle = {
+         weight: 0,
+         opacity: 0.85,
+         fillOpacity: 0.85,
+      };
+
+      this._fixtureMarkers.setStyle( fixtureStyle );
+      this._fixtureMarkers.addTo( this.map );
+
    }
 
-   private getColour( weeks_ahead: number ) {
-      if ( weeks_ahead < 1 ) { return "#ff0000"; }
-      if ( weeks_ahead < 2 ) { return "#ff8800"; }
-      if ( weeks_ahead < 3 ) { return "#ffff00"; }
-      if ( weeks_ahead < 4 ) { return "#00ff00"; }
-      if ( weeks_ahead < 5 ) { return "#0088ff"; }
-      if ( weeks_ahead < 6 ) { return "#8800ff"; }
+   selectFeature( fixtureMarker: FixtureMarker ) {
+      if ( this._selectedFixtureMarker ) {
+         this._selectedFixtureMarker.setStyle( { weight: 0 } );
+      }
+
+      this._selectedFixtureMarker = fixtureMarker;
+      this._selectedFixtureMarker.setStyle( { weight: 4 } );
+      console.log( "Map Fixture selected " + fixtureMarker.fixture.name );
+   }
+
+   /** Returns the number of weeks in the future from now */
+   private weeksAhead( date: string ): number {
+      const millsecondsToWeeks = 7 * 24 * 60 * 60 * 1000;
+      const weeks = Math.round( ( new Date( date ).valueOf() - new Date().valueOf() ) / millsecondsToWeeks );
+      return weeks;
+   }
+
+   private getColour( weeksAhead: number ) {
+      if ( weeksAhead < 1 ) { return "#ff0000"; }
+      if ( weeksAhead < 2 ) { return "#ff8800"; }
+      if ( weeksAhead < 3 ) { return "#ffff00"; }
+      if ( weeksAhead < 4 ) { return "#00ff00"; }
+      if ( weeksAhead < 5 ) { return "#0088ff"; }
+      if ( weeksAhead < 6 ) { return "#8800ff"; }
       return "#666666";
    }
 
-   private setHomeLocation( home: SBPoint ) {
+   selectFixture( fixture: Fixture ) {
 
-      const source = new VectorSource();
+      const layers = this._fixtureMarkers.getLayers() as FixtureMarker[];
 
-      const center = new Point( home.x, home.y ).transform( this.DisplayProjection, this.OpenLayersProjection );
+      const found = layers.find( fixtureMarker => {
+         return ( fixtureMarker.fixture === fixture );
+      } );
 
-      /*    const radiusFactor = 1 / Math.cos( home.x * ( Math.PI / 180 ) );
-
-          const circle1 = new Vector( Polygon.createRegularPolygon( center, 50000.0 * radiusFactor, 100, 0 ) );
-
-          const circle2 = new Vector( Polygon.createRegularPolygon( center, 100000.0 * radiusFactor, 100, 0 ) );
-
-          const circle3 = new Vector( Polygon.createRegularPolygon( center, 150000.0 * radiusFactor, 100, 0 ) ); */
-
-
-      for (const radius of [ 50000.0, 100000.0, 150000.0] ) {
-         const feat = new Feature();
-    //     feat.setGeometry ( Polygon.circular( center, radius ) );
-     //    source.addFeature( feat );
-      }
-
-      this.homeLayer.setSource( source );
-
-      this.map.getView().setCenter( fromLonLat(center), 8 );
-
-   }
-
-   /** Select a given fixture centring the map on the feature */
-   private selectFixture( selected: Fixture ) {
-      for ( const feature of this.features ) {
-
-         if ( feature.get( 'Fixture' ) === selected ) {
-            const p = { x: feature.geometry.x, y: feature.geometry.y };
-            this.map.moveTo( p );
-            break;
-         }
+      if ( found && found !== this._selectedFixtureMarker ) {
+         this.selectFeature( found );
+         this.map.panTo( found.fixture.latLong );
       }
    }
+}
 
-   private createOSMMapLayer(): TileLayer {
-
-      const layer = new TileLayer( {
-         source: new OSM(),
-         opacity: 0.7,
-       //  zIndex: 2,
-      } );
-
-      return layer;
-
-   }
-
-   private createHomeLayer(): VectorLayer {
-
-      const layer = new VectorLayer( {
-         opacity: 0.1,
-         zIndex: 1,
-   //      style: {
-     //       stroke: { width: 6 },
-       //  }
-      } );
-
-      return layer;
-   }
-
-   private createFixtureLayer(): VectorLayer {
-
-      const layer = new VectorLayer( {
-         opacity: 0.7,
-         zIndex: 0,
-     //    style: {
-     //       stroke: { width: 4 },
-     //       text: { scale: 12, }
-     //    }
-      } );
-
-      return layer;
-   }
-
+class FixtureMarker extends CircleMarker {
+   fixture: Fixture;
 }

@@ -71,7 +71,6 @@ export class UserDataService {
     return observableOf(this._getUserDoc().update(details)).pipe(
       switchMap( () => this._getUserDoc().valueChanges() )
     );
-
   }
 
   /** Creates new user data and saves it to the database */
@@ -86,7 +85,8 @@ export class UserDataService {
       autoFind: true,
       results: [],
       ecards: [],
-      resultsLastupDated: new Date().toISOString()
+      resultsLastupDated: new Date().toISOString(),
+      postcode: ""
     };
     const user = this._getUserDoc().set(userdata);
 

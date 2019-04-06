@@ -1,6 +1,6 @@
 import { Storage } from "@google-cloud/storage";
 import * as request from "request-promise";
-import { Fixture, SBPoint } from "../../../../src/app/model/fixture";
+import { Fixture, LatLong } from "../../../../src/app/model/fixture";
 import { EventGrade } from "../../../../src/app/model/oevent";
 import { BOFPDParseData, BOFPDParser } from "./bof_pda_parse";
 import { GT_Irish, GT_OSGB, GT_WGS84 } from "./geo_conversion";
@@ -16,8 +16,7 @@ export class Fixtures {
 
    constructor () { }
 
-   // Read BOF PDA data from URL and parse it.
-
+   /** Read BOF PDA data from URL and parse it. */
    public async processFixtures() {
       const text = await this.loadBOFPDA();
 
@@ -58,14 +57,14 @@ export class Fixtures {
 
    /** Get lat/long for the event.  If grid reference is specified then obtain lat/log from it
     * otherwise if postcode is avaialble use its lat/long */
-   private getLatLong( postcode: string, gridRefStr: string, locationLookup: LocationLookup ): SBPoint {
+   private getLatLong( postcode: string, gridRefStr: string, locationLookup: LocationLookup ): LatLong {
       if ( gridRefStr !== '' ) {
          this.GT_OSGB.parseGridRef( gridRefStr);
          const wgs84 = this.GT_OSGB.getWGS84();
-         return { x: wgs84.longitude, y: wgs84.latitude };
+         return { lat: wgs84.latitude, lng: wgs84.longitude };
       } else if ( postcode !== '' ) {
          const loc = locationLookup.findPostcodeLocation( postcode );
-         return { x: loc.longitude, y: loc.latitude };
+         return { lat: loc.latitude, lng: loc.longitude };
       } else {
          return null;
       }
@@ -99,7 +98,7 @@ export class Fixtures {
       }
    }
 
-   /** Save fixtures Json file to Google Storage */
+   /** Save fixtures JSON file to Google Storage */
    async saveToStorage( fixtures: Fixture[] ): Promise<void> {
       const storage = new Storage();
       const bucket = storage.bucket( process.env.GCLOUD_STORAGE_BUCKET );

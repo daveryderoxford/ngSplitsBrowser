@@ -17,6 +17,7 @@ import { AngularSplitModule } from 'angular-split';
         SpinnerModule,
         AppMaterialModule,
         AppRoutingModule,
+        AngularSplitModule.forRoot()
     ],
     declarations: [NavbarComponent],
     exports: [

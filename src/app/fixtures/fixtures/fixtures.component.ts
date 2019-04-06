@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Fixture, Nation } from 'app/model';
 import { testFixtures } from './fixturesTestData';
-import { SBPoint } from 'app/model/fixture';
+import { LatLong } from 'app/model/fixture';
 
 @Component({
   selector: 'app-fixtures',
@@ -15,7 +15,7 @@ export class FixturesComponent implements OnInit {
 
   fixtures: Fixture[] = testFixtures();
 
-  homeLocation: SBPoint;
+  homeLocation: LatLong;
 
   nationality: Nation;
 
