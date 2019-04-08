@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Fixture, LatLong } from 'app/model/fixture';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { AngularFireAuth } from "@angular/fire/auth";
-import { AngularFireStorage } from "@angular/fire/storage";
-import { switchMap, map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { AngularFireStorage } from "@angular/fire/storage";
+import { Fixture } from 'app/model/fixture';
 import { UserDataService } from 'app/user/user-data.service';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 export type FixtureWeekPeriod = "Saturday" | "Sunday" | "Weekday";
 
@@ -54,6 +53,4 @@ export class FixturesService {
    setWeekPeriod( period: FixtureWeekPeriod[] ) {
       this._weekPeriod.next( period );
    }
-
-
 }

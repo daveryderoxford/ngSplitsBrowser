@@ -14,7 +14,9 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    private _fixtures: Fixture[] = [];
    private _selectedFixtureMarker: FixtureMarker = null;
+
    private _fixtureMarkers = new FeatureGroup<FixtureMarker>();
+   private _homeMarkers = new FeatureGroup<Circle>();
 
    @Input() set fixtures( fixtures: Fixture[] ) {
       this.setFixtures( fixtures );
@@ -44,35 +46,35 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
          opacity: 0.75
       } ).addTo( this.map );
 
-      this.setHomeLocation( londonLatLng ).addTo( this.map );
+      this._homeMarkers.addTo( this.map );
+      this._fixtureMarkers.addTo( this.map );
+
+      this.setHomeLocation( londonLatLng );
       this.setFixtures( this._fixtures );
    }
 
    ngAfterViewInit() {
-      // Leaflet calculkae the map sise before angular is full initialise so we need to invalidate it once the view is complete.
+      /* Leaflet calculkae the map sise before angular is full initialise so we need to
+      invalidate it once the view is complete. */
       this.map.invalidateSize();
    }
 
-   setHomeLocation( latLng: LatLong ): LayerGroup {
+   setHomeLocation( latLng: LatLong ) {
 
-      const markers = new FeatureGroup<Circle>();
+      this._homeMarkers.clearLayers();
 
       const MileToMeter = 1609.34;
 
       for ( const radius of [ 20, 40, 60, 80 ] ) {
-         markers.addLayer( circle( latLng, { radius: radius * MileToMeter } ) );
+         this._homeMarkers.addLayer( circle( latLng, { radius: radius * MileToMeter } ) );
       }
 
-      const circleStyle = {
+      this._homeMarkers.setStyle( {
          color: '#000000',
          weight: 6,
          opacity: 0.08,
          fill: false
-      };
-
-      markers.setStyle( circleStyle );
-
-      return markers;
+      });
    }
 
    setFixtures( fixtures: Fixture[] ) {
@@ -139,7 +141,6 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       };
 
       this._fixtureMarkers.setStyle( fixtureStyle );
-      this._fixtureMarkers.addTo( this.map );
 
    }
 

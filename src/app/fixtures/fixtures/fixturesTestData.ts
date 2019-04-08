@@ -1,7 +1,5 @@
 import { Fixture, Nation } from 'app/model';
 
-
-
 const points = new Array();
 points.push( [ 0, 52.157792558339, 0.1811280448097, -0 ] );
 points.push( [ 1, 55.95030271493, -3.1240916655429, -0 ] );
@@ -521,9 +519,9 @@ export function testFixtures(): Fixture[] {
 
   for ( const point of points ) {
 
-    const millseconds = Date.now() + (point[ 3 ] - 1) * 7 * 24 * 60 * 60 * 1000;
+    const millseconds = Date.now() + ( point[ 3 ] - 1 ) * 7 * 24 * 60 * 60 * 1000;
     const date = new Date();
-    date.setTime( millseconds);
+    date.setTime( millseconds );
     const str = date.toISOString();
     const fixture: Fixture = {
       id: point[ 0 ],
