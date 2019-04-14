@@ -1,7 +1,7 @@
 
 import { expect } from 'chai';
 import 'mocha';
-import { PostCodeLookup, Location, LatLong } from '../fixtures/postcode';
+import { PostCodeLookup, Location, LatLongPostCodeIO } from '../fixtures/postcode';
 
 const expectedLocations: Location[] = [
    {
@@ -39,7 +39,7 @@ describe( 'Postcode conversion', () => {
    it( 'should convert grid reference to postcode', async () => {
       const lookup = new PostCodeLookup();
 
-      const latlongs: LatLong[] = [
+      const latlongs: LatLongPostCodeIO[] = [
          {
             latitude: 51.43116,
             longitude: -0.508227,
@@ -50,7 +50,7 @@ describe( 'Postcode conversion', () => {
          }
       ];
 
-      const results = await lookup.gridRefToPostcode( latlongs );
+      const results = await lookup.latLongToPostcode( latlongs );
 
       expect( results.length ).to.equal( 2 );
 

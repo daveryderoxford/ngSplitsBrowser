@@ -42,7 +42,6 @@
 // tslint:disable:max-line-length
 // tslint:disable:class-name
 
-
 type GT_status = string;
 
 export class GT_OSGB {
