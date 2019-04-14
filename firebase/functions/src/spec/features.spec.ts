@@ -1,59 +1,45 @@
-
 import { expect } from 'chai';
+import { spies } from 'chai-spies';
 import 'mocha';
 import { Fixtures } from '../fixtures/fixtures';
-import { Location, LatLong, PostCodeLookup } from '../fixtures/postcode';
+import { smalltestBOFPDAFile } from './BOFPDATestData.spec';
 
-const expectedLocations: Location[] = [
-   {
-      "postcode": "TW18 2AB",
-      "longitude": -0.508227,
-      "latitude": 51.43116,
-      "eastings": 503801,
-      "northings": 171295
-   },
-   {
-      "postcode": "CM15 8BN",
-      "longitude": 0.31313,
-      "latitude": 51.617483,
-      "eastings": 560239,
-      "northings": 193496
-   }
+const expectedFixtures: Feature[] = [
+   {},
+   {}
 ];
 
-describe( 'Fixutes from actual bof', () => {
+describe( '', () => {
 
-   it( 'should should process the docuemtn without error', async () => {
+   chai.use(spies);
+
+   it( 'should should process known BOF data correctly', async () => {
 
       const fixtures = new Fixtures();
 
+      const spySave = chai.spy.on(fixtures, 'saveToStorage', returns => Promise.resolve());
+      const spyLoadBOF = chai.spy.on(fixtures, 'loadBOFPDA', returns => Promise.resolve(smalltestBOFPDAFile));
 
-      const results = await fixtures.processFixtures(  );
+      await fixtures.processFixtures();
 
-      // Read docuemnt from google
+      expect(spyLoadBOF).to.have.been.called();
+      expect(spySave).to.have.been.called().with(expectedFixtures);
 
    } );
 
-   it( 'should convert document correctly mocking bof fixtures and google', async () => {
-      const lookup = new PostCodeLookup();
+   it( 'should should process data from live BOF feed', async () => {
 
-      const latlongs: LatLong[] = [
-         {
-            latitude: 51.43116,
-            longitude: -0.508227,
-         },
-         {
-            latitude: 51.617483,
-            longitude: 0.31313,
-         }
-      ];
+      const fixtures = new Fixtures();
 
-      const results = await lookup.gridRefToPostcode( latlongs );
+      const spySave = chai.spy.on(fixtures, 'saveToStorage', returns => Promise.resolve());
 
-      expect( results.length ).to.equal( 2 );
+      await fixtures.processFixtures();
 
-      expect( results ).to.deep.equal( expectedLocations );
-   } );
+      // Perform your test
+   
+      expect(spySave).to.have.been.called();
+
+   });
 
 } );
 

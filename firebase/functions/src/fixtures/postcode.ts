@@ -8,7 +8,7 @@ export interface Location {
    postcode: string;
 }
 
-export interface LatLong {
+export interface LatLongPostCodeIO {
    latitude: number;
    longitude: number;
 }
@@ -34,7 +34,7 @@ export class PostCodeLookup {
    }
 
    /** Uses https://api.postcodes.io/ service to map lat/longs to postcodes */
-   public async latlongToPostcode( latLongs: LatLong[], maxReturned: number = 1 ): Promise<Location[]> {
+   public async latLongToPostcode( latLongs: LatLongPostCodeIO[], maxReturned: number = 1 ): Promise<Location[]> {
 
       const array = latLongs.map( l => {
          return { latitude: l.latitude, longitude: l.longitude, limit: maxReturned };
