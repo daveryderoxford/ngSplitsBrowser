@@ -13,7 +13,7 @@ export interface BOFPDParseData {
    club: string;
    clubURL: string;
    region: string;
-   eventLocation: string;
+   area: string;
    postcode: string;
    nearestTown: string;
    gridRefStr: string;
@@ -76,7 +76,7 @@ export class BOFPDParser {
 
          fixture.region = this.text( cells[4] );
 
-         fixture.eventLocation = this.text( cells[5] );
+         fixture.area = this.text( cells[5] );
          const streetMapURL = this.href( cells[5] );
          // Row may contain a grid reference or a postcode.  We differentate by checking for valid postcode.
          fixture.postcode = this.processPostCode( streetMapURL );

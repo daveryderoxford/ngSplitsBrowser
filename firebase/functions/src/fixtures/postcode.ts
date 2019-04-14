@@ -5,8 +5,6 @@ import * as request from "request-promise";
 export interface Location {
    latitude: number;
    longitude: number;
-   eastings: number;
-   northings: number;
    postcode: string;
 }
 
@@ -21,39 +19,41 @@ export class PostCodeLookup {
 
       const data = { postcodes: postcodes };
 
-      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude,eastings,northings", data );
+      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude", data );
 
-      const locations = response.result.map( res => this.makeLocation( res.result ) );
+      const locations = response.result.map( res => {
+         const loc: Location = {
+            postcode: res.query.postcode,
+            latitude: res.result.latitude,
+            longitude: res.result.longitude
+         };
+         return loc;
+      } );
 
       return locations;
    }
 
    /** Uses https://api.postcodes.io/ service to map lat/longs to postcodes */
-   public async gridRefToPostcode( latLongs: LatLong[], maxReturned: number = 1 ): Promise<Location[]> {
+   public async latlongToPostcode( latLongs: LatLong[], maxReturned: number = 1 ): Promise<Location[]> {
 
-      const array = latLongs.map( l =>  {
+      const array = latLongs.map( l => {
          return { latitude: l.latitude, longitude: l.longitude, limit: maxReturned };
-      });
+      } );
 
-      const data = { geolocations: array};
+      const data = { geolocations: array };
 
-      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude,eastings,northings", data );
+      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude", data );
 
-      const locations = response.result.map( res => this.makeLocation( res.result[ 0 ] ) );
+      const locations = response.result.map( res => {
+         const loc: Location = {
+            latitude: res.query.latitude,
+            longitude: res.query.longitude,
+            postcode: res.results[0].postcode,
+         };
+         return loc;
+      } );
 
       return locations;
-   }
-
-   /** Maps result object to location object */
-   private makeLocation( data: any ): Location {
-      const loc: Location = {
-         postcode: data.postcode,
-         latitude: data.latitude,
-         longitude: data.longitude,
-         eastings: data.eastings,
-         northings: data.northings
-      };
-      return loc;
    }
 
    private async makeRequest( method: string, inputObject: any ): Promise<any> {

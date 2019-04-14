@@ -528,6 +528,7 @@ export function testFixtures(): Fixture[] {
       name: 'Event ' + point[ 0 ],
       club: 'CLUB',
       date: str,
+      area: 'area',
       latLong: { lat: point[ 1 ], lng: point[ 2 ] }
 
     };

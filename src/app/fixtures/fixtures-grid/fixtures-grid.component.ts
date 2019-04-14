@@ -1,4 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
+import {
+   ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit,
+   Output, QueryList, ViewChildren, ViewContainerRef
+} from '@angular/core';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
 
@@ -15,13 +18,18 @@ export class FixturesGridComponent implements OnInit {
 
    @Input() fixtures: Fixture[];
 
-   @Input() selectedFixture: Fixture;
+   @Input() set selectedFixture( f: Fixture ) {
+      this._selectedFixture = f;
+      this.showElement( f );
+   }
 
-   @Input() homeLatLong: LatLong;
+   @Input() homeLocation: LatLong;
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
-  // displayedColumns = [ "date", "name", "club", "level", "distance", "location", "postcode" ];
+   @ViewChildren( 'tableRows', { read: ViewContainerRef } ) rows: QueryList<ViewContainerRef>;
+
+   // displayedColumns = [ "date", "name", "club", "level", "distance", "location", "postcode" ];
    displayedColumns = [ "date", "name", "club", "level", "distance", "location" ];
 
    constructor () { }
@@ -39,11 +47,12 @@ export class FixturesGridComponent implements OnInit {
    }
 
    distanceFromHome( pos: LatLong ): string {
-      if ( !this.homeLatLong ) {
+      const kmToMiles = 0.62137119224;
+      if ( !this.homeLocation ) {
          return "";
       }
-      const dist = this.getDistanceFromLatLonInKm( this.homeLatLong, pos );
-      return Math.round( dist ).toString();
+      const dist = this.getDistanceFromLatLonInKm( this.homeLocation, pos );
+      return Math.round( dist * kmToMiles ).toString();
    }
 
    bingURL( loc: LatLong ): string {
@@ -70,6 +79,15 @@ export class FixturesGridComponent implements OnInit {
 
    private deg2rad( deg: number ): number {
       return deg * ( Math.PI / 180 );
+   }
+
+   private showElement( fixture: Fixture ) {
+      const index = this.fixtures.findIndex( f => f === fixture );
+
+      if ( index !== -1 ) {
+         const row = this.rows.toArray()[ index ];
+         row.element.nativeElement.scrollIntoViewIfNeeded( true, { behavior: 'instant' } );
+      }
    }
 
 }

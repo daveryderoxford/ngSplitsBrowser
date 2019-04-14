@@ -26,7 +26,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       this.selectFixture( selected );
    }
 
-   @Input() set homeLatLong( home: LatLong ) {
+   @Input() set homeLocation( home: LatLong ) {
       this.setHomeLocation( home );
    }
 
@@ -40,7 +40,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
       const londonLatLng = { lat: 51.509865, lng: -0.118092 };
 
-      this.map = new Map( 'map' ).setView( londonLatLng, 12 );
+      this.map = new Map( 'map' ).setView( londonLatLng, 9 );
 
       tileLayer( 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
          opacity: 0.75
@@ -54,7 +54,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
    }
 
    ngAfterViewInit() {
-      /* Leaflet calculkae the map sise before angular is full initialise so we need to
+      /* Leaflet calculates the map size before angular is full initialise so we need to
       invalidate it once the view is complete. */
       this.map.invalidateSize();
    }
@@ -75,6 +75,10 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
          opacity: 0.08,
          fill: false
       });
+
+      if (this.map) {
+         this.map.panTo( latLng );
+      }
    }
 
    setFixtures( fixtures: Fixture[] ) {

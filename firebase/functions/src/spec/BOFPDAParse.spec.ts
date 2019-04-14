@@ -26,7 +26,7 @@ describe( 'BOF PDA Fixtures fiile parser ', () => {
       expect( bofFixtures[ 0 ].region ).to.equal( 'NWOA' );
       expect( bofFixtures[ 0 ].grade ).to.equal( 'National' );
 
-      expect( bofFixtures[ 0 ].eventLocation ).to.equal( 'Hampsfell' );
+      expect( bofFixtures[ 0 ].area ).to.equal( 'Hampsfell' );
       expect( bofFixtures[ 0 ].nearestTown ).to.equal( 'Grange over Sands' );
       expect( bofFixtures[ 0 ].gridRefStr ).to.equal( 'SD393805' );
    } );

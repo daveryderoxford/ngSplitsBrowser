@@ -36,7 +36,7 @@ export class LocationLookup {
             return { latitude: wgs.latitude, longitude: wgs.longitude };
          } );
 
-      this.latlongLocations = await this.lookup.gridRefToPostcode( requiredLatLogs );
+      this.latlongLocations = await this.lookup.latlongToPostcode( requiredLatLogs );
    }
 
    public findPostcodeLocation( postcode: string ): Location {
@@ -46,8 +46,7 @@ export class LocationLookup {
    public findLatLongLocation( gridRef: string ): Location {
       const osgb = new GT_OSGB();
       osgb.parseGridRef( gridRef );
-      return this.latlongLocations.find( loc => (Math.abs(loc.eastings - osgb.eastings)) < 1000 &&
+      return this.latlongLocations.find( loc => loc.lat - osgb.eastings)) < 1000 &&
                                                (Math.abs(loc.northings - osgb.northings)) < 1000. );
    }
-
 }

@@ -39,6 +39,7 @@ import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-bu
 import { FixturesMapComponent } from './fixtures/fixtures-map/fixtures-map.component';
 import { FixturesGridComponent } from './fixtures/fixtures-grid/fixtures-grid.component';
 import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
+import { FixturesOptionsComponent } from './fixtures/fixtures-options/fixtures-options.component';
 
 @NgModule({
   declarations: [
@@ -68,6 +69,7 @@ import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
     FixturesMapComponent,
     FixturesGridComponent,
     FixturesComponent,
+    FixturesOptionsComponent,
   ],
   entryComponents: [
     ResultsFoundDialogComponent
