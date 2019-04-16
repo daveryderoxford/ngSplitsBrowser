@@ -47,14 +47,14 @@ export class Fixtures {
          return fixture;
       } );
 
-      this.calcPostCodes( fixtures, bofFixtures );
-      this.calcLatLongs( fixtures, bofFixtures );
+      await this.calcPostCodes( fixtures, bofFixtures );
+      await this.calcLatLongs( fixtures, bofFixtures );
 
       return fixtures as Fixture[];
    }
 
    /** Sets Fixture postcodes for bof data for all values, calculating from latlong where necessary */
-   async calcPostCodes( fixtures: Partial<Fixture>[], bofFixtures: BOFPDParseData[] ) {
+   private async calcPostCodes( fixtures: Partial<Fixture>[], bofFixtures: BOFPDParseData[] ) {
       const latlongsToCalc: LatLongPIO[] = [];
       const fixturesToCalc: Partial<Fixture>[] = [];
 
@@ -66,6 +66,8 @@ export class Fixtures {
             const loc = this.osgbToLatLong( bofFixtures[ i ].gridRefStr );
             latlongsToCalc.push( loc );
             fixturesToCalc.push( fixtures[ i ] );
+         } else {
+            fixtures[ i ].postcode = "";
          }
       }
 
@@ -77,7 +79,7 @@ export class Fixtures {
    }
 
    /** Sets Fixture latlong for bof data for all values, calculating from postcode where necessary */
-   async calcLatLongs( fixtures: Partial<Fixture>[], bofFixtures: BOFPDParseData[] ) {
+   private async calcLatLongs( fixtures: Partial<Fixture>[], bofFixtures: BOFPDParseData[] ) {
       const postcodesToCalc: string[] = [];
       const fixtuersToCalc: Partial<Fixture>[] = [];
 
@@ -88,6 +90,9 @@ export class Fixtures {
          } else if ( bofFixtures[ i ].postcode !== "" ) {
             postcodesToCalc.push( bofFixtures[ i ].postcode );
             fixtuersToCalc.push( fixtures[ i ] );
+         } else {
+            fixtures[ i ].latLong = null;
+
          }
       }
 
@@ -125,7 +130,7 @@ export class Fixtures {
    }
 
    /** Save fixtures JSON file to Google Storage */
-   async saveToStorage( fixtures: Fixture[] ): Promise<void> {
+   private async saveToStorage( fixtures: Fixture[] ): Promise<void> {
       const storage = new Storage();
       const bucket = storage.bucket( process.env.GCLOUD_STORAGE_BUCKET );
 
@@ -141,7 +146,7 @@ export class Fixtures {
       }
    }
 
-   async loadBOFPDA(): Promise<string> {
+   private async loadBOFPDA(): Promise<string> {
       let response: string;
       try {
          response = await request( this.BOFPDAURL, { method: "get" } );

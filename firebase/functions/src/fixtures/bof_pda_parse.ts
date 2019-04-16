@@ -98,7 +98,7 @@ export class BOFPDParser {
 
       let id = this.urlParam( bofURL, "amp;event" );
 
-      // If event id is not found then it is a activity
+      // If event id is not found then it is an activity
       if (!id) {
          id = "activity-" + this.urlParam( bofURL, "amp;activity" );
       }

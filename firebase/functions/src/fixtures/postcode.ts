@@ -48,7 +48,6 @@ export class PostCodeLookup {
          return { latitude: l.lat, longitude: l.lng, limit: maxReturned, radius: searchRadius };
       } );
 
-
       //  loop over batchs of BATCH_SIZE as postcodes.io will only take 100
       while ( inputArray.length ) {
 

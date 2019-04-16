@@ -4,7 +4,7 @@ import 'mocha';
 import { BOFPDParseData, BOFPDParser } from '../fixtures/bof_pda_parse';
 import { testBOFPDAFile } from './BOFPDATestData.spec';
 
-xdescribe( 'BOF PDA Fixtures fiile parser ', () => {
+describe( 'BOF PDA Fixtures fiile parser ', () => {
 
    it( 'Should parse all fields incluing a grid reference column', () => {
 
@@ -76,6 +76,6 @@ xdescribe( 'BOF PDA Fixtures fiile parser ', () => {
       expect( bofFixtures[ 2 ].name ).to.equal( 'Postcode' );
       expect( bofFixtures[ 2 ].id ).to.equal( 'activity-26377' );
 
-} );
+   } );
 
-});
+} );

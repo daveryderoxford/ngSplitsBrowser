@@ -10,20 +10,22 @@ const spies = require( 'chai-spies' );
 const expectedFixtures: Fixture[] = [
    {
       id: "72446",
-      date: "24-03-2019T00:00:00.000Z",
+      date: "2019-03-24T00:00:00.000Z",
       name: "SROC Red Rose Classic",
       grade: "National",
       clubURL: "http://www.sroc.org",
       club: "SROC",
       association: "NWOA",
-      latLong: { lat: 54.21636, lng: -2.932341 },  // SD393805
+      latLong: { lat: 54.216616169229894, lng: -2.9323406028649956 },  // SD393805
       postcode: "LA11 6HL",
       area: "Hampsfell",
       nearestTown: "Grange over Sands",
+      type: "Foot"
+
    },
    {
-      id: "6012",
-      date: "28-03-2019T00:00:00.000Z",
+      id: "76012",
+      date: "2019-03-28T00:00:00.000Z",
       name: "Spring series 4, Whitehaven",
       grade: "Club",
       clubURL: "http://www.wcoc.co.uk",
@@ -32,11 +34,12 @@ const expectedFixtures: Fixture[] = [
       area: "",
       nearestTown: "Whitehaven",
       postcode: "",
-      latLong: null
+      latLong: null,
+      type: "Foot"
    },
    {
       id: "activity-26377",
-      date: "30-03-2019T00:00:00.000Z",
+      date: "2019-03-30T00:00:00.000Z",
       name: "Postcode",
       grade: "Local",
       clubURL: "http://www.quantockorienteers.co.uk",
@@ -45,7 +48,9 @@ const expectedFixtures: Fixture[] = [
       postcode: "TA1 2RH",
       latLong: { lat: 51.010333, lng: -3.073797 },
       area: "Blackbrook and Holway",
-      nearestTown: "Taunton"
+      nearestTown: "Taunton",
+            type: "Foot"
+
    }
 ];
 
@@ -57,12 +62,12 @@ describe( 'Fxtures', () => {
 
       const fixtures = new Fixtures();
 
-      const spySave = spy.on( fixtures, 'saveToStorage', returns => Promise.resolve() );
+      const spyLoadBOF = spy.on( fixtures, 'loadBOFPDA', returns => Promise.resolve( smalltestBOFPDAFile ) );
 
-      const spyLoadBOF = spy.on( fixtures, 'loadBOFPDA', (fix: Fixture[]) => {
-         expect( fix ).to.deep.equal(expectedFixtures);
+      const spySave = spy.on( fixtures, 'saveToStorage', ( fix: Fixture[] ) => {
+         expect( fix ).to.deep.equal( expectedFixtures );
          return Promise.resolve( smalltestBOFPDAFile );
-      });
+      } );
 
       await fixtures.processFixtures();
 
@@ -70,7 +75,8 @@ describe( 'Fxtures', () => {
 
    } );
 
-   it( 'should should process data from live BOF feed', async () => {
+
+   xit( 'should should process data from live BOF feed', async () => {
 
       const fixtures = new Fixtures();
 
@@ -83,6 +89,8 @@ describe( 'Fxtures', () => {
       expect( spySave ).to.have.been.called();
 
    } );
+
+
 
 } );
 
