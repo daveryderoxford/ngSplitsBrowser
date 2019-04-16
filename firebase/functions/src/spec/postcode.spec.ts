@@ -17,14 +17,10 @@ const locations: LatLong[] = [
    }
 ];
 
-
 describe( 'Postcode IO', () => {
    const lookup = new PostCodeLookup();
 
-
    it( 'should convert postcodes to location', async () => {
-
-      console.log(postcodes.toString());
 
       const results = await lookup.postcodeToLocation( postcodes );
 
@@ -39,11 +35,10 @@ describe( 'Postcode IO', () => {
       const results = await lookup.latLongToPostcode( locations );
 
       expect( results.length ).to.equal( 2 );
-      expect(  results[0]).to.equal( "TW18 2AB");
-      expect(  results[1]).to.equal( "CM15 8BN");
+      expect( results[ 0 ] ).to.equal( "TW18 2AB" );
+      expect( results[ 1 ] ).to.equal( "CM15 8BN" );
 
    } );
-
 
    it( 'should handle large request over 100', async () => {
 
@@ -55,7 +50,7 @@ describe( 'Postcode IO', () => {
       const results = await lookup.postcodeToLocation( p );
 
       expect( results.length ).to.equal( 2 );
-      expect(results[0]).to.equal(null);
+      expect( results[ 0 ] ).to.equal( null );
 
    } );
 

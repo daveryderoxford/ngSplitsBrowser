@@ -18,8 +18,9 @@ export class PostCodeLookup {
       //  loop over batchs of BATCH_SIZE as postcodes.io will only take 100
       while ( postcodes.length ) {
 
-         const postData = { postcodes: postcodes.splice( 0, this.BATCH_SIZE ) };
+         const batch = postcodes.splice( 0, this.BATCH_SIZE ); // splice consmes BATCH_SIZE elements
 
+         const postData = { postcodes: batch };
          const response = await this.makeRequest( "postcodes?filter=longitude,latitude", postData );
 
          const result = response.result.map( res => {
@@ -51,8 +52,9 @@ export class PostCodeLookup {
       //  loop over batchs of BATCH_SIZE as postcodes.io will only take 100
       while ( inputArray.length ) {
 
-         const postData = { geolocations: inputArray.splice( 0, this.BATCH_SIZE ) };
+         const batch = inputArray.splice( 0, this.BATCH_SIZE ); // splice consmes BATCH_SIZE elements
 
+         const postData = { geolocations: batch };
          const response = await this.makeRequest( "postcodes?filter=postcode", postData );
 
          const result = response.result.map( res => {
