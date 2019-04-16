@@ -1,57 +1,74 @@
 import * as request from "request-promise";
-
 // require( 'request-debug' )( request );
 
-export interface Location {
-   latitude: number;
-   longitude: number;
-   postcode: string;
-}
-
-export interface LatLongPostCodeIO {
-   latitude: number;
-   longitude: number;
+export interface LatLong {
+   lat: number;
+   lng: number;
 }
 
 /** Uses https://api.postcodes.io/ service to map  postcodes to lat/long */
 export class PostCodeLookup {
-   public async postcodeToLocation( postcodes: string[] ): Promise<Location[]> {
 
-      const data = { postcodes: postcodes };
+   BATCH_SIZE = 100;
 
-      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude", data );
+   public async postcodeToLocation( postcodes: string[] ): Promise<LatLong[]> {
 
-      const locations = response.result.map( res => {
-         const loc: Location = {
-            postcode: res.query.postcode,
-            latitude: res.result.latitude,
-            longitude: res.result.longitude
-         };
-         return loc;
-      } );
+      const locations: LatLong[] = [];
+
+      //  loop over batchs of BATCH_SIZE as postcodes.io will only take 100
+      while ( postcodes.length ) {
+
+         const postData = { postcodes: postcodes.splice( 0, this.BATCH_SIZE ) };
+
+         const response = await this.makeRequest( "postcodes?filter=longitude,latitude", postData );
+
+         const result = response.result.map( res => {
+            if ( !res.result || res.result.length === 0 ) {
+               console.log( "Postcode: Failed to convert postcode " + res.query );
+               return null;
+            }
+            const loc: LatLong = {
+               lat: res.result.latitude,
+               lng: res.result.longitude
+            };
+            return loc;
+         } );
+
+         locations.push( result );
+      }
 
       return locations;
    }
 
    /** Uses https://api.postcodes.io/ service to map lat/longs to postcodes */
-   public async latLongToPostcode( latLongs: LatLongPostCodeIO[], maxReturned: number = 1 ): Promise<Location[]> {
+   public async latLongToPostcode( latLongs: LatLong[], maxReturned = 1, searchRadius = 2000 ): Promise<string[]> {
 
-      const array = latLongs.map( l => {
-         return { latitude: l.latitude, longitude: l.longitude, limit: maxReturned };
+      const locations: string[] = [];
+
+      const inputArray = latLongs.map( l => {
+         return { latitude: l.lat, longitude: l.lng, limit: maxReturned, radius: searchRadius };
       } );
 
-      const data = { geolocations: array };
 
-      const response = await this.makeRequest( "postcodes?filter=postcode,longitude,latitude", data );
+      //  loop over batchs of BATCH_SIZE as postcodes.io will only take 100
+      while ( inputArray.length ) {
 
-      const locations = response.result.map( res => {
-         const loc: Location = {
-            latitude: res.query.latitude,
-            longitude: res.query.longitude,
-            postcode: res.results[0].postcode,
-         };
-         return loc;
-      } );
+         const postData = { geolocations: inputArray.splice( 0, this.BATCH_SIZE ) };
+
+         const response = await this.makeRequest( "postcodes?filter=postcode", postData );
+
+         const result = response.result.map( res => {
+            if ( !res.result || res.result.length === 0 ) {
+               console.log( "Postcode: Failed to convert latlong  " +
+                  res.query.latitude.toString() + " " + res.query.longitude.toString() );
+               return "";
+            } else {
+               return res.result[ 0 ].postcode;
+            }
+         } );
+
+         locations.push( result );
+      }
 
       return locations;
    }

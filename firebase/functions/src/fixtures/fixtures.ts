@@ -3,16 +3,14 @@ import * as request from "request-promise";
 import { Fixture, LatLong } from "../../../../src/app/model/fixture";
 import { EventGrade } from "../../../../src/app/model/oevent";
 import { BOFPDParseData, BOFPDParser } from "./bof_pda_parse";
-import { GT_Irish, GT_OSGB, GT_WGS84 } from "./geo_conversion";
-import { LocationLookup } from "./location_lookup";
+import { GT_OSGB } from "./geo_conversion";
+import { LatLong as LatLongPIO, PostCodeLookup } from "./postcode";
 
 export class Fixtures {
+   readonly BOFPDAURL =
+      "https://www.britishorienteering.org.uk/event_diary_pda.php";
 
-   readonly BOFPDAURL = "https://www.britishorienteering.org.uk/event_diary_pda.php";
-
-   GT_OSGB = new GT_OSGB();
-   GT_WGS84 = new GT_WGS84();
-   GT_Irish = new GT_Irish();
+   lookup = new PostCodeLookup();
 
    constructor () { }
 
@@ -28,57 +26,83 @@ export class Fixtures {
       await this.saveToStorage( fixtures );
    }
 
-   /** Make fixtures arrafy for BOF fixturesd. */
+   /** Make fixtures array for BOF fixturesd. */
    private async makeFixtures( bofFixtures: BOFPDParseData[] ): Promise<Fixture[]> {
 
-      const locationLookup = await LocationLookup.create( bofFixtures );
-
       //  Create fixture array
-      const fixtures: Fixture[] = bofFixtures.map( bof => {
-         const fixture: Fixture = {
+      const fixtures: Partial<Fixture>[] = bofFixtures.map( bof => {
+         const fixture: Partial<Fixture> = {
             id: bof.id,
             date: bof.date,
             name: bof.name,
             club: bof.club,
             clubURL: bof.clubURL,
+            area: bof.area,
             association: bof.region,
             nearestTown: bof.nearestTown,
             grade: this.mapGrade( bof.grade ),
-            type: "Foot",
-            latLong: this.getLatLong( bof.postcode, bof.gridRefStr, locationLookup ),
-            postcode: this.getPostCode( bof.postcode, bof.gridRefStr, locationLookup ),
+            type: "Foot"
          };
 
          return fixture;
       } );
 
-      return fixtures;
+      this.calcPostCodes( fixtures, bofFixtures );
+      this.calcLatLongs( fixtures, bofFixtures );
+
+      return fixtures as Fixture[];
    }
 
-   /** Get lat/long for the event.  If grid reference is specified then obtain lat/log from it
-    * otherwise if postcode is avaialble use its lat/long */
-   private getLatLong( postcode: string, gridRefStr: string, locationLookup: LocationLookup ): LatLong {
-      if ( gridRefStr !== '' ) {
-         this.GT_OSGB.parseGridRef( gridRefStr);
-         const wgs84 = this.GT_OSGB.getWGS84();
-         return { lat: wgs84.latitude, lng: wgs84.longitude };
-      } else if ( postcode !== '' ) {
-         const loc = locationLookup.findPostcodeLocation( postcode );
-         return { lat: loc.latitude, lng: loc.longitude };
-      } else {
-         return null;
+   /** Sets Fixture postcodes for bof data for all values, calculating from latlong where necessary */
+   async calcPostCodes( fixtures: Partial<Fixture>[], bofFixtures: BOFPDParseData[] ) {
+      const latlongsToCalc: LatLongPIO[] = [];
+      const fixturesToCalc: Partial<Fixture>[] = [];
+
+      // Set postcodes for ones avalible from BOF data and identify ones that need to be calculated using postcode.io
+      for ( let i = 0; i < fixtures.length; i++ ) {
+         if ( bofFixtures[ i ].postcode !== "" ) {
+            fixtures[ i ].postcode = bofFixtures[ i ].postcode;
+         } else if ( bofFixtures[ i ].gridRefStr !== "" ) {
+            const loc = this.osgbToLatLong( bofFixtures[ i ].gridRefStr );
+            latlongsToCalc.push( loc );
+            fixturesToCalc.push( fixtures[ i ] );
+         }
+      }
+
+      const postcodes = await this.lookup.latLongToPostcode( latlongsToCalc );
+
+      for ( let i = 0; i < postcodes.length; i++ ) {
+         fixturesToCalc[ i ].postcode = postcodes[ i ];
       }
    }
 
-   /** if post code is specified then use it otherwise if grid reference is present look up value */
-   private getPostCode( postcode: string, gridRefStr: string, locationLookup: LocationLookup ): string {
-      if ( postcode !== '' ) {
-         return postcode;
-      } else if ( gridRefStr !== '' ) {
-        return locationLookup.findGridrefLocation(gridRefStr).postcode;
-      } else {
-         return '';
+   /** Sets Fixture latlong for bof data for all values, calculating from postcode where necessary */
+   async calcLatLongs( fixtures: Partial<Fixture>[], bofFixtures: BOFPDParseData[] ) {
+      const postcodesToCalc: string[] = [];
+      const fixtuersToCalc: Partial<Fixture>[] = [];
+
+      // Set latlongs for ones avalible from BOF data and identify ones that need to be calculated using postcode.io
+      for ( let i = 0; i < fixtures.length; i++ ) {
+         if ( bofFixtures[ i ].gridRefStr !== "" ) {
+            fixtures[ i ].latLong = this.osgbToLatLong( bofFixtures[ i ].gridRefStr );
+         } else if ( bofFixtures[ i ].postcode !== "" ) {
+            postcodesToCalc.push( bofFixtures[ i ].postcode );
+            fixtuersToCalc.push( fixtures[ i ] );
+         }
       }
+
+      const locations = await this.lookup.postcodeToLocation( postcodesToCalc );
+
+      for ( let i = 0; i < locations.length; i++ ) {
+         fixtuersToCalc[ i ].latLong = locations[ i ];
+      }
+   }
+
+   private osgbToLatLong( gridRefStr: string ): LatLong {
+      const osgb = new GT_OSGB();
+      osgb.parseGridRef( gridRefStr );
+      const wgs84 = osgb.getWGS84();
+      return { lat: wgs84.latitude, lng: wgs84.longitude };
    }
 
    private mapGrade( bofGrade: string ): EventGrade {
@@ -93,8 +117,10 @@ export class Fixtures {
             return "National";
          case "Major":
             return "International";
+         case "International":
+            return "International";
          default:
-            throw new Error( "Unexpected bof grade encountered" );
+            throw new Error( "Fixtures: Unexpected bof grade encountered: " + bofGrade);
       }
    }
 
@@ -126,5 +152,3 @@ export class Fixtures {
       return response;
    }
 }
-
-

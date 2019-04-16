@@ -1,61 +1,60 @@
 
 import { expect } from 'chai';
 import 'mocha';
-import { PostCodeLookup, Location, LatLongPostCodeIO } from '../fixtures/postcode';
+import { PostCodeLookup, LatLong } from '../fixtures/postcode';
 
-const expectedLocations: Location[] = [
+
+const postcodes = [ "TW18 2AB", "CM15 8BN" ];
+
+const locations: LatLong[] = [
    {
-      "postcode": "TW18 2AB",
-      "longitude": -0.508227,
-      "latitude": 51.43116,
-      "eastings": 503801,
-      "northings": 171295
+      "lat": 51.43116,
+      "lng": -0.508227,
    },
    {
-      "postcode": "CM15 8BN",
-      "longitude": 0.31313,
-      "latitude": 51.617483,
-      "eastings": 560239,
-      "northings": 193496
+      "lat": 51.617483,
+      "lng": 0.31313,
    }
 ];
 
-describe( 'Postcode conversion', () => {
+
+describe( 'Postcode IO', () => {
+   const lookup = new PostCodeLookup();
+
 
    it( 'should convert postcodes to location', async () => {
-
-      const lookup = new PostCodeLookup();
-
-      const postcodes = [ "TW182AB", "CM158BN" ];
 
       const results = await lookup.postcodeToLocation( postcodes );
 
       expect( results.length ).to.equal( 2 );
 
-      expect( results ).to.deep.equal( expectedLocations );
+      expect( results ).to.deep.equal( locations );
 
    } );
 
-   it( 'should convert grid reference to postcode', async () => {
-      const lookup = new PostCodeLookup();
+   it( 'should convert lat long to postcode', async () => {
 
-      const latlongs: LatLongPostCodeIO[] = [
-         {
-            latitude: 51.43116,
-            longitude: -0.508227,
-         },
-         {
-            latitude: 51.617483,
-            longitude: 0.31313,
-         }
-      ];
-
-      const results = await lookup.latLongToPostcode( latlongs );
+      const results = await lookup.latLongToPostcode( locations );
 
       expect( results.length ).to.equal( 2 );
 
-      expect( results ).to.deep.equal( expectedLocations );
+      expect( results ).to.deep.equal( postcodes );
    } );
+
+
+   it( 'should handle large request over 100', async () => {
+
+   } );
+
+   it( 'should handle postcode not found', async () => {
+
+      const p = [ "XX18 2XX", "CM15 8BN" ];
+      const results = await lookup.postcodeToLocation( p );
+
+      expect( results.length ).to.equal( 2 );
+
+   } );
+
 
 } );
 

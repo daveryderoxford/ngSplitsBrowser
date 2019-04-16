@@ -68,5 +68,14 @@ describe( 'BOF PDA Fixtures fiile parser ', () => {
 
    } );
 
+   it( 'Should parse activity', () => {
+
+      const parser = new BOFPDParser();
+      const bofFixtures: BOFPDParseData[] = parser.parseBOFPDAFile( testBOFPDAFile );
+
+      expect( bofFixtures[ 2 ].name ).to.equal( 'Postcode' );
+      expect( bofFixtures[ 2 ].id ).to.equal( 'activity-26377' );
+
 } );
 
+});

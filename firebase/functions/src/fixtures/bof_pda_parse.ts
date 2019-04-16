@@ -2,7 +2,7 @@
 import * as cheerio from "cheerio";
 import { URL } from "url";
 
-export type BOFLevel = 'Activity' | 'Local' | 'Regional' | 'National' | 'Major';
+export type BOFLevel = 'Activity' | 'Local' | 'Regional' | 'National' | 'Major' | "International";
 
 export interface BOFPDParseData {
    id: string;
@@ -43,9 +43,9 @@ export class BOFPDParser {
    }
 
    /** Parse out each row of BOF PDA fixtures table.
-    * each tabke row has cells with the following format
+    * each table row has cells with the following format
 
-    Cell   Title  Contents
+    Cell   Title  Example Contents
       0    Date        <td>Sun 24/03/19</td>
       1    Event Name  <td><a href="index.php?pg=event&amp;amp;event=72446&amp;bpg=">SROC Red Rose Classic</a></td>
       2    Level       <td>National</td>
@@ -67,7 +67,7 @@ export class BOFPDParser {
          fixture.name = this.text( cells[1] );
          const bofURL = this.href( cells[1] );
          fixture.BOFLink = bofURL;
-         fixture.id = this.urlParam( bofURL, "amp;event" );
+         fixture.id = this.getId( bofURL);
 
          fixture.grade = this.text( cells[2] ) as BOFLevel;
 
@@ -86,11 +86,24 @@ export class BOFPDParser {
          fixture.gridRefStr = this.text( cells[7] );
 
       } catch ( e ) {
-         console.log( 'BOF PDA Format Parser: Error processing row ' + this.$(row).text() + '\n' + e );
+         console.log( 'BOFPDParser: Error processing row ' + this.$(row).text() + '\n' + e );
          throw ( e );
       }
 
       return fixture as BOFPDParseData;
+   }
+
+   /** The id parameter may either be an a event or activity id */
+   private getId( bofURL: string): string {
+
+      let id = this.urlParam( bofURL, "amp;event" );
+
+      // If event id is not found then it is a activity
+      if (!id) {
+         id = "activity-" + this.urlParam( bofURL, "amp;activity" );
+      }
+
+      return id;
    }
 
    private text( el: CheerioElement ): string {
