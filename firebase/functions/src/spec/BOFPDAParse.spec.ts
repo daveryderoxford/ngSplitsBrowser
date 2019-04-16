@@ -4,7 +4,7 @@ import 'mocha';
 import { BOFPDParseData, BOFPDParser } from '../fixtures/bof_pda_parse';
 import { testBOFPDAFile } from './BOFPDATestData.spec';
 
-describe( 'BOF PDA Fixtures fiile parser ', () => {
+xdescribe( 'BOF PDA Fixtures fiile parser ', () => {
 
    it( 'Should parse all fields incluing a grid reference column', () => {
 

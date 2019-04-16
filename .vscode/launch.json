@@ -20,9 +20,12 @@
         "tdd",
         "--timeout",
         "999999",
+        "--require",
+        "ts-node/register",
         "--colors",
-        "${workspaceFolder}/firebase/functions/src/spec/*.ts"
+        "${workspaceFolder}/firebase/functions/src/spec/*.ts",
       ],
+      "sourceMaps": true,
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector"    },

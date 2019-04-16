@@ -58,12 +58,15 @@ describe( 'Fxtures', () => {
       const fixtures = new Fixtures();
 
       const spySave = spy.on( fixtures, 'saveToStorage', returns => Promise.resolve() );
-      const spyLoadBOF = spy.on( fixtures, 'loadBOFPDA', returns => Promise.resolve( smalltestBOFPDAFile ) );
+
+      const spyLoadBOF = spy.on( fixtures, 'loadBOFPDA', (fix: Fixture[]) => {
+         expect( fix ).to.deep.equal(expectedFixtures);
+         return Promise.resolve( smalltestBOFPDAFile );
+      });
 
       await fixtures.processFixtures();
 
       expect( spyLoadBOF ).to.have.been.called();
-      //  expect(spySave).to.have.been.called().with.Arguments.deep([expectedFixtures]);
 
    } );
 

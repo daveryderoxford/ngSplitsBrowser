@@ -13,7 +13,7 @@ export class PostCodeLookup {
 
    public async postcodeToLocation( postcodes: string[] ): Promise<LatLong[]> {
 
-      const locations: LatLong[] = [];
+      let locations: LatLong[] = [];
 
       //  loop over batchs of BATCH_SIZE as postcodes.io will only take 100
       while ( postcodes.length ) {
@@ -34,16 +34,15 @@ export class PostCodeLookup {
             return loc;
          } );
 
-         locations.push( result );
+         locations = locations.concat( result );
       }
-
       return locations;
    }
 
    /** Uses https://api.postcodes.io/ service to map lat/longs to postcodes */
    public async latLongToPostcode( latLongs: LatLong[], maxReturned = 1, searchRadius = 2000 ): Promise<string[]> {
 
-      const locations: string[] = [];
+      let locations: string[] = [];
 
       const inputArray = latLongs.map( l => {
          return { latitude: l.lat, longitude: l.lng, limit: maxReturned, radius: searchRadius };
@@ -66,8 +65,7 @@ export class PostCodeLookup {
                return res.result[ 0 ].postcode;
             }
          } );
-
-         locations.push( result );
+         locations = locations.concat( result );
       }
 
       return locations;

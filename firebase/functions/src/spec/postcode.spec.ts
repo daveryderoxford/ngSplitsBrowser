@@ -24,6 +24,8 @@ describe( 'Postcode IO', () => {
 
    it( 'should convert postcodes to location', async () => {
 
+      console.log(postcodes.toString());
+
       const results = await lookup.postcodeToLocation( postcodes );
 
       expect( results.length ).to.equal( 2 );
@@ -37,8 +39,9 @@ describe( 'Postcode IO', () => {
       const results = await lookup.latLongToPostcode( locations );
 
       expect( results.length ).to.equal( 2 );
+      expect(  results[0]).to.equal( "TW18 2AB");
+      expect(  results[1]).to.equal( "CM15 8BN");
 
-      expect( results ).to.deep.equal( postcodes );
    } );
 
 
@@ -52,9 +55,9 @@ describe( 'Postcode IO', () => {
       const results = await lookup.postcodeToLocation( p );
 
       expect( results.length ).to.equal( 2 );
+      expect(results[0]).to.equal(null);
 
    } );
-
 
 } );
 
