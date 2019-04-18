@@ -3,8 +3,8 @@
     "rules": "firebase/database.rules.json"
   },
   "functions": {
-    "source": "firebase/functions/lib",
-     "predeploy": "npm --prefix functions run build"
+    "source": "firebase/functions",
+    "predeploy": "npm --prefix firebase/functions run build"
   },
   "hosting": {
     "public": "dist",

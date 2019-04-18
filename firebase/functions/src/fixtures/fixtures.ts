@@ -1,10 +1,11 @@
-import { Storage } from "@google-cloud/storage";
 import * as request from "request-promise";
-import { Fixture, LatLong } from "../../../../src/app/model/fixture";
-import { EventGrade } from "../../../../src/app/model/oevent";
+import { Fixture, LatLong } from "../model/fixture";
+import { EventGrade } from "../model/oevent";
 import { BOFPDParseData, BOFPDParser } from "./bof_pda_parse";
 import { GT_OSGB } from "./geo_conversion";
 import { LatLong as LatLongPIO, PostCodeLookup } from "./postcode";
+import * as admin from "firebase-admin";
+
 
 export class Fixtures {
    readonly BOFPDAURL =
@@ -12,18 +13,29 @@ export class Fixtures {
 
    lookup = new PostCodeLookup();
 
-   constructor () { }
+   constructor ( private storage: admin.storage.Storage ) { }
 
    /** Read BOF PDA data from URL and parse it. */
    public async processFixtures() {
+
+      console.log( "Loading BOF PDA Data" );
       const text = await this.loadBOFPDA();
+
+      console.log( "Parsing BOF PDA Data" );
 
       const parser = new BOFPDParser();
       const bofFixtures = parser.parseBOFPDAFile( text );
 
+      console.log( "Making fixtures (includes )" );
+
       const fixtures = await this.makeFixtures( bofFixtures );
 
+      console.log( "Saving fixtures" );
+
       await this.saveToStorage( fixtures );
+
+      console.log( "Done" );
+
    }
 
    /** Make fixtures array for BOF fixturesd. */
@@ -125,23 +137,24 @@ export class Fixtures {
          case "International":
             return "International";
          default:
-            throw new Error( "Fixtures: Unexpected bof grade encountered: " + bofGrade);
+            throw new Error( "Fixtures: Unexpected bof grade encountered: " + bofGrade );
       }
    }
 
    /** Save fixtures JSON file to Google Storage */
    private async saveToStorage( fixtures: Fixture[] ): Promise<void> {
-      const storage = new Storage();
-      const bucket = storage.bucket( process.env.GCLOUD_STORAGE_BUCKET );
-
-      const filename = "./fixtures/uk";
-
-      const file = bucket.file( filename );
+      const filename = "fixtures/uk";
 
       try {
-         await file.save( JSON.stringify( fixtures ) );
+         const file = this.storage.bucket().file( filename );
+         // console.log( "Saving fixture file.  Bucket: " + file.bucket.name + "   File name: " +  file.name);
+
+         const data = JSON.stringify( fixtures );
+         // console.log( "Saving data file:" + data);
+
+         await file.save( data );
       } catch ( e ) {
-         console.log( "Fixtures: Error saving fixtures to clould storage: " + e );
+         console.error( "Fixtures: Error saving fixtures to clould storage: " + e );
          throw e;
       }
    }
@@ -151,7 +164,7 @@ export class Fixtures {
       try {
          response = await request( this.BOFPDAURL, { method: "get" } );
       } catch ( e ) {
-         console.log( "Fixtures: Error making HTTP request: " + e );
+         console.error( "Fixtures: Error making HTTP request: " + e );
          throw e;
       }
       return response;

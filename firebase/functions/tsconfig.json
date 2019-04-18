@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "lib": ["es6", "es2015.promise"],
+    "lib": [ "es2017"],
     "module": "commonjs",
+    "target": "es2017",
     "noImplicitAny": false,
     "outDir": "lib",
-    "sourceMap": true,
+    "baseUrl": "src",
+    "rootDir": "src",
     "allowJs": true,
-    "target": "es5",
     "typeRoots": [
       "node_modules/@types"
     ]
   },
   "include": [
-    "src/**/*.ts",
+    "**/*.ts",
   ]
 }

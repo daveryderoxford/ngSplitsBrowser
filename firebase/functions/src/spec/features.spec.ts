@@ -1,9 +1,11 @@
-import { expect, use, spy } from 'chai';
+import { expect, spy, use } from 'chai';
 // import { spies } from 'chai-spies';
 import 'mocha';
-import { Fixture, LatLong } from "../../../../src/app/model/fixture";
-import { smalltestBOFPDAFile } from './BOFPDATestData.spec';
+import { Fixture } from "model/fixture";
 import { Fixtures } from '../fixtures/fixtures';
+import { smalltestBOFPDAFile } from './BOFPDATestData.spec';
+import * as admin from "firebase-admin";
+
 
 const spies = require( 'chai-spies' );
 
@@ -60,7 +62,7 @@ describe( 'Fxtures', () => {
 
    it( 'should should process known BOF data correctly', async () => {
 
-      const fixtures = new Fixtures();
+      const fixtures = new Fixtures(admin.storage());
 
       const spyLoadBOF = spy.on( fixtures, 'loadBOFPDA', returns => Promise.resolve( smalltestBOFPDAFile ) );
 
@@ -78,7 +80,7 @@ describe( 'Fxtures', () => {
 
    xit( 'should should process data from live BOF feed', async () => {
 
-      const fixtures = new Fixtures();
+      const fixtures = new Fixtures(admin.storage());
 
       const spySave = spy.on( fixtures, 'saveToStorage', returns => Promise.resolve() );
 
@@ -89,9 +91,6 @@ describe( 'Fxtures', () => {
       expect( spySave ).to.have.been.called();
 
    } );
-
-
-
 } );
 
 

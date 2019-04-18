@@ -41,6 +41,7 @@
 
 // tslint:disable:max-line-length
 // tslint:disable:class-name
+// tslint:disable: no-use-before-declare
 
 type GT_status = string;
 
