@@ -17,9 +17,9 @@ export class EventGrades {
     }
 }
 
-export type EventDiscipline = "Sprint" | "Urban" | "Middle" | "Long" | "Ultralong"| "Other" ;
+export type EventDiscipline = "Sprint" | "Urban" | "Middle" | "Long" | "Ultralong"| "Other" | "Unknown";
 export class EventDisciplines {
-    static disciplines: Array<EventDiscipline> = ["Sprint", "Urban", "Middle", "Long", "Ultralong", "Other" ];
+    static disciplines: Array<EventDiscipline> = [ "Sprint", "Urban", "Middle", "Long", "Ultralong", "Other", "Unknown" ];
 }
 
 export type EventType = "Foot" | "Bike" | "Ski" | "Trail" | "Other" ;

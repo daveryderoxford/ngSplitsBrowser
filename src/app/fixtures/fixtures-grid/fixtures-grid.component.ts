@@ -46,22 +46,44 @@ export class FixturesGridComponent implements OnInit {
       return ( this._selectedFixture === fixture );
    }
 
-   distanceFromHome( pos: LatLong ): string {
+   /** Reformat ISO date into displayed date string */
+   dateString( date: string ) {
+      // For the next week display days in the future
+
+   }
+
+   distanceFromHome( fix: Fixture ): string {
       const kmToMiles = 0.62137119224;
-      if ( !this.homeLocation ) {
+      if ( !this.homeLocation || !fix.latLong ) {
          return "";
       }
-      const dist = this.getDistanceFromLatLonInKm( this.homeLocation, pos );
+      const dist = this.getDistanceFromLatLonInKm( this.homeLocation, fix.latLong );
       return Math.round( dist * kmToMiles ).toString();
    }
 
-   bingURL( loc: LatLong ): string {
-      return 'https://www.bing.com/maps/?cp=' + loc.lat.toString() + '~' + loc.lng.toString() +
-         '&lvl=13&style=s&where1=' + loc.lat.toString() + ',' + loc.lng.toString();
+   bingURL( fix: Fixture ): string {
+      if ( !fix.latLong || !fix.latLong.lat ) {
+         return "";
+      }
+      return 'https://www.bing.com/maps/?cp=' + this.latLongStr( fix.latLong, '~' ) + "&lvl=15&style=s&sp=" +
+                           this.latLongStr( fix.latLong, '_' ) + "_" + fix.area;
    }
 
-   googleURL( row: Fixture ): string {
-      return "";
+   googleURL( fix: Fixture ): string {
+      return "https://www.google.com/maps/search/?api=1&query=" + this.latLongStr( fix.latLong ) + "&query_place_id=" + fix.area;
+   }
+
+   /** Returns URL for  directions between home location and area */
+   googleDirectonsURL(fix: Fixture ): string {
+      if ( !this.homeLocation || !fix.latLong ) {
+         return "";
+      }
+      return "https://www.google.com/maps/dir/?api=1&origin=" + this.latLongStr( this.homeLocation)
+                + "&destination= " + this.latLongStr(fix.latLong);
+   }
+
+   private latLongStr(loc: LatLong, seperator = ","): string {
+      return loc.lat.toString() + seperator + loc.lng.toString();
    }
 
    private getDistanceFromLatLonInKm( pos1: LatLong, pos2: LatLong ): number {

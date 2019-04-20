@@ -527,13 +527,24 @@ export function testFixtures(): Fixture[] {
       id: point[ 0 ],
       name: 'Event ' + point[ 0 ],
       club: 'CLUB',
+      clubURL: "",
       date: str,
       area: 'area',
-      latLong: { lat: point[ 1 ], lng: point[ 2 ] }
-
+      latLong: { lat: point[ 1 ], lng: point[ 2 ] },
+      postcode: "",
+      discipline: "Unknown",
+      type: "Foot",
+      webpage: "",
+      association: "SOA",
+      nearestTown: "Woking",
+      grade: "Local",
     };
     fixtures.push( fixture );
     i++;
   }
   return fixtures;
 }
+
+
+
+

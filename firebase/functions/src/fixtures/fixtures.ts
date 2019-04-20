@@ -22,16 +22,13 @@ export class Fixtures {
       const text = await this.loadBOFPDA();
 
       console.log( "Parsing BOF PDA Data" );
-
       const parser = new BOFPDParser();
       const bofFixtures = parser.parseBOFPDAFile( text );
 
-      console.log( "Making fixtures (includes )" );
-
+      console.log( "Making fixtures (includes getting postcodes)" );
       const fixtures = await this.makeFixtures( bofFixtures );
 
       console.log( "Saving fixtures" );
-
       await this.saveToStorage( fixtures );
 
       console.log( "Done" );
@@ -53,8 +50,11 @@ export class Fixtures {
             association: bof.region,
             nearestTown: bof.nearestTown,
             grade: this.mapGrade( bof.grade ),
-            type: "Foot"
+            type: "Foot",
+            discipline: "Unknown",
+            webpage: bof.BOFLink,
          };
+
 
          return fixture;
       } );

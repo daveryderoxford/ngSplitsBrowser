@@ -11,14 +11,14 @@ export interface Fixture {
      date: ISODateString;
      name: string;
      club: string;
-     clubURL?: string;
-     area?: string;
+     clubURL: string;
+     area: string;
      latLong?: LatLong;
-     postcode?: string;
-     grade?: EventGrade;
-     type?: EventType;
-     discipline?: EventDiscipline;
-     webpage?: string;
-     nearestTown?: string;
-     association?: string;
+     postcode: string;
+     grade: EventGrade;
+     type: EventType;
+     discipline: EventDiscipline;
+     webpage: string;
+     nearestTown: string;
+     association: string;
 }

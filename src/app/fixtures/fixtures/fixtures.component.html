@@ -3,7 +3,7 @@
   <as-split direction="vertical">
 
     <as-split-area>
-        <app-fixtures-map [fixtures]="fixtures | async" 
+        <app-fixtures-map [fixtures]="fixtures" 
                          [homeLocation]="homeLocation | async"
                          [selectedFixture]="selectedFixture" 
                          (fixtureSelected)="onFeatureSelected($event)"> 
@@ -11,7 +11,7 @@
     </as-split-area>
 
     <as-split-area>
-      <app-fixtures-grid [fixtures]="fixtures | async" 
+      <app-fixtures-grid [fixtures]="fixtures" 
                         [homeLocation]="homeLocation | async"
                         [selectedFixture]="selectedFixture"
                         (fixtureSelected)="onFeatureSelected($event)">

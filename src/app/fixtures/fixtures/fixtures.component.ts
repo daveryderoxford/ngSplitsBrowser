@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Fixture, Nation } from 'app/model';
-import { testFixtures } from './fixturesTestData';
+import { testFixtures } from './fixturesTestData.spec';
 import { LatLong } from 'app/model/fixture';
 import { FixturesService } from '../fixtures.service';
 import { Observable, of } from 'rxjs';
@@ -14,17 +14,14 @@ import { Observable, of } from 'rxjs';
 export class FixturesComponent implements OnInit {
   selectedFixture: Fixture;
 
-  fixtures: Observable<Fixture[]>;
+  fixtures: Fixture[];
   homeLocation: Observable<LatLong>;
   postcode: Observable<string>;
 
   constructor(public fs: FixturesService) { }
 
   ngOnInit() {
-    this.fixtures = of( testFixtures() );
-
-  // TODO add real fixtures !!
-   // this.fixtures = this.fs.getFixtures();
+   this.fs.getFixtures().subscribe( f => this.fixtures = f );
    this.homeLocation = this.fs.getHomeLocation();
    this.postcode = this.fs.getPostcode();
   }

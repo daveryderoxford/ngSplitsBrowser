@@ -89,7 +89,10 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
          return;
       }
 
-      for ( const fixture of fixtures.reverse() ) {
+      const fixturesToDraw = fixtures.filter( fix => fix.latLong);
+
+      for ( const fixture of fixturesToDraw.reverse() ) {
+
          const weeks = this.weeksAhead( fixture.date );
 
          const MaxNumberedWeeks = 5;
@@ -145,7 +148,6 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       };
 
       this._fixtureMarkers.setStyle( fixtureStyle );
-
    }
 
    selectFeature( fixtureMarker: FixtureMarker ) {
@@ -179,9 +181,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
       const layers = this._fixtureMarkers.getLayers() as FixtureMarker[];
 
-      const found = layers.find( fixtureMarker => {
-         return ( fixtureMarker.fixture === fixture );
-      } );
+      const found = layers.find( fixtureMarker => fixtureMarker.fixture === fixture );
 
       if ( found && found !== this._selectedFixtureMarker ) {
          this.selectFeature( found );

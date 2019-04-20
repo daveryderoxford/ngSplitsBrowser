@@ -4,7 +4,7 @@ import { AngularFireStorage } from "@angular/fire/storage";
 import { Fixture, LatLong } from 'app/model/fixture';
 import { UserDataService } from 'app/user/user-data.service';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, startWith, tap, switchMap } from 'rxjs/operators';
 
 export type FixtureWeekPeriod = "Saturday" | "Sunday" | "Weekday";
 
@@ -21,19 +21,20 @@ export class FixturesService {
       protected storage: AngularFireStorage,
       protected http: HttpClient ) {
 
-     // this.usd.userData().subscribe( user => {
-     //    if (user.postcode && user.postcode !== "") {
-     //       this.setPostcode( user.postcode );
-     //    }
-   //   } );
+      this.usd.userData().subscribe( user => {
+         if (user && user.postcode && user.postcode !== "") {
+            this.setPostcode( user.postcode );
+         }
+      } );
 
       this._weekPeriod.next( [ "Saturday", "Sunday", "Weekday" ] );
    }
 
    getFixtures(): Observable<Fixture[]> {
 
-      const obs = this.storage.ref( "./fixtures/uk" ).getDownloadURL().pipe(
-         switchMap( url => this.http.get<Fixture[]>( url )),
+      const obs = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
+         switchMap( url => this.http.get<Fixture[]>( url ) ),
+         startWith( [] ),
          catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
       );
 
@@ -67,7 +68,7 @@ export class FixturesService {
 
    private calcLatLong( postcode: string ): Observable<LatLong> {
       const obs = this.http.get<any>( "https://api.postcodes.io/postcodes/" + postcode).pipe(
-         catchError( this.handleError<LatLong>( 'FixturesService: Postcode location failed') ),
+         catchError( this.handleError<LatLong>( 'FixturesService: Postcode location failed', null) ),
          map( obj => {
             const l: LatLong = { lat: obj.result.latitude, lng: obj.result.longitude };
             return l;
@@ -89,12 +90,12 @@ export class FixturesService {
       return ( error: any ): Observable<T> => {
 
          // TODO: send the error to remote logging infrastructure
-         console.error("Fixture service: " + error ); // log to console instead
+         console.error(operation + error );
 
          // TODO: better job of transforming error for user consumption
        //  this.log( `${operation} failed: ${error.message}` );
 
-         // Let the app keep running by returning an empty result.
+         // Return default result.
          return of( result as T );
       };
    }
