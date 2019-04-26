@@ -152,7 +152,14 @@ export class Fixtures {
          const data = JSON.stringify( fixtures );
          // console.log( "Saving data file:" + data);
 
-         await file.save( data );
+         const options = {
+            gzip: true,
+            contentType: "application/json",
+            metadata: { cacheControl: "public, max-age=86400" }
+         };
+
+         await file.save( data, options );
+
       } catch ( e ) {
          console.error( "Fixtures: Error saving fixtures to clould storage: " + e );
          throw e;

@@ -5,6 +5,8 @@
 
 .table {
   width: 100%;
+  table-layout: fixed;
+
 }
 
 .nodata {
@@ -16,10 +18,20 @@
 }
 
 tr:hover {
-  background: rgb(235,235,235);
+  background: rgb(245,245,245);
 }
 
   .selected {
-      background: rgb(243, 234, 182);
+    background: rgb(225, 225, 225);
   }
+
+
+th, td {
+  overflow: hidden;
+  width: 200px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
 

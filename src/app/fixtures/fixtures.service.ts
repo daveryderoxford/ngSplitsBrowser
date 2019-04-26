@@ -1,12 +1,12 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AngularFireStorage } from "@angular/fire/storage";
 import { Fixture, LatLong } from 'app/model/fixture';
 import { UserDataService } from 'app/user/user-data.service';
+import { isPast, isToday, isFuture } from 'date-fns';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map, startWith, tap, switchMap } from 'rxjs/operators';
+import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
 
-export type FixtureWeekPeriod = "Saturday" | "Sunday" | "Weekday";
 
 @Injectable( {
    providedIn: 'root'
@@ -15,7 +15,6 @@ export class FixturesService {
 
    _postcode = new BehaviorSubject<string>( "TW182AB");
    _homeLocation = new BehaviorSubject<LatLong>( { lat: 51.509865, lng: -0.118092 } );
-   _weekPeriod = new BehaviorSubject<FixtureWeekPeriod[]>( [] );
 
    constructor ( protected usd: UserDataService,
       protected storage: AngularFireStorage,
@@ -26,19 +25,27 @@ export class FixturesService {
             this.setPostcode( user.postcode );
          }
       } );
-
-      this._weekPeriod.next( [ "Saturday", "Sunday", "Weekday" ] );
    }
 
    getFixtures(): Observable<Fixture[]> {
 
+      const httpOptions = { headers: new HttpHeaders( { 'Accept-Encoding': 'gzip' }) };
+
       const obs = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
-         switchMap( url => this.http.get<Fixture[]>( url ) ),
+         switchMap( url => this.http.get<Fixture[]>( url, httpOptions ) ),
+         map( fixtures => this.futureFixtures(fixtures) ),
          startWith( [] ),
          catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
       );
 
       return obs;
+   }
+
+   private futureFixtures( fixtures: Fixture[] ): Fixture[] {
+      return fixtures.filter( fix => {
+         const d = new Date( fix.date );
+         return isToday(d) || isFuture(d);
+      });
    }
 
    getPostcode(): Observable<string> {
@@ -56,14 +63,6 @@ export class FixturesService {
          this._postcode.next( postcode );
          this._homeLocation.next( latlong );
       });
-   }
-
-   getWeekPeriod(): Observable<FixtureWeekPeriod[]> {
-      return this._weekPeriod.asObservable();
-   }
-
-   setWeekPeriod( period: FixtureWeekPeriod[] ) {
-      this._weekPeriod.next( period );
    }
 
    private calcLatLong( postcode: string ): Observable<LatLong> {

@@ -4,6 +4,8 @@ import {
 } from '@angular/core';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
+import { format, differenceInCalendarDays } from 'date-fns';
+
 
 @Component( {
    selector: 'app-fixtures-grid',
@@ -14,7 +16,7 @@ import { LatLong } from 'app/model/fixture';
 } )
 export class FixturesGridComponent implements OnInit {
 
-   _selectedFixture: Fixture;
+   private _selectedFixture: Fixture;
 
    @Input() fixtures: Fixture[];
 
@@ -29,8 +31,7 @@ export class FixturesGridComponent implements OnInit {
 
    @ViewChildren( 'tableRows', { read: ViewContainerRef } ) rows: QueryList<ViewContainerRef>;
 
-   // displayedColumns = [ "date", "name", "club", "level", "distance", "location", "postcode" ];
-   displayedColumns = [ "date", "name", "club", "level", "distance", "location" ];
+   displayedColumns = [ "date", "distance", "name", "club", "level", "area", "location", "directions" ];
 
    constructor () { }
 
@@ -46,9 +47,26 @@ export class FixturesGridComponent implements OnInit {
       return ( this._selectedFixture === fixture );
    }
 
+   trackBy( index, fix: Fixture ) {
+      return fix ? fix.id : undefined;
+   }
+
    /** Reformat ISO date into displayed date string */
    dateString( date: string ) {
       // For the next week display days in the future
+      const d = new Date( date );
+
+      const daysFrom = differenceInCalendarDays( d, Date() );
+
+      if ( daysFrom > 7 ) {
+         return format( d, "ddd DD-MMM-YY");
+      } else if ( daysFrom <= 7 && daysFrom > 1 ) {
+         return "Next " + format( d, "ddd Do" );
+      } else if ( daysFrom === 1 ) {
+         return "Tommorow ";
+      } else if ( daysFrom === 0 ) {
+         return "Today ";
+      }
 
    }
 
@@ -62,27 +80,26 @@ export class FixturesGridComponent implements OnInit {
    }
 
    bingURL( fix: Fixture ): string {
-      if ( !fix.latLong || !fix.latLong.lat ) {
-         return "";
-      }
       return 'https://www.bing.com/maps/?cp=' + this.latLongStr( fix.latLong, '~' ) + "&lvl=15&style=s&sp=" +
-                           this.latLongStr( fix.latLong, '_' ) + "_" + fix.area;
+         this.latLongStr( fix.latLong, '_' ) + "_" + fix.area;
    }
 
    googleURL( fix: Fixture ): string {
-      return "https://www.google.com/maps/search/?api=1&query=" + this.latLongStr( fix.latLong ) + "&query_place_id=" + fix.area;
+      return "https://www.google.com/maps/search/?api=1&query=" +
+            this.latLongStr( fix.latLong ) + "&query_place_id=" + fix.area + "&zoom=10";
    }
 
    /** Returns URL for  directions between home location and area */
-   googleDirectonsURL(fix: Fixture ): string {
-      if ( !this.homeLocation || !fix.latLong ) {
+   googleDirectionsURL( fix: Fixture ): string {
+      if (!this.homeLocation ) {
          return "";
       }
-      return "https://www.google.com/maps/dir/?api=1&origin=" + this.latLongStr( this.homeLocation)
-                + "&destination= " + this.latLongStr(fix.latLong);
+
+      return "https://www.google.com/maps/dir/?api=1&origin=" + this.latLongStr( this.homeLocation )
+         + "&destination= " + this.latLongStr( fix.latLong );
    }
 
-   private latLongStr(loc: LatLong, seperator = ","): string {
+   private latLongStr( loc: LatLong, seperator = "," ): string {
       return loc.lat.toString() + seperator + loc.lng.toString();
    }
 
@@ -111,6 +128,8 @@ export class FixturesGridComponent implements OnInit {
          row.element.nativeElement.scrollIntoViewIfNeeded( true, { behavior: 'instant' } );
       }
    }
+
+
 
 }
 

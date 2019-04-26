@@ -1,0 +1,21 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+mat-button-toggle {
+  height:38px;
+  line-height: 38px;
+  padding: 0 5px;
+}
+    
+::ng-deep .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+  line-height: 35px !important;
+  padding: 0 5px !important;
+}
+
+mat-form-field {
+  margin-left: 2.5rem;
+  width: 100px;
+}

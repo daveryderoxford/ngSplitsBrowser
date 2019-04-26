@@ -43,7 +43,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       this.map = new Map( 'map' ).setView( londonLatLng, 9 );
 
       tileLayer( 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-         opacity: 0.75
+         opacity: 1.0
       } ).addTo( this.map );
 
       this._homeMarkers.addTo( this.map );
@@ -148,6 +148,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       };
 
       this._fixtureMarkers.setStyle( fixtureStyle );
+
    }
 
    selectFeature( fixtureMarker: FixtureMarker ) {

@@ -1,7 +1,13 @@
+<div class="container">
+  <div>
+    <mat-form-field appearance="fill">
+      <mat-label fontSi>Postcode</mat-label>
+      <input matInput [formControl]="postcodeFormControl" [value]="postcode" (keydown.enter)="postcodeEntered()">
+    </mat-form-field>
 
+    <button mat-button (click)="postcodeEntered()">Go</button>
+  </div>
 
-  <mat-form-field>
-      <input matInput placeholder="Post code" [formControl]="postcodeFormControl" [value]="postcode" (keydown.enter)="postcodeEntered()">
-  </mat-form-field>
+  <app-filter></app-filter>
 
-<button mat-button (click)="postcodeEntered()">Go</button>
+</div>

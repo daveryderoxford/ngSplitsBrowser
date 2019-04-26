@@ -40,6 +40,7 @@ import { FixturesMapComponent } from './fixtures/fixtures-map/fixtures-map.compo
 import { FixturesGridComponent } from './fixtures/fixtures-grid/fixtures-grid.component';
 import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
 import { FixturesOptionsComponent } from './fixtures/fixtures-options/fixtures-options.component';
+import { FilterComponent } from './fixtures/fixtures/filter/filter.component';
 
 @NgModule({
   declarations: [
@@ -70,6 +71,7 @@ import { FixturesOptionsComponent } from './fixtures/fixtures-options/fixtures-o
     FixturesGridComponent,
     FixturesComponent,
     FixturesOptionsComponent,
+    FilterComponent,
   ],
   entryComponents: [
     ResultsFoundDialogComponent
@@ -87,6 +89,7 @@ import { FixturesOptionsComponent } from './fixtures/fixtures-options/fixtures-o
     HttpClientModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  exports: [FilterComponent]
 })
 export class AppModule { }

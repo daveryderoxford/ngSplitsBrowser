@@ -1,22 +1,20 @@
+<div class=container>
+  <app-fixtures-options [postcode]="postcode | async" (postcodeChanged)="postcodeChanged($event)" class="top-right">
+  </app-fixtures-options>
 
-<app-fixtures-options [postcode]="postcode | async" (postcodeChanged)="postcodeChanged($event)"></app-fixtures-options>
   <as-split direction="vertical">
 
     <as-split-area>
-        <app-fixtures-map [fixtures]="fixtures" 
-                         [homeLocation]="homeLocation | async"
-                         [selectedFixture]="selectedFixture" 
-                         (fixtureSelected)="onFeatureSelected($event)"> 
-        </app-fixtures-map>
+      <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation | async" [selectedFixture]="selectedFixture"
+        (fixtureSelected)="onFeatureSelected($event)">
+      </app-fixtures-map>
     </as-split-area>
 
     <as-split-area>
-      <app-fixtures-grid [fixtures]="fixtures" 
-                        [homeLocation]="homeLocation | async"
-                        [selectedFixture]="selectedFixture"
-                        (fixtureSelected)="onFeatureSelected($event)">
+      <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation | async" [selectedFixture]="selectedFixture"
+        (fixtureSelected)="onFeatureSelected($event)">
       </app-fixtures-grid>
     </as-split-area>
 
   </as-split>
-  
+</div>

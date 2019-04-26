@@ -25,7 +25,7 @@ export class PostCodeLookup {
          const response = await this.httpRequest( "postcodes?filter=longitude,latitude", postData );
 
          const result = response.result.map( res => {
-            if ( !res.result || res.result.length === 0 ) {
+            if ( !res.result ||  res.result.latitude === null) {
                // console.log( "Postcode: Failed to convert postcode " + res.query );
                return null;
             }

@@ -48,6 +48,7 @@ export class UserComponent implements OnInit {
       surname: [""],
       club: [""],
       nationality: [""],
+      postcode: [ "" ],
       nationalId: [""],
       autoFind: [""],
       ecards: this.formBuilder.array([])
@@ -82,6 +83,7 @@ export class UserComponent implements OnInit {
         surname: userData.surname,
         club: userData.club,
         nationality: userData.nationality,
+        postcode: userData.postcode,
         nationalId: userData.nationalId,
         autoFind: userData.autoFind,
         ecards: [],
@@ -136,7 +138,7 @@ export class UserComponent implements OnInit {
     );
   }
 
-  /** Returns found results that are not alreday in the users results based on ecardId and type  */
+  /** Returns found results that are not already in the users results based on ecardId and type  */
   removeAlreadyInUserResults(foundResults: UserResult[], allResults: UserResult[]): UserResult[] {
 
     for (const userResult of allResults) {
@@ -184,7 +186,7 @@ export class UserComponent implements OnInit {
       }
     }
 
-    /** TO DO do we want to search by ecard as well?
+    /** TO DO do we want to search by name as well?
     if (
       !originalUser ||
       originalUser.firstName !== updatedUser.firstName ||
