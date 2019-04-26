@@ -1,5 +1,7 @@
-import { ascending as d3_ascending, max as d3_max, min as d3_min, range as d3_range,
-         transpose as d3_transpose, zip as d3_zip } from "d3-array";
+import {
+   ascending as d3_ascending, max as d3_max, min as d3_min, range as d3_range,
+   transpose as d3_transpose, zip as d3_zip
+} from "d3-array";
 import { map as d3_map, Map as d3_Map } from "d3-collection";
 import { Course } from ".";
 import { ChartType } from "../graph/splitsbrowser/chart-types";
@@ -14,13 +16,13 @@ export interface FatestSplitsData {
    split: sbTime;  // Split time
 }
 export interface ChartData {
-         dataColumns: {x: any, ys: any}[];
-         competitorNames: string[];
-         numControls: number;
-         xExtent: number[];
-         yExtent: number[];
-         dubiousTimesInfo: {start: number, end: number}[][];
-      }
+   dataColumns: { x: any, ys: any }[];
+   competitorNames: string[];
+   numControls: number;
+   xExtent: number[];
+   yExtent: number[];
+   dubiousTimesInfo: { start: number, end: number }[][];
+}
 
 export class CourseClassSet {
    allCompetitors: Array<Competitor>;
@@ -84,8 +86,6 @@ export class CourseClassSet {
    public hasDubiousData(): boolean {
       return this.classes.some((courseClass) => courseClass.hasDubiousData);
    }
-
-
 
    /**
    * Returns an array of the cumulative times of the winner of the set of
@@ -385,7 +385,7 @@ export class CourseClassSet {
                   start: indexPair.start - controlIndexAdjust, end: indexPair.end - controlIndexAdjust
                };
             });
-      }, this);
+      });
 
       const cumulativeTimesByControl = d3_transpose(selectedCompetitorData);
       const xData = (chartType.skipStart) ? referenceCumTimes.slice(1) : referenceCumTimes;
@@ -442,7 +442,7 @@ export class CourseClassSet {
 
       // Now construct a map that maps from source value to rank.
       // TODO - Check this section DKR was  var rankMap = new d3_map();
-      const rankMap = d3_map() as d3_Map<number>;
+      const rankMap = d3_map<number>() as d3_Map<number>;
       sortedData.forEach((value: number, index: number) => {
          if (!rankMap.has(value.toString())) {
             rankMap.set(value.toString(), index + 1);
