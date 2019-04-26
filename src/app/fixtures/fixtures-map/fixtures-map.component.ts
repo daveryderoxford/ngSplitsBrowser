@@ -40,7 +40,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
       const londonLatLng = { lat: 51.509865, lng: -0.118092 };
 
-      this.map = new Map( 'map' ).setView( londonLatLng, 9 );
+      this.map = new Map( 'map', { preferCanvas: true } ).setView( londonLatLng, 9 );
 
       tileLayer( 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
          opacity: 1.0
