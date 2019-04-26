@@ -51,7 +51,7 @@ export class UserComponent implements OnInit {
       postcode: [ "" ],
       nationalId: [""],
       autoFind: [""],
-      ecards: this.formBuilder.array([])
+      ecards: this.formBuilder.array([]) as FormArray
     });
   }
 
@@ -109,6 +109,10 @@ export class UserComponent implements OnInit {
   removeEcard(i: number) {
     // remove address from the list
     this._ecardsControl().removeAt(i);
+  }
+
+  ecardControls() {
+    return this.userForm.get('ecards')['controls'];
   }
 
 

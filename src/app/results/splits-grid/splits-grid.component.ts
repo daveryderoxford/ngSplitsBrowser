@@ -10,7 +10,7 @@ import { ResultsSelectionService } from "../results-selection.service";
 @Component({
    selector: "app-splits-grid",
    templateUrl: "./splits-grid.component.html",
-   styleUrls: ["./splits-grid.component.scss"]
+   styleUrls: ["./splits-grid.component.scss"],
 })
 export class SplitsGridComponent implements OnInit {
    results: Results;
@@ -43,7 +43,6 @@ export class SplitsGridComponent implements OnInit {
       this.rs.selectedCourse.subscribe(course => this.selectedCourseUpdated(course));
       this.rs.selectedClass.subscribe(oclass => this.selectedClassUpdated(oclass));
 
-
       // Update results seelction when user changed form controls
       this.classSelect.valueChanges.subscribe( (courseClass: CourseClass) => {
          this.rs.selectClass(courseClass);
@@ -71,7 +70,7 @@ export class SplitsGridComponent implements OnInit {
       }
    }
 
-   selectedClassUpdated(oclass) {
+   selectedClassUpdated(oclass: CourseClass) {
 
       this.oclass = oclass;
 
@@ -85,7 +84,8 @@ export class SplitsGridComponent implements OnInit {
 
    /** Returns color om a red/green color scale for a given percentage along the scale */
    private colorScale(percent: number): string {
-      let r, g = 0;
+      let r = 0;
+      let g = 0;
       let b = 0;
       if (percent < 50) {
          r = 255;

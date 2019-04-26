@@ -59,8 +59,7 @@
                </button>
            </div>
 
-
-            <div formArrayName="ecards" *ngFor="let ecard of userForm.controls['ecards'].controls; let i = index;">
+            <div formArrayName="ecards" *ngFor="let ecard of userForm.get('ecards')['controls']; let i = index;">
 
               <div [formGroupName]="i" fxFlexLayout=row fxLayoutAlign="space-between">
 

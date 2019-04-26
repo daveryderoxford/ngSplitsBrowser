@@ -71,11 +71,11 @@ export class Repairer {
     * @sb-param {Event} eventData - The event data to repair.
     */
     static transferCompetitorData(resultsData: Results): void {
-        resultsData.classes.forEach(function (courseClass) {
-            courseClass.competitors.forEach(function (competitor) {
+        for ( const courseClass of resultsData.classes ) {
+            for (const competitor of courseClass.competitors ) {
                 competitor.setRepairedCumulativeTimes(competitor.getAllOriginalCumulativeTimes());
-            });
-        });
+            }
+        }
     }
 
     /**
@@ -223,9 +223,10 @@ export class Repairer {
     */
     private repairCourseClass(courseClass: CourseClass): void {
         this.madeAnyChanges = false;
-        courseClass.competitors.forEach(function (competitor) {
+
+        for (const competitor of courseClass.competitors) {
             this.repairCompetitor(competitor);
-        }, this);
+        }
 
         if (this.madeAnyChanges) {
             courseClass.recordHasDubiousData();
@@ -237,9 +238,10 @@ export class Repairer {
     * @sb-param {Results} eventData - The event data to repair.
     */
     private repairEventData(resultsData: Results): void {
-        resultsData.classes.forEach(function (courseClass) {
+
+        for (const courseClass of resultsData.classes) {
             this.repairCourseClass(courseClass);
-        }, this);
+        }
     }
 }
 
