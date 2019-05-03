@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
 import { Fixture, LatLong } from 'app/model/fixture';
-import { circle, Circle, CircleMarker, FeatureGroup, LayerGroup, Map, tileLayer, TooltipOptions } from "leaflet";
+import { circle, Circle, CircleMarker, FeatureGroup, LayerGroup, Map, tileLayer, TooltipOptions, control } from "leaflet";
 
 @Component( {
    selector: 'app-fixtures-map',
@@ -41,13 +41,13 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       const londonLatLng = { lat: 51.509865, lng: -0.118092 };
 
       this.map = new Map( 'map', { preferCanvas: true } ).setView( londonLatLng, 9 );
+      control.scale( { position: 'bottomleft'} ).addTo( this.map );
 
-      tileLayer( 'http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      tileLayer( 'https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
          opacity: 0.75
       } ).addTo( this.map );
 
       this._homeMarkers.addTo( this.map );
-      this._fixtureMarkers.addTo( this.map );
 
       this.setHomeLocation( londonLatLng );
       this.setFixtures( this._fixtures );
@@ -83,11 +83,15 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    setFixtures( fixtures: Fixture[] ) {
 
+      this._fixtureMarkers.removeFrom(this.map );
+
       this._fixtures = fixtures;
 
       if ( !this.map ) {
          return;
       }
+
+      this._fixtureMarkers.clearLayers();
 
       const fixturesToDraw = fixtures.filter( fix => fix.latLong);
 
@@ -148,6 +152,8 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       };
 
       this._fixtureMarkers.setStyle( fixtureStyle );
+      this._fixtureMarkers.addTo( this.map );
+
 
    }
 

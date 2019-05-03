@@ -41,7 +41,7 @@
   <ng-container matColumnDef="area">
     <th mat-header-cell *matHeaderCellDef> Area </th>
     <td mat-cell *matCellDef="let row">
-      <div *ngIf="row.latLong; then arealink else noarealink"></div>
+      <div *ngIf="row.latLong; then arealink else nolink"></div>
       <ng-template #arealink><a href="{{bingURL(row)}}" target="_blank">{{row.area}}</a></ng-template>
       <ng-template #nolink>{{row.area}}</ng-template>
     </td>
@@ -51,7 +51,7 @@
   <ng-container matColumnDef="location">
     <th mat-header-cell *matHeaderCellDef> Location </th>
     <td mat-cell *matCellDef="let row">
-      <div *ngIf="row.latLong; then arealink else noarealink"></div>
+      <div *ngIf="row.latLong; then arealink else nolink"></div>
       <ng-template #arealink>
           <a href={{googleURL(row)}} target="_blank"> {{row.postcode}} </a> 
       </ng-template>
@@ -69,6 +69,6 @@
 
   <!-- Header and Row Declarations -->
   <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row #tableRows *matRowDef="let row; columns: displayedColumns;" (click)=eventClicked(row)
+  <tr mat-row [hidden]="!flilterFixture(row)" #tableRows *matRowDef="let row; columns: displayedColumns;" (click)=eventClicked(row)
     [ngClass]="{ 'selected': selected(row) }"></tr>
 </table>

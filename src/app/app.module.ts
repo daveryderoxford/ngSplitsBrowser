@@ -40,7 +40,8 @@ import { FixturesMapComponent } from './fixtures/fixtures-map/fixtures-map.compo
 import { FixturesGridComponent } from './fixtures/fixtures-grid/fixtures-grid.component';
 import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
 import { FixturesOptionsComponent } from './fixtures/fixtures-options/fixtures-options.component';
-import { FilterComponent } from './fixtures/fixtures/filter/filter.component';
+import { GradeFilterComponent } from './fixtures/grade-filter-dialog/grade-filter-dialog.component';
+import { FixtureWeekFilterComponent } from './fixtures/fixtures-options/fixture-week-filter.component';
 
 @NgModule({
   declarations: [
@@ -71,10 +72,12 @@ import { FilterComponent } from './fixtures/fixtures/filter/filter.component';
     FixturesGridComponent,
     FixturesComponent,
     FixturesOptionsComponent,
-    FilterComponent,
+    GradeFilterComponent,
+    FixtureWeekFilterComponent,
   ],
   entryComponents: [
-    ResultsFoundDialogComponent
+    ResultsFoundDialogComponent,
+    GradeFilterComponent
   ],
   imports: [
     BrowserModule,
@@ -89,7 +92,6 @@ import { FilterComponent } from './fixtures/fixtures/filter/filter.component';
     HttpClientModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
   ],
-  bootstrap: [AppComponent],
-  exports: [FilterComponent]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

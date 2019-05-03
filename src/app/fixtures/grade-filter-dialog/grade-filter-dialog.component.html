@@ -1,0 +1,51 @@
+<h1 mat-dialog-title>Fixture Filter Options</h1>
+<div mat-dialog-content>
+
+   <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <table>
+         <tr>
+            <th> </th>
+            <th> Display </th>
+            <th> Distance </th>
+            <th> Time (months) </th>
+         </tr>
+
+         <tr formArrayName="items" *ngFor="let grade of grades; let i = index;">
+
+            <ng-container [formGroupName]="i">
+
+               <td style="align-left">
+                  {{grade}}
+               </td>
+
+               <td>
+                  <mat-checkbox formControlName="enabled"> </mat-checkbox>
+               </td>
+
+               <td>
+                  <mat-form-field>
+
+                     <input matInput formControlName="distance" type="number">
+                  </mat-form-field>
+               </td>
+
+               <td>
+                  <mat-form-field>
+                     <input matInput formControlName="time" type="number">
+                  </mat-form-field>
+               </td>
+
+            </ng-container>
+
+         </tr>
+
+      </table>
+
+   </form>
+
+   <div mat-dialog-actions>
+      <button mat-button mat-dialog-close>CANCEL</button>
+      <button mat-button type="submit" (click)="onSubmit()" cdkFocusInitial>OK</button>
+   </div>
+
+</div>

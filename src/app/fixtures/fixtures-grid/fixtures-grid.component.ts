@@ -4,7 +4,8 @@ import {
 } from '@angular/core';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
-import { format, differenceInCalendarDays } from 'date-fns';
+import { format, differenceInCalendarDays, isSaturday, isSunday, isWeekend, differenceInMonths } from 'date-fns';
+import { FixtureFilter } from '../fixtures-options/fixtures-options.component';
 
 
 @Component( {
@@ -18,6 +19,8 @@ export class FixturesGridComponent implements OnInit {
 
    private _selectedFixture: Fixture;
 
+   fixtures1 = [];
+
    @Input() fixtures: Fixture[];
 
    @Input() set selectedFixture( f: Fixture ) {
@@ -26,6 +29,8 @@ export class FixturesGridComponent implements OnInit {
    }
 
    @Input() homeLocation: LatLong;
+
+   @Input() flilter: FixtureFilter;
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
@@ -50,6 +55,30 @@ export class FixturesGridComponent implements OnInit {
    trackBy( index, fix: Fixture ) {
       return fix ? fix.id : undefined;
    }
+
+   flilterFixture( fix: Fixture ): boolean {
+      const fiilter = this.flilter;
+      
+         const fixdate = new Date( fix.date );
+
+         const timeOK = ( isSaturday( fixdate ) && fiilter.time.sat === true ) ||
+            ( isSunday( fixdate ) && fiilter.time.sun === true ) ||
+            ( !isWeekend( fixdate ) && fiilter.time.weekday === true );
+
+         let gradeOK: boolean;
+         if ( fiilter.gradesEnabled ) {
+            const f = fiilter.grades.find( ( g ) => fix.grade === g.name );
+            gradeOK = f.enabled &&
+               ( differenceInMonths( new Date(), fixdate ) <= f.time );
+            // fix.distance < f.distance &&
+         } else {
+            gradeOK = true;
+         }
+
+         return timeOK && gradeOK;
+
+   }
+
 
    /** Reformat ISO date into displayed date string */
    dateString( date: string ) {

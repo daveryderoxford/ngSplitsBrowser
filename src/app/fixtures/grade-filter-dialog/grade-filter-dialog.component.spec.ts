@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FilterComponent } from './filter.component';
+import { GradeFilterComponent } from './grade-filter-dialog.component';
 
 describe('FilterComponent', () => {
-  let component: FilterComponent;
-  let fixture: ComponentFixture<FilterComponent>;
+  let component: GradeFilterComponent;
+  let fixture: ComponentFixture<GradeFilterComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FilterComponent ]
+      declarations: [ GradeFilterComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FilterComponent);
+    fixture = TestBed.createComponent(GradeFilterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

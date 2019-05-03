@@ -1,6 +1,6 @@
 <div class="container">
   <div>
-    <mat-form-field appearance="fill">
+    <mat-form-field appearance="outline">
       <mat-label>Postcode</mat-label>
       <input matInput [formControl]="postcodeFormControl" [value]="postcode" (keydown.enter)="postcodeEntered()">
     </mat-form-field>
@@ -8,6 +8,14 @@
     <button mat-button (click)="postcodeEntered()">Go</button>
   </div>
 
-  <app-filter></app-filter>
+  <app-fixture-week-filter [timeFilter]="filter.time" (filterChanged)="timeFilterChanged($event)">
+  </app-fixture-week-filter>
+
+  <div>
+
+    <mat-slide-toggle labelPosition=before [checked]="filter.gradesEnabled" [formControl]="gradesEnabledControl">Hide far events</mat-slide-toggle>
+    <button mat-button  (click)="displayGrades()">Options</button>
+
+  </div>
 
 </div>
