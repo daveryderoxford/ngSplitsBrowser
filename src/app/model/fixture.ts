@@ -21,4 +21,6 @@ export interface Fixture {
      webpage: string;
      nearestTown: string;
      association: string;
+     distance?: number;
+     hidden?: boolean;
 }

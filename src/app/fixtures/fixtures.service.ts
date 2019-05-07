@@ -1,51 +1,115 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AngularFireStorage } from "@angular/fire/storage";
+import { EventGrades } from 'app/model';
 import { Fixture, LatLong } from 'app/model/fixture';
+import { FixtureFilter, GradeFilter } from 'app/model/fixture-filter';
 import { UserDataService } from 'app/user/user-data.service';
-import { isPast, isToday, isFuture } from 'date-fns';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { catchError, map, startWith, switchMap, tap } from 'rxjs/operators';
-
+import { differenceInMonths, isFuture, isSaturday, isSunday, isToday, isWeekend } from 'date-fns';
+import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
+import { catchError, map, share, startWith, switchMap, tap } from 'rxjs/operators';
+import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable( {
    providedIn: 'root'
 } )
 export class FixturesService {
 
-   _postcode = new BehaviorSubject<string>( "TW182AB");
+   _postcode = new BehaviorSubject<string>( "" );
    _homeLocation = new BehaviorSubject<LatLong>( { lat: 51.509865, lng: -0.118092 } );
 
-   constructor ( protected usd: UserDataService,
+   _filter$ = new BehaviorSubject<FixtureFilter>( {
+      time: { sat: true, sun: true, weekday: true },
+      gradesEnabled: true,
+      grades: this.makeDefaultGrades()
+   } );
+
+   constructor (
+      private afAuth: AngularFireAuth,
+      protected usd: UserDataService,
       protected storage: AngularFireStorage,
       protected http: HttpClient ) {
 
-      this.usd.userData().subscribe( user => {
-         if (user && user.postcode && user.postcode !== "") {
+      this.afAuth.authState.pipe(
+         switchMap( () => this.usd.userData() )
+      ).subscribe( user => {
+         if ( user.postcode && user.postcode !== "" ) {
             this.setPostcode( user.postcode );
          }
-      } );
+         if ( user.fixtureGradeFilters ) {
+            const newFilter: FixtureFilter = Object.assign( {}, this._filter$.value );
+            newFilter.grades = user.fixtureGradeFilters;
+            this.setFilter( newFilter );
+         }
+      });
    }
 
    getFixtures(): Observable<Fixture[]> {
 
-      const httpOptions = { headers: new HttpHeaders( { 'Accept-Encoding': 'gzip' }) };
+      const httpOptions = { headers: new HttpHeaders( { 'Accept-Encoding': 'gzip' } ) };
 
-      const obs = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
+      const fileContents: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
          switchMap( url => this.http.get<Fixture[]>( url, httpOptions ) ),
-         map( fixtures => this.futureFixtures(fixtures) ),
+         map( fixtures => this.futureFixtures( fixtures ) ),
          startWith( [] ),
          catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
       );
 
-      return obs;
+      const fixturesWithDistance = combineLatest( [ fileContents, this._homeLocation ] ).pipe(
+         map( ( [ fixtures, loc ] ) => {
+            const n = fixtures.map( fix => {
+               fix.distance = this.distanceFromHome( fix, loc );
+               return fix;
+            } );
+            return n;
+         }
+         ),
+         share()
+      );
+
+      const fixturesObs = combineLatest( [ fixturesWithDistance, this._filter$ ] ).pipe(
+         map( ( [ fixtures, filter ] ) => {
+            const n = fixtures.map( fix => {
+               fix.hidden = this.isHidden( fix, filter );
+               return fix;
+            } );
+            return n;
+         }
+         ),
+         share()
+      );
+
+      return fixturesObs;
    }
 
    private futureFixtures( fixtures: Fixture[] ): Fixture[] {
       return fixtures.filter( fix => {
          const d = new Date( fix.date );
-         return isToday(d) || isFuture(d);
-      });
+         return isToday( d ) || isFuture( d );
+      } );
+   }
+
+   private isHidden( fix: Fixture, filter: FixtureFilter ): boolean {
+
+      const fixdate = new Date( fix.date );
+
+      const timeOK = ( isSaturday( fixdate ) && filter.time.sat === true ) ||
+         ( isSunday( fixdate ) && filter.time.sun === true ) ||
+         ( !isWeekend( fixdate ) && filter.time.weekday === true );
+
+      let gradeOK: boolean;
+      if ( filter.gradesEnabled ) {
+         const gradeFilter = filter.grades.find( ( g ) => fix.grade === g.name );
+
+         gradeOK = gradeFilter.enabled &&
+            differenceInMonths( fixdate, new Date() ) <= gradeFilter.time &&
+            fix.distance < gradeFilter.distance;
+      } else {
+         gradeOK = true;
+      }
+
+      return !timeOK || !gradeOK;
+
    }
 
    getPostcode(): Observable<string> {
@@ -59,24 +123,72 @@ export class FixturesService {
    setPostcode( postcode: string ) {
 
       this.calcLatLong( postcode )
-      .subscribe( latlong => {
-         this._postcode.next( postcode );
-         this._homeLocation.next( latlong );
-      });
+         .subscribe( latlong => {
+            this._postcode.next( postcode );
+            this._homeLocation.next( latlong );
+         } );
+   }
+
+   setFilter( filter: FixtureFilter ) {
+      this._filter$.next( filter );
+   }
+
+   getFilter(): Observable<FixtureFilter> {
+      return this._filter$.asObservable();
+   }
+
+   private makeDefaultGrades(): GradeFilter[] {
+      const filters = [];
+      for ( const grade of EventGrades.grades ) {
+         const filter: GradeFilter = {
+            name: grade,
+            enabled: true,
+            distance: 100,
+            time: 2
+         };
+         filters.push( filter );
+      }
+      return ( filters );
    }
 
    private calcLatLong( postcode: string ): Observable<LatLong> {
-      const obs = this.http.get<any>( "https://api.postcodes.io/postcodes/" + postcode).pipe(
-         catchError( this.handleError<LatLong>( 'FixturesService: Postcode location failed', null) ),
+      const obs = this.http.get<any>( "https://api.postcodes.io/postcodes/" + postcode ).pipe(
+         catchError( this.handleError<LatLong>( 'FixturesService: Postcode location failed', null ) ),
          map( obj => {
             const l: LatLong = { lat: obj.result.latitude, lng: obj.result.longitude };
             return l;
-            }
+         }
          ),
-         tap( obj => console.log("FixturesService::  lat: " + obj.lat +  "long: " + obj.lng))
+         tap( obj => console.log( "FixturesService::  lat: " + obj.lat + "long: " + obj.lng ) )
       );
 
       return obs;
+   }
+
+   private getDistanceFromLatLonInKm( pos1: LatLong, pos2: LatLong ): number {
+      const R = 6371; // Radius of the earth in km
+      const dLat = this.deg2rad( pos2.lat - pos1.lat );  // deg2rad below
+      const dLon = this.deg2rad( pos2.lng - pos1.lng );
+      const a =
+         Math.sin( dLat / 2 ) * Math.sin( dLat / 2 ) +
+         Math.cos( this.deg2rad( pos1.lat ) ) * Math.cos( this.deg2rad( pos2.lat ) ) *
+         Math.sin( dLon / 2 ) * Math.sin( dLon / 2 );
+      const c = 2 * Math.atan2( Math.sqrt( a ), Math.sqrt( 1 - a ) );
+      const d = R * c; // Distance in km
+      return d;
+   }
+
+   private deg2rad( deg: number ): number {
+      return deg * ( Math.PI / 180 );
+   }
+
+   distanceFromHome( fix: Fixture, home: LatLong ): number {
+      const kmToMiles = 0.62137119224;
+      if ( !home || !fix.latLong ) {
+         return -1;
+      }
+      const dist = this.getDistanceFromLatLonInKm( home, fix.latLong );
+      return Math.round( dist * kmToMiles );
    }
 
    /**
@@ -89,10 +201,10 @@ export class FixturesService {
       return ( error: any ): Observable<T> => {
 
          // TODO: send the error to remote logging infrastructure
-         console.error(operation + error );
+         console.error( operation + error );
 
          // TODO: better job of transforming error for user consumption
-       //  this.log( `${operation} failed: ${error.message}` );
+         //  this.log( `${operation} failed: ${error.message}` );
 
          // Return default result.
          return of( result as T );

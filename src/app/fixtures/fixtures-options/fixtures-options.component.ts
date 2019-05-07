@@ -1,20 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, SimpleChanges } from '@angular/core';
 import { Fixture, EventGrade } from 'app/model';
 import { FormControl, Validators } from '@angular/forms';
-import { FixtureTimeFilter } from './fixture-week-filter.component';
-import { EventGrades } from '../../../../firebase/functions/lib/model/oevent';
 import { combineLatest, BehaviorSubject } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
+import { map, startWith, debounceTime } from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
 import { GradeFilterComponent } from '../grade-filter-dialog/grade-filter-dialog.component';
+import { GradeFilter, FixtureFilter, FixtureTimeFilter } from 'app/model/fixture-filter';
 
-export interface GradeFilter { name: string; enabled: boolean; distance: number; time: number; }
-
-export interface FixtureFilter {
-   time: FixtureTimeFilter;
-   gradesEnabled: boolean;
-   grades: GradeFilter[];
-}
 
 @Component( {
    selector: 'app-fixtures-options',
@@ -45,7 +37,7 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
       this.gradeOptions$ = new BehaviorSubject( this.filter.grades );
 
       combineLatest( this.timeFilter$,
-                     this.gradesEnabledControl.valueChanges.pipe(startWith( this.filter.gradesEnabled )),
+         this.gradesEnabledControl.valueChanges.pipe( startWith( this.filter.gradesEnabled )),
                      this.gradeOptions$ ).subscribe( ( [ time, gradeEnabled, gradeOptions ] ) => {
          const filter = {
             time: time,

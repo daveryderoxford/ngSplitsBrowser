@@ -1,9 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-export interface FixtureTimeFilter {
-   sat: boolean;
-   sun: boolean;
-   weekday: boolean;
-}
+import { FixtureTimeFilter } from 'app/model/fixture-filter';
 
 @Component( {
    selector: 'app-fixture-week-filter',

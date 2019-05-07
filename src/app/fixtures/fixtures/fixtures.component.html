@@ -1,21 +1,23 @@
-<div class=container>
-  <app-fixtures-options class="top-right" [postcode]="postcode | async" (postcodeChanged)="postcodeChanged($event)" 
-                       [filter]="filter$ | async" (filterChanged)="filterChanged($event)">
-  </app-fixtures-options>
 
-  <as-split direction="vertical">
+  <div class=container>
+    <app-fixtures-options class="top-right" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)"
+      [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)">
+    </app-fixtures-options>
 
-    <as-split-area>
-      <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation | async" [selectedFixture]="selectedFixture"
-        (fixtureSelected)="onFeatureSelected($event)">
-      </app-fixtures-map>
-    </as-split-area>
+    <as-split direction="vertical">
 
-    <as-split-area>
-      <app-fixtures-grid [fixtures]="fixtures1" [homeLocation]="homeLocation | async" [flilter]="filter$ | async" [selectedFixture]="selectedFixture"
-        (fixtureSelected)="onFeatureSelected($event)">
-      </app-fixtures-grid>
-    </as-split-area>
+      <as-split-area>
+        <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
+          [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
+        </app-fixtures-map>
+      </as-split-area>
 
-  </as-split>
-</div>
+      <as-split-area>
+        <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
+          [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
+        </app-fixtures-grid>
+      </as-split-area>
+
+    </as-split>
+  </div>
+

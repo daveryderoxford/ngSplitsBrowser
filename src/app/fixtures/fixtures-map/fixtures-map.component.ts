@@ -1,6 +1,9 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, ChangeDetectionStrategy } from '@angular/core';
+import {
+   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
+   EventEmitter, Input, OnInit, Output, ViewEncapsulation
+} from '@angular/core';
 import { Fixture, LatLong } from 'app/model/fixture';
-import { circle, Circle, CircleMarker, FeatureGroup, LayerGroup, Map, tileLayer, TooltipOptions, control } from "leaflet";
+import { circle, Circle, CircleMarker, control, FeatureGroup, Map, tileLayer, TooltipOptions } from "leaflet";
 
 @Component( {
    selector: 'app-fixtures-map',
@@ -34,14 +37,14 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    map: Map = null;
 
-   constructor () { }
+   constructor ( private ref: ChangeDetectorRef ) { }
 
    ngOnInit() {
 
       const londonLatLng = { lat: 51.509865, lng: -0.118092 };
 
       this.map = new Map( 'map', { preferCanvas: true } ).setView( londonLatLng, 9 );
-      control.scale( { position: 'bottomleft'} ).addTo( this.map );
+      control.scale( { position: 'bottomleft' } ).addTo( this.map );
 
       tileLayer( 'https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
          opacity: 0.75
@@ -74,16 +77,15 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
          weight: 6,
          opacity: 0.08,
          fill: false
-      });
+      } );
 
-      if (this.map) {
+      if ( this.map ) {
          this.map.panTo( latLng );
       }
    }
 
    setFixtures( fixtures: Fixture[] ) {
 
-      this._fixtureMarkers.removeFrom(this.map );
 
       this._fixtures = fixtures;
 
@@ -91,58 +93,65 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
          return;
       }
 
+      this.ref.detach();
+
+      this._fixtureMarkers.removeFrom( this.map );
+
       this._fixtureMarkers.clearLayers();
 
-      const fixturesToDraw = fixtures.filter( fix => fix.latLong);
+      const fixturesToDraw = fixtures.filter( fix => fix.latLong );
 
       for ( const fixture of fixturesToDraw.reverse() ) {
 
-         const weeks = this.weeksAhead( fixture.date );
+         if ( !fixture.hidden ) {
 
-         const MaxNumberedWeeks = 5;
-         const MinRadius = 6;
+            const weeks = this.weeksAhead( fixture.date );
 
-         let radius: number;
-         let label: string;
-         if ( weeks <= MaxNumberedWeeks ) {
-            radius = MinRadius + ( MaxNumberedWeeks - weeks );
-            label = ( weeks + 1 ).toString();
-         } else {
-            radius = MinRadius;
-            label = "";
-         }
+            const MaxNumberedWeeks = 5;
+            const MinRadius = 6;
 
-         const c = new FixtureMarker( fixture.latLong, {
-            radius: radius,
-            fillColor: this.getColour( weeks ),
-            color: "#000000"
-         } );
-
-         c.fixture = fixture;
-
-         // Tooltip in centre of circle
-         if ( label !== "" ) {
-            const tooltipOptions: TooltipOptions = {
-               permanent: true,
-               direction: 'center',
-               className: 'text',
-            };
-            c.bindTooltip( label, tooltipOptions );
-         }
-
-         c.on( {
-            click: evt => {
-               const fixtureMarker: FixtureMarker = evt.target;
-
-               if ( fixtureMarker !== this._selectedFixtureMarker ) {
-                  this.selectFeature( fixtureMarker );
-                  this.fixtureSelected.emit( fixtureMarker.fixture );
-
-               }
+            let radius: number;
+            let label: string;
+            if ( weeks <= MaxNumberedWeeks ) {
+               radius = MinRadius + ( MaxNumberedWeeks - weeks );
+               label = ( weeks + 1 ).toString();
+            } else {
+               radius = MinRadius;
+               label = "";
             }
-         } );
 
-         this._fixtureMarkers.addLayer( c );
+            const c = new FixtureMarker( fixture.latLong, {
+               radius: radius,
+               fillColor: this.getColour( weeks ),
+               color: "#000000"
+            } );
+
+            c.fixture = fixture;
+
+            // Tooltip in centre of circle
+            if ( label !== "" ) {
+               const tooltipOptions: TooltipOptions = {
+                  permanent: true,
+                  direction: 'center',
+                  className: 'text',
+               };
+               //    c.bindTooltip( label, tooltipOptions );
+            }
+
+            c.on( {
+               click: evt => {
+                  const fixtureMarker: FixtureMarker = evt.target;
+
+                  if ( fixtureMarker !== this._selectedFixtureMarker ) {
+                     this.selectFeature( fixtureMarker );
+                     this.fixtureSelected.emit( fixtureMarker.fixture );
+
+                  }
+               }
+            } );
+
+            this._fixtureMarkers.addLayer( c );
+         }
       }
 
       const fixtureStyle = {
@@ -154,6 +163,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       this._fixtureMarkers.setStyle( fixtureStyle );
       this._fixtureMarkers.addTo( this.map );
 
+      this.ref.reattach();
 
    }
 
@@ -188,7 +198,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
       const layers = this._fixtureMarkers.getLayers() as FixtureMarker[];
 
-      const found = layers.find( fixtureMarker => fixtureMarker.fixture === fixture );
+      const found = layers.find( fixtureMarker => fixture && fixtureMarker.fixture.id === fixture.id );
 
       if ( found && found !== this._selectedFixtureMarker ) {
          this.selectFeature( found );

@@ -37,11 +37,12 @@ import { ResultsViewButtonComponent } from './results/results-navbar/results-vie
 import { CompareWithComponent } from './results/results-navbar/compare-with.component';
 import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-button.component';
 import { FixturesMapComponent } from './fixtures/fixtures-map/fixtures-map.component';
-import { FixturesGridComponent } from './fixtures/fixtures-grid/fixtures-grid.component';
+import { FixturesGridComponent, FixtureDatePipe } from './fixtures/fixtures-grid/fixtures-grid.component';
 import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
 import { FixturesOptionsComponent } from './fixtures/fixtures-options/fixtures-options.component';
 import { GradeFilterComponent } from './fixtures/grade-filter-dialog/grade-filter-dialog.component';
 import { FixtureWeekFilterComponent } from './fixtures/fixtures-options/fixture-week-filter.component';
+
 
 @NgModule({
   declarations: [
@@ -70,6 +71,7 @@ import { FixtureWeekFilterComponent } from './fixtures/fixtures-options/fixture-
     ClassMenuButtonComponent,
     FixturesMapComponent,
     FixturesGridComponent,
+    FixtureDatePipe,
     FixturesComponent,
     FixturesOptionsComponent,
     GradeFilterComponent,

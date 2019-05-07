@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
-import { GradeFilter } from 'app/fixtures/fixtures-options/fixtures-options.component';
-import { EventGrade, EventGrades } from 'app/model';
+import { EventGrades } from 'app/model';
+import { GradeFilter } from 'app/model/fixture-filter';
 
 
 @Component( {
