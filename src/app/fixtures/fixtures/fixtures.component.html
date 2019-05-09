@@ -1,6 +1,6 @@
 
-  <div class=container>
-    <app-fixtures-options class="top-right" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)"
+  <div class=large-screen>
+    <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)"
       [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)">
     </app-fixtures-options>
 
@@ -20,4 +20,27 @@
 
     </as-split>
   </div>
+
+  <div class=handset>
+    <div class="mat-elevation-z2">
+      <button mat-button>MENU</button>
+      <button mat-button (click)="hideMobleFilter = !hideMobleFilter">FILTER </button>
+    </div>
+
+    <app-fixtures-options [hidden]="hideMobleFilter" class="top-right mat-elevation-z2" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)"
+    [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)">
+  </app-fixtures-options>
+  
+      <mat-list>
+          <mat-list-item [hidden]="fixture.hidden" *ngFor="let fixture of fixtures">
+            <h3 matLine> {{fixture.date | fixturedate }} {{fixture.club}} </h3>
+            <p matLine> {{fixture.name}} <p>
+            <h3 matLine> {{fixture.location}} </h3>
+            <mat-divider></mat-divider>
+          </mat-list-item>
+        </mat-list>
+
+  </div>
+
+  
 
