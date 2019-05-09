@@ -21,6 +21,7 @@ export class FixturesComponent implements OnInit {
    fixtures: Fixture[];
    fixtures1: Fixture[] = [];
 
+   hideMobleFilter = false;
 
    constructor ( public fs: FixturesService ) { }
 

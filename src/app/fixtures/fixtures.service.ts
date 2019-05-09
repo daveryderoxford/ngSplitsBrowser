@@ -24,6 +24,8 @@ export class FixturesService {
       grades: this.makeDefaultGrades()
    } );
 
+   _userData =  this.afAuth.authState.pipe( switchMap( () => this.usd.userData() ));
+
    constructor (
       private afAuth: AngularFireAuth,
       protected usd: UserDataService,

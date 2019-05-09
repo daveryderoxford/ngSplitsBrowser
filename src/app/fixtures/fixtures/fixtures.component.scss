@@ -1,16 +1,34 @@
-.container {
-     width: 100%;
-     height: 100%;
-     position: relative;
+@media all and (max-width: 479px) { 
+  .large-screen {
+    display: none;
+  }
+
+  .handset {
+    width: 100%;
+    height: 100%;
+  }
+
 }
 
-/* Top right  */
-.top-right {
-  position: absolute;
-  top: 8px;
-  right: 16px;
-  z-index: 10000;
-  background: rgba(255, 255, 255, 1.0);
-  padding-top: 10px;
-  padding-left: 10px;
+@media all and (min-width: 480px) { 
+  .large-screen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .handset {
+    display: none;
+  }
+
+  /* Top right  */
+  .top-right {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+    z-index: 10000;
+    background: rgba(255, 255, 255, 1.0);
+    padding-top: 10px;
+    padding-left: 10px;
+  }
 }
