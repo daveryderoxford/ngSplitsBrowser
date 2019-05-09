@@ -185,7 +185,6 @@ export class UserDataService {
       ref => ref.where('ecard', '==', ecard.id).where('cctype', '==', ecard.type)).valueChanges();
   } */
 
-
   /** Find user results for the current user  */
   async findUserResults(ecard: ECard): Promise<UserResult[]> {
     //

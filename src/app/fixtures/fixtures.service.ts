@@ -7,7 +7,7 @@ import { FixtureFilter, GradeFilter } from 'app/model/fixture-filter';
 import { UserDataService } from 'app/user/user-data.service';
 import { differenceInMonths, isFuture, isSaturday, isSunday, isToday, isWeekend } from 'date-fns';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
-import { catchError, map, share, startWith, switchMap, tap } from 'rxjs/operators';
+import { catchError, map, share, startWith, switchMap, tap, filter } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable( {
@@ -15,7 +15,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 } )
 export class FixturesService {
 
-   _postcode = new BehaviorSubject<string>( "" );
+   _postcode = new BehaviorSubject<string>( "OX3 7EP" );
    _homeLocation = new BehaviorSubject<LatLong>( { lat: 51.509865, lng: -0.118092 } );
 
    _filter$ = new BehaviorSubject<FixtureFilter>( {
@@ -31,14 +31,16 @@ export class FixturesService {
       protected http: HttpClient ) {
 
       this.afAuth.authState.pipe(
-         switchMap( () => this.usd.userData() )
-      ).subscribe( user => {
-         if ( user.postcode && user.postcode !== "" ) {
-            this.setPostcode( user.postcode );
+         filter( user => user !== null ),    // Only handle login requests
+         switchMap( () => this.usd.userData() ),
+      ).subscribe( userdata => {
+         // TODO User data shoul;d always be not null here check
+         if ( userdata && userdata.postcode && userdata.postcode !== "" ) {
+            this.setPostcode( userdata.postcode );
          }
-         if ( user.fixtureGradeFilters ) {
+         if ( userdata && userdata.fixtureGradeFilters ) {
             const newFilter: FixtureFilter = Object.assign( {}, this._filter$.value );
-            newFilter.grades = user.fixtureGradeFilters;
+            newFilter.grades = userdata.fixtureGradeFilters;
             this.setFilter( newFilter );
          }
       });
@@ -68,9 +70,9 @@ export class FixturesService {
       );
 
       const fixturesObs = combineLatest( [ fixturesWithDistance, this._filter$ ] ).pipe(
-         map( ( [ fixtures, filter ] ) => {
+         map( ( [ fixtures, ftr ] ) => {
             const n = fixtures.map( fix => {
-               fix.hidden = this.isHidden( fix, filter );
+               fix.hidden = this.isHidden( fix, ftr );
                return fix;
             } );
             return n;
@@ -89,17 +91,17 @@ export class FixturesService {
       } );
    }
 
-   private isHidden( fix: Fixture, filter: FixtureFilter ): boolean {
+   private isHidden( fix: Fixture, ftr: FixtureFilter ): boolean {
 
       const fixdate = new Date( fix.date );
 
-      const timeOK = ( isSaturday( fixdate ) && filter.time.sat === true ) ||
-         ( isSunday( fixdate ) && filter.time.sun === true ) ||
-         ( !isWeekend( fixdate ) && filter.time.weekday === true );
+      const timeOK = ( isSaturday( fixdate ) && ftr.time.sat === true ) ||
+         ( isSunday( fixdate ) && ftr.time.sun === true ) ||
+         ( !isWeekend( fixdate ) && ftr.time.weekday === true );
 
       let gradeOK: boolean;
-      if ( filter.gradesEnabled ) {
-         const gradeFilter = filter.grades.find( ( g ) => fix.grade === g.name );
+      if ( ftr.gradesEnabled ) {
+         const gradeFilter = ftr.grades.find( ( g ) => fix.grade === g.name );
 
          gradeOK = gradeFilter.enabled &&
             differenceInMonths( fixdate, new Date() ) <= gradeFilter.time &&
@@ -129,8 +131,8 @@ export class FixturesService {
          } );
    }
 
-   setFilter( filter: FixtureFilter ) {
-      this._filter$.next( filter );
+   setFilter( f: FixtureFilter ) {
+      this._filter$.next( f );
    }
 
    getFilter(): Observable<FixtureFilter> {
@@ -140,13 +142,13 @@ export class FixturesService {
    private makeDefaultGrades(): GradeFilter[] {
       const filters = [];
       for ( const grade of EventGrades.grades ) {
-         const filter: GradeFilter = {
+         const f: GradeFilter = {
             name: grade,
             enabled: true,
             distance: 100,
             time: 2
          };
-         filters.push( filter );
+         filters.push( f );
       }
       return ( filters );
    }

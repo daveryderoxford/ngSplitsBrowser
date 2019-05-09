@@ -31,7 +31,6 @@ export class FixturesComponent implements OnInit {
       this.fs.getFixtures().subscribe( f =>  {
          this.fixtures = f;
       });
-
    }
 
    onFeatureSelected( fixture: Fixture ) {
@@ -45,7 +44,6 @@ export class FixturesComponent implements OnInit {
    filterChanged(filter: FixtureFilter) {
       this.fs.setFilter( filter);
    }
-
 }
 
 
