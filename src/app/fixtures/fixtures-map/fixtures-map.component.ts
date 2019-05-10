@@ -3,7 +3,11 @@ import {
    EventEmitter, Input, OnInit, Output, ViewEncapsulation
 } from '@angular/core';
 import { Fixture, LatLong } from 'app/model/fixture';
-import { circle, Circle, CircleMarker, control, FeatureGroup, Map, tileLayer, TooltipOptions } from "leaflet";
+import { circle, Circle, CircleMarker, control, FeatureGroup, Map, tileLayer, TooltipOptions, TileLayer } from "leaflet";
+
+class FixtureMarker extends CircleMarker {
+   fixture: Fixture;
+}
 
 @Component( {
    selector: 'app-fixtures-map',
@@ -37,6 +41,8 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    map: Map = null;
 
+   tileLayer: TileLayer;
+
    constructor ( private ref: ChangeDetectorRef ) { }
 
    ngOnInit() {
@@ -46,9 +52,13 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       this.map = new Map( 'map', { preferCanvas: true } ).setView( londonLatLng, 9 );
       control.scale( { position: 'bottomleft' } ).addTo( this.map );
 
-      tileLayer( 'https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      this.tileLayer = tileLayer( 'https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
          opacity: 0.75
-      } ).addTo( this.map );
+      } );
+      this.tileLayer.addTo( this.map );
+
+      this.map.createPane( 'fixtures' );
+      this.map.createPane( 'homemarkers' );
 
       this._homeMarkers.addTo( this.map );
 
@@ -64,28 +74,36 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    setHomeLocation( latLng: LatLong ) {
 
+      // TODO Can be called on  that is called before the map is created.
+      // not sure how to fix this.  Cant create map in constructor as element is not avaliable.
+      // Even ngChanges lifecycle s too early.  Also related to have to call in ngInit
+      if (!this.map) {
+         return;
+      }
+
       this._homeMarkers.clearLayers();
+
+      this.map.getPane( 'homemarkers' ).style.pointerEvents = 'none';
+      this.map.getPane( 'homemarkers' ).style.zIndex = '450';
 
       const MileToMeter = 1609.34;
 
       for ( const radius of [ 20, 40, 60, 80 ] ) {
-         this._homeMarkers.addLayer( circle( latLng, { radius: radius * MileToMeter } ) );
+         this._homeMarkers.addLayer( circle( latLng, { radius: radius * MileToMeter, pane: 'homemarkers' } ) );
       }
 
       this._homeMarkers.setStyle( {
          color: '#000000',
          weight: 6,
          opacity: 0.08,
-         fill: false
+         fill: false,
       } );
 
-      if ( this.map ) {
-         this.map.panTo( latLng );
-      }
+      this.map.panTo( latLng );
+
    }
 
    setFixtures( fixtures: Fixture[] ) {
-
 
       this._fixtures = fixtures;
 
@@ -94,6 +112,8 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       }
 
       this.ref.detach();
+
+      this.map.getPane( 'fixtures' ).style.zIndex = '600';
 
       this._fixtureMarkers.removeFrom( this.map );
 
@@ -123,7 +143,8 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
             const c = new FixtureMarker( fixture.latLong, {
                radius: radius,
                fillColor: this.getColour( weeks ),
-               color: "#000000"
+               color: "#000000",
+               pane: 'fixtures'
             } );
 
             c.fixture = fixture;
@@ -134,6 +155,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
                   permanent: true,
                   direction: 'center',
                   className: 'text',
+                  pane: 'fixtures'
                };
                //    c.bindTooltip( label, tooltipOptions );
             }
@@ -207,6 +229,4 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
    }
 }
 
-class FixtureMarker extends CircleMarker {
-   fixture: Fixture;
-}
+
