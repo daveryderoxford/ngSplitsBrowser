@@ -6,9 +6,9 @@ import { AppMaterialModule } from "./app-material.module";
 import { NavbarComponent } from "./components/navbar/navbar.component";
 import { SpinnerModule } from './components/spinner.module';
 import { DialogsModule } from "./dialogs/dialogs.module";
-import { AngularFireAuth } from "@angular/fire/auth";
 import { AppRoutingModule } from "../app-routing.module";
 import { AngularSplitModule } from 'angular-split';
+import { AngularFireAuthModule } from "@angular/fire/auth";
 
 @NgModule({
     imports: [
@@ -17,16 +17,19 @@ import { AngularSplitModule } from 'angular-split';
         SpinnerModule,
         AppMaterialModule,
         AppRoutingModule,
-        AngularSplitModule.forRoot()
+        AngularSplitModule.forRoot(),
     ],
-    declarations: [NavbarComponent],
+    declarations: [
+        NavbarComponent
+    ],
     exports: [
+        CommonModule,
+        AngularFireAuthModule,
         SpinnerModule,
         DialogsModule,
         AppMaterialModule,
         NavbarComponent,
         AngularSplitModule
     ],
-    providers: [AngularFireAuth]
 })
 export class SharedModule { }

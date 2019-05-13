@@ -24,25 +24,19 @@ import { EventsTableComponent } from './events/events-table/events-table.compone
 import { EventsViewComponent } from "./events/eventsview/events-view.component";
 import { MyEventsTabComponent } from './events/my-events-tab/my-events-tab.component';
 import { MyResultsTableComponent } from './events/my-results-table/my-results-table.component';
+import { FixturesModule } from './fixtures/fixtures.module';
 import { MainComponent } from "./main/main.component";
 import { GraphComponent } from "./results/graph/graph.component";
+import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-button.component';
+import { CompareWithComponent } from './results/results-navbar/compare-with.component';
 import { ResultsNavbarComponent } from "./results/results-navbar/results-navbar.component";
+import { ResultsViewButtonComponent } from './results/results-navbar/results-view-button.component';
 import { ResultsSearchComponent } from "./results/results-search/results-search.component";
 import { ResultsViewComponent } from "./results/results-view/results-view.component";
 import { SplitsGridComponent } from './results/splits-grid/splits-grid.component';
 import { SharedModule } from "./shared/shared.module";
 import { ResultsFoundDialogComponent } from './user/results-found-dialog/results-found-dialog.component';
 import { UserComponent } from "./user/user.component";
-import { ResultsViewButtonComponent } from './results/results-navbar/results-view-button.component';
-import { CompareWithComponent } from './results/results-navbar/compare-with.component';
-import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-button.component';
-import { FixturesMapComponent } from './fixtures/fixtures-map/fixtures-map.component';
-import { FixturesGridComponent, FixtureDatePipe } from './fixtures/fixtures-grid/fixtures-grid.component';
-import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
-import { FixturesOptionsComponent } from './fixtures/fixtures-options/fixtures-options.component';
-import { GradeFilterComponent } from './fixtures/grade-filter-dialog/grade-filter-dialog.component';
-import { FixtureWeekFilterComponent } from './fixtures/fixtures-options/fixture-week-filter.component';
-
 
 @NgModule({
   declarations: [
@@ -69,17 +63,9 @@ import { FixtureWeekFilterComponent } from './fixtures/fixtures-options/fixture-
     ResultsViewButtonComponent,
     CompareWithComponent,
     ClassMenuButtonComponent,
-    FixturesMapComponent,
-    FixturesGridComponent,
-    FixtureDatePipe,
-    FixturesComponent,
-    FixturesOptionsComponent,
-    GradeFilterComponent,
-    FixtureWeekFilterComponent,
   ],
   entryComponents: [
     ResultsFoundDialogComponent,
-    GradeFilterComponent
   ],
   imports: [
     BrowserModule,
@@ -93,6 +79,7 @@ import { FixtureWeekFilterComponent } from './fixtures/fixtures-options/fixture-
     SharedModule,
     HttpClientModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
+    FixturesModule
   ],
   bootstrap: [AppComponent]
 })

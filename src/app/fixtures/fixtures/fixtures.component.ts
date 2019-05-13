@@ -4,6 +4,8 @@ import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
 import { Observable } from 'rxjs';
 import { FixturesService } from '../fixtures.service';
+import { filter, map } from 'rxjs/operators';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component( {
    selector: 'app-fixtures',
@@ -17,17 +19,27 @@ export class FixturesComponent implements OnInit {
    homeLocation$: Observable<LatLong>;
    postcode$: Observable<string>;
    fixtures$: Observable<Fixture[]>;
+   filteredFixtures$: Observable<Fixture[]>;
 
    fixtures: Fixture[];
    fixtures1: Fixture[] = [];
 
-   hideMobleFilter = false;
+   hideMobleFilter = true;
 
-   constructor ( public fs: FixturesService ) { }
+   isHandSet: boolean;
+
+   constructor ( public fs: FixturesService,
+                 breakpointObserver: BreakpointObserver ) {
+      this.isHandSet = breakpointObserver.isMatched( Breakpoints.Handset );
+   }
 
    ngOnInit() {
       this.homeLocation$ = this.fs.getHomeLocation();
       this.postcode$ = this.fs.getPostcode();
+
+      this.filteredFixtures$ = this.fs.getFixtures().pipe(
+         map( fixtures => fixtures.filter (fix => !fix.hidden))
+      );
 
       this.fs.getFixtures().subscribe( f =>  {
          this.fixtures = f;
@@ -42,8 +54,8 @@ export class FixturesComponent implements OnInit {
       this.fs.setPostcode( p );
    }
 
-   filterChanged(filter: FixtureFilter) {
-      this.fs.setFilter( filter);
+   filterChanged(f: FixtureFilter) {
+      this.fs.setFilter( f );
    }
 }
 

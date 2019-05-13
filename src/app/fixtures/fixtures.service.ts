@@ -7,7 +7,7 @@ import { FixtureFilter, GradeFilter } from 'app/model/fixture-filter';
 import { UserDataService } from 'app/user/user-data.service';
 import { differenceInMonths, isFuture, isSaturday, isSunday, isToday, isWeekend } from 'date-fns';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
-import { catchError, map, share, startWith, switchMap, tap, filter } from 'rxjs/operators';
+import { catchError, map, share, startWith, switchMap, tap, filter, shareReplay } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
 
 @Injectable( {
@@ -15,8 +15,8 @@ import { AngularFireAuth } from '@angular/fire/auth';
 } )
 export class FixturesService {
 
-   _postcode = new BehaviorSubject<string>( "OX3 7EP" );
-   _homeLocation = new BehaviorSubject<LatLong>( { lat: 51.509865, lng: -0.118092 } );
+   _postcode$ = new BehaviorSubject<string>( "OX3 7EP" );
+   _homeLocation$ = new BehaviorSubject<LatLong>( { lat: 51.509865, lng: -0.118092 } );
 
    _filter$ = new BehaviorSubject<FixtureFilter>( {
       time: { sat: true, sun: true, weekday: true },
@@ -56,34 +56,34 @@ export class FixturesService {
          switchMap( url => this.http.get<Fixture[]>( url, httpOptions ) ),
          map( fixtures => this.futureFixtures( fixtures ) ),
          startWith( [] ),
+         shareReplay(),
          catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
       );
 
-      const fixturesWithDistance = combineLatest( [ fileContents, this._homeLocation ] ).pipe(
+      const fixturesWithDistance$ = combineLatest( [ fileContents, this._homeLocation$ ] ).pipe(
          map( ( [ fixtures, loc ] ) => {
-            const n = fixtures.map( fix => {
-               fix.distance = this.distanceFromHome( fix, loc );
-               return fix;
-            } );
-            return n;
-         }
+               const n = fixtures.map( fix => {
+                  fix.distance = this.distanceFromHome( fix, loc );
+                  return fix;
+               } );
+               return n;
+            }
          ),
-         share()
+         shareReplay(),
       );
 
-      const fixturesObs = combineLatest( [ fixturesWithDistance, this._filter$ ] ).pipe(
+      const fixturesObs$ = combineLatest( [ fixturesWithDistance$, this._filter$ ] ).pipe(
          map( ( [ fixtures, ftr ] ) => {
-            const n = fixtures.map( fix => {
-               fix.hidden = this.isHidden( fix, ftr );
-               return fix;
-            } );
-            return n;
-         }
-         ),
-         share()
+               const n = fixtures.map( fix => {
+                  fix.hidden = this.isHidden( fix, ftr );
+                  return fix;
+               } );
+               return n;
+            }
+         )
       );
 
-      return fixturesObs;
+      return fixturesObs$;
    }
 
    private futureFixtures( fixtures: Fixture[] ): Fixture[] {
@@ -117,19 +117,19 @@ export class FixturesService {
    }
 
    getPostcode(): Observable<string> {
-      return this._postcode.asObservable();
+      return this._postcode$.asObservable();
    }
 
    getHomeLocation(): Observable<LatLong> {
-      return this._homeLocation.asObservable();
+      return this._homeLocation$.asObservable();
    }
 
    setPostcode( postcode: string ) {
 
       this.calcLatLong( postcode )
          .subscribe( latlong => {
-            this._postcode.next( postcode );
-            this._homeLocation.next( latlong );
+            this._postcode$.next( postcode );
+            this._homeLocation$.next( latlong );
          } );
    }
 
@@ -142,18 +142,16 @@ export class FixturesService {
    }
 
    private makeDefaultGrades(): GradeFilter[] {
-      const filters = [];
-      for ( const grade of EventGrades.grades ) {
-         const f: GradeFilter = {
-            name: grade,
-            enabled: true,
-            distance: 100,
-            time: 2
-         };
-         filters.push( f );
-      }
-      return ( filters );
+      return [
+         { name: 'IOF', enabled: true, distance: 1000, time: 48 },
+         { name: 'International', enabled: true, distance: 1000, time: 48 },
+         { name: 'National', enabled: true, distance: 500, time: 12 },
+         { name: 'Regional', enabled: true, distance: 1000, time: 12 },
+         { name: 'Club', enabled: true, distance: 60, time: 6 },
+         { name: 'Local', enabled: true, distance: 40, time: 2 },
+      ];
    }
+
 
    private calcLatLong( postcode: string ): Observable<LatLong> {
       const obs = this.http.get<any>( "https://api.postcodes.io/postcodes/" + postcode ).pipe(
@@ -186,7 +184,7 @@ export class FixturesService {
       return deg * ( Math.PI / 180 );
    }
 
-   distanceFromHome( fix: Fixture, home: LatLong ): number {
+   private distanceFromHome( fix: Fixture, home: LatLong ): number {
       const kmToMiles = 0.62137119224;
       if ( !home || !fix.latLong ) {
          return -1;

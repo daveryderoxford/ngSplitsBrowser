@@ -1,5 +1,5 @@
 
-/** Material2 components used for application app  */
+/** Material2 components impored at an application level  */
 import { NgModule } from "@angular/core";
 
 import {
@@ -11,8 +11,9 @@ import {
   MatExpansionModule, MatFormFieldModule
 } from "@angular/material";
 
-import { FlexLayoutModule } from "@angular/flex-layout";
+import {ScrollDispatchModule} from '@angular/cdk/scrolling';
 
+import { FlexLayoutModule } from "@angular/flex-layout";
 
 @NgModule({
   exports: [
@@ -46,7 +47,8 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     MatPaginatorModule,
     MatExpansionModule,
     MatFormFieldModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    ScrollDispatchModule
   ],
 })
 export class AppMaterialModule { }

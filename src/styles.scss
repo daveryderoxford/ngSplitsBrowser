@@ -169,3 +169,8 @@ ul, ol {
     padding-bottom: 0px;
 }
 
+.sb-highzorder-dialog .mat-dialog-container {
+  z-index: 10000;
+  padding: 18x;
+}
+

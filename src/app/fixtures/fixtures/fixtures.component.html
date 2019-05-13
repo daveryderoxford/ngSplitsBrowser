@@ -1,46 +1,71 @@
+<!-- Large Screen -->
+<div *ngIf="!isHandSet" class="large-screen">
 
-  <div class=large-screen>
-    <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)"
-      [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)">
-    </app-fixtures-options>
-
-    <as-split direction="vertical">
-
-      <as-split-area>
-        <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
-          [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
-        </app-fixtures-map>
-      </as-split-area>
-
-      <as-split-area>
-        <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
-          [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
-        </app-fixtures-grid>
-      </as-split-area>
-
-    </as-split>
-  </div>
-
-  <div class=handset>
-    <div class="mat-elevation-z2">
-      <button mat-button>MENU</button>
-      <button mat-button (click)="hideMobleFilter = !hideMobleFilter">FILTER </button>
-    </div>
-
-    <app-fixtures-options [hidden]="hideMobleFilter" class="top-right mat-elevation-z2" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)"
-    [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)">
+  <app-fixtures-options class="large-sceen-filter-options mat-elevation-z2" [postcode]="postcode$ | async"
+    (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
+    (filterChanged)="filterChanged($event)">
   </app-fixtures-options>
-  
-      <mat-list>
-          <mat-list-item [hidden]="fixture.hidden" *ngFor="let fixture of fixtures">
-            <h3 matLine> {{fixture.date | fixturedate }} {{fixture.club}} </h3>
-            <p matLine> {{fixture.name}} <p>
-            <h3 matLine> {{fixture.location}} </h3>
-            <mat-divider></mat-divider>
-          </mat-list-item>
-        </mat-list>
 
+  <as-split direction="vertical">
+
+    <as-split-area>
+      <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation$ | async" [selectedFixture]="selectedFixture"
+        (fixtureSelected)="onFeatureSelected($event)">
+      </app-fixtures-map>
+    </as-split-area>
+
+    <as-split-area>
+      <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
+        [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
+      </app-fixtures-grid>
+    </as-split-area>
+
+  </as-split>
+</div>
+
+<!-- Handset -->
+<div *ngIf="isHandSet" fxLayout="column" class=handset>
+
+  <div fxFlex class="mat-elevation-z2 handset-filter-options">
+    <button mat-button>MENU</button>
+    <button mat-button (click)="hideMobleFilter = !hideMobleFilter">FILTER </button>
   </div>
 
-  
+  <app-fixtures-options fxFlex [hidden]="hideMobleFilter" class="mat-elevation-z2 handset-filter-options "
+    [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
+    (filterChanged)="filterChanged($event)">
+  </app-fixtures-options>
 
+  <cdk-virtual-scroll-viewport fxFill itemSize="120">
+    <mat-list>
+
+      <mat-list-item *cdkVirtualFor="let fixture of filteredFixtures$ | async">
+        <h3 matLine layout-align="space-between">
+
+          <span fxFlex>{{fixture.date | fixturedate }}</span>
+
+          <span fxFlex *ngIf="fixture.distance !== -1;">
+            {{fixture.distance}}miles
+          </span>
+
+          <a fxFlex="nogrow" href={{fixture.clubURL}} target="_blank"> {{fixture.club}} </a>
+        </h3>
+
+        <p matLine class="no-wrap"> {{fixture.name | ellipsis:39 }} </p>
+
+        <p matLine layout-align="space-between">
+          <a fxFlex *ngIf="fixture.latLong;" href="{{fixture | googleURL}}" target="_blank">{{fixture.postcode}}</a>
+          <span fxFlex *ngIf="!fixture.latLong;">{{fixture.postcode }}</span>
+
+          <a fxFlex="nogrow" *ngIf="fixture.latLong;" href="{{fixture | bingURL}}"
+            target="_blank">{{fixture.area | ellipsis: 30}}</a>
+          <span fxFlex="nogrow" *ngIf="!fixture.latLong;">{{fixture.area | ellipsis: 30}}</span>
+        </p>
+
+        <mat-divider></mat-divider>
+      </mat-list-item>
+
+    </mat-list>
+  </cdk-virtual-scroll-viewport>
+
+</div>

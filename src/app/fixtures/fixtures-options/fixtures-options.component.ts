@@ -1,12 +1,10 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, SimpleChanges } from '@angular/core';
-import { Fixture, EventGrade } from 'app/model';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { combineLatest, BehaviorSubject } from 'rxjs';
-import { map, startWith, debounceTime } from 'rxjs/operators';
 import { MatDialog } from '@angular/material';
+import { FixtureFilter, FixtureTimeFilter, GradeFilter } from 'app/model/fixture-filter';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { startWith } from 'rxjs/operators';
 import { GradeFilterComponent } from '../grade-filter-dialog/grade-filter-dialog.component';
-import { GradeFilter, FixtureFilter, FixtureTimeFilter } from 'app/model/fixture-filter';
-
 
 @Component( {
    selector: 'app-fixtures-options',
@@ -48,9 +46,7 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
       } );
    }
 
-   ngAfterViewInit() {
-
-   }
+   ngAfterViewInit() { }
 
    postcodeEntered() {
 
@@ -80,19 +76,16 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
       // Display grade dialog
 
       const dialogRef = this.dialog.open( GradeFilterComponent, {
-         width: '420px',
-         data: this.gradeOptions$.value
+         width: '350px',
+         maxWidth: '100vw',
+         data: this.gradeOptions$.value,
+         panelClass: 'sb-highzorder-dialog'
       } );
 
       dialogRef.afterClosed().subscribe( gradeFilter => {
-         console.log( 'The dialog was closed' );
          if ( gradeFilter) {
             this.gradeOptions$.next( gradeFilter );
          }
       } );
    }
-
 }
-
-
-

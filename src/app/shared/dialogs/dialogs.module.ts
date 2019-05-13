@@ -18,9 +18,6 @@ import { MessageDialogComponent } from './message-dialog.component';
         ConfirmDialogComponent,
         MessageDialogComponent,
     ],
-    providers: [
-        DialogsService,
-    ],
     entryComponents: [
         ConfirmDialogComponent,
         MessageDialogComponent,

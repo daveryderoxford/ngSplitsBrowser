@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>Fixture Filter Options</h1>
+<h1 mat-dialog-title>Filter Fixtures</h1>
 <div mat-dialog-content>
 
    <form [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -6,15 +6,15 @@
          <tr>
             <th> </th>
             <th> Display </th>
-            <th> Distance </th>
-            <th> Time (months) </th>
+            <th>Distance <br> (miles)</th>
+            <th>Time <br>(months) </th>
          </tr>
 
          <tr formArrayName="items" *ngFor="let grade of grades; let i = index;">
 
             <ng-container [formGroupName]="i">
 
-               <td style="align-left">
+               <td style="text-align: right">
                   {{grade}}
                </td>
 
@@ -24,7 +24,6 @@
 
                <td>
                   <mat-form-field>
-
                      <input matInput formControlName="distance" type="number">
                   </mat-form-field>
                </td>
@@ -42,10 +41,9 @@
       </table>
 
    </form>
+</div>
 
-   <div mat-dialog-actions>
-      <button mat-button mat-dialog-close>CANCEL</button>
-      <button mat-button type="submit" (click)="onSubmit()" cdkFocusInitial>OK</button>
-   </div>
-
+<div mat-dialog-actions>
+   <button mat-button mat-dialog-close>CANCEL</button>
+   <button mat-button type="submit" (click)="onSubmit()" cdkFocusInitial>OK</button>
 </div>

@@ -1,34 +1,30 @@
-@media all and (max-width: 479px) { 
-  .large-screen {
-    display: none;
-  }
 
   .handset {
     width: 100%;
     height: 100%;
+    overflow: none;
   }
 
-}
+  .handset-filter-options {
+    margin-top: 15px;
+  }
 
-@media all and (min-width: 480px) { 
   .large-screen {
     width: 100%;
     height: 100%;
     position: relative;
   }
 
-  .handset {
-    display: none;
-  }
-
-  /* Top right  */
-  .top-right {
-    position: absolute;
-    top: 8px;
-    right: 16px;
-    z-index: 10000;
-    background: rgba(255, 255, 255, 1.0);
-    padding-top: 10px;
-    padding-left: 10px;
-  }
+ /* Top right */
+ .large-sceen-filter-options {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  z-index: 1000; // This is the same z order as the leaflet controls. 
+  background: rgba(255, 255, 255, 1.0);
+  padding-top: 10px;
+  padding-left: 10px;
 }
+
+
+

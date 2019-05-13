@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter,
-   Input, OnInit, Output, QueryList, ViewChildren, ViewContainerRef, PipeTransform, Pipe } from '@angular/core';
+   Input, OnInit, Output, QueryList, ViewChildren, ViewContainerRef, PipeTransform, Pipe, NgModule } from '@angular/core';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
 import { differenceInCalendarDays, format } from 'date-fns';
@@ -61,54 +61,6 @@ export class FixturesGridComponent implements OnInit {
          row.element.nativeElement.scrollIntoViewIfNeeded( true, { behavior: 'instant' } );
       }
    }
-
-   private bingURL( fix: Fixture ): string {
-      return 'https://www.bing.com/maps/?cp=' + this.latLongStr( fix.latLong, '~' ) + "&lvl=15&style=s&sp=" +
-         this.latLongStr( fix.latLong, '_' ) + "_" + fix.area;
-   }
-
-   private googleURL( fix: Fixture ): string {
-      return "https://www.google.com/maps/search/?api=1&query=" +
-         this.latLongStr( fix.latLong ) + "&query_place_id=" + fix.area + "&zoom=10";
-   }
-
-   /** Returns URL for  directions between home location and area */
-   private googleDirectionsURL( fix: Fixture ): string {
-      if ( !this.homeLocation ) {
-         return "";
-      }
-
-      return "https://www.google.com/maps/dir/?api=1&origin=" + this.latLongStr( this.homeLocation )
-         + "&destination= " + this.latLongStr( fix.latLong );
-   }
-
-   private latLongStr( loc: LatLong, seperator = "," ): string {
-      return loc.lat.toString() + seperator + loc.lng.toString();
-   }
 }
 
-/** Reformat ISO date into displayed date string */
-@Pipe( {
-   name: 'fixturedate',
-   pure: true
-} )
-export class FixtureDatePipe implements PipeTransform {
-   transform( date: string ): string {
-
-      // For the next week display days in the future
-      const d = new Date( date );
-
-      const daysFrom = differenceInCalendarDays( d, Date() );
-
-      if ( daysFrom > 7 ) {
-         return format( d, "ddd DD-MMM-YY" );
-      } else if ( daysFrom <= 7 && daysFrom > 1 ) {
-         return "Next " + format( d, "ddd Do" );
-      } else if ( daysFrom === 1 ) {
-         return "Tommorow ";
-      } else if ( daysFrom === 0 ) {
-         return "Today ";
-      }
-   }
-}
 
