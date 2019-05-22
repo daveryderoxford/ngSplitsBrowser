@@ -15,8 +15,7 @@
     position: relative;
   }
 
- /* Top right */
- .large-sceen-filter-options {
+ .top-right {
   position: absolute;
   top: 8px;
   right: 16px;
@@ -24,6 +23,15 @@
   background: rgba(255, 255, 255, 1.0);
   padding-top: 10px;
   padding-left: 10px;
+}
+
+ /* Top left right */
+ .top-left {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  z-index: 1000; // This is the same z order as the leaflet controls. 
+  background: rgba(255, 255, 255, 0.8);
 }
 
 

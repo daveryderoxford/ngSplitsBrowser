@@ -1,16 +1,17 @@
 .container {
      width: 100%;
      height: 100%;
-}
-
-.leaflet-tooltip-pane .text {
-  color: black; 
-  background: transparent;
-  border:0;
-  box-shadow: none;
-  font-size: 12px;
+     position: relative;
 }
 
 .hide {
   display: none;
+}
+
+.bottom-left {
+  position: absolute;
+  bottom: 45px;
+  left: 8px;
+  z-index: 1000; // This is the same z order as the leaflet controls. 
+  background: rgba(255, 255, 255, 0.6);
 }
