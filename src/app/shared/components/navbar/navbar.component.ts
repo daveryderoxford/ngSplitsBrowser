@@ -1,9 +1,10 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
 import { AngularFireAuth } from "@angular/fire/auth";
-import { Results } from "../../../results/model";
+import { Router } from "@angular/router";
 import * as firebase from "firebase";
-import {BulkImportService} from "scripts/bulk-import";
+import { BulkImportService } from "scripts/bulk-import";
+
+export type NavBarLayout = "top" | "sidebar" | "menu";
 
 @Component({
   selector: "app-navbar",
@@ -12,10 +13,9 @@ import {BulkImportService} from "scripts/bulk-import";
 })
 export class NavbarComponent implements OnInit {
 
-  @Input()
-  results: Results;
+  @Input() layout: NavBarLayout = "top";
 
-  public authorised = false;
+  authorised = false;
 
   constructor(private afAuth: AngularFireAuth,
               private router: Router,

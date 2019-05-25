@@ -155,7 +155,7 @@ export class Fixtures {
          const options = {
             gzip: true,
             contentType: "application/json",
-            metadata: { cacheControl: "public, max-age=86400" }
+            metadata: { cacheControl: "public, max-age=86400, no-transform" }
          };
 
          await file.save( data, options );

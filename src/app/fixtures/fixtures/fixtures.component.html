@@ -1,7 +1,9 @@
 <!-- Large Screen -->
 <div *ngIf="!isHandSet" class="large-screen">
 
-  <app-fixtures-options class="large-sceen-filter-options mat-elevation-z2" [postcode]="postcode$ | async"
+  <app-navbar class="top-left" layout="menu"></app-navbar>
+
+  <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async"
     (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
     (filterChanged)="filterChanged($event)">
   </app-fixtures-options>
@@ -26,13 +28,11 @@
 <!-- Handset -->
 <div *ngIf="isHandSet" fxLayout="column" class=handset>
 
+
+
   <div fxFlex class="mat-elevation-z2 handset-filter-options">
-    <mat-icon>menu</mat-icon>
-
-    <button mat-icon-button>
-      <mat-icon (click)="hideMobleFilter = !hideMobleFilter">filter_list</mat-icon>
-    </button>
-
+    <app-navbar layout="menu"></app-navbar>
+    <button mat-button (click)="hideMobleFilter = !hideMobleFilter">FILTER </button>
   </div>
 
   <app-fixtures-options fxFlex [hidden]="hideMobleFilter" class="mat-elevation-z2 handset-filter-options "

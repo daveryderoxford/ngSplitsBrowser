@@ -54,10 +54,11 @@ export class FixturesService {
 
    getFixtures(): Observable<Fixture[]> {
 
-      const httpOptions = { headers: new HttpHeaders( { 'Accept-Encoding': 'gzip' } ) };
+      // It is not required to set the Accept-Encoding' header as this is set by the browser
+      // const httpOptions = { headers: new HttpHeaders( { 'Accept-Encoding': 'gzip' } ) };
 
       const fileContents: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
-         switchMap( url => this.http.get<Fixture[]>( url, httpOptions ) ),
+         switchMap( url => this.http.get<Fixture[]>( url ) ),
          map( fixtures => this.futureFixtures( fixtures ) ),
          startWith( [] ),
          shareReplay(),
