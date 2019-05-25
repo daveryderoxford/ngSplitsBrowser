@@ -27,8 +27,12 @@
 <div *ngIf="isHandSet" fxLayout="column" class=handset>
 
   <div fxFlex class="mat-elevation-z2 handset-filter-options">
-    <button mat-button>MENU</button>
-    <button mat-button (click)="hideMobleFilter = !hideMobleFilter">FILTER </button>
+    <mat-icon>menu</mat-icon>
+
+    <button mat-icon-button>
+      <mat-icon (click)="hideMobleFilter = !hideMobleFilter">filter_list</mat-icon>
+    </button>
+
   </div>
 
   <app-fixtures-options fxFlex [hidden]="hideMobleFilter" class="mat-elevation-z2 handset-filter-options "

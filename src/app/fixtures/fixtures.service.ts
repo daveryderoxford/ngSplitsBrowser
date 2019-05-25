@@ -9,6 +9,9 @@ import { differenceInMonths, isFuture, isSaturday, isSunday, isToday, isWeekend 
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { catchError, map, share, startWith, switchMap, tap, filter, shareReplay } from 'rxjs/operators';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { snapshotChanges } from '@angular/fire/database';
+import { FixtureReservation } from 'app/model/fixture-reservation';
 
 @Injectable( {
    providedIn: 'root'
@@ -30,6 +33,7 @@ export class FixturesService {
       private afAuth: AngularFireAuth,
       protected usd: UserDataService,
       protected storage: AngularFireStorage,
+      protected fs: AngularFirestore,
       protected http: HttpClient ) {
 
       this.afAuth.authState.pipe(
@@ -139,6 +143,28 @@ export class FixturesService {
 
    getFilter(): Observable<FixtureFilter> {
       return this._filter$.asObservable();
+   }
+
+   async addMapReservation(id: string, reservation: FixtureReservation): Promise<void> {
+     const doc = this.fs.doc<Fixture>('fixtures/' + id);
+
+     const p =  doc.valueChanges().pipe(
+         tap( fix => fix.fixtureReservation = reservation),
+         map( fix => await doc.set(fix) )
+      );
+
+      return p
+   }
+
+   reserveMap(fixture: Fixture, courseName: string) {
+      if ( !fixture.fixtureReservation ) {
+         const course = fixture.fixtureReservation.courses.find( c => c.name === courseName);
+         if (course) {
+            course.reservations.push();
+         }
+      } else {
+         throw new Error('FixtureService: Unexpected error: ');
+      }
    }
 
    private makeDefaultGrades(): GradeFilter[] {

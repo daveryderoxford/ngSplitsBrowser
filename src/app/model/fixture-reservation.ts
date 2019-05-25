@@ -11,9 +11,9 @@ export interface FixtureCourse {
 
 export interface MapReservation {
     userId: string;
-    name: string;
+    firstname: string;
+    surname: string;
     club: string;
+    madeAt: string;
+    ecard: number;
 }
-
-
-
