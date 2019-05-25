@@ -4,7 +4,7 @@ import { Router } from "@angular/router";
 import * as firebase from "firebase";
 import { BulkImportService } from "scripts/bulk-import";
 
-export type NavBarLayout = "top" | "sidebar";
+export type NavBarLayout = "top" | "sidebar" | "menu";
 
 @Component({
   selector: "app-navbar",

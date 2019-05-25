@@ -27,11 +27,11 @@ import { FixtureTimeFilter } from 'app/model/fixture-filter';
       `mat-button-toggle {
          height: 38px;
          line-height: 38px;
-         padding: 0 5px;
+         padding: 0 8px;
       }`,
-      `:: ng-deep .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-         line- height: 35px!important;
-         padding: 0 5px!important;
+      `::ng-deep .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
+         line-height: 35px !important;
+         padding: 0 8px !important;
       }`
    ]
 } )
