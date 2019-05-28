@@ -11,7 +11,7 @@ import { catchError, map, share, startWith, switchMap, tap, filter, shareReplay 
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { snapshotChanges } from '@angular/fire/database';
-import { FixtureReservation } from 'app/model/fixture-reservation';
+import { FixtureReservation, MapReservation } from 'app/model/fixture-reservation';
 
 @Injectable( {
    providedIn: 'root'
@@ -27,7 +27,7 @@ export class FixturesService {
       grades: this.makeDefaultGrades()
    } );
 
-   _userData =  this.afAuth.authState.pipe( switchMap( () => this.usd.userData() ));
+   _userData = this.afAuth.authState.pipe( switchMap( () => this.usd.userData() ) );
 
    constructor (
       private afAuth: AngularFireAuth,
@@ -49,7 +49,7 @@ export class FixturesService {
             newFilter.grades = userdata.fixtureGradeFilters;
             this.setFilter( newFilter );
          }
-      });
+      } );
    }
 
    getFixtures(): Observable<Fixture[]> {
@@ -67,24 +67,24 @@ export class FixturesService {
 
       const fixturesWithDistance$ = combineLatest( [ fileContents, this._homeLocation$ ] ).pipe(
          map( ( [ fixtures, loc ] ) => {
-               const n = fixtures.map( fix => {
-                  fix.distance = this.distanceFromHome( fix, loc );
-                  return fix;
-               } );
-               return n;
-            }
+            const n = fixtures.map( fix => {
+               fix.distance = this.distanceFromHome( fix, loc );
+               return fix;
+            } );
+            return n;
+         }
          ),
          shareReplay(),
       );
 
       const fixturesObs$ = combineLatest( [ fixturesWithDistance$, this._filter$ ] ).pipe(
          map( ( [ fixtures, ftr ] ) => {
-               const n = fixtures.map( fix => {
-                  fix.hidden = this.isHidden( fix, ftr );
-                  return fix;
-               } );
-               return n;
-            }
+            const n = fixtures.map( fix => {
+               fix.hidden = this.isHidden( fix, ftr );
+               return fix;
+            } );
+            return n;
+         }
          )
       );
 
@@ -146,25 +146,30 @@ export class FixturesService {
       return this._filter$.asObservable();
    }
 
-   async addMapReservation(id: string, reservation: FixtureReservation): Promise<void> {
-     const doc = this.fs.doc<Fixture>('fixtures/' + id);
+   /** Adds a new map reservation. Throws an exception if one already exists for the fixture */
 
-     const p =  doc.valueChanges().pipe(
-         tap( fix => fix.fixtureReservation = reservation),
-         map( fix => await doc.set(fix) )
-      );
+   async addMapReservation( id: string, reservation: FixtureReservation ): Promise<void> {
+      const doc = this.fs.doc<MapReservation>( 'fixtures/mapreservations/' + id );
 
-      return p
+      try {
+         const res = await doc.valueChanges().toPromise();
+         await doc.set( res );
+      } catch ( e ) {
+         console.log( 'FixtureService: Error adding map reservation:' + e.message );
+         throw e;
+      }
    }
 
-   reserveMap(fixture: Fixture, courseName: string) {
+   async reserveMap( fixture: Fixture, courseName: string ) {
       if ( !fixture.fixtureReservation ) {
-         const course = fixture.fixtureReservation.courses.find( c => c.name === courseName);
-         if (course) {
+         const course = fixture.fixtureReservation.courses.find( c => c.name === courseName );
+         if ( course ) {
             course.reservations.push();
+            const doc = this.fs.doc<Fixture>( 'fixtures/' + fixture.id );
+            await doc.set( fixture );
          }
       } else {
-         throw new Error('FixtureService: Unexpected error: ');
+         throw new Error( 'FixtureService: Unexpected error: ' );
       }
    }
 

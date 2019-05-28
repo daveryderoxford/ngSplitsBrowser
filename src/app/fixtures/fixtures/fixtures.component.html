@@ -43,7 +43,8 @@
   <cdk-virtual-scroll-viewport fxFill itemSize="120">
     <mat-list>
 
-      <mat-list-item *cdkVirtualFor="let fixture of filteredFixtures$ | async">
+      <mat-list-item [matMenuTriggerFor]="menu" [matMenuTriggerData]="{fixture: fixture}"
+        *cdkVirtualFor="let fixture of filteredFixtures$ | async">
         <h3 matLine layout-align="space-between">
 
           <span fxFlex>{{fixture.date | fixturedate }}</span>
@@ -71,5 +72,14 @@
 
     </mat-list>
   </cdk-virtual-scroll-viewport>
+
+  <mat-menu #menu="matMenu" hasBackdrop=true>
+    <ng-template matMenuContent let-name="fixture">
+      <a mat-menu-item href={{fixture.clubURL}}> Club website</a>
+      <a mat-menu-item href={{fixture | bingURL}}> OS Map</a>
+      <a mat-menu-item href="{{fixture | googleURL}}">Google map</a>
+      <a mat-menu-item> href="{{fixture | googleDirectionsURL}}" Directions</a>
+    </ng-template>
+  </mat-menu>
 
 </div>
