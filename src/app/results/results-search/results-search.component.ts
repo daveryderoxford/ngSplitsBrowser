@@ -24,7 +24,7 @@ export class ResultsSearchComponent implements OnInit {
 
   @HostBinding('class.docs-expanded') _isExpanded: boolean;
 
-  @ViewChild(MatAutocompleteTrigger)
+  @ViewChild(MatAutocompleteTrigger, { static: true })
   private _autocompleteTrigger: MatAutocompleteTrigger;
 
   results: Results;

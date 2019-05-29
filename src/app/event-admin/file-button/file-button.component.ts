@@ -18,7 +18,7 @@ export class FileButtonComponent {
   @Input() label = "Select file";
   @Output() onFileSelect = new EventEmitter<File[]>();
 
-  @ViewChild("inputFile") nativeInputFile: ElementRef;
+  @ViewChild("inputFile", { static: true }) nativeInputFile: ElementRef;
 
   private _files: File[];
 

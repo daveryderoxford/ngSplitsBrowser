@@ -30,7 +30,7 @@ export class SplitsGridComponent implements OnInit {
    courseToggle = new FormControl();
    colorToggle = new FormControl();
 
-   @ViewChild(MatSort) sort: MatSort;
+   @ViewChild(MatSort, { static: false }) sort: MatSort;
 
    constructor(private rs: ResultsSelectionService) { }
 

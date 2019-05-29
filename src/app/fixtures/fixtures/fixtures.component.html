@@ -41,7 +41,7 @@
   <cdk-virtual-scroll-viewport fxFill itemSize="120">
     <mat-list>
 
-      <mat-list-item (click)="menuButton.dispatchEvent(new Event('click'))" *cdkVirtualFor="let fixture of filteredFixtures$ | async">
+      <mat-list-item *cdkVirtualFor="let fixture of filteredFixtures$ | async">
         <h3 matLine layout-align="space-between">
 
           <span fxFlex>{{fixture.date | fixturedate }}</span>
