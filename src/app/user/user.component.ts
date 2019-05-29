@@ -2,7 +2,7 @@
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { FormArray, FormBuilder, FormGroup } from "@angular/forms";
-import { MatDialog } from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { EventService } from "app/events/event.service";
 import { ControlCardTypes, UserData } from "app/model";

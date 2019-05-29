@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ResultsFoundDialogComponent } from './results-found-dialog.component';
 import { UserResult, OEvent } from 'app/model';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { AppMaterialModule } from 'app/shared/app-material.module';
 import { DialogsModule } from 'app/shared/dialogs/dialogs.module';

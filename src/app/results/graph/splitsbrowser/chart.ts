@@ -248,7 +248,7 @@ export class Chart {
       const mousemoveHandler = event => this.onMouseMove(event);
       const mouseupHandler = event => this.onMouseUp(event);
       const mousedownHandler = event => this.onMouseDown(event);
-      $(this.svg.node()).mouseenter(event => this.onMouseEnter(<JQueryEventObject>event))
+      $(this.svg.node()).mouseenter(event => this.onMouseEnter(<JQueryEventObject><unknown>event))
          .mousemove(mousemoveHandler)
          .mouseleave(() => this.onMouseLeave())
          .mousedown(mousedownHandler)

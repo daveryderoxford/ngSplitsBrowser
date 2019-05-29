@@ -5,7 +5,7 @@ import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
-import {MatAutocompleteTrigger} from '@angular/material';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import {Subscription} from 'rxjs/Subscription';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;

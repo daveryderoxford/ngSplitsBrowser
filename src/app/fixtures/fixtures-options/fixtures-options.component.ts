@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material';
+import { MatDialog } from '@angular/material/dialog';
 import { FixtureFilter, FixtureTimeFilter, GradeFilter } from 'app/model/fixture-filter';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { startWith } from 'rxjs/operators';

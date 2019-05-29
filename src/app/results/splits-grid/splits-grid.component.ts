@@ -2,7 +2,8 @@
 import { SelectionModel } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { MatSort, MatTableDataSource } from "@angular/material";
+import { MatSort } from "@angular/material/sort";
+import { MatTableDataSource } from "@angular/material/table";
 import { distinctUntilChanged } from 'rxjs/operators';
 import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
 import { ResultsSelectionService } from "../results-selection.service";
