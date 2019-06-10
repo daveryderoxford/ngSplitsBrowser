@@ -14,6 +14,7 @@ import { FixturesRoutingModule } from './fixtures-routing.module';
 import { FixturesComponent } from './fixtures/fixtures.component';
 import { GradeFilterComponent } from './grade-filter-dialog/grade-filter-dialog.component';
 import { FixtureKeyComponent } from './fixtures-map/fixture-key.component';
+import { FixtureActionPopupComponent } from './fixtures/fixture-action-popup.component';
 
 @NgModule({
   declarations: [
@@ -24,9 +25,11 @@ import { FixtureKeyComponent } from './fixtures-map/fixture-key.component';
     GradeFilterComponent,
     FixtureWeekFilterComponent,
     FixtureKeyComponent,
+    FixtureActionPopupComponent,
   ],
   entryComponents: [
-    GradeFilterComponent
+    GradeFilterComponent,
+    FixtureActionPopupComponent
   ],
   imports: [
     CommonModule,

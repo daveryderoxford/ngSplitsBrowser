@@ -3,6 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, E
 import { Fixture, LatLong } from 'app/model/fixture';
 import { Canvas, circle, Circle, CircleMarker, control, FeatureGroup,
         Map, tileLayer, TileLayer, TooltipOptions, CircleMarkerOptions, Util  } from "leaflet";
+import { differenceInCalendarDays } from 'date-fns';
 
 
 @Component({
@@ -122,6 +123,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
          if (!fixture.hidden) {
 
+            console.log('Fixtue; ' + fixture.name);
             const weeks = this.weeksAhead(fixture.date);
 
             const MaxNumberedWeeks = 5;
@@ -186,10 +188,12 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       console.log("Map Fixture selected " + fixtureMarker.fixture.name);
    }
 
-   /** Returns the number of weeks in the future from now */
+   /** Returns the number of weeks in the future from now
+    * times within the next 7 days return 0.
+   */
    private weeksAhead(date: string): number {
       const millsecondsToWeeks = 7 * 24 * 60 * 60 * 1000;
-      const weeks = Math.round((new Date(date).valueOf() - new Date().valueOf()) / millsecondsToWeeks);
+      const weeks = Math.floor( (new Date(date).valueOf() - new Date().valueOf()) / millsecondsToWeeks);
       return weeks;
    }
 

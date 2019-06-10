@@ -1,5 +1,6 @@
 /** Various utility functions for Splitsbrowser */
-import { uniqBy } from 'lodash';
+import { uniqBy } from 'lodash-es';
+
 
 export class Utils {
 

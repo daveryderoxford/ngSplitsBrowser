@@ -7,7 +7,6 @@ export interface FixtureReservation {
 export interface FixtureCourse {
     name: string;
     distance: number;
-    maxMaps: number;
     reservations: MapReservation[];
 }
 
@@ -18,4 +17,5 @@ export interface MapReservation {
     club: string;
     madeAt: string;
     ecard: number;
+    waitinglist?: number;
 }

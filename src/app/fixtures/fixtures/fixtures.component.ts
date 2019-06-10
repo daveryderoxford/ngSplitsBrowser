@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { FixturesService } from '../fixtures.service';
 import { filter, map } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatDialog } from '@angular/material/dialog';
+import { FixtureActionPopupComponent } from './fixture-action-popup.component';
 
 @Component( {
    selector: 'app-fixtures',
@@ -29,7 +31,8 @@ export class FixturesComponent implements OnInit {
    isHandSet: boolean;
 
    constructor ( public fs: FixturesService,
-                 breakpointObserver: BreakpointObserver ) {
+                 breakpointObserver: BreakpointObserver,
+                 public dialog: MatDialog  ) {
       this.isHandSet = breakpointObserver.isMatched( Breakpoints.Handset );
    }
 
@@ -57,6 +60,13 @@ export class FixturesComponent implements OnInit {
    filterChanged(f: FixtureFilter) {
       this.fs.setFilter( f );
    }
+
+   displayMobileActions(fixture: Fixture) {
+
+   const dialogRef = this.dialog.open( FixtureActionPopupComponent, {
+      data: fixture,
+   } );
+  }
 }
 
 

@@ -41,7 +41,7 @@
   <cdk-virtual-scroll-viewport fxFill itemSize="120">
     <mat-list>
 
-      <mat-list-item *cdkVirtualFor="let fixture of filteredFixtures$ | async">
+      <mat-list-item (click)="displayMobileActions(fixture)" *cdkVirtualFor="let fixture of filteredFixtures$ | async">
         <h3 matLine layout-align="space-between">
 
           <span fxFlex>{{fixture.date | fixturedate }}</span>
@@ -63,10 +63,6 @@
             target="_blank">{{fixture.area | ellipsis: 30}}</a>
           <span fxFlex="nogrow" *ngIf="!fixture.latLong;">{{fixture.area | ellipsis: 30}}</span>
         </p>
-
-        <button mat-icon-button [matMenuTriggerFor]="menu" [matMenuTriggerData]="{fixture: fixture}">
-            <mat-icon>more_vert</mat-icon>
-         </button>
 
         <mat-divider></mat-divider>
       </mat-list-item>

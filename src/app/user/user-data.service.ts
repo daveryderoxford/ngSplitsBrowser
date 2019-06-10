@@ -2,13 +2,14 @@ import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore, AngularFirestoreDocument } from "@angular/fire/firestore";
 import { EventService } from "app/events/event.service";
-import { CompetitorSearchData, ECard, OEvent, UserData, UserInfo, UserResult } from "app/model";
+import { CompetitorSearchData, ECard, OEvent, UserData, UserInfo, UserResult, Fixture } from "app/model";
 import { Competitor, Course, InvalidData, Results } from "app/results/model";
 import { ResultsSelectionService } from "app/results/results-selection.service";
 import { CompetitorDataService } from "app/shared/services/competitor-data.service";
 import * as firebase from "firebase";
 import { BehaviorSubject, Observable, of as observableOf } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
+import { UserReservation } from 'app/model/user';
 
 @Injectable({
   providedIn: "root"
@@ -55,13 +56,13 @@ export class UserDataService {
   private _getUserDataObservable(): Observable<UserData | null> {
     const user = this._getUserDoc()
       .snapshotChanges().pipe(
-      map(ret => {
-        const snapshot = ret.payload;
-        if (!snapshot.exists) {
-          this.createUser();
-        }
-        return snapshot.data() as UserData;
-      }));
+        map(ret => {
+          const snapshot = ret.payload;
+          if (!snapshot.exists) {
+            this.createUser();
+          }
+          return snapshot.data() as UserData;
+        }));
     return user;
   }
 
@@ -69,7 +70,7 @@ export class UserDataService {
   updateDetails(details: Partial<UserInfo>): Observable<UserData> {
 
     return observableOf(this._getUserDoc().update(details)).pipe(
-      switchMap( () => this._getUserDoc().valueChanges() )
+      switchMap(() => this._getUserDoc().valueChanges())
     );
   }
 
@@ -84,6 +85,7 @@ export class UserDataService {
       nationalId: "",
       autoFind: true,
       results: [],
+      fixtures: [],
       ecards: [],
       resultsLastupDated: new Date().toISOString(),
       postcode: ""
@@ -102,19 +104,35 @@ export class UserDataService {
     return userDoc;
   }
 
+  /** Reserve a map for the user */
+  async saveMapReservation(fixture: Fixture, course: string) {
+    // Add map reservation to user
+
+    const res: UserReservation = {
+      eventId: fixture.id,
+      date: fixture.date,
+      name: fixture.name,
+      course: course,
+    };
+
+    await this._getUserDoc().update({
+      fixtures: firebase.firestore.FieldValue.arrayUnion(res) as any
+    });
+  }
+
   /** Add userResult to the user results list, populating detail from the results data.
-   * The user defaults to the current user
+   * The user defaults to the current user.
   */
-   addResult( userResult: UserResult, user = this.currentUserData ): Observable<void> {
+  addResult(userResult: UserResult, user = this.currentUserData): Observable<void> {
 
     const obs = this.rs.loadResults(userResult.event).pipe(
-      tap( results =>  this._processResults(user.results, results, userResult) ),
-      switchMap( () => this._getUserDoc().set(user) )
+      tap(results => this._processResults(user.results, results, userResult)),
+      switchMap(() => this._getUserDoc().set(user))
     );
 
     return obs;
-
   }
+
 
   private _processResults(userResults: UserResult[], results: Results, userResult: UserResult) {
 
@@ -199,7 +217,7 @@ export class UserDataService {
     }
 
     // Sort by time
-  //  userResults.sort( (a: UserResult, b) => new Date(a.event.date) - new Date (b.event.date) );
+    //  userResults.sort( (a: UserResult, b) => new Date(a.event.date) - new Date (b.event.date) );
 
     return userResults;
   }

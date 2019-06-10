@@ -7,6 +7,8 @@ import { Fixtures } from "./fixtures/fixtures";
 
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
+import { UserData, UserFixture, UserReservation } from "model/user";
+import { MapReservation, FixtureReservation } from "model/fixture-reservation";
 
 const firebaseAdmin = admin.initializeApp();
 
@@ -150,3 +152,41 @@ function encodeAsFirebaseKey( string ) {
       .replace( /\[/g, "%5B" )
       .replace( /\]/g, "%5D" );
 }
+
+/** User data updated  */
+exports.updateEvent = functions.firestore
+   .document( 'users/{userId}' )
+   .onUpdate( async ( change, context ) => {
+
+      const newValue = change.after.data() as UserData;
+      const previousValue = change.before.data() as UserData;
+
+      /** If fmap reservation added to user then unodate the fixture reservation */
+      if ( newValue.fixtures.length > previousValue.fixtures.length ) {
+         const userReservation = newValue.fixtures[newValue.fixtures.length - 1] as UserReservation;
+
+         const doc =  admin.firestore().doc( '/fixtures/reservations' + userReservation.eventId);
+         const snap = await doc.get();
+         const eventRes =  snap.data() as FixtureReservation;
+
+         const course = eventRes.courses.find( c => c.name === userReservation.course);
+
+         if (!course) {
+            throw new Error("Course not found for map reservation");
+         }
+
+         const newReservation: MapReservation = {
+            userId: newValue.key,
+            firstname: newValue.firstname,
+            surname: newValue.surname,
+            club: newValue.club,
+            madeAt: new Date().toISOString(),
+            ecard: -1
+        };
+        course.reservations.push(newReservation);
+
+        // Add new reservation to course
+         await doc.set( previousValue );
+      }
+
+   } );
