@@ -58,7 +58,7 @@ export class FixtureDatePipe implements PipeTransform {
 
       const daysFrom = differenceInCalendarDays(d, Date());
 
-      if (daysFrom > 7) {
+      if (daysFrom >= 7) {
          return format(d, "ddd DD-MMM-YY");
       } else if (daysFrom <= 7 && daysFrom > 1) {
          return "Next " + format(d, "ddd Do");

@@ -1,10 +1,8 @@
 
 /** data associated with a user */
-import { sbTime } from "../results/model";
 import { ControlCardType, OEvent } from "./oevent";
 import { ISODateString } from "./date";
 import { GradeFilter } from "./fixture-filter";
-import { UserFixture } from '../../../firebase/functions/src/model/user';
 
 export interface ECard {
     id: string;
@@ -32,7 +30,6 @@ export interface UserData extends UserInfo {
     fixtures: UserFixture[] | UserReservation[];
 }
 
-
 /** Information on the results for a user.
  * the event key plus the ecard +id uniqiely identifies the result
  */
@@ -47,13 +44,13 @@ export interface UserResult {
         courseclass: string;
         coursePosition: number;
         classPosition: number;
-        totalTime: sbTime;
+        totalTime: number;
         distance: number;
         climb: number;
         courseWinner: string;
-        courseWinningTime: sbTime;
+        courseWinningTime: number;
         classWinner: string;
-        classWinningTime: sbTime;
+        classWinningTime: number;
     };
 }
 

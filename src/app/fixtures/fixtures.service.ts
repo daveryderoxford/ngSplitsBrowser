@@ -12,6 +12,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { snapshotChanges } from '@angular/fire/database';
 import { FixtureReservation, MapReservation } from 'app/model/fixture-reservation';
+import { now } from 'd3';
 
 @Injectable( {
    providedIn: 'root'
@@ -40,7 +41,7 @@ export class FixturesService {
          filter( user => user !== null ),    // Only handle login requests
          switchMap( () => this.usd.userData() ),
       ).subscribe( userdata => {
-         // TODO User data shoul;d always be not null here check
+         // TODO User data should always be not null here check
          if ( userdata && userdata.postcode && userdata.postcode !== "" ) {
             this.setPostcode( userdata.postcode );
          }
@@ -146,31 +147,44 @@ export class FixturesService {
       return this._filter$.asObservable();
    }
 
-   /** Adds a new map reservation. Throws an exception if one already exists for the fixture */
+   /** Adds a new map reservation for a fixture. Throws an exception if one already exists for the fixture */
 
    async addMapReservation( id: string, reservation: FixtureReservation ): Promise<void> {
-      const doc = this.fs.doc<MapReservation>( 'fixtures/mapreservations/' + id );
+      const doc = this.fs.doc<FixtureReservation>( '/mapreservations/' + id );
 
       try {
          const res = await doc.valueChanges().toPromise();
-         await doc.set( res );
+         await doc.set( reservation );
       } catch ( e ) {
          console.log( 'FixtureService: Error adding map reservation:' + e.message );
          throw e;
       }
    }
 
-   async reserveMap( fixture: Fixture, courseName: string ) {
-      if ( !fixture.fixtureReservation ) {
-         const course = fixture.fixtureReservation.courses.find( c => c.name === courseName );
-         if ( course ) {
-            course.reservations.push();
-            const doc = this.fs.doc<Fixture>( 'fixtures/' + fixture.id );
-            await doc.set( fixture );
+   async reserveMap( fixture: FixtureReservation, courseName: string, ecard: number ): Promise<void> {
+
+         const course = fixture.courses.find( c => c.name === courseName );
+
+         if ( !course ) {
+            throw new Error( 'FixtureService: Unexpected error.  Course not def ' );
          }
-      } else {
-         throw new Error( 'FixtureService: Unexpected error: ' );
-      }
+
+         // User data populated by server
+         const user = this.usd.currentUserData;
+
+         const reg: MapReservation = {
+            userId: user.key,
+            firstname: user.firstname,
+            surname: user.surname,
+            club: user.club,
+            madeAt: new Date().toDateString(),
+            ecard: ecard,
+         };
+
+         course.reservations.push( reg);
+
+         const ref =  this.fs.doc('fixtures' + fixture.eventId);
+         await ref.set(fixture);
    }
 
    private makeDefaultGrades(): GradeFilter[] {
