@@ -33,6 +33,8 @@ export class UserComponent implements OnInit {
 
   nations = Nations.getNations();
 
+  cardclass: "mat-card-mobile";
+
   constructor(
     private formBuilder: FormBuilder,
     private afAuth: AngularFireAuth,

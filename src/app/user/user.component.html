@@ -8,87 +8,90 @@
 
     <div class=error>{{error}}</div>
 
-    <mat-card>
+    <mat-card [class]=cardclass>
 
-      <form [formGroup]="userForm" (ngSubmit)="save()" novalidate>
+      <form (ngSubmit)="save()" novalidate fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=10px
+        [formGroup]="userForm">
 
-        <div fxLayout="column" fxFlex fxLayoutAlign="space-around" fxLayoutGap=10px>
+        <mat-progress-bar *ngIf="showProgressBar" mode="query"> </mat-progress-bar>
 
-          <mat-progress-bar *ngIf="showProgressBar" mode="query"> </mat-progress-bar>
+        <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
 
-          <div fxFlexLayout=row fxLayoutAlign="space-between">
-            <mat-form-field>
-              <input matInput required formControlName="firstname" placeholder="First Name">
-            </mat-form-field>
-
-            <mat-form-field>
-              <input matInput required formControlName="surname" placeholder="Last Names">
-            </mat-form-field>
-          </div>
-
-          <mat-form-field>
-            <mat-select required formControlName="nationality" placeholder="Nationality">
-              <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
-                {{ nation.fullname }}
-              </mat-option>
-            </mat-select>
+          <mat-form-field fxFlex=50>
+            <input matInput required formControlName="firstname" placeholder="First Name">
           </mat-form-field>
 
-            <mat-form-field>
-              <input matInput required formControlName="postcode" placeholder="Postcode">
-              <mat-hint>For displaying fixture locations (UK)</mat-hint>
-            </mat-form-field>
+          <mat-form-field fxFlex=50>
+            <input matInput required formControlName="surname" placeholder="Last Names">
+          </mat-form-field>
+        </div>
 
+        <mat-form-field>
+          <mat-select required formControlName="nationality" placeholder="Nationality">
+            <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
+              {{ nation.fullname }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput required formControlName="postcode" placeholder="Postcode">
+          <mat-hint>For displaying fixture locations (UK)</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
+          <mat-hint align="end">Between 2 and 10 characters</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field>
+          <input matInput formControlName="nationalId" type="number" placeholder="National ID number">
+        </mat-form-field>
+
+        <div fxLayout="row" fxLayoutAlign="start">
+          <b> ECards </b>
+
+          <span fxFlex></span>
           
+          <button mat-button (click)="addEcard()">
+            ADD
+            <mat-icon [ngStyle]="{'color':'green'}">add_circle</mat-icon>
+          </button>
+        </div>
 
-          <mat-form-field>
-            <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
-            <mat-hint align="end">Between 2 and 10 characters</mat-hint>
-          </mat-form-field>
+        <div formArrayName="ecards" *ngFor="let ecard of userForm.get('ecards')['controls']; let i = index;">
 
-          <mat-form-field>
-            <input matInput formControlName="nationalId" type="number" placeholder="National ID number">
-          </mat-form-field>
+          <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
 
-          <div class="ecardgroup">
-            <div fxLayout="row" fxLayoutAlign="space-between">
-               <b>ECards</b>
-               <button mat-button (click)="addEcard()">
-                   ADD
-                   <mat-icon [ngStyle]="{'color':'green'}">add_circle</mat-icon>
-               </button>
-           </div>
+            <div [formGroupName]="i">
 
-            <div formArrayName="ecards" *ngFor="let ecard of userForm.get('ecards')['controls']; let i = index;">
+              <mat-form-field fxFlex=100px>
+                <input matInput formControlName="id" min=0 placeholder="Number">
+              </mat-form-field>
 
-              <div [formGroupName]="i" fxFlexLayout=row fxLayoutAlign="space-between">
-
-                <mat-form-field>
-                  <input matInput required formControlName="id" placeholder="Number">
-                </mat-form-field>
-
-                <mat-form-field>
-                  <mat-select required formControlName="type" placeholder="Type">
-                    <mat-option *ngFor="let type of ecardTypes" [value]="type">
-                      {{ type }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-
-                <button mat-icon-button (click)="removeEcard(i)">
-                  <mat-icon [ngStyle]="{'color':'red'}">remove_circle</mat-icon>
-                </button>
-
-              </div>
+              <mat-form-field fxFlex=100px>
+                <mat-select formControlName="type" placeholder="Type">
+                  <mat-option *ngFor="let type of ecardTypes" [value]="type">
+                    {{ type }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
 
-          </div>
+            <span fxFlex></span>
 
-          <mat-checkbox formControlName="autoFind"> Automatically add results </mat-checkbox>
+            <button mat-button (click)="removeEcard(i)">
+              <mat-icon [ngStyle]="{'color':'red'}" >remove_circle</mat-icon>
+            </button>
 
-          <div fxLayout="row" fxLayoutAlign="space-between center">
-            <button [disabled]="userForm.invalid" mat-raised-button color=primary type="submit" aria-label="login">Save</button>
           </div>
+        </div>
+
+        <mat-checkbox formControlName="autoFind"> Automatically add results </mat-checkbox>
+
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <button [disabled]="userForm.invalid || !userForm.dirty" mat-raised-button color=primary type="submit"
+            aria-label="login">Save</button>
         </div>
 
       </form>

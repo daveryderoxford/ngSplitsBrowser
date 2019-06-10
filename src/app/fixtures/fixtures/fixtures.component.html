@@ -30,7 +30,12 @@
 
   <div fxFlex class="mat-elevation-z2 handset-filter-options">
     <app-navbar layout="menu"></app-navbar>
-    <button mat-button (click)="hideMobleFilter = !hideMobleFilter">FILTER </button>
+    <button mat-button style="float: right;" (click)="hideMobleFilter = !hideMobleFilter">
+       FILTER
+       <mat-icon *ngIf="hideMobleFilter">arrow_drop_down</mat-icon>
+       <mat-icon *ngIf="!hideMobleFilter">arrow_drop_up</mat-icon>
+
+    </button>
   </div>
 
   <app-fixtures-options fxFlex [hidden]="hideMobleFilter" class="mat-elevation-z2 handset-filter-options "

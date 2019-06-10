@@ -4,9 +4,20 @@
    padding-bottom: 20px;
 }
 
-.with-icon {
-   display: flex;
-   align-items: center;
+mat-card { 
+   max-width: 300px !important;
 }
 
-mat-card{ max-width: 400px }; 
+.mat-card-mobile { 
+   max-width: 100vw !important;
+}
+
+.pc {
+   width: 50% !important;
+}
+
+.inline {
+   display: inline-block !important;
+}
+
+
