@@ -71,7 +71,7 @@ export interface CourseSummary {
 
 export interface OEvent extends EventInfo {
      key: string;
-     user: string;
+     userId: string;
      splits?: SplitsFileInfo | null;
      summary?: EventSummary | null;
      legacyPassword?: string;

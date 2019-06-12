@@ -1,5 +1,7 @@
 export interface FixtureReservation {
     eventId: string;
+    userId: string;
+    type: string;
     closeingDate: string;
     courses: FixtureCourse[];
 }

@@ -39,7 +39,7 @@ xdescribe('CompetitorDataService', () => {
 
     const oevent: OEvent = {
       key: "abcd",
-      user: 'AUserId',
+      userId: 'AUserId',
       yearIndex: 2018,    // Used for filtering
       gradeIndex: {},
       name: 'Test Event1',

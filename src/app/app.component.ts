@@ -44,7 +44,7 @@ export class AppComponent {
   }
 
   private configureFirebase() {
-    this.afs.firestore.settings( { timestampsInSnapshots: true});
+    this.afs.firestore.settings( { });
   }
 }
 

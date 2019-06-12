@@ -56,7 +56,7 @@ export const test_userdata = [userdata1, userdata2, userdata3];
  */
 export const eventA: OEvent = {
    key: 'eventkeyA',
-   user: 'user1',
+   userId: 'user1',
    yearIndex: 2018,
    gradeIndex: { Regional: true, Local: true },
    name: 'Event A',
@@ -73,7 +73,7 @@ export const eventA: OEvent = {
 
 export const eventB: OEvent = {
    key: 'eventkeyB',
-   user: 'user2',
+   userId: 'user2',
    yearIndex: 2018,
    gradeIndex: { National: true, Regional: true, Local: true },
    name: 'Event B',
@@ -90,7 +90,7 @@ export const eventB: OEvent = {
 
 export const eventC: OEvent = {
    key: 'eventkeyC',
-   user: 'user2',
+   userId: 'user2',
    legacyPassword: 'Joe',
    yearIndex: 2017,
    gradeIndex: { Local: true },

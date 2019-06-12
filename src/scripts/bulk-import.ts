@@ -119,7 +119,7 @@ export class BulkImportService {
       webpage: inputEvent.webpage,
       splits: null,
       email: inputEvent.email,
-      user: "qWLOONZF1NhBZCV1FI9htz3AitI2",
+      userId: "qWLOONZF1NhBZCV1FI9htz3AitI2",
       legacyPassword: inputEvent.legacyPassword,
       yearIndex: new Date(inputEvent.eventdate * 1000).getFullYear(),
       gradeIndex: EventGrades.indexObject(grade),

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { Router } from "@angular/router";
-import * as firebase from "firebase";
+import * as firebase from "firebase/app";
 import { BulkImportService } from "scripts/bulk-import";
 
 export type NavBarLayout = "top" | "sidebar" | "menu";

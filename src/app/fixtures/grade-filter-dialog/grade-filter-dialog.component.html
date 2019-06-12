@@ -1,12 +1,12 @@
 <h1 mat-dialog-title>Filter Fixtures</h1>
-<div mat-dialog-content>
+<div mat-dialog-content style="max-height: 85vh">
 
    <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <table>
          <tr>
-            <th> </th>
-            <th> Display </th>
-            <th>Distance <br> (miles)</th>
+            <th style="text-align: right">Display</th>
+             <th> </th>
+            <th>Distance <br>(miles)</th>
             <th>Time <br>(months) </th>
          </tr>
 
@@ -24,13 +24,13 @@
 
                <td>
                   <mat-form-field>
-                     <input matInput formControlName="distance" type="number">
+                     <input matInput [style.fontSize.px]=15 formControlName="distance" type="number">
                   </mat-form-field>
                </td>
 
                <td>
                   <mat-form-field>
-                     <input matInput formControlName="time" type="number">
+                     <input matInput [style.fontSize.px]=15 formControlName="time" type="number">
                   </mat-form-field>
                </td>
 

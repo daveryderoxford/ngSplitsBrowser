@@ -6,7 +6,7 @@ import { CompetitorSearchData, ECard, OEvent, UserData, UserInfo, UserResult, Fi
 import { Competitor, Course, InvalidData, Results } from "app/results/model";
 import { ResultsSelectionService } from "app/results/results-selection.service";
 import { CompetitorDataService } from "app/shared/services/competitor-data.service";
-import * as firebase from "firebase";
+import * as firebase from "firebase/app";
 import { BehaviorSubject, Observable, of as observableOf } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
 import { UserReservation } from 'app/model/user';

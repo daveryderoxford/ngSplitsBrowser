@@ -76,7 +76,7 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
       // Display grade dialog
 
       const dialogRef = this.dialog.open( GradeFilterComponent, {
-         width: '350px',
+         width: '320px',
          maxWidth: '100vw',
          data: this.gradeOptions$.value,
          panelClass: 'sb-highzorder-dialog'

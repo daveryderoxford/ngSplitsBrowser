@@ -193,7 +193,8 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
    */
    private weeksAhead(date: string): number {
       const millsecondsToWeeks = 7 * 24 * 60 * 60 * 1000;
-      const weeks = Math.floor( (new Date(date).valueOf() - new Date().valueOf()) / millsecondsToWeeks);
+      const oneDay = 24 * 60 * 60 * 1000;
+      const weeks = Math.floor( ( new Date( date ).valueOf() + oneDay - new Date().valueOf() ) / millsecondsToWeeks);
       return weeks;
    }
 

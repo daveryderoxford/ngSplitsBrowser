@@ -3,9 +3,8 @@ import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { OEvent, UserResult } from "app/model";
 import { UserDataService } from "app/user/user-data.service";
-import * as firebase from "firebase";
 import { Observable } from "rxjs";
-import { map, filter } from 'rxjs/operators';
+import { filter, map } from 'rxjs/operators';
 
 @Component({
    selector: "app-my-events-tab",
