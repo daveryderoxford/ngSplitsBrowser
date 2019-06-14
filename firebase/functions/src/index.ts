@@ -1,20 +1,18 @@
-/** Splitsbrowser Goole clould functions exports */
-
-import { OEvent } from "./model/oevent";
-import { Club } from "./model/club";
-
-import { Fixtures } from "./fixtures/fixtures";
+/**
+ * Splitsbrowser Google clould functions exports
+ */
 
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { UserData, UserFixture, UserReservation } from "model/user";
-import { MapReservation, FixtureReservation } from "model/fixture-reservation";
+import * as clubIndex from "./club-index";
+import { Fixtures } from "./fixtures/fixtures";
+import * as mapReg from "./fixtures/mapRegistration";
+
 
 const firebaseAdmin = admin.initializeApp();
 
 /** Run to perfrom maintenance tasks once/day */
-
-exports.maintenance = functions.pubsub.topic( 'maintenance' ).onPublish( async ( message ) => {
+export const maintenance = functions.pubsub.topic( 'maintenance' ).onPublish( async ( message ) => {
 
    console.log( "Maintenance task starting");
 
@@ -25,168 +23,9 @@ exports.maintenance = functions.pubsub.topic( 'maintenance' ).onPublish( async (
    }
 });
 
-exports.updateEvent = functions.firestore
-   .document( 'events/{eventId}' )
-   .onWrite( async ( change, context ) => {
-      const written = change.after.data() as OEvent;
-   });
+export const eventClubReferencesCreate = clubIndex.created;
+export const eventClubReferencesUpdate = clubIndex.updated;
+export const eventClubReferencesDelete = clubIndex.deleted;
+export const rebuildClubs = clubIndex.rebuildClubs;
 
-exports.updateEvent = functions.firestore
-   .document( 'events/{eventId}' )
-   .onUpdate( async ( change, context ) => {
-
-      const newValue = change.after.data() as OEvent;
-      const previousValue = change.before.data() as OEvent;
-
-      if ( newValue.club !== previousValue.club ) {
-         const clubs = await readClubs();
-         await removeClubReference( previousValue );
-         await addClubReference( newValue );
-
-
-      }
-
-   } );
-
-exports.eventClubReferencesUpdate = functions.firestore
-   .document( 'events/{eventId}' )
-   .onUpdate( async ( change, context ) => {
-      const written = change.after.data() as OEvent;
-
-      // ...or the previous value before this update
-      const previous = change.before.data() as OEvent;
-
-      if ( ( written.club !== previous.club ) || ( written.nationality !== previous.nationality ) ) {
-         await removeClubReference( previous );
-         await addClubReference( written );
-      }
-   } );
-
-exports.eventClubReferencesDelete = functions.firestore
-   .document( 'events/{eventId}' )
-   .onDelete( async ( snapshot ) => {
-      const event = snapshot.data() as OEvent;
-      await removeClubReference( event );
-   } );
-
-exports.eventClubReferencesCreate = functions.firestore
-   .document( 'events/{eventId}' )
-   .onCreate( async ( snapshot ) => {
-      const event = snapshot.data() as OEvent;
-
-      await addClubReference( event );
-   } );
-
-/** Read clubs object */
-async function readClubs(): Promise<Club[]> {
-   const doc = await admin.firestore().doc( '/clubs/clubs' ).get();
-   return doc.data() as Club[];
-}
-
-async function writeClubs( clubs: Club[] ): Promise<void> {
-  // TODO actually re-write the clubs
-}
-
-async function addClubReference( event: OEvent ): Promise<void> {
-   const clubRef = getClubRef( event );
-
-   const clubSnapshot: admin.database.DataSnapshot = await clubRef.once( "value" );
-   let club = clubSnapshot.val();
-
-   if ( !club ) {
-      club = {
-         name: event.club,
-         nationality: event.nationality,
-         numEvents: 0
-      };
-      console.log( "Creating new club " + club.name + "  " + club.nationality );
-   }
-   club.numEvents = club.numEvents + 1;
-
-   await clubRef.set( club );
-
-   console.log( "Added club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents );
-
-}
-
-async function removeClubReference( event ): Promise<void> {
-   const clubRef = getClubRef( event );
-   const clubSnapshot = await clubRef.once( "value" ) as admin.database.DataSnapshot;
-   const club: Club = clubSnapshot.val();
-
-   if ( !club ) {
-      console.log( "Removing reference club not found" );
-      return;
-   }
-
-   club.numEvents = club.numEvents - 1;
-   if ( club.numEvents === 0 ) {
-      await clubRef.remove();
-   } else {
-      await clubRef.set( club );
-   }
-
-   console.log( "Removed club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents );
-}
-
-function getClubRef( event: OEvent ): admin.database.Reference {
-   let key = padRight( event.club.toLowerCase(), 10 ) + event.nationality;
-   key = encodeAsFirebaseKey( key );
-   const ref = admin.database().ref( "clubs/" + key );
-   return ( ref );
-}
-
-function padRight( str: string, length: number ): string {
-   while ( str.length < length ) {
-      str = str + "-";
-   }
-   return str;
-}
-
-function encodeAsFirebaseKey( string ) {
-   return string.replace( /\%/g, "%25" )
-      .replace( /\./g, "%2E" )
-      .replace( /\#/g, "%23" )
-      .replace( /\$/g, "%24" )
-      .replace( /\//g, "%2F" )
-      .replace( /\[/g, "%5B" )
-      .replace( /\]/g, "%5D" );
-}
-
-/** User data updated  */
-exports.updateEvent = functions.firestore
-   .document( 'users/{userId}' )
-   .onUpdate( async ( change, context ) => {
-
-      const newValue = change.after.data() as UserData;
-      const previousValue = change.before.data() as UserData;
-
-      /** If fmap reservation added to user then unodate the fixture reservation */
-      if ( newValue.fixtures.length > previousValue.fixtures.length ) {
-         const userReservation = newValue.fixtures[newValue.fixtures.length - 1] as UserReservation;
-
-         const doc =  admin.firestore().doc( '/fixtures/reservations' + userReservation.eventId);
-         const snap = await doc.get();
-         const eventRes =  snap.data() as FixtureReservation;
-
-         const course = eventRes.courses.find( c => c.name === userReservation.course);
-
-         if (!course) {
-            throw new Error("Course not found for map reservation");
-         }
-
-         const newReservation: MapReservation = {
-            userId: newValue.key,
-            firstname: newValue.firstname,
-            surname: newValue.surname,
-            club: newValue.club,
-            madeAt: new Date().toISOString(),
-            ecard: -1
-        };
-        course.reservations.push(newReservation);
-
-        // Add new reservation to course
-         await doc.set( previousValue );
-      }
-
-   } );
+export const userUpdated = mapReg.userUpdated;

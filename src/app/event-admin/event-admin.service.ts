@@ -1,3 +1,6 @@
+/**
+ * Event data admininstarion service
+ */
 
 import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
@@ -10,7 +13,7 @@ import { Utils } from "app/shared";
 import { firestore } from "firebase/app";
 import { Observable } from "rxjs";
 import { take } from 'rxjs/operators';
-import { Club, CompetitorSearchData } from "../model";
+import { CompetitorSearchData } from "app/model";
 import { CompetitorDataService } from "../shared/services/competitor-data.service";
 
 type PartialEvent = Partial<OEvent>;
@@ -20,14 +23,10 @@ type PartialEvent = Partial<OEvent>;
 } )
 export class EventAdminService {
 
-   public clubManger: ClubListManager;
-
    constructor ( protected afAuth: AngularFireAuth,
       protected afs: AngularFirestore,
       protected storage: AngularFireStorage,
-      protected csd: CompetitorDataService ) {
-      this.clubManger = new ClubListManager( afs );
-   }
+      protected csd: CompetitorDataService ) { }
 
    /** Get observable for event key */
    getEvent( key: string ): Observable<OEvent> {
@@ -50,12 +49,7 @@ export class EventAdminService {
 
       console.log( "EventService:  Adding Event " + JSON.stringify( event ) );
 
-      // Update club list and event in a transaction
-      await this.afs.firestore.runTransaction( async ( trans ) => {
-         await this.clubManger.eventAdded( event, trans );
-         const ref = this.afs.firestore.doc( "/events/" + event.key );
-         trans.set( ref, event );
-      } );
+      await this.afs.firestore.doc( "/events/" + event.key ).set(event);
 
       console.log( "EventService:  Event added" );
 
@@ -68,19 +62,13 @@ export class EventAdminService {
 
       console.log( "EventService: Updating key " + key );
 
-      const eventsDoc = this.afs.doc<OEvent>( "/events/" + key );
       const update: PartialEvent = Object.assign( eventInfo );
 
       update.date = new Date( update.date ).toISOString();
 
       this.setIndexProperties( update );
 
-      // Update club list and event in a transaction
-      await this.afs.firestore.runTransaction( async ( trans ) => {
-         await this.clubManger.eventChanged( key, eventInfo, trans );
-         const ref = this.afs.firestore.doc( "/events/" + key );
-         trans.update( ref, update );
-      } );
+      await this.afs.firestore.doc( "/events/" + key ).update(update);
 
       console.log( "EventAdminService:  Event updated " + key );
    }
@@ -107,12 +95,8 @@ export class EventAdminService {
          throw err;
       }
 
-      // Delete event and update club reference in a transaction
-      await fs.runTransaction( async ( trans ) => {
-         await this.clubManger.eventDeleted( event, trans );
-         const eventRef = this.afs.firestore.doc( "/events/" + event.key );
-         trans.delete( eventRef );
-      } );
+      // Delete event entry
+      await this.afs.firestore.doc( "/events/" + event.key ).delete();
 
       // Finally delete results file from Google storage
       if ( event.splits ) {
@@ -290,108 +274,6 @@ export class EventAdminService {
       return ( summary );
    }
 
-}
-
-/** Class to manage list of clubs in all events */
-class ClubListManager {
-
-   constructor ( protected afs: AngularFirestore ) { }
-
-   /** Call in transaction before an event is deleetd to decerment its reference count  */
-   public async eventDeleted( event: OEvent, trans: firestore.Transaction ): Promise<void> {
-      const club = await this._readClub( event, trans );
-      this._removeClubReference( event, club, trans );
-   }
-
-   /** Call in transaction when an event is changed to manage club list  */
-   public async eventChanged( key: string, written: EventInfo,
-      trans: firestore.Transaction ) {
-
-      const previous = await this._readEvent( key );
-
-      if ( ( written.club !== previous.club ) ||
-         ( written.nationality !== previous.nationality ) ) {
-
-         // In transaction, Reads must be before any writes
-         const writtenClub = await this._readClub( written, trans );
-         const previousClub = await this._readClub( previous, trans );
-         this._removeClubReference( previous, previousClub, trans );
-         this._addClubReference( written, writtenClub, trans );
-      }
-   }
-
-   /** Call in transaction before an event is added to craete club s required and increamrnt its reference count */
-   public async eventAdded( event: OEvent, trans ) {
-      const club = await this._readClub( event, trans );
-      this._addClubReference( event, club, trans );
-   }
-
-   /** Get key string for a club comprised to nationality code and club name concaternated. */
-   private _getClubKey( event: EventInfo ) {
-      const key = event.nationality + '-' + event.club;
-      return Utils.encodeAsKey( key );
-   }
-
-   /** Read club object in a transaction */
-   private async _readClub( event: EventInfo, trans: firestore.Transaction ): Promise<Club | undefined> {
-      const ref = this.afs.firestore.doc( '/clubs/' + this._getClubKey( event ) );
-      const snapahot = await trans.get( ref );
-      if ( snapahot.exists ) {
-         return snapahot.data() as Club;
-      } else {
-         return undefined;
-      }
-   }
-
-   /** Read event object - Not part of the transaction  */
-   private async _readEvent( key: string ): Promise<OEvent | undefined> {
-      return this.afs.doc<OEvent>( '/events/' + key ).valueChanges().pipe( take( 1 ) ).toPromise();
-   }
-
-   /** Add a reference to a club in a transaction, creating club if required */
-   private _addClubReference( eventInfo: EventInfo,
-      club: Club,
-      trans: firestore.Transaction ): void {
-
-      if ( !club ) {
-         club = {
-            key: this._getClubKey( eventInfo ),
-            name: eventInfo.club,
-            nationality: eventInfo.nationality,
-            numEvents: 0,
-            lastEvent: eventInfo.date,
-         };
-         console.log( "Creating new club " + club.name + "  " + club.nationality );
-      }
-
-      club.numEvents = club.numEvents + 1;
-      club.lastEvent = eventInfo.date;
-
-      const clubRef = this.afs.firestore.doc( '/clubs/' + club.key );
-      trans.set( clubRef, club );
-
-      console.log( "Added club reference " + club.name + "  " + club.nationality + " Num events " + club.numEvents );
-   }
-
-   /** Remove a club reference in a transaction deleting the club if required */
-   private _removeClubReference( event, club: Club, trans: firestore.Transaction ): void {
-
-      if ( !club ) {
-         console.log( "WARNING Removing reference to a club not found  Name:" + event.club );
-         return;
-      }
-
-      const clubRef = this.afs.firestore.doc( '/clubs/' + club.key );
-
-      club.numEvents = club.numEvents - 1;
-      if ( club.numEvents < 1 ) {
-         trans.delete( clubRef );
-      } else {
-         trans.set( clubRef, club );
-      }
-
-      console.log( "Removed club reference " + club.name + "  " + club.nationality + " Num events" + club.numEvents );
-   }
 }
 
 /** Class to perform Firestore batchs iof more than 500 operations.

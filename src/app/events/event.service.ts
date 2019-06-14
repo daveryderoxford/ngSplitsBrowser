@@ -1,10 +1,12 @@
-
+/**
+ * Event service
+ */
 import { Injectable } from "@angular/core";
 import { AngularFirestore, QueryFn } from "@angular/fire/firestore";
 import { BehaviorSubject, merge, Observable } from "rxjs";
-import { finalize, take, tap } from 'rxjs/operators';
-import { Club, EventInfo, OEvent } from "../model";
-import { PaganationService } from "../shared";
+import { take, tap } from 'rxjs/operators';
+import { Club, EventInfo, OEvent } from "app/model";
+import { PaganationService } from "app/shared";
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
@@ -72,9 +74,7 @@ export class EventService {
 
   /** Get a list if club namees for all events ordered by name and nationality */
   getClubs(): Observable<Club[]> {
-    const obs =  this.afs.collection<Club>("/clubs", ref =>
-      ref.orderBy("name").orderBy("nationality"))
-      .valueChanges().pipe(
+    const obs =  this.afs.doc<Club[]>("clubs").valueChanges().pipe(
         tap( clubs => console.log("EventService:  Clubs list returned.  Num clubs: " + clubs.length.toString() )),
         take(1)
       );

@@ -133,7 +133,6 @@ export class BulkImportService {
 
     // Save event data and club index in a transaction
     await this.afs.firestore.runTransaction(async (trans) => {
-      await this.es.clubManger.eventAdded(event, trans);
       const ref = this.afs.firestore.doc("/events/" + event.key);
       trans.set(ref, event);
     });
