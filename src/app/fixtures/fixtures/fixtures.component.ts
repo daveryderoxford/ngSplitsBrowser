@@ -1,12 +1,12 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
-import { filter, map } from 'rxjs/operators';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { MatDialog } from '@angular/material/dialog';
 import { FixtureActionPopupComponent } from './fixture-action-popup.component';
 
 @Component( {
@@ -31,8 +31,8 @@ export class FixturesComponent implements OnInit {
    isHandSet: boolean;
 
    constructor ( public fs: FixturesService,
-                 breakpointObserver: BreakpointObserver,
-                 public dialog: MatDialog  ) {
+      breakpointObserver: BreakpointObserver,
+      public dialog: MatDialog ) {
       this.isHandSet = breakpointObserver.isMatched( Breakpoints.Handset );
    }
 
@@ -41,12 +41,12 @@ export class FixturesComponent implements OnInit {
       this.postcode$ = this.fs.getPostcode();
 
       this.filteredFixtures$ = this.fs.getFixtures().pipe(
-         map( fixtures => fixtures.filter (fix => !fix.hidden))
+         map( fixtures => fixtures.filter( fix => !fix.hidden ) )
       );
 
-      this.fs.getFixtures().subscribe( f =>  {
+      this.fs.getFixtures().subscribe( f => {
          this.fixtures = f;
-      });
+      } );
    }
 
    onFeatureSelected( fixture: Fixture ) {
@@ -57,16 +57,16 @@ export class FixturesComponent implements OnInit {
       this.fs.setPostcode( p );
    }
 
-   filterChanged(f: FixtureFilter) {
+   filterChanged( f: FixtureFilter ) {
       this.fs.setFilter( f );
    }
 
-   displayMobileActions(fixture: Fixture) {
+   displayMobileActions( fixture: Fixture ) {
 
-   const dialogRef = this.dialog.open( FixtureActionPopupComponent, {
-      data: fixture,
-   } );
-  }
+      this.dialog.open( FixtureActionPopupComponent, {
+         data: fixture,
+      } );
+   }
 }
 
 

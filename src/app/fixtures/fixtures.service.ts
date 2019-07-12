@@ -1,18 +1,15 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from "@angular/fire/storage";
-import { EventGrades } from 'app/model';
 import { Fixture, LatLong } from 'app/model/fixture';
 import { FixtureFilter, GradeFilter } from 'app/model/fixture-filter';
+import { FixtureReservation } from 'app/model/fixture-reservation';
 import { UserDataService } from 'app/user/user-data.service';
 import { differenceInMonths, isFuture, isSaturday, isSunday, isToday, isWeekend } from 'date-fns';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
-import { catchError, map, share, startWith, switchMap, tap, filter, shareReplay } from 'rxjs/operators';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { snapshotChanges } from '@angular/fire/database';
-import { FixtureReservation, MapReservation } from 'app/model/fixture-reservation';
-import { now } from 'd3';
+import { catchError, filter, map, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
 
 @Injectable( {
    providedIn: 'root'
@@ -28,7 +25,15 @@ export class FixturesService {
       grades: this.makeDefaultGrades()
    } );
 
-   _userData = this.afAuth.authState.pipe( switchMap( () => this.usd.userData() ) );
+   _userData$ = this.afAuth.authState.pipe( switchMap( () => this.usd.userData() ) );
+
+   _fileContents: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
+      switchMap( url => this.http.get<Fixture[]>( url ) ),
+      map( fixtures => this.futureFixtures( fixtures ) ),
+      shareReplay(),
+      startWith( [] ),
+      catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
+   );
 
    constructor (
       private afAuth: AngularFireAuth,
@@ -55,18 +60,7 @@ export class FixturesService {
 
    getFixtures(): Observable<Fixture[]> {
 
-      // It is not required to set the Accept-Encoding' header as this is set by the browser
-      // const httpOptions = { headers: new HttpHeaders( { 'Accept-Encoding': 'gzip' } ) };
-
-      const fileContents: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
-         switchMap( url => this.http.get<Fixture[]>( url ) ),
-         map( fixtures => this.futureFixtures( fixtures ) ),
-         startWith( [] ),
-         shareReplay(),
-         catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
-      );
-
-      const fixturesWithDistance$ = combineLatest( [ fileContents, this._homeLocation$ ] ).pipe(
+      const fixturesWithDistance$ = combineLatest( [ this._fileContents, this._homeLocation$ ] ).pipe(
          map( ( [ fixtures, loc ] ) => {
             const n = fixtures.map( fix => {
                fix.distance = this.distanceFromHome( fix, loc );
@@ -148,9 +142,8 @@ export class FixturesService {
    }
 
    /** Adds a new map reservation for a fixture. Throws an exception if one already exists for the fixture */
-
    async addMapReservation( id: string, reservation: FixtureReservation ): Promise<void> {
-      const doc = this.fs.doc<FixtureReservation>( '/mapreservations/' + id );
+      const doc = this.fs.doc<FixtureReservation>( '/enteries/' + id );
 
       try {
          const res = await doc.valueChanges().toPromise();
@@ -159,32 +152,6 @@ export class FixturesService {
          console.log( 'FixtureService: Error adding map reservation:' + e.message );
          throw e;
       }
-   }
-
-   async reserveMap( fixture: FixtureReservation, courseName: string, ecard: number ): Promise<void> {
-
-         const course = fixture.courses.find( c => c.name === courseName );
-
-         if ( !course ) {
-            throw new Error( 'FixtureService: Unexpected error.  Course not def ' );
-         }
-
-         // User data populated by server
-         const user = this.usd.currentUserData;
-
-         const reg: MapReservation = {
-            userId: user.key,
-            firstname: user.firstname,
-            surname: user.surname,
-            club: user.club,
-            madeAt: new Date().toDateString(),
-            ecard: ecard,
-         };
-
-         course.reservations.push( reg);
-
-         const ref =  this.fs.doc('fixtures' + fixture.eventId);
-         await ref.set(fixture);
    }
 
    private makeDefaultGrades(): GradeFilter[] {

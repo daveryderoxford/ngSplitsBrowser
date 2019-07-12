@@ -1,7 +1,8 @@
 
 /** Material2 components impored at an application level  */
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { NgModule } from "@angular/core";
-
+import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatButtonModule } from "@angular/material/button";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
@@ -31,10 +32,6 @@ import { MatTableModule } from "@angular/material/table";
 import { MatTabsModule } from "@angular/material/tabs";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { MatTooltipModule } from "@angular/material/tooltip";
-
-import {ScrollDispatchModule} from '@angular/cdk/scrolling';
-
-import { FlexLayoutModule } from "@angular/flex-layout";
 
 @NgModule({
   exports: [
@@ -69,7 +66,7 @@ import { FlexLayoutModule } from "@angular/flex-layout";
     MatExpansionModule,
     MatFormFieldModule,
     FlexLayoutModule,
-    ScrollDispatchModule
+    ScrollingModule
   ],
 })
 export class AppMaterialModule { }

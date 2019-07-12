@@ -1,14 +1,53 @@
 
+$mat-row-height: 38px;
+$mat-row-horizontal-padding: 24px;
+
+
+// Table elements styles
+
+table {
+  width: 100%;
+  table-layout: fixed;
+  border-spacing: 0;
+  font-family: Roboto,"Helvetica Neue",sans-serif;
+}
+
+tr {
+  height: $mat-row-height;
+}
+
+th, td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0;
+  border: none;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: rgba(220,220,220);
+  padding-left: $mat-row-horizontal-padding;
+  padding-right: $mat-row-horizontal-padding;
+}
+
+th {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(0,0,0,.54);
+}
+
+td {
+  font-size: 13px;
+  color: rgba(0,0,0,.87);
+}
+
+
+// Individual column styles
  .center {
   text-align: center;
 }
 
-.table {
-  width: 100%;
-  table-layout: fixed;
 
-}
-
+// No date 
 .nodata {
   color: rgb(235,235,235);
   width: 100%;
@@ -17,6 +56,7 @@
   width: 100%;
 }
 
+// Dynamic  styles
 tr:hover {
   background: rgb(245,245,245);
 }
@@ -24,14 +64,4 @@ tr:hover {
   .selected {
     background: rgb(225, 225, 225);
   }
-
-
-th, td {
-  overflow: hidden;
-  width: 200px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-
 

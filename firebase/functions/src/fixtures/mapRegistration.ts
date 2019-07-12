@@ -4,8 +4,8 @@
 
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import { UserData, UserReservation } from "model/user";
-import { FixtureReservation, MapReservation } from "model/fixture-reservation";
+import { UserData, UserReservation } from "../model/user";
+import { FixtureReservation, MapReservation } from "../model/fixture-reservation";
 
 export const userUpdated = functions.firestore
    .document( 'users/{userId}' )
@@ -40,7 +40,7 @@ export const userUpdated = functions.firestore
         course.reservations.push(newReservation);
 
         // Add new reservation to the course array
-         await doc.set( previousValue );
+         await doc.set( eventRes );
       }
 
    } );

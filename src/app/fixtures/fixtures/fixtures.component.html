@@ -11,13 +11,13 @@
   <as-split direction="vertical">
 
     <as-split-area>
-      <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation$ | async" [selectedFixture]="selectedFixture"
+      <app-fixtures-map [fixtures]="filteredFixtures$ | async" [homeLocation]="homeLocation$ | async" [selectedFixture]="selectedFixture"
         (fixtureSelected)="onFeatureSelected($event)">
       </app-fixtures-map>
     </as-split-area>
 
     <as-split-area>
-      <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
+      <app-fixtures-grid [fixtures]="filteredFixtures$ | async" [homeLocation]="homeLocation$ | async"
         [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
       </app-fixtures-grid>
     </as-split-area>

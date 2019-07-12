@@ -30,7 +30,7 @@ export class UserDataService {
       if (user === null) {
         this._currentUserData.next(null);
       } else {
-        this._getUserDataObservable().subscribe((userData) => {
+        this._getUserData$().subscribe((userData) => {
           this._currentUserData.next(userData);
         });
       }
@@ -53,9 +53,8 @@ export class UserDataService {
     return this._currentUserData.value;
   }
 
-  private _getUserDataObservable(): Observable<UserData | null> {
-    const user = this._getUserDoc()
-      .snapshotChanges().pipe(
+  private _getUserData$(): Observable<UserData | null> {
+    const user = this._getUserDoc().snapshotChanges().pipe(
         map(ret => {
           const snapshot = ret.payload;
           if (!snapshot.exists) {
@@ -104,9 +103,10 @@ export class UserDataService {
     return userDoc;
   }
 
-  /** Reserve a map for the user */
-  async saveMapReservation(fixture: Fixture, course: string) {
-    // Add map reservation to user
+  /** Reserve a map for the user
+   * Server will update event entry information to reflect entry
+  */
+  async reseveMap(fixture: Fixture, course: string) {
 
     const res: UserReservation = {
       eventId: fixture.id,
@@ -133,13 +133,12 @@ export class UserDataService {
     return obs;
   }
 
-
   private _processResults(userResults: UserResult[], results: Results, userResult: UserResult) {
 
     // Find competitor by ecard. Note that a synthtic ecard will be assigned if the event does not have ecard values.
     const comp = results.findCompetitorByECard(userResult.ecardId);
 
-    // Populate result data
+    // Populate result data for the user
     const course = comp.courseClass.course;
     const courseWinner = this._getCourseWinner(course);
 
@@ -196,12 +195,6 @@ export class UserDataService {
     }
     return this._getUserDoc().set(user);
   }
-
-  /* Not required
-  findByECard(ecard: ECard): Observable<UserData[]> {
-    return this.afs.collection<UserData>('users',
-      ref => ref.where('ecard', '==', ecard.id).where('cctype', '==', ecard.type)).valueChanges();
-  } */
 
   /** Find user results for the current user  */
   async findUserResults(ecard: ECard): Promise<UserResult[]> {

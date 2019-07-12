@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, EventEmitter,
-   Input, OnInit, Output, QueryList, ViewChildren, ViewContainerRef, PipeTransform, Pipe, NgModule } from '@angular/core';
+   Input, OnInit, Output, QueryList, ViewChildren, ViewContainerRef, PipeTransform, Pipe, NgModule, ViewChild } from '@angular/core';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
 import { differenceInCalendarDays, format } from 'date-fns';
+import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 @Component( {
    selector: 'app-fixtures-grid',
@@ -19,17 +20,17 @@ export class FixturesGridComponent implements OnInit {
    @Input() fixtures: Fixture[];
 
    @Input() set selectedFixture( f: Fixture ) {
+      if ( f !== this._selectedFixture ) {
+         this.showElement( f );
+      }
       this._selectedFixture = f;
-      this.showElement( f );
    }
 
    @Input() homeLocation: LatLong;
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
-   @ViewChildren( 'tableRows', { read: ViewContainerRef } ) rows: QueryList<ViewContainerRef>;
-
-   displayedColumns = [ "date", "distance", "name", "club", "level", "area", "location", "directions" ];
+   @ViewChild( CdkVirtualScrollViewport, { static: false} ) viewPort: CdkVirtualScrollViewport;
 
    constructor () { }
 
@@ -57,10 +58,7 @@ export class FixturesGridComponent implements OnInit {
       const index = this.fixtures.findIndex( f => f === fixture );
 
       if ( index !== -1 ) {
-         const row = this.rows.toArray()[ index ];
-         row.element.nativeElement.scrollIntoViewIfNeeded( true, { behavior: 'instant' } );
+         this.viewPort.scrollToIndex( index );
       }
    }
 }
-
-
