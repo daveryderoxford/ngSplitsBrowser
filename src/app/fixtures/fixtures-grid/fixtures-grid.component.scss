@@ -1,12 +1,11 @@
 
 $mat-row-height: 38px;
-$mat-row-horizontal-padding: 24px;
+$mat-row-horizontal-padding: 8px;
 
 
 // Table elements styles
 
 table {
-  width: 100%;
   table-layout: fixed;
   border-spacing: 0;
   font-family: Roboto,"Helvetica Neue",sans-serif;
@@ -30,6 +29,7 @@ th, td {
 }
 
 th {
+  text-align: left;
   font-size: 12px;
   font-weight: 500;
   color: rgba(0,0,0,.54);
@@ -46,15 +46,61 @@ td {
   text-align: center;
 }
 
-
-// No date 
-.nodata {
-  color: rgb(235,235,235);
-  width: 100%;
-  text-align: center;
-  margin-top: 50px;
-  width: 100%;
+.date {
+  width: 100px;
+  max-width: 120px;
+  min-width: 100px;
+  padding-left: 24px;
 }
+
+.distance {
+  width: 40px;
+  max-width: 50px;
+  min-width: 40px;
+}
+
+.name {
+  width: 300px;
+  max-width: 400px;
+  min-width: 100px;
+}
+
+.club {
+  width: 75px;
+  max-width: 100px;
+  min-width: 50px;
+}
+
+.level {
+  width: 75px;
+  max-width: 100px;
+  min-width: 50px;
+}
+
+.area {
+  width: 150px;
+  max-width: 200px;
+  min-width: 75px;
+}
+
+.location {
+  width: 75px;
+  max-width: 100px;
+  min-width: 50px;
+}
+
+.directions {
+  width: 75px;
+  max-width: 100%;
+}
+
+.actions {
+  width: 30px;
+  max-width: 30px;
+  min-width: 30px;
+  padding-right: 12px;
+}
+
 
 // Dynamic  styles
 tr:hover {
