@@ -28,22 +28,23 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
    constructor ( public dialog: MatDialog ) { }
 
    ngOnInit() {
-      this.postcodeFormControl = new FormControl( '', [ this.validatePostcode, Validators.required ] );
-      this.gradesEnabledControl = new FormControl();
+      this.postcodeFormControl = new FormControl( this.postcode, [ this.validatePostcode, Validators.required ] );
+      this.gradesEnabledControl = new FormControl( this.filter.gradesEnabled );
 
       this.timeFilter$ = new BehaviorSubject( this.filter.time );
       this.gradeOptions$ = new BehaviorSubject( this.filter.grades );
 
-      combineLatest( this.timeFilter$,
-         this.gradesEnabledControl.valueChanges.pipe( startWith( this.filter.gradesEnabled )),
-                     this.gradeOptions$ ).subscribe( ( [ time, gradeEnabled, gradeOptions ] ) => {
-         const filter = {
-            time: time,
-            gradesEnabled: gradeEnabled,
-            grades: gradeOptions
-         };
-         this.filterChanged.emit( filter );
-      } );
+      combineLatest( [
+         this.timeFilter$,
+         this.gradesEnabledControl.valueChanges.pipe( startWith( this.filter.gradesEnabled ) ),
+         this.gradeOptions$ ] ).subscribe( ( [ time, gradeEnabled, gradeOptions ] ) => {
+            const filter = {
+               time: time,
+               gradesEnabled: gradeEnabled,
+               grades: gradeOptions
+            };
+            this.filterChanged.emit( filter );
+         } );
    }
 
    ngAfterViewInit() { }
@@ -83,7 +84,7 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
       } );
 
       dialogRef.afterClosed().subscribe( gradeFilter => {
-         if ( gradeFilter) {
+         if ( gradeFilter ) {
             this.gradeOptions$.next( gradeFilter );
          }
       } );

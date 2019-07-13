@@ -1,6 +1,8 @@
 <!-- Large Screen -->
 <div *ngIf="!isHandSet" class="large-screen">
 
+  <ng-container *ngIf="fixtures$ | async as fixtures">
+
   <app-navbar class="top-left" layout="menu"></app-navbar>
 
   <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async"
@@ -11,18 +13,20 @@
   <as-split direction="vertical">
 
     <as-split-area>
-      <app-fixtures-map [fixtures]="filteredFixtures$ | async" [homeLocation]="homeLocation$ | async" [selectedFixture]="selectedFixture"
+      <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation$ | async" [selectedFixture]="selectedFixture"
         (fixtureSelected)="onFeatureSelected($event)">
       </app-fixtures-map>
     </as-split-area>
 
     <as-split-area>
-      <app-fixtures-grid [fixtures]="filteredFixtures$ | async" [homeLocation]="homeLocation$ | async"
+      <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
         [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
       </app-fixtures-grid>
     </as-split-area>
 
   </as-split>
+
+  </ng-container>
 </div>
 
 <!-- Handset -->
@@ -46,7 +50,7 @@
   <cdk-virtual-scroll-viewport fxFill itemSize="120">
     <mat-list>
 
-      <mat-list-item (click)="displayMobileActions(fixture)" *cdkVirtualFor="let fixture of filteredFixtures$ | async">
+      <mat-list-item (click)="displayMobileActions(fixture)" *cdkVirtualFor="let fixture of fixtures$ | async">
         <h3 matLine layout-align="space-between">
 
           <span fxFlex>{{fixture.date | fixturedate }}</span>
