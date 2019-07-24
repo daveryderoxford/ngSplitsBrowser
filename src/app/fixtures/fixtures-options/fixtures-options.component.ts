@@ -6,11 +6,11 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { GradeFilterComponent } from '../grade-filter-dialog/grade-filter-dialog.component';
 
-@Component( {
+@Component({
    selector: 'app-fixtures-options',
    templateUrl: './fixtures-options.component.html',
-   styleUrls: [ './fixtures-options.component.scss' ]
-} )
+   styleUrls: ['./fixtures-options.component.scss']
+})
 export class FixturesOptionsComponent implements OnInit, AfterViewInit {
 
    timeFilter$: BehaviorSubject<FixtureTimeFilter>;
@@ -25,67 +25,68 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
    postcodeFormControl: FormControl;
    gradesEnabledControl: FormControl;
 
-   constructor ( public dialog: MatDialog ) { }
+   constructor(public dialog: MatDialog) { }
 
    ngOnInit() {
-      this.postcodeFormControl = new FormControl( '', [ this.validatePostcode, Validators.required ] );
+      this.postcodeFormControl = new FormControl('', [this.validatePostcode, Validators.required]);
       this.gradesEnabledControl = new FormControl();
 
-      this.timeFilter$ = new BehaviorSubject( this.filter.time );
-      this.gradeOptions$ = new BehaviorSubject( this.filter.grades );
+      this.timeFilter$ = new BehaviorSubject(this.filter.time);
+      this.gradeOptions$ = new BehaviorSubject(this.filter.grades);
 
-      combineLatest( this.timeFilter$,
-         this.gradesEnabledControl.valueChanges.pipe( startWith( this.filter.gradesEnabled )),
-                     this.gradeOptions$ ).subscribe( ( [ time, gradeEnabled, gradeOptions ] ) => {
-         const filter = {
-            time: time,
-            gradesEnabled: gradeEnabled,
-            grades: gradeOptions
-         };
-         this.filterChanged.emit( filter );
-      } );
+      combineLatest(
+         this.timeFilter$,
+         this.gradesEnabledControl.valueChanges.pipe(startWith(this.filter.gradesEnabled)),
+         this.gradeOptions$).subscribe(([time, gradeEnabled, gradeOptions]) => {
+            const filter = {
+               time: time,
+               gradesEnabled: gradeEnabled,
+               grades: gradeOptions
+            };
+            this.filterChanged.emit(filter);
+         });
    }
 
    ngAfterViewInit() { }
 
    postcodeEntered() {
 
-      if ( !this.postcodeFormControl.valid ) {
+      if (!this.postcodeFormControl.valid) {
          return;
       }
       const portcode = this.postcodeFormControl.value.trim().toUpperCase();
-      this.postcodeChanged.emit( portcode );
+      this.postcodeChanged.emit(portcode);
    }
 
-   validatePostcode( input: FormControl ) {
+   validatePostcode(input: FormControl) {
       const text = input.value.trim();
 
-      if ( text === "" ) {
+      if (text === "") {
          return null;
       }
       const regex = /^[A-Z]{1,2}([0-9]{1,2}|[0-9][A-Z])\s*[0-9][A-Z]{2}$/gi;
 
-      return regex.test( text ) ? null : { postcodeInvalid: true };
+      return regex.test(text) ? null : { postcodeInvalid: true };
    }
 
-   timeFilterChanged( val: FixtureTimeFilter ) {
-      this.timeFilter$.next( val );
+   timeFilterChanged(val: FixtureTimeFilter) {
+      this.timeFilter$.next(val);
    }
 
    displayGrades() {
       // Display grade dialog
 
-      const dialogRef = this.dialog.open( GradeFilterComponent, {
+      const dialogRef = this.dialog.open(GradeFilterComponent, {
          width: '320px',
          maxWidth: '100vw',
          data: this.gradeOptions$.value,
          panelClass: 'sb-highzorder-dialog'
-      } );
+      });
 
-      dialogRef.afterClosed().subscribe( gradeFilter => {
-         if ( gradeFilter) {
-            this.gradeOptions$.next( gradeFilter );
+      dialogRef.afterClosed().subscribe(gradeFilter => {
+         if (gradeFilter) {
+            this.gradeOptions$.next(gradeFilter);
          }
-      } );
+      });
    }
 }
