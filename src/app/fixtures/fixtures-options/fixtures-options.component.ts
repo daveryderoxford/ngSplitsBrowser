@@ -36,7 +36,7 @@ export class FixturesOptionsComponent implements OnInit {
 
       combineLatest([
          this.timeFilter$,
-         this.gradesEnabledControl.valueChanges,
+         this.gradesEnabledControl.valueChanges.pipe(startWith(this.filter.gradesEnabled)),
          this.gradeOptions$]).subscribe(([time, gradeEnabled, gradeOptions]) => {
             const filter = {
                time: time,
