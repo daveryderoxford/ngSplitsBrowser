@@ -23,6 +23,5 @@ export interface Fixture {
      nearestTown: string;
      association: string;
      distance?: number;
-     hidden?: boolean;
      fixtureReservation?: FixtureReservation;
 }

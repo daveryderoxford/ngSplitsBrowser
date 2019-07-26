@@ -1,10 +1,14 @@
-import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
-         EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import {
+   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
+   EventEmitter, Input, OnInit, Output, ViewEncapsulation
+} from '@angular/core';
 
 import { Fixture, LatLong } from 'app/model/fixture';
 
-import { Canvas, circle, Circle, CircleMarker, CircleMarkerOptions, control,
-         FeatureGroup, Map, tileLayer, TileLayer, Util } from "leaflet";
+import {
+   Canvas, circle, Circle, CircleMarker, CircleMarkerOptions, control,
+   FeatureGroup, Map, tileLayer, TileLayer, Util
+} from "leaflet";
 
 
 @Component( {
@@ -19,6 +23,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    private _fixtures: Fixture[] = [];
    private _selectedFixtureMarker: FixtureMarker = null;
+   private _homeLocation: LatLong;
 
    private _fixtureMarkers = new FeatureGroup<FixtureMarker>();
    private _homeMarkers = new FeatureGroup<Circle>();
@@ -45,9 +50,9 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    ngOnInit() {
 
-      const londonLatLng = { lat: 51.509865, lng: -0.118092 };
+    //  const londonLatLng = { lat: 51.509865, lng: -0.118092 };
 
-      this.map = new Map( 'map', { preferCanvas: true, zoomControl: false } ).setView( londonLatLng, 9 );
+      this.map = new Map( 'map', { preferCanvas: true, zoomControl: false } ).setView( this._homeLocation, 9 );
 
       control.scale( { position: 'bottomleft' } ).addTo( this.map );
       control.zoom( { position: 'bottomright' } ).addTo( this.map );
@@ -62,7 +67,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
       this._homeMarkers.addTo( this.map );
 
-      this.setHomeLocation( londonLatLng );
+      this.setHomeLocation( this._homeLocation );
       this.setFixtures( this._fixtures );
    }
 
@@ -73,6 +78,8 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
    }
 
    setHomeLocation( latLng: LatLong ) {
+
+      this._homeLocation = latLng;
 
       // TODO Can be called on  that is called before the map is created.
       // not sure how to fix this.  Cant create map in constructor as element is not avaliable.
@@ -122,47 +129,45 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
       for ( const fixture of fixturesToDraw.reverse() ) {
 
-         if ( !fixture.hidden ) {
+         const weeks = this.weeksAhead( fixture.date );
 
-            const weeks = this.weeksAhead( fixture.date );
+         const MaxNumberedWeeks = 5;
+         const MinRadius = 6;
 
-            const MaxNumberedWeeks = 5;
-            const MinRadius = 6;
-
-            let radius: number;
-            let label: string;
-            if ( weeks <= MaxNumberedWeeks ) {
-               radius = MinRadius + ( MaxNumberedWeeks - weeks );
-               label = ( weeks + 1 ).toString();
-            } else {
-               radius = MinRadius;
-               label = "";
-            }
-
-            const c = new FixtureMarker( fixture.latLong, {
-               radius: radius,
-               fillColor: this.getColour( weeks ),
-               color: "#000000",
-               pane: 'fixtures',
-               text: label
-            } );
-
-            c.fixture = fixture;
-
-            c.on( {
-               click: evt => {
-                  const fixtureMarker: FixtureMarker = evt.target;
-
-                  if ( fixtureMarker !== this._selectedFixtureMarker ) {
-                     this.selectFeature( fixtureMarker );
-                     this.fixtureSelected.emit( fixtureMarker.fixture );
-
-                  }
-               }
-            } );
-
-            this._fixtureMarkers.addLayer( c );
+         let radius: number;
+         let label: string;
+         if ( weeks <= MaxNumberedWeeks ) {
+            radius = MinRadius + ( MaxNumberedWeeks - weeks );
+            label = ( weeks + 1 ).toString();
+         } else {
+            radius = MinRadius;
+            label = "";
          }
+
+         const c = new FixtureMarker( fixture.latLong, {
+            radius: radius,
+            fillColor: this.getColour( weeks ),
+            color: "#000000",
+            pane: 'fixtures',
+            text: label
+         } );
+
+         c.fixture = fixture;
+
+         c.on( {
+            click: evt => {
+               const fixtureMarker: FixtureMarker = evt.target;
+
+               if ( fixtureMarker !== this._selectedFixtureMarker ) {
+                  this.selectFeature( fixtureMarker );
+                  this.fixtureSelected.emit( fixtureMarker.fixture );
+
+               }
+            }
+         } );
+
+         this._fixtureMarkers.addLayer( c );
+
       }
 
       const fixtureStyle = {

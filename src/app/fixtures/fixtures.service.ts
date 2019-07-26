@@ -16,8 +16,8 @@ import { catchError, filter, map, shareReplay, startWith, switchMap, tap } from 
 } )
 export class FixturesService {
 
-   _postcode$ = new BehaviorSubject<string>( "OX3 7EP" );
-   _homeLocation$ = new BehaviorSubject<LatLong>( { lat: 51.509865, lng: -0.118092 } );
+   _postcode$ = new BehaviorSubject<string>( "TW18 2AB" );
+   _homeLocation$ = new BehaviorSubject<LatLong>( { "lat": 51.43116, "lng": -0.508227, } );
 
    _filter$ = new BehaviorSubject<FixtureFilter>( {
       time: { sat: true, sun: true, weekday: true },
@@ -73,14 +73,7 @@ export class FixturesService {
       );
 
       const fixturesObs$ = combineLatest( [ fixturesWithDistance$, this._filter$ ] ).pipe(
-         map( ( [ fixtures, ftr ] ) => {
-            const n = fixtures.map( fix => {
-               fix.hidden = this.isHidden( fix, ftr );
-               return fix;
-            } );
-            return n;
-         }
-         )
+         map( ( [ fixtures, ftr ] ) => fixtures.filter( fix => !this.isHidden(fix, ftr)) )
       );
 
       return fixturesObs$;

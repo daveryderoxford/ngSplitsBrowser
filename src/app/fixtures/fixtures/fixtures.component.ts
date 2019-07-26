@@ -23,8 +23,6 @@ export class FixturesComponent implements OnInit {
    fixtures$: Observable<Fixture[]>;
    filteredFixtures$: Observable<Fixture[]>;
 
-   fixtures: Fixture[];
-   fixtures1: Fixture[] = [];
 
    hideMobleFilter = true;
 
@@ -34,19 +32,12 @@ export class FixturesComponent implements OnInit {
       breakpointObserver: BreakpointObserver,
       public dialog: MatDialog ) {
       this.isHandSet = breakpointObserver.isMatched( Breakpoints.Handset );
+      this.homeLocation$ = this.fs.getHomeLocation();
+      this.postcode$ = this.fs.getPostcode();
+      this.fixtures$ = this.fs.getFixtures();
    }
 
    ngOnInit() {
-      this.homeLocation$ = this.fs.getHomeLocation();
-      this.postcode$ = this.fs.getPostcode();
-
-      this.filteredFixtures$ = this.fs.getFixtures().pipe(
-         map( fixtures => fixtures.filter( fix => !fix.hidden ) )
-      );
-
-      this.fs.getFixtures().subscribe( f => {
-         this.fixtures = f;
-      } );
    }
 
    onFeatureSelected( fixture: Fixture ) {

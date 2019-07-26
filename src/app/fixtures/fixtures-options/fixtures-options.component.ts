@@ -38,13 +38,28 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
          this.timeFilter$,
          this.gradesEnabledControl.valueChanges.pipe(startWith(this.filter.gradesEnabled)),
          this.gradeOptions$).subscribe(([time, gradeEnabled, gradeOptions]) => {
+      this.postcodeFormControl = new FormControl( this.postcode, [ this.validatePostcode, Validators.required ] );
+      this.gradesEnabledControl = new FormControl( this.filter.gradesEnabled );
+
+      this.timeFilter$ = new BehaviorSubject( this.filter.time );
+      this.gradeOptions$ = new BehaviorSubject( this.filter.grades );
+
+      combineLatest( [
+         this.timeFilter$,
+         this.gradesEnabledControl.valueChanges.pipe( startWith( this.filter.gradesEnabled ) ),
+         this.gradeOptions$ ] ).subscribe( ( [ time, gradeEnabled, gradeOptions ] ) => {
             const filter = {
                time: time,
                gradesEnabled: gradeEnabled,
                grades: gradeOptions
             };
+<<<<<<< HEAD
             this.filterChanged.emit(filter);
          });
+=======
+            this.filterChanged.emit( filter );
+         } );
+>>>>>>> f1daefa094c2bd9205572823b304940a8be5c645
    }
 
    ngAfterViewInit() { }
@@ -83,9 +98,15 @@ export class FixturesOptionsComponent implements OnInit, AfterViewInit {
          panelClass: 'sb-highzorder-dialog'
       });
 
+<<<<<<< HEAD
       dialogRef.afterClosed().subscribe(gradeFilter => {
          if (gradeFilter) {
             this.gradeOptions$.next(gradeFilter);
+=======
+      dialogRef.afterClosed().subscribe( gradeFilter => {
+         if ( gradeFilter ) {
+            this.gradeOptions$.next( gradeFilter );
+>>>>>>> f1daefa094c2bd9205572823b304940a8be5c645
          }
       });
    }
