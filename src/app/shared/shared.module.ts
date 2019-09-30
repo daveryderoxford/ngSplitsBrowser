@@ -1,14 +1,15 @@
 
 /** Shared componens and services  */
-import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
+import { NgModule } from "@angular/core";
+import { AngularFireAuthModule } from "@angular/fire/auth";
+import { AngularSplitModule } from 'angular-split';
+import { AppRoutingModule } from "../app-routing.module";
 import { AppMaterialModule } from "./app-material.module";
 import { NavbarComponent } from "./components/navbar/navbar.component";
-import { SpinnerModule } from './components/spinner.module';
+import { SidenavButtonComponent } from './components/sidenav-button/sidenav-button.component';
+import { SpinnerModule } from './components/spinner/spinner.module';
 import { DialogsModule } from "./dialogs/dialogs.module";
-import { AppRoutingModule } from "../app-routing.module";
-import { AngularSplitModule } from 'angular-split';
-import { AngularFireAuthModule } from "@angular/fire/auth";
 
 @NgModule({
     imports: [
@@ -20,7 +21,8 @@ import { AngularFireAuthModule } from "@angular/fire/auth";
         AngularSplitModule.forRoot(),
     ],
     declarations: [
-        NavbarComponent
+        NavbarComponent,
+        SidenavButtonComponent
     ],
     exports: [
         CommonModule,
@@ -29,6 +31,7 @@ import { AngularFireAuthModule } from "@angular/fire/auth";
         DialogsModule,
         AppMaterialModule,
         NavbarComponent,
+        SidenavButtonComponent,
         AngularSplitModule
     ],
 })

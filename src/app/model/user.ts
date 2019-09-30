@@ -32,7 +32,6 @@ export interface UserData extends UserInfo {
     fixtures: UserFixture[] | UserReservation[];
 }
 
-
 /** Information on the results for a user.
  * the event key plus the ecard +id uniqiely identifies the result
  */

@@ -1,0 +1,34 @@
+<app-spinner [loading]="loading"> </app-spinner>
+
+<mat-sidenav-container class="fullscreen">
+
+  <mat-sidenav>
+
+    <mat-action-list>
+      <button mat-list-item (click)='closeSidenav( "/")'>Home</button>
+
+      <button mat-list-item (click)='closeSidenav("/fixtures")'>Fixtures</button>
+      <button mat-list-item (click)='closeSidenav( "/events")'>Results</button>
+      <button mat-list-item (click)='closeSidenav( "/admin/event-admin" )'>Admin</button>
+
+      <mat-divider></mat-divider>
+
+      <ng-container *ngIf="authorised">
+        <button mat-list-item (click)='closeSidenav( "/user")'>User settings</button>
+        <button mat-list-item (click)='closeSidenav("/change-password")'>Change password</button>
+        <button mat-list-item (click)="logout()">Logout</button>
+      </ng-container>
+
+      <button mat-list-item *ngIf="!authorised" (click)='closeSidenav("/login")'>Login</button>
+
+      <mat-divider></mat-divider>
+
+      <button mat-button (click)="scriptsClicked()">Scripts</button>
+
+    </mat-action-list>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content class="fullscreen">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>

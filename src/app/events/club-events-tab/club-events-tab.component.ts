@@ -35,7 +35,7 @@ export class ClubEventsTabComponent implements OnInit {
 
    ngOnInit() {
       // Club filter
-      this.clubs$ = combineLatest(this.es.getClubs(), this.clubNationalityFilter$, this.clubNameFilter$).pipe(
+      this.clubs$ = combineLatest([this.es.getClubs(), this.clubNationalityFilter$, this.clubNameFilter$]).pipe(
          map(([clubs, nat, name]) => this.filterClubs(clubs, nat, name))
       );
    }

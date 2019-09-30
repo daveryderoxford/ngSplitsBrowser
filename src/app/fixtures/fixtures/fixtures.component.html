@@ -3,7 +3,7 @@
 
   <ng-container *ngIf="fixtures$ | async as fixtures">
 
-  <app-navbar class="top-left" layout="menu"></app-navbar>
+  <app-sidenav-button class="top-left"> </app-sidenav-button>
 
   <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async"
     (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
@@ -33,7 +33,7 @@
 <div *ngIf="isHandSet" fxLayout="column" class=handset>
 
   <div fxFlex class="mat-elevation-z2 handset-filter-options">
-    <app-navbar layout="menu"></app-navbar>
+    <app-sidenav-button> </app-sidenav-button>
     <button mat-button style="float: right;" (click)="hideMobleFilter = !hideMobleFilter">
        FILTER
        <mat-icon *ngIf="hideMobleFilter">arrow_drop_down</mat-icon>

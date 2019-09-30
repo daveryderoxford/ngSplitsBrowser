@@ -1,5 +1,4 @@
-<app-navbar> </app-navbar>
-
+<app-sidenav-button></app-sidenav-button>
 
 <div fxLayout="column" fxLayoutAlign="start">
 
@@ -14,10 +13,10 @@
         <h3 matSubheader>Recent Results</h3>
         <div *ngFor="let event of events | async" (click)="eventClicked(event)">
           <mat-list-item>
-            <span matLine class='list-header'> {{ event.date |  date }}  {{ event.name }} </span>
+            <span matLine class='list-header'> {{ event.date |  date }} {{ event.name }} </span>
             <span matLine>
-                  {{event.nationality}}  {{event.club}}
-              </span>
+              {{event.nationality}} {{event.club}}
+            </span>
 
           </mat-list-item>
         </div>
@@ -27,9 +26,8 @@
 
   <div class="gray_background panel_margin">
 
-    <div fxLayout="row" fxFlex='100%' fxLayoutGap=30px fxLayoutAlign="space-around" 
-         fxLayout.xs="column" fxFlex.xs='100%' fxLayoutAlign.xs="start center"
-         class="gray_background">
+    <div fxLayout="row" fxFlex='100%' fxLayoutGap=30px fxLayoutAlign="space-around" fxLayout.xs="column"
+      fxFlex.xs='100%' fxLayoutAlign.xs="start center" class="gray_background">
 
       <mat-card>
         <mat-card-header>
@@ -40,12 +38,13 @@
 
         <mat-card-content>
           <p>
-            Splitsbrowser supports viewing of the results of orienteering events. Competitors can maintain a list of events they have
+            Splitsbrowser supports viewing of the results of orienteering events. Competitors can maintain a list of
+            events they have
             attended.
           </p>
         </mat-card-content>
         <mat-card-actions>
-           <button mat-button routerLink="/about">About</button>
+          <button mat-button routerLink="/about">About</button>
           <button mat-button routerLink="/events">Results</button>
         </mat-card-actions>
       </mat-card>
@@ -59,7 +58,9 @@
 
         <mat-card-content>
           <p>
-            Event organisers may upload event results In order to download event a event you will need to register as user
+            Event organisers may upload event results In order to download event a event you will need to register
+            as
+            user
           </p>
         </mat-card-content>
         <mat-card-actions>
@@ -92,8 +93,7 @@
     <div fxLayout="row" fxLayoutGap=20px fxFlex fxLayoutAlign="end center">
       <a class=footer_link routerLink="/about">About</a>
       <a class=footer_link href="https://github.com/daveryderoxford/ngSplitsBrowser">Github</a>
-      <div></div>
     </div>
   </div>
 
-   
+</div>
