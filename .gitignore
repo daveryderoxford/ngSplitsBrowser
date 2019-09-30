@@ -45,3 +45,6 @@ Thumbs.db
 
 # misc  PRIVATE Files
 /src/app/app.firebase-config.ts
+
+# Firebase hosting file
+/hosting.*.cache
