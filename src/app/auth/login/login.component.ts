@@ -4,71 +4,76 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import * as firebase from 'firebase/app';
 
+export type AuthProvider = "EmailAndPassword" | "Google" | "Facebook";
+
+const facebookAuthProvider = new firebase.auth.FacebookAuthProvider();
+const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss']
+   selector: 'app-login',
+   templateUrl: './login.component.html',
+   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-    loginForm: FormGroup;
-    error: string;
+   loginForm: FormGroup;
+   error: string;
+   loading = false;
 
-    constructor(private router: Router,
-        private formBuilder: FormBuilder,
-        private afAuth: AngularFireAuth) { }
+   constructor(private router: Router,
+      private formBuilder: FormBuilder,
+      private afAuth: AngularFireAuth) { }
 
-    ngOnInit() {
-        this.loginForm = this.formBuilder.group({
-            email: ['', [Validators.required, Validators.email]],
-            password: ['', Validators.required]
-        });
+   ngOnInit() {
+      this.loginForm = this.formBuilder.group({
+         email: ['', [Validators.required, Validators.email]],
+         password: ['', Validators.required]
+      });
 
-        this.error = '';
-    }
+      this.error = '';
+   }
 
-    async login() {
-        if (this.loginForm.valid) {
-            this.error = '';
-            try {
-                await this.afAuth.auth.signInWithEmailAndPassword(this.loginForm.value.email,
-                    this.loginForm.value.password);
-                this.postSignIn();
-            } catch (err) {
-                this.signinError(err);
-            }
-        }
-    }
+   async loginFormSubmit() {
+      if (this.loginForm.valid) {
+         await this.signInWith("EmailAndPassword", this.loginForm.value);
+      }
+   }
 
-    async loginWithGoogle() {
-        await this.signIn(new firebase.auth.GoogleAuthProvider());
-        this.postSignIn();
-    }
+   async signInWith(provider: AuthProvider, credentials?: any) {
 
-    async loginWithFacebook() {
-        await this.signIn(new firebase.auth.FacebookAuthProvider());
-        this.postSignIn();
-    }
+      try {
+         this.loading = true;
+         this.error = '';
 
-    private async signIn(provider: firebase.auth.AuthProvider): Promise<any> {
-        this.error = '';
-        try {
-            await this.afAuth.auth.signInWithPopup(provider);
-        } catch (err) {
-            this.signinError(err);
-        }
-    }
+         switch (provider) {
 
-    private signinError(err) {
-        console.log('LoginComponent: Error loging in' + err);
-        this.error = 'Login attempt failed';
-    }
+            case "EmailAndPassword":
+               await this.afAuth.auth.signInWithEmailAndPassword(credentials.email, credentials.password);
+               break;
 
-    private postSignIn() {
-       console.log('LoginComponent: Successful login');
-        this.router.navigate(['/']);
-    }
+            case "Google":
+               await this.afAuth.auth.signInWithPopup(googleAuthProvider);
+               break;
 
+            case "Facebook":
+               await this.afAuth.auth.signInWithPopup(facebookAuthProvider);
+               break;
+         }
+         this._handleSignInSuccess();
+      } catch (err) {
+         this._handleSigninError(err);
+      } finally {
+         this.loading = false;
+      }
+   }
+
+   private _handleSigninError(err: any) {
+      console.log('LoginComponent: Error loging in.  Error code:' + + err.code + '  ' + err.message);
+      this.error = 'Login attempt failed';
+   }
+
+   private _handleSignInSuccess() {
+      console.log('LoginComponent: Successful login');
+      this.error = '';
+      this.router.navigate(['/']);
+   }
 }
-
-
-
