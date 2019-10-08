@@ -66,18 +66,18 @@ export class AppComponent implements OnInit {
       this.afs.firestore.settings( {} );
    }
 
-   closeSidenav( target: string ) {
-      this.sidenav.close();
-      this.router.navigate( [ target ] );
+   async closeSidenav( target: string ) {
+      await this.sidenav.close();
+      await this.router.navigate( [ target ] );
    }
 
-   logout() {
-      this.afAuth.auth.signOut();
+   async logout() {
       // navigate away from protected pages
       if ( this.router.url.includes( "admin" ) ) {
-         this.router.navigate( [ "/" ] );
+         await this.router.navigate( [ "/" ] );
       }
-      this.sidenav.close();
+      await this.afAuth.auth.signOut();
+      await this.sidenav.close();
    }
 
    async scriptsClicked() {

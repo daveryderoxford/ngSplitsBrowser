@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import * as firebase from 'firebase/app';
 
 export type AuthProvider = "EmailAndPassword" | "Google" | "Facebook";
@@ -18,12 +18,18 @@ export class LoginComponent implements OnInit {
    loginForm: FormGroup;
    error: string;
    loading = false;
+   returnUrl: string;
 
-   constructor(private router: Router,
+   constructor (private route: ActivatedRoute,
+      private router: Router,
       private formBuilder: FormBuilder,
       private afAuth: AngularFireAuth) { }
 
    ngOnInit() {
+      this.route.queryParams.subscribe( params => {
+         this.returnUrl = params[ 'returnUrl' ];
+      } );
+
       this.loginForm = this.formBuilder.group({
          email: ['', [Validators.required, Validators.email]],
          password: ['', Validators.required]
@@ -40,6 +46,8 @@ export class LoginComponent implements OnInit {
 
    async signInWith(provider: AuthProvider, credentials?: any) {
 
+      let user: firebase.auth.UserCredential;
+
       try {
          this.loading = true;
          this.error = '';
@@ -47,11 +55,11 @@ export class LoginComponent implements OnInit {
          switch (provider) {
 
             case "EmailAndPassword":
-               await this.afAuth.auth.signInWithEmailAndPassword(credentials.email, credentials.password);
+              user = await this.afAuth.auth.signInWithEmailAndPassword(credentials.email, credentials.password);
                break;
 
             case "Google":
-               await this.afAuth.auth.signInWithPopup(googleAuthProvider);
+               user = await this.afAuth.auth.signInWithPopup(googleAuthProvider);
                break;
 
             case "Facebook":
@@ -74,6 +82,6 @@ export class LoginComponent implements OnInit {
    private _handleSignInSuccess() {
       console.log('LoginComponent: Successful login');
       this.error = '';
-      this.router.navigate(['/']);
+      this.router.navigateByUrl(this.returnUrl);
    }
 }
