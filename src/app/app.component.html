@@ -8,8 +8,8 @@
       <button mat-list-item (click)='closeSidenav( "/")'>Home</button>
 
       <button mat-list-item (click)='closeSidenav("/fixtures")'>Fixtures</button>
-      <button mat-list-item (click)='closeSidenav( "/events")'>Results</button>
-      <button mat-list-item (click)='closeSidenav( "/admin/event-admin" )'>Admin</button>
+      <!-- <button mat-list-item (click)='closeSidenav( "/events")'>Results</button> 
+      <button mat-list-item (click)='closeSidenav( "/admin/event-admin" )'>Admin</button> -->
 
       <mat-divider></mat-divider>
 
@@ -23,7 +23,9 @@
 
       <mat-divider></mat-divider>
 
-      <button mat-button (click)="scriptsClicked()">Scripts</button>
+      <ng-container *ngIf="isAdmin()">
+        <button mat-button (click)="scriptsClicked()">Scripts</button>
+      </ng-container>
 
     </mat-action-list>
 

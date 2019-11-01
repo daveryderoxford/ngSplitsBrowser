@@ -9,7 +9,6 @@ import { CompetitorDataService } from "app/shared/services/competitor-data.servi
 import * as firebase from "firebase/app";
 import { BehaviorSubject, Observable, of as observableOf } from 'rxjs';
 import { map, switchMap, take, tap } from 'rxjs/operators';
-import { UserReservation } from 'app/model/user';
 
 @Injectable({
   providedIn: "root"
@@ -84,7 +83,7 @@ export class UserDataService {
       nationalId: "",
       autoFind: true,
       results: [],
-      fixtures: [],
+      reminders: [],
       ecards: [],
       resultsLastupDated: new Date().toISOString(),
       postcode: ""
@@ -103,21 +102,17 @@ export class UserDataService {
     return userDoc;
   }
 
-  /** Reserve a map for the user
-   * Server will update event entry information to reflect entry
-  */
-  async reseveMap(fixture: Fixture, course: string) {
+  /** Reserve a map for the user */
+  async addFixtureReminder( eventId: string) {
+    await this._getUserDoc().update( {
+      reminders: firebase.firestore.FieldValue.arrayUnion( eventId ) as any
+    } );
+  }
 
-    const res: UserReservation = {
-      eventId: fixture.id,
-      date: fixture.date,
-      name: fixture.name,
-      course: course,
-    };
-
-    await this._getUserDoc().update({
-      fixtures: firebase.firestore.FieldValue.arrayUnion(res) as any
-    });
+  async removeFixtureReminder( eventId: string ) {
+    await this._getUserDoc().update( {
+      reminders: firebase.firestore.FieldValue.arrayRemove( eventId ) as any
+    } );
   }
 
   /** Add userResult to the user results list, populating detail from the results data.

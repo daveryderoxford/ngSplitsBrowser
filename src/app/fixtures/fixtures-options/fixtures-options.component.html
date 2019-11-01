@@ -1,6 +1,10 @@
 <div class="container">
   <div>
-    <mat-form-field appearance="outline" style="margin-bottom: -8px">
+    <mat-button-toggle disableRipple [checked]="this.filter.likedOnly" (change)="likeClicked($event)">
+      Liked
+    </mat-button-toggle>
+
+    <mat-form-field appearance="outline">
       <mat-label>Postcode</mat-label>
       <input matInput [formControl]="postcodeFormControl" [value]="postcode" (keydown.enter)="postcodeEntered()">
     </mat-form-field>

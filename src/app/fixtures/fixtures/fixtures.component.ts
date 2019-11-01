@@ -23,10 +23,10 @@ export class FixturesComponent implements OnInit {
    fixtures$: Observable<Fixture[]>;
    filteredFixtures$: Observable<Fixture[]>;
 
-
    hideMobleFilter = true;
 
    isHandSet: boolean;
+   mapview = false;
 
    constructor ( public fs: FixturesService,
       breakpointObserver: BreakpointObserver,

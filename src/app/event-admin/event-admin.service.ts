@@ -198,7 +198,7 @@ export class EventAdminService {
       return query.valueChanges();
    }
 
-   /** Get a reference to sreach data for a given competitor */
+   /** Get a reference to search data for a given competitor */
    private _resultRef( eventkey: string, resultkey: string ): firestore.DocumentReference {
       return this.afs.doc( '/events/' + eventkey + '/results/' + resultkey ).ref;
    }

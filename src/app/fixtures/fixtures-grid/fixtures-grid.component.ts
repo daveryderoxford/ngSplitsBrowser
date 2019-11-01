@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, EventEmitter,
    Input, OnInit, Output, QueryList, ViewChildren, ViewContainerRef, PipeTransform, Pipe, NgModule, ViewChild } from '@angular/core';
-import { Fixture } from 'app/model';
+import { Fixture, UserData } from 'app/model';
 import { LatLong } from 'app/model/fixture';
 import { differenceInCalendarDays, format } from 'date-fns';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { UserDataService } from 'app/user/user-data.service';
+import { Observable } from 'rxjs';
 
 @Component( {
    selector: 'app-fixtures-grid',
@@ -32,9 +34,16 @@ export class FixturesGridComponent implements OnInit {
 
    @ViewChild( CdkVirtualScrollViewport, { static: false} ) viewPort: CdkVirtualScrollViewport;
 
-   constructor () { }
+   likedEvents: string[] = [];
+
+   constructor (private usd: UserDataService) { }
 
    ngOnInit() {
+      this.usd.userData().subscribe( userdata => {
+         if (userdata) {
+         this.likedEvents = userdata.reminders;
+        }
+      } );
    }
 
    eventClicked( row: Fixture ) {
@@ -60,5 +69,10 @@ export class FixturesGridComponent implements OnInit {
       if ( index !== -1 ) {
          this.viewPort.scrollToIndex( index );
       }
+   }
+
+   isLiked( eventId: string): boolean {
+      if ( !this.likedEvents ) { return false; }
+      return this.likedEvents.includes( eventId );
    }
 }

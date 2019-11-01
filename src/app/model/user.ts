@@ -4,7 +4,6 @@ import { sbTime } from "../results/model";
 import { ControlCardType, OEvent } from "./oevent";
 import { ISODateString } from "./date";
 import { GradeFilter } from "./fixture-filter";
-import { UserFixture } from '../../../firebase/functions/src/model/user';
 
 export interface ECard {
     id: string;
@@ -29,7 +28,7 @@ export interface UserInfo {
 export interface UserData extends UserInfo {
     key: string;  // Matches with the users Firebase reference
     results: UserResult[];
-    fixtures: UserFixture[] | UserReservation[];
+    reminders: string[];  // array of eventIds
 }
 
 /** Information on the results for a user.
@@ -56,13 +55,3 @@ export interface UserResult {
     };
 }
 
-export interface UserFixture {
-    eventId: string;
-    date: string;
-    name: string;
-}
-
-export interface UserReservation extends UserFixture {
-    course: string;
-    waitinglist?: number;
-}

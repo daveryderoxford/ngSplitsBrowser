@@ -1,5 +1,4 @@
 import { ISODateString } from './date';
-import { FixtureReservation } from './fixture-reservation';
 import { EventDiscipline, EventGrade, EventType } from './oevent';
 
 export interface LatLong {
@@ -23,5 +22,4 @@ export interface Fixture {
      nearestTown: string;
      association: string;
      distance?: number;
-     fixtureReservation?: FixtureReservation;
 }

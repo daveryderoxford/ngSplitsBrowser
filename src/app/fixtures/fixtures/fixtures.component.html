@@ -3,28 +3,28 @@
 
   <ng-container *ngIf="fixtures$ | async as fixtures">
 
-  <app-sidenav-button class="top-left"> </app-sidenav-button>
+    <app-sidenav-button class="top-left"> </app-sidenav-button>
 
-  <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async"
-    (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
-    (filterChanged)="filterChanged($event)">
-  </app-fixtures-options>
+    <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async"
+      (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
+      (filterChanged)="filterChanged($event)">
+    </app-fixtures-options>
 
-  <as-split direction="vertical">
+    <as-split direction="vertical">
 
-    <as-split-area>
-      <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation$ | async" [selectedFixture]="selectedFixture"
-        (fixtureSelected)="onFeatureSelected($event)">
-      </app-fixtures-map>
-    </as-split-area>
+      <as-split-area>
+        <app-fixtures-map [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
+          [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
+        </app-fixtures-map>
+      </as-split-area>
 
-    <as-split-area>
-      <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
-        [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
-      </app-fixtures-grid>
-    </as-split-area>
+      <as-split-area>
+        <app-fixtures-grid [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
+          [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
+        </app-fixtures-grid>
+      </as-split-area>
 
-  </as-split>
+    </as-split>
 
   </ng-container>
 </div>
@@ -32,46 +32,49 @@
 <!-- Handset -->
 <div *ngIf="isHandSet" fxLayout="column" class=handset>
 
-  <div fxFlex class="mat-elevation-z2 handset-filter-options">
+  <div class="mat-elevation-z2 handset-filter-options">
     <app-sidenav-button> </app-sidenav-button>
-    <button mat-button style="float: right;" (click)="hideMobleFilter = !hideMobleFilter">
-       FILTER
-       <mat-icon *ngIf="hideMobleFilter">arrow_drop_down</mat-icon>
-       <mat-icon *ngIf="!hideMobleFilter">arrow_drop_up</mat-icon>
-
+    <span fxFlex></span>
+    <button mat-button (click)="mapview=false">
+      <mat-icon>list</mat-icon>
+    </button>
+    <button mat-button (click)="mapview=true">
+      <mat-icon>map</mat-icon>
+    </button>
+    <button mat-button (click)="hideMobleFilter = !hideMobleFilter">
+      FILTER
+      <mat-icon *ngIf="hideMobleFilter">arrow_drop_down</mat-icon>
+      <mat-icon *ngIf="!hideMobleFilter">arrow_drop_up</mat-icon>
     </button>
   </div>
 
-  <app-fixtures-options fxFlex [hidden]="hideMobleFilter" class="mat-elevation-z2 handset-filter-options "
+  <app-fixtures-options [hidden]="hideMobleFilter" class="mat-elevation-z2 handset-filter-options "
     [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
     (filterChanged)="filterChanged($event)">
   </app-fixtures-options>
 
-  <cdk-virtual-scroll-viewport fxFill itemSize="120">
+  <cdk-virtual-scroll-viewport fxFlex itemSize="120" *ngIf="!mapview">
     <mat-list>
 
-      <mat-list-item (click)="displayMobileActions(fixture)" *cdkVirtualFor="let fixture of fixtures$ | async">
-        <h3 matLine layout-align="space-between">
+      <mat-list-item (click)="menubutton.openMenu()" *cdkVirtualFor="let fixture of fixtures$ | async">
 
-          <span fxFlex>{{fixture.date | fixturedate }}</span>
-
+        <div mat-line layout-align="space-evenly">
+          <span fxFlex=50>{{fixture.date | fixturedate }}</span>
+          <span fxFlex=30> {{fixture.club}}</span>
           <span fxFlex *ngIf="fixture.distance !== -1;">
             {{fixture.distance}}miles
           </span>
-
-          <a fxFlex="nogrow" href={{fixture.clubURL}} target="_blank"> {{fixture.club}} </a>
-        </h3>
-
-        <p matLine class="no-wrap"> {{fixture.name | ellipsis:39 }} </p>
-
-        <p matLine layout-align="space-between">
-          <a fxFlex *ngIf="fixture.latLong;" href="{{fixture | googleURL}}" target="_blank">{{fixture.postcode}}</a>
-          <span fxFlex *ngIf="!fixture.latLong;">{{fixture.postcode }}</span>
-
-          <a fxFlex="nogrow" *ngIf="fixture.latLong;" href="{{fixture | bingURL}}"
-            target="_blank">{{fixture.area | ellipsis: 30}}</a>
-          <span fxFlex="nogrow" *ngIf="!fixture.latLong;">{{fixture.area | ellipsis: 30}}</span>
+        </div>
+        <p mat-line>
+          {{fixture.name | ellipsis:39}}
         </p>
+        <p mat-line>
+          {{fixture.area | ellipsis: 30}}
+          <span fxFlex></span>
+          <mat-icon inline=true>check_circle</mat-icon>
+        </p>
+
+        <app-fixture-actions #menubutton mobile="true" [fixture]="fixture"></app-fixture-actions>
 
         <mat-divider></mat-divider>
       </mat-list-item>
@@ -79,13 +82,8 @@
     </mat-list>
   </cdk-virtual-scroll-viewport>
 
-  <mat-menu #menu="matMenu" hasBackdrop=true>
-    <ng-template matMenuContent let-fixture="fixture">
-      <a mat-menu-item href="{{fixture.clubURL}}"> Club website</a>
-      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | bingURL}}" target="_blank">OS Map</a>
-      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleURL}}" target="_blank">Google map</a>
-      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleDirectionsURL}}" target="_blank"> Directions</a>
-    </ng-template>
-  </mat-menu>
+  <app-fixtures-map fxFlex *ngIf="mapview" [fixtures]="fixtures$ | async" [homeLocation]="homeLocation$ | async"
+    [selectedFixture]="selectedFixture" (fixtureSelected)="onFeatureSelected($event)">
+  </app-fixtures-map>
 
 </div>

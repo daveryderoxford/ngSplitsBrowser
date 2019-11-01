@@ -29,23 +29,24 @@ export class MainComponent implements OnInit {
      this.router.navigate(["/graph", event.key ]);
   }
 
-  async showIosInstallBanner() {
-    // Detects if device is on iOS
-    const isIos = () => {
-      const userAgent = window.navigator.userAgent.toLowerCase();
-      return /iphone|ipad|ipod/.test( userAgent );
-    };
-    // Detects if device is in standalone mode
-    const nav: any = window.navigator;
-    const isInStandaloneMode = () => ( 'standalone' in nav ) && nav.standalone;
+  // Detects if device is on iOS
+  isIos(): boolean {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod/.test( userAgent );
+  }
 
-    // Show the banner once
-    localStorage.setItem( 'whatever', 'something' );
+  isInStandaloneMode(): boolean {
+    const nav: any = window.navigator;
+    return ('standalone' in nav ) && nav.standalone;
+
+  }
+
+  async showIosInstallBanner() {
 
     const isBannerShown = localStorage.getItem( 'isBannerShown');
 
     // Checks if it should display install popup notification
-    if ( isIos() && !isInStandaloneMode() && isBannerShown === undefined ) {
+    if (this.isIos() && !this.isInStandaloneMode() && isBannerShown === undefined ) {
       const snackBarRef = this.snackBar.open(  `To install the app, tap "Share" icon below and select "Add to Home Screen".` );
 
       snackBarRef.afterDismissed().subscribe( () => {
@@ -54,6 +55,4 @@ export class MainComponent implements OnInit {
 
     }
   }
-
-
 }

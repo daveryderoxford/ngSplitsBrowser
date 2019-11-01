@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -9,138 +9,137 @@ import { EventService } from '../../events/event.service';
 import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
 import { EventAdminService } from '../event-admin.service';
 
-@Component({
-  selector: 'app-event-edit',
-  templateUrl: './event-edit.component.html',
-  styleUrls: ['./event-edit.component.scss']
-})
-export class EventEditComponent implements OnInit {
-  @Input() oevent: OEvent;
-  new = true;
-  @Output() eventSubmitted = new EventEmitter<EventInfo>();
-  showProgressBar = false;
+@Component( {
+   selector: 'app-event-edit',
+   templateUrl: './event-edit.component.html',
+   styleUrls: [ './event-edit.component.scss' ]
+} )
+export class EventEditComponent implements OnInit, OnChanges {
+   @Input() oevent: OEvent;
+   new = true;
+   @Output() eventSubmitted = new EventEmitter<EventInfo>();
+   showProgressBar = false;
 
-  f: FormGroup;
-  grades = EventGrades.grades;
-  nations = Nations.getNations();
-  types = EventTypes.types;
-  disciplines = EventDisciplines.disciplines;
-  controlCardTypes = ControlCardTypes.types;
+   f: FormGroup;
+   grades = EventGrades.grades;
+   nations = Nations.getNations();
+   types = EventTypes.types;
+   disciplines = EventDisciplines.disciplines;
+   controlCardTypes = ControlCardTypes.types;
 
-  clubs: Club[] = [];
-  filteredClubs$: Observable<Club[]>;
+   clubs: Club[] = [];
+   filteredClubs$: Observable<Club[]>;
 
-  constructor(private router: Router,
-    private formBuilder: FormBuilder,
-    private eventService: EventAdminService,
-    private es: EventService,
-    public snackBar: MatSnackBar
-  ) {
-    this.createForm();
-  }
-
-  private createForm() {
-    this.f = this.formBuilder.group({
-      name: ["", Validators.required],
-      date: ["", Validators.required],
-      nationality: ["", Validators.required],
-      club: ["", Validators.required],
-      grade: ["", Validators.required],
-      type: ["", Validators.required],
-      discipline: ["", Validators.required],
-      controlCardType: ["", Validators.required],
-      webpage: ["", Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
-    });
-  }
-
-  ngOnInit() {
-
-    this.filteredClubs$ = combineLatest(this.es.getClubs(),
-                                        this.f.controls.club.valueChanges.pipe(startWith('')),
-                                        this.f.controls.nationality.valueChanges.pipe(startWith('')))
-      .pipe(
-        filter(club => (club !== null || club !== [])),
-        map(([clubs, name, nat]) => this.filterClubs(clubs, name, nat))
-      );
-
-    this.filteredClubs$.subscribe((clubs) => {
-      this.clubs = clubs;
-    });
-  }
-
-  filterClubs(clubs: Club[], name: string, nationality: string): Club[] {
-
-    const ret: Club[] = [];
-
-    if (clubs) {
-      for (const club of clubs) {
-        if (!nationality || nationality === '' || club.nationality === nationality) {
-          if (!name || name === '') {
-            ret.push(club);
-          } else if (club.name.startsWith(name.toUpperCase())) {
-            ret.push(club);
-          }
-        }
-      }
-    }
-    return ret;
-  }
-
-  displayClub(club?: Club): string | undefined {
-    return club ? club.name : undefined;
-  }
-
-  // tslint:disable-next-line:use-life-cycle-interface
-  private ngOnChanges(changes: SimpleChanges) {
-    // set the form fields then the evnt is changed.
-    if (this.oevent === null) {
-      this.new = true;
+   constructor ( private router: Router,
+      private formBuilder: FormBuilder,
+      private eventService: EventAdminService,
+      private es: EventService,
+      public snackBar: MatSnackBar
+   ) {
       this.createForm();
-      this.f.reset();
-    } else {
-      this.new = false;
-      this.f.reset(this.oevent);
-    }
-  }
+   }
 
-  cancel() {
-    if (this.f.dirty) {
-      // display a warning****
-    }
-  }
+   private createForm() {
+      this.f = this.formBuilder.group( {
+         name: [ "", Validators.required ],
+         date: [ "", Validators.required ],
+         nationality: [ "", Validators.required ],
+         club: [ "", Validators.required ],
+         grade: [ "", Validators.required ],
+         type: [ "", Validators.required ],
+         discipline: [ "", Validators.required ],
+         controlCardType: [ "", Validators.required ],
+         webpage: [ "", Validators.pattern( /((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i ) ]
+      } );
+   }
 
-  private addhttp(url: string | null): string | null {
-    if (url) {
-      if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
-        url = "http://" + url;
+   ngOnInit() {
+
+      this.filteredClubs$ = combineLatest( [ this.es.getClubs(),
+      this.f.controls.club.valueChanges.pipe( startWith( '' ) ),
+      this.f.controls.nationality.valueChanges.pipe( startWith( '' ) ) ] )
+         .pipe(
+            filter( club => ( club !== null || club !== [] ) ),
+            map( ( [ clubs, name, nat ] ) => this.filterClubs( clubs, name, nat ) )
+         );
+
+      this.filteredClubs$.subscribe( ( clubs ) => {
+         this.clubs = clubs;
+      } );
+   }
+
+   filterClubs( clubs: Club[], name: string, nationality: string ): Club[] {
+
+      const ret: Club[] = [];
+
+      if ( clubs ) {
+         for ( const club of clubs ) {
+            if ( !nationality || nationality === '' || club.nationality === nationality ) {
+               if ( !name || name === '' ) {
+                  ret.push( club );
+               } else if ( club.name.startsWith( name.toUpperCase() ) ) {
+                  ret.push( club );
+               }
+            }
+         }
       }
-    }
-    return url;
-  }
+      return ret;
+   }
 
-  async submit() {
+   displayClub( club?: Club ): string | undefined {
+      return club ? club.name : undefined;
+   }
 
-    if (this.f.valid) {
-
-      try {
-        this.showProgressBar = true;
-
-        this.f.value.webpage = this.addhttp(this.f.value.webpage);
-
-        if (this.new) {
-          await this.eventService.saveNew(this.f.value);
-        } else {
-          await this.eventService.updateEventInfo(this.oevent.key, this.f.value);
-        }
-        this.showProgressBar = false;
-      } catch (err) {
-        this.showProgressBar = false;
-        const snackBarRef = this.snackBar.open("Error updating event information");
-        console.log("EventEditComponent:  Error updating event information " + err);
+   ngOnChanges( changes: SimpleChanges ) {
+      // set the form fields when the event is changed.
+      if ( this.oevent === null ) {
+         this.new = true;
+         this.createForm();
+         this.f.reset();
+      } else {
+         this.new = false;
+         this.f.reset( this.oevent );
       }
+   }
 
-      //  this.eventSubmitted.emit(this.event);
+   cancel() {
+      if ( this.f.dirty ) {
+         // display a warning****
+      }
+   }
 
-    }
-  }
+   private addhttp( url: string | null ): string | null {
+      if ( url ) {
+         if ( !/^(?:f|ht)tps?\:\/\//.test( url ) ) {
+            url = "http://" + url;
+         }
+      }
+      return url;
+   }
+
+   async submit() {
+
+      if ( this.f.valid ) {
+
+         try {
+            this.showProgressBar = true;
+
+            this.f.value.webpage = this.addhttp( this.f.value.webpage );
+
+            if ( this.new ) {
+               await this.eventService.saveNew( this.f.value );
+            } else {
+               await this.eventService.updateEventInfo( this.oevent.key, this.f.value );
+            }
+            this.showProgressBar = false;
+         } catch ( err ) {
+            this.showProgressBar = false;
+            const snackBarRef = this.snackBar.open( "Error updating event information" );
+            console.log( "EventEditComponent:  Error updating event information " + err );
+         }
+
+         //  this.eventSubmitted.emit(this.event);
+
+      }
+   }
 }

@@ -16,7 +16,7 @@ export class FileButtonComponent {
   @Input() accept: string;
   @Input() multiple = false;
   @Input() label = "Select file";
-  @Output() onFileSelect = new EventEmitter<File[]>();
+  @Output() fileSelected = new EventEmitter<File[]>();
 
   @ViewChild("inputFile", { static: true }) nativeInputFile: ElementRef;
 
@@ -26,7 +26,7 @@ export class FileButtonComponent {
 
   onNativeInputFileSelect($event) {
     this._files = $event.srcElement.files;
-    this.onFileSelect.emit(this._files);
+    this.fileSelected.emit(this._files);
   }
 
   selectFile() {

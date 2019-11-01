@@ -11,8 +11,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es2015",
-    "allowJs": true,
-    "checkJs": true,
+    "allowJs": false,
+    "checkJs": false,
     "diagnostics": true,
     "typeRoots": [
       "node_modules/@types"
@@ -24,8 +24,5 @@
     "types": [
       "d3"
     ]
-  },
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }

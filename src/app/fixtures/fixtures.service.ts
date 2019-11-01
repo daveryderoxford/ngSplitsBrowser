@@ -5,11 +5,11 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from "@angular/fire/storage";
 import { Fixture, LatLong } from 'app/model/fixture';
 import { FixtureFilter, GradeFilter } from 'app/model/fixture-filter';
-import { FixtureReservation } from 'app/model/fixture-reservation';
 import { UserDataService } from 'app/user/user-data.service';
 import { differenceInMonths, isFuture, isSaturday, isSunday, isToday, isWeekend } from 'date-fns';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { catchError, filter, map, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
+import { UserData } from 'app/model';
 
 @Injectable( {
    providedIn: 'root'
@@ -22,10 +22,9 @@ export class FixturesService {
    _filter$ = new BehaviorSubject<FixtureFilter>( {
       time: { sat: true, sun: true, weekday: true },
       gradesEnabled: true,
-      grades: this.makeDefaultGrades()
+      grades: this.makeDefaultGrades(),
+      likedOnly: false
    } );
-
-   _userData$ = this.afAuth.authState.pipe( switchMap( () => this.usd.userData() ) );
 
    _fileContents: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
       switchMap( url => this.http.get<Fixture[]>( url ) ),
@@ -72,8 +71,8 @@ export class FixturesService {
          shareReplay(),
       );
 
-      const fixturesObs$ = combineLatest( [ fixturesWithDistance$, this._filter$ ] ).pipe(
-         map( ( [ fixtures, ftr ] ) => fixtures.filter( fix => !this.isHidden(fix, ftr)) )
+      const fixturesObs$ = combineLatest( [ fixturesWithDistance$, this.usd.userData(), this._filter$ ] ).pipe(
+         map( ( [fixtures, userdata, ftr] ) => fixtures.filter( fix => this.showFixture(fix, userdata, ftr)) )
       );
 
       return fixturesObs$;
@@ -86,7 +85,7 @@ export class FixturesService {
       } );
    }
 
-   private isHidden( fix: Fixture, ftr: FixtureFilter ): boolean {
+   private showFixture( fix: Fixture, userdata: UserData, ftr: FixtureFilter ): boolean {
 
       const fixdate = new Date( fix.date );
 
@@ -105,7 +104,18 @@ export class FixturesService {
          gradeOK = true;
       }
 
-      return !timeOK || !gradeOK;
+      let likedOk: boolean;
+      if ( ftr.likedOnly ) {
+         if (userdata) {
+            likedOk = userdata.reminders.includes(fix.id);
+         } else {
+            likedOk = true;
+         }
+      } else {
+         likedOk = true;
+      }
+
+      return timeOK && gradeOK && likedOk;
 
    }
 
@@ -134,18 +144,6 @@ export class FixturesService {
       return this._filter$.asObservable();
    }
 
-   /** Adds a new map reservation for a fixture. Throws an exception if one already exists for the fixture */
-   async addMapReservation( id: string, reservation: FixtureReservation ): Promise<void> {
-      const doc = this.fs.doc<FixtureReservation>( '/enteries/' + id );
-
-      try {
-         const res = await doc.valueChanges().toPromise();
-         await doc.set( reservation );
-      } catch ( e ) {
-         console.log( 'FixtureService: Error adding map reservation:' + e.message );
-         throw e;
-      }
-   }
 
    private makeDefaultGrades(): GradeFilter[] {
       return [

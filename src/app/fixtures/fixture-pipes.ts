@@ -100,6 +100,17 @@ export class FixtureDistancePipe implements PipeTransform {
    }
 }
 
+
+@Pipe( {
+   name: 'liked'
+} )
+export class LikedPipe implements PipeTransform {
+   transform( eventId: string, likedEvents: string[] ): boolean {
+      if ( !likedEvents ) { return false; }
+      return likedEvents.includes( eventId );
+   }
+}
+
 function latLongStr(loc: LatLong, seperator = ","): string {
    return loc.lat.toString() + seperator + loc.lng.toString();
 }
@@ -112,6 +123,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       FixtureDatePipe,
       EllipsisPipe,
       FixtureDistancePipe,
+      LikedPipe,
    ],
    exports: [
       GoogleURLPipe,
@@ -120,6 +132,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       FixtureDatePipe,
       EllipsisPipe,
       FixtureDistancePipe,
+      LikedPipe,
    ]
 })
 export class FilterPipeModuleModule {

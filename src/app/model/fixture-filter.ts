@@ -9,4 +9,5 @@ export interface FixtureFilter {
    time: FixtureTimeFilter;
    gradesEnabled: boolean;
    grades: GradeFilter[];
+   likedOnly: boolean;
 }

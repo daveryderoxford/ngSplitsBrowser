@@ -46,11 +46,17 @@ td {
   text-align: center;
 }
 
+.liked {
+  width: 20px;
+  max-width: 20px;
+  min-width: 20px;
+  padding-left: 15px;
+}
+
 .date {
   width: 100px;
-  max-width: 120px;
+  max-width: 100px;
   min-width: 100px;
-  padding-left: 24px;
 }
 
 .distance {
@@ -60,26 +66,26 @@ td {
 }
 
 .name {
-  width: 300px;
+  width: 200px;
   max-width: 400px;
-  min-width: 100px;
+  min-width: 75px;
 }
 
 .club {
-  width: 75px;
-  max-width: 100px;
+  width: 70px;
+  max-width: 700px;
   min-width: 50px;
 }
 
 .level {
-  width: 75px;
-  max-width: 100px;
-  min-width: 50px;
+  width: 60px;
+  max-width: 60px;
+  min-width: 40px;
 }
 
 .area {
-  width: 150px;
-  max-width: 200px;
+  width: 100px;
+  max-width: 150px;
   min-width: 75px;
 }
 
@@ -101,6 +107,9 @@ td {
   padding-right: 12px;
 }
 
+.red {
+  color: red;
+}
 
 // Dynamic  styles
 tr:hover {

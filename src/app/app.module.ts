@@ -37,6 +37,7 @@ import { SplitsGridComponent } from './results/splits-grid/splits-grid.component
 import { SharedModule } from "./shared/shared.module";
 import { ResultsFoundDialogComponent } from './user/results-found-dialog/results-found-dialog.component';
 import { UserComponent } from "./user/user.component";
+import { PaymentModule } from './payments/payment.module';
 
 @NgModule({
   declarations: [
@@ -79,7 +80,8 @@ import { UserComponent } from "./user/user.component";
     SharedModule,
     HttpClientModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
-    FixturesModule
+    FixturesModule,
+    PaymentModule
   ],
   bootstrap: [AppComponent]
 })

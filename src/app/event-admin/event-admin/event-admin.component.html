@@ -49,7 +49,7 @@
 
         <mat-card-content>
           <div fxLayout=row>
-          <file-button color=primary (onFileSelect)="uploadSplits($event)" label="Upload Splits"></file-button>   
+          <file-button color=primary (fileSelected)="uploadSplits($event)" label="Upload Splits"></file-button>   
           <span fxFlexAlign=end *ngIf=selectedEvent.summary>  
              Splits uploaded  {{selectedEvent.summary.courses.length}} courses <BR>
             <span *ngFor="let course of selectedEvent.summary.courses"> 
