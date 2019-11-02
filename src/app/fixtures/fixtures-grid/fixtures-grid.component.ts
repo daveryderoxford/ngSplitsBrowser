@@ -1,11 +1,8 @@
-import { ChangeDetectionStrategy, Component, EventEmitter,
-   Input, OnInit, Output, QueryList, ViewChildren, ViewContainerRef, PipeTransform, Pipe, NgModule, ViewChild } from '@angular/core';
-import { Fixture, UserData } from 'app/model';
-import { LatLong } from 'app/model/fixture';
-import { differenceInCalendarDays, format } from 'date-fns';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { Fixture } from 'app/model';
+import { LatLong } from 'app/model/fixture';
 import { UserDataService } from 'app/user/user-data.service';
-import { Observable } from 'rxjs';
 
 @Component( {
    selector: 'app-fixtures-grid',
@@ -14,10 +11,11 @@ import { Observable } from 'rxjs';
    changeDetection: ChangeDetectionStrategy.OnPush
 
 } )
-export class FixturesGridComponent implements OnInit {
+export class FixturesGridComponent implements OnInit, OnChanges {
 
    private _selectedFixture: Fixture;
    displayData: Array<any> = [];
+   itemSize: number;
 
    @Input() fixtures: Fixture[];
 
@@ -29,10 +27,11 @@ export class FixturesGridComponent implements OnInit {
    }
 
    @Input() homeLocation: LatLong;
+   @Input() handset;
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
-   @ViewChild( CdkVirtualScrollViewport, { static: false} ) viewPort: CdkVirtualScrollViewport;
+   @ViewChild( CdkVirtualScrollViewport, { static: false } ) viewPort: CdkVirtualScrollViewport;
 
    likedEvents: string[] = [];
 
@@ -44,6 +43,14 @@ export class FixturesGridComponent implements OnInit {
          this.likedEvents = userdata.reminders;
         }
       } );
+   }
+
+   ngOnChanges() {
+      if (this.handset) {
+         this.itemSize = 120;
+      } else {
+         this.itemSize = 38;
+      }
    }
 
    eventClicked( row: Fixture ) {
@@ -66,7 +73,7 @@ export class FixturesGridComponent implements OnInit {
    private showElement( fixture: Fixture ) {
       const index = this.fixtures.findIndex( f => f === fixture );
 
-      if ( index !== -1 ) {
+      if ( index !== -1 && this.viewPort) {
          this.viewPort.scrollToIndex( index );
       }
    }

@@ -1,11 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy, Input, ViewChild } from '@angular/core';
-import { Fixture } from 'app/model/fixture';
+import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { UserDataService } from 'app/user/user-data.service';
-import { Router } from '@angular/router';
-import { EntryService } from '../entry-service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuTrigger } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Fixture, LatLong } from 'app/model/fixture';
+import { UserDataService } from 'app/user/user-data.service';
+import { EntryService } from '../entry-service';
 
 @Component( {
    selector: 'app-fixture-actions',
@@ -16,7 +15,8 @@ import { MatMenuTrigger } from '@angular/material/menu';
 export class FixtureActionsComponent implements OnInit {
 
    @Input() fixture: Fixture;
-   @Input() mobile = false;
+   @Input() handset = false;
+   @Input() homeLocation: LatLong;
 
    loggedIn: boolean;
 

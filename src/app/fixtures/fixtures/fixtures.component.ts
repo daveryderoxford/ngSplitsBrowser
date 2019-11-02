@@ -1,13 +1,14 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
-import { Observable } from 'rxjs';
+import { Observable, interval } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
 import { FixtureActionPopupComponent } from './fixture-action-popup.component';
+import { FixturesMapComponent } from '../fixtures-map/fixtures-map.component';
 
 @Component( {
    selector: 'app-fixtures',
@@ -25,13 +26,13 @@ export class FixturesComponent implements OnInit {
 
    hideMobleFilter = true;
 
-   isHandSet: boolean;
+   handset: boolean;
    mapview = false;
 
    constructor ( public fs: FixturesService,
       breakpointObserver: BreakpointObserver,
       public dialog: MatDialog ) {
-      this.isHandSet = breakpointObserver.isMatched( Breakpoints.Handset );
+      this.handset = breakpointObserver.isMatched( Breakpoints.Handset );
       this.homeLocation$ = this.fs.getHomeLocation();
       this.postcode$ = this.fs.getPostcode();
       this.fixtures$ = this.fs.getFixtures();
@@ -50,6 +51,10 @@ export class FixturesComponent implements OnInit {
 
    filterChanged( f: FixtureFilter ) {
       this.fs.setFilter( f );
+   }
+
+   toggleMobileFilter() {
+      this.hideMobleFilter = !this.hideMobleFilter;
    }
 
    displayMobileActions( fixture: Fixture ) {

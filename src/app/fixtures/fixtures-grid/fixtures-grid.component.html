@@ -1,6 +1,7 @@
+<cdk-virtual-scroll-viewport fxFill [itemSize]="itemSize">
 
-<cdk-virtual-scroll-viewport itemSize="38" style="height: 100%;">
-  <table style="width: 100%; height: 100%">
+  <!-- Large Screen -->
+  <table *ngIf="!handset" fxFill>
     <thead>
       <tr>
         <th class="liked"></th>
@@ -18,7 +19,9 @@
     <tbody>
       <tr *cdkVirtualFor="let row of fixtures; trackBy: trackBy" style="width:100%; min-height: 30px;"
         (click)=eventClicked(row) [ngClass]="{ 'selected': selected(row) }">
-        <td class="liked"> <mat-icon *ngIf="isLiked(row.id)" class="red">check_circle</mat-icon></td>
+        <td class="liked">
+          <mat-icon *ngIf="isLiked(row.id)" class="red">check_circle</mat-icon>
+        </td>
         <td class="date"> {{row.date | fixturedate }} </td>
         <td class="distance"> {{row.distance | distance }}</td>
         <td class="name"> {{row.name}} </td>
@@ -33,7 +36,7 @@
         </td>
         <td class="location">
           <div *ngIf="row.latLong; then googlelink else nolink1"></div>
-          <ng-template #googlelink>  <a href="{{row | googleURL}}" target="_blank">{{row.postcode}}</a></ng-template>
+          <ng-template #googlelink> <a href="{{row | googleURL}}" target="_blank">{{row.postcode}}</a></ng-template>
           <ng-template #nolink1>{{row.postcode}}</ng-template>
         </td>
         <td class="directions">
@@ -41,9 +44,40 @@
             Directions</a>
         </td>
         <td class="actions">
-           <app-fixture-actions [fixture]="row"></app-fixture-actions>
+          <app-fixture-actions [fixture]="row" [handset]="handset"></app-fixture-actions>
         </td>
       </tr>
     </tbody>
   </table>
+
+
+  <!-- Handset -->
+  <mat-list *ngIf="handset">
+
+    <mat-list-item (click)="actions.openMenu()" *cdkVirtualFor="let fixture of fixtures">
+
+      <div mat-line>
+        <span fxFlex=50>{{fixture.date | fixturedate }}</span>
+        <span fxFlex=30> {{fixture.club}}</span>
+        <span fxFlex *ngIf="fixture.distance !== -1;">
+          {{fixture.distance}}miles
+        </span>
+      </div>
+      <p mat-line>
+        {{fixture.name | ellipsis:35}}
+      </p>
+      <p mat-line>
+        {{fixture.area | ellipsis: 30}}
+        <span fxFlex></span>
+
+        <mat-icon *ngIf="isLiked(fixture.id)" inline=true>check_circle</mat-icon>
+      </p>
+
+      <app-fixture-actions #actions [handset]="handset" [fixture]="fixture"></app-fixture-actions>
+
+      <mat-divider></mat-divider>
+    </mat-list-item>
+
+  </mat-list>
+
 </cdk-virtual-scroll-viewport>

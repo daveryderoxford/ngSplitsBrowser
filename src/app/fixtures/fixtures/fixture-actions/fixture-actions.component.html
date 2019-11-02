@@ -5,11 +5,11 @@
 <mat-menu #menu="matMenu" overlapTrigger=true>
   <ng-template matMenuContent>
 
-    <ng-container *ngIf="mobile">
+    <ng-container *ngIf="handset">
       <a mat-menu-item href="{{fixture.clubURL}}"> Club website</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | bingURL}}">OS map</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleURL}}" target="_blank">Google map</a>
-      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleDirectionsURL}}" target="_blank">Directions</a>
+      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleDirectionsURL:homeLocation}}" target="_blank">Directions</a>
       <mat-divider></mat-divider>
     </ng-container>
 

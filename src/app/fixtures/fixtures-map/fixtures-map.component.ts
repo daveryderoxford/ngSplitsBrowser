@@ -9,6 +9,7 @@ import {
    Canvas, circle, Circle, CircleMarker, CircleMarkerOptions, control,
    FeatureGroup, Map, tileLayer, TileLayer, Util
 } from "leaflet";
+import { interval } from 'rxjs';
 
 
 @Component( {
@@ -74,6 +75,12 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
    ngAfterViewInit() {
       /* Leaflet calculates the map size before angular is full initialise so we need to
       invalidate it once the view is complete. */
+      this.map.invalidateSize();
+      interval( 500 ).subscribe( () => this.map.invalidateSize());
+
+   }
+
+   invalidate() {
       this.map.invalidateSize();
    }
 
