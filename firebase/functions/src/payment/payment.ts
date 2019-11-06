@@ -1,17 +1,5 @@
 /**
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+
  */
 'use strict';
 
@@ -31,7 +19,7 @@ export interface StripePayment {
 
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import * as logging from '@google-cloud/logging';
+// import * as logging from '@google-cloud/logging';
 
 const stripe = require( 'stripe' )( functions.config().stripe.testkey );
 
@@ -117,7 +105,9 @@ export const cleanupUser = functions
 // alerts, if you've opted into receiving them.
 // [START reporterror]
 function reportError( err, context = {} ) {
-   // This is the name of the StackDriver log stream that will receive the log
+
+   console.log( err);
+/*   // This is the name of the StackDriver log stream that will receive the log
    // entry. This name can be any valid log stream name, but must contain "err"
    // in order for the error to be picked up by StackDriver Error Reporting.
    const logName = 'errors';
@@ -149,9 +139,8 @@ function reportError( err, context = {} ) {
          }
          return resolve();
       } );
-   } );
+   } ); */
 }
-// [END reporterror]
 
 // Sanitize the error message for the user
 function userFacingMessage( error ) {
