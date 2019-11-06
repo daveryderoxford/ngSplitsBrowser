@@ -25,7 +25,8 @@ export class AppComponent implements OnInit {
       private afAuth: AngularFireAuth,
       private sidebarService: SidenavService,
       private snackbar: MatSnackBar,
-      private bs: BulkImportService
+      private bs: BulkImportService,
+      private snackBar: MatSnackBar
    ) {
 
       // Send google analytics message when navigating to any route succeeds.
@@ -95,7 +96,14 @@ export class AppComponent implements OnInit {
 
    async closeSidenav( target: string ) {
       await this.sidenav.close();
-      await this.router.navigate( [target] );
+      if ( target ) {
+         await this.router.navigate( [target] );
+      }
+   }
+
+   async contact() {
+      await this.sidenav.close();
+      window.location.href = "mailto:support@splitsbrowser.org.uk";
    }
 
    async logout() {
@@ -107,22 +115,50 @@ export class AppComponent implements OnInit {
       await this.sidenav.close();
    }
 
+
    // Administration functions
 
-    isAdmin(): boolean {
+   isAdmin(): boolean {
       return false;
 
       // TODO make this work
-    /*  try {
-         if (!this.user) {
-            return false;
-         }
-         const idTokenResult = await this.user.getIdTokenResult( true );
-         return idTokenResult.claims.admin;
-      } catch ( err ) {
-         console.log( "AppComponent: Error obtaining custom claim " + err );
-         return false;
-      } */
+      /*  try {
+           if (!this.user) {
+              return false;
+           }
+           const idTokenResult = await this.user.getIdTokenResult( true );
+           return idTokenResult.claims.admin;
+        } catch ( err ) {
+           console.log( "AppComponent: Error obtaining custom claim " + err );
+           return false;
+        } */
+   }
+
+   // Detects if device is on iOS
+   isIos(): boolean {
+      const userAgent = window.navigator.userAgent.toLowerCase();
+      return /iphone|ipad|ipod/.test( userAgent );
+   }
+
+   isInStandaloneMode(): boolean {
+      const nav: any = window.navigator;
+      return ( 'standalone' in nav ) && nav.standalone;
+
+   }
+
+   async showIosInstallBanner() {
+
+      const isBannerShown = localStorage.getItem( 'isBannerShown' );
+
+      // Checks if it should display install popup notification
+      if ( this.isIos() && !this.isInStandaloneMode() && isBannerShown === undefined ) {
+         const snackBarRef = this.snackBar.open( `To install the app, tap "Share" icon below and select "Add to Home Screen".` );
+
+         snackBarRef.afterDismissed().subscribe( () => {
+            localStorage.setItem( 'isBannerShown', 'true' );
+         } );
+
+      }
    }
 
    async scriptsClicked() {

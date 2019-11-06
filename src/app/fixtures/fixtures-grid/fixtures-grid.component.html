@@ -20,7 +20,7 @@
       <tr *cdkVirtualFor="let row of fixtures; trackBy: trackBy" style="width:100%; min-height: 30px;"
         (click)=eventClicked(row) [ngClass]="{ 'selected': selected(row) }">
         <td class="liked">
-          <mat-icon *ngIf="isLiked(row.id)" class="red">check_circle</mat-icon>
+          <mat-icon *ngIf="isLiked(row.id)" class="red">favorite</mat-icon>
         </td>
         <td class="date"> {{row.date | fixturedate }} </td>
         <td class="distance"> {{row.distance | distance }}</td>
@@ -70,7 +70,7 @@
         {{fixture.area | ellipsis: 30}}
         <span fxFlex></span>
 
-        <mat-icon *ngIf="isLiked(fixture.id)" inline=true>check_circle</mat-icon>
+        <mat-icon *ngIf="isLiked(fixture.id)" inline=true>favorite</mat-icon>
       </p>
 
       <app-fixture-actions #actions [handset]="handset" [fixture]="fixture"></app-fixture-actions>

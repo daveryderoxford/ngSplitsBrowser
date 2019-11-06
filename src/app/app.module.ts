@@ -9,7 +9,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from 'environments/environment';
 import "hammerjs";
-import { AboutComponent } from "./about/about.component";
+import { AboutModule } from './about/about.module';
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { firebaseConfig } from "./app.firebase-config";
@@ -25,19 +25,11 @@ import { EventsViewComponent } from "./events/eventsview/events-view.component";
 import { MyEventsTabComponent } from './events/my-events-tab/my-events-tab.component';
 import { MyResultsTableComponent } from './events/my-results-table/my-results-table.component';
 import { FixturesModule } from './fixtures/fixtures.module';
-import { MainComponent } from "./main/main.component";
-import { GraphComponent } from "./results/graph/graph.component";
-import { ClassMenuButtonComponent } from './results/results-navbar/class-menu-button.component';
-import { CompareWithComponent } from './results/results-navbar/compare-with.component';
-import { ResultsNavbarComponent } from "./results/results-navbar/results-navbar.component";
-import { ResultsViewButtonComponent } from './results/results-navbar/results-view-button.component';
-import { ResultsSearchComponent } from "./results/results-search/results-search.component";
-import { ResultsViewComponent } from "./results/results-view/results-view.component";
-import { SplitsGridComponent } from './results/splits-grid/splits-grid.component';
+import { PaymentModule } from './payments/payment.module';
+import { ResultsModule } from "./results/results.module";
 import { SharedModule } from "./shared/shared.module";
 import { ResultsFoundDialogComponent } from './user/results-found-dialog/results-found-dialog.component';
 import { UserComponent } from "./user/user.component";
-import { PaymentModule } from './payments/payment.module';
 
 @NgModule({
   declarations: [
@@ -45,25 +37,15 @@ import { PaymentModule } from './payments/payment.module';
     LoginComponent,
     RecoverComponent,
     SignupComponent,
-    MainComponent,
+    ChangePasswordComponent,
     EventsViewComponent,
     UserComponent,
-    AboutComponent,
-    GraphComponent,
-    ResultsViewComponent,
-    ResultsNavbarComponent,
-    ResultsSearchComponent,
-    ChangePasswordComponent,
-    SplitsGridComponent,
     EventsTableComponent,
     AllEventsTabComponent,
     ClubEventsTabComponent,
     MyEventsTabComponent,
     MyResultsTableComponent,
     ResultsFoundDialogComponent,
-    ResultsViewButtonComponent,
-    CompareWithComponent,
-    ClassMenuButtonComponent,
   ],
   entryComponents: [
     ResultsFoundDialogComponent,
@@ -81,7 +63,9 @@ import { PaymentModule } from './payments/payment.module';
     HttpClientModule,
     ServiceWorkerModule.register('/ngsw-worker.js', { enabled: environment.production }),
     FixturesModule,
-    PaymentModule
+    PaymentModule,
+    ResultsModule,
+    AboutModule
   ],
   bootstrap: [AppComponent]
 })

@@ -22,7 +22,9 @@
       "dom"
     ],
     "types": [
-      "d3"
+      "d3",
+      "stripe-v3",
+      "stripe-checkout"
     ]
   }
 }

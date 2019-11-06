@@ -1,32 +1,64 @@
-<app-sidenav-button> </app-sidenav-button>
+<mat-toolbar>
+  <app-sidenav-button> </app-sidenav-button>
+  About
+</mat-toolbar>
 
-<mat-card>
-  <mat-card-header>
-    <mat-card-title>Splitsbrowser History</mat-card-title>
-    <mat-card-subtitle>A brief history of Splitsbrowser</mat-card-subtitle>
-  </mat-card-header>
 
-  <mat-card-content>
-    Splitsbrowser was originally a Java application developed by Dave Ryder during the 1990's ' 
-    Ed Nash and subsequently a php application was 
+<div fxLayout="row" fxLayoutAlign="center center">
+  <mat-accordion fxFlex="0 1 800px">
+  
+    <app-about-item title="Introduction">
+      Splitsbrowser was origane
+      Display of UK fixtures
+    </app-about-item>
 
-    Splitsbrowser have
-    website The Java application was ported to php and greatly enhanced by  
-    <a href='https://github.com/LukeWoodward/SplitsBrowser'>Luke Woodward</a>.
+    <app-about-item title="Fixture features">
+      Fixtures are displayed from:
+      <ul>
+        <li>British orienteering fixture list</li>
+        <li>British Army Orineteering Association fixtures</li>
+      </ul>
+      There are two views of 
 
-    More recently it has been combined into both versions of RouteGadget written by 
-    <a href='https://github.com/Maprunner/rg2/wiki/Splitsbrowser-integration'>
-    Simon Errington</a> and <a href='http://www.routegadget.net/index.php?stay'>XXXXX</a>
+      Filtering of fixtures by 
+          <ul>
+            <li>Weekday</li>
+            <li>British Army Orineteering Association fixtures</li>
+          </ul>
 
-    Recently Splitsbrowser has been updated to store 
-    Other counteries maintaining their own Splitsbrowser installations include: 
-         https://www.nivut.org.il/splitsbrowser/
+        The following actions may be perfomed on fixtures
+            <ul>
+              <li>Weekday</li>
+              <li>British Army Orineteering Association fixtures</li>
+            </ul>
 
-         IF Femman http://www.femman.fi/
-         Swiss oreinteeing fedration 
+    </app-about-item>
 
-         Version that provides closer intagration between 
-    
-    </mat-card-content>
+      <app-about-item title="Development">
+         Splitsbrowser source code is located at <a href="https://github.com/daveryderoxford/ngSplitsBrowser">Github</a>
+         It runs on Firebase/Google Cloud.  
+         It make use of the following open source packages 
+            <ul>
+              <li>Leaflet</li>
+              <li></li>
+            </ul>
+         It is written in Typescript. 
+      </app-about-item>
 
-</mat-card>
+          <app-about-item title="Acknoledgements">
+             The fixture map is based on mp by Ollie O'Brien <a href="https://map.oobrien.com/">https://map.oobrien.com/</a>
+             British oreinteering fixtures are 
+          </app-about-item>
+
+          <app-about-item title="Privacy policy">
+              Our privacy policy is documented <a routerLink="/about/privacy">here</a>
+           </app-about-item>
+
+      <app-about-item title="Contact details">
+        Please mail <a href="support@splitsbrowser.org.uk">support@splitsbrowser.org.uk</a> with any comment problems or issues. 
+      </app-about-item>
+
+
+  </mat-accordion>
+
+</div>

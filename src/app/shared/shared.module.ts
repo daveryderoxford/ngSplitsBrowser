@@ -4,9 +4,7 @@ import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { AngularSplitModule } from 'angular-split';
-import { AppRoutingModule } from "../app-routing.module";
 import { AppMaterialModule } from "./app-material.module";
-import { NavbarComponent } from "./components/navbar/navbar.component";
 import { SidenavButtonComponent } from './components/sidenav-button/sidenav-button.component';
 import { SpinnerModule } from './components/spinner/spinner.module';
 import { DialogsModule } from "./dialogs/dialogs.module";
@@ -17,11 +15,9 @@ import { DialogsModule } from "./dialogs/dialogs.module";
         DialogsModule,
         SpinnerModule,
         AppMaterialModule,
-        AppRoutingModule,
         AngularSplitModule.forRoot(),
     ],
     declarations: [
-        NavbarComponent,
         SidenavButtonComponent
     ],
     exports: [
@@ -30,7 +26,6 @@ import { DialogsModule } from "./dialogs/dialogs.module";
         SpinnerModule,
         DialogsModule,
         AppMaterialModule,
-        NavbarComponent,
         SidenavButtonComponent,
         AngularSplitModule
     ],
