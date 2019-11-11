@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -12,7 +12,7 @@ import { EntryService } from '../entry-service';
    styleUrls: ['./fixture-actions.component.scss'],
    changeDetection: ChangeDetectionStrategy.OnPush
 } )
-export class FixtureActionsComponent implements OnInit {
+export class FixtureActionsComponent implements OnInit, AfterViewInit {
 
    @Input() fixture: Fixture;
    @Input() handset = false;
@@ -31,6 +31,11 @@ export class FixtureActionsComponent implements OnInit {
    }
 
    ngOnInit() {
+   }
+
+   ngAfterViewInit() {
+      // dismiss menu on scroll to fix ios issue where menu scrolls incorrectly.
+      window.addEventListener('scroll', () => this.menu.closeMenu(), true);
    }
 
    /** Open the menu from an external source */

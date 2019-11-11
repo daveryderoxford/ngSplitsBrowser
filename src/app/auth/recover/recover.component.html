@@ -1,10 +1,8 @@
-<app-sidenav-button> </app-sidenav-button>
+<app-toolbar>Recover Your Password</app-toolbar>
 
     <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
 
         <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
-
-            <h5> Recover Your Password</h5>
 
             <div class=error>{{error}}</div>
 
@@ -22,7 +20,7 @@
                         <BR>
                         <div fxLayout="row" fxLayoutAlign="space-between center">
                             <button [disabled]="recoverForm.invalid" mat-raised-button color=primary type="submit" aria-label="login">Recover</button>
-                            <a mat-button routerLink="/login">Remembered your password?</a>
+                            <a mat-button routerLink="/auth/login">Remembered your password?</a>
 
                         </div>
                     </div>

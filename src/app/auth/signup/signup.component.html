@@ -1,10 +1,8 @@
-<app-sidenav-button> </app-sidenav-button>
+<app-toolbar>Register user</app-toolbar>
 
 <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
 
     <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
-
-        <h5> Register user </h5>
 
         <div class=error>{{error}}</div>
 
@@ -15,7 +13,7 @@
                 <div fxLayout="column" fxFlex fxLayoutAlign="space-around">
 
                     <mat-form-field>
-                        <input matInput formControlName="email" type="email" placeholder="Email">
+                        <input matInput formControlName="email" type="email" placeholder="Email" >
                         <mat-error>Invalid email</mat-error>
                     </mat-form-field>
  
@@ -33,7 +31,7 @@
 
                     <div fxLayout="row" fxLayoutAlign="space-between center">
                         <button [disabled]="signupForm.invalid" mat-raised-button color=primary type="submit" aria-label="Signup">Sign up</button>
-                        <a mat-button routerLink="/login">Already have user name</a>
+                        <a mat-button routerLink="/auth/login">Already have user name</a>
                     </div>
  
                 </div>

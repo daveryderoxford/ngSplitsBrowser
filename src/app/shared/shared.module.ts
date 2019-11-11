@@ -5,8 +5,9 @@ import { NgModule } from "@angular/core";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { AngularSplitModule } from 'angular-split';
 import { AppMaterialModule } from "./app-material.module";
-import { SidenavButtonComponent } from './components/sidenav-button/sidenav-button.component';
+import { SidenavButtonComponent } from './components/sidenav-button.component';
 import { SpinnerModule } from './components/spinner/spinner.module';
+import { ToolbarComponent } from './components/toolbar.component';
 import { DialogsModule } from "./dialogs/dialogs.module";
 
 @NgModule({
@@ -18,7 +19,8 @@ import { DialogsModule } from "./dialogs/dialogs.module";
         AngularSplitModule.forRoot(),
     ],
     declarations: [
-        SidenavButtonComponent
+        SidenavButtonComponent,
+        ToolbarComponent
     ],
     exports: [
         CommonModule,
@@ -27,6 +29,7 @@ import { DialogsModule } from "./dialogs/dialogs.module";
         DialogsModule,
         AppMaterialModule,
         SidenavButtonComponent,
+        ToolbarComponent,
         AngularSplitModule
     ],
 })

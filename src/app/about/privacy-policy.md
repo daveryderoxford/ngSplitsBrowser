@@ -1,4 +1,4 @@
-# Privacy Policy
+
 
 ## Who are we and what do we do?
 Splistbrowser ("we", "our" and "us") is a trading name of Splistbrowser Ltd, a company registered in England and Wales,

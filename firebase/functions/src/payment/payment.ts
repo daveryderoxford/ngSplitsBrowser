@@ -105,8 +105,7 @@ export const cleanupUser = functions
 // alerts, if you've opted into receiving them.
 // [START reporterror]
 function reportError( err, context = {} ) {
-
-   console.log( err);
+   console.error( err);
 /*   // This is the name of the StackDriver log stream that will receive the log
    // entry. This name can be any valid log stream name, but must contain "err"
    // in order for the error to be picked up by StackDriver Error Reporting.
@@ -143,6 +142,6 @@ function reportError( err, context = {} ) {
 }
 
 // Sanitize the error message for the user
-function userFacingMessage( error ) {
+function userFacingMessage( error ): string {
    return error.type ? error.message : 'An error occurred, developers have been alerted';
 }

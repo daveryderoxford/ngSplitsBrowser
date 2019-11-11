@@ -1,10 +1,8 @@
-<app-sidenav-button> </app-sidenav-button>
+<app-toolbar>Login</app-toolbar>
 
-<div fxLayout="column" fxLayoutAlign="start center" fxFlexFill class=gray>
+<div fxLayout="column" fxLayoutAlign="start center" fxFlexFill>
 
     <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
-
-        <h5> Splitsbrowser Login </h5>
 
         <div class=error>{{error}}</div>
 
@@ -17,12 +15,12 @@
                     <div fxLayout="column" fxFlexFill fxLayoutAlign="center" fxLayoutGap=10px>
 
                         <mat-form-field>
-                            <input matInput formControlName="email" type="email" placeholder="Email">
+                            <input matInput formControlName="email" type="email" placeholder="Email" autocomplete="on">
                             <mat-error>Invalid email</mat-error>
                         </mat-form-field>
 
                         <mat-form-field>
-                            <input matInput formControlName="password" type="password" placeholder="Password">
+                            <input matInput formControlName="password" type="password" placeholder="Password" autocomplete="on">
                             <mat-error>Password required</mat-error>
                         </mat-form-field>
 
@@ -31,8 +29,8 @@
                         </div>
 
                         <div fxLayout="row" fxLayoutAlign="space-between">
-                            <a mat-button routerLink='/recover'>Forgot password?</a>
-                            <a mat-button routerLink='/signup'>Create account?</a>
+                            <a mat-button routerLink='/auth/recover'>Forgot password?</a>
+                            <a mat-button routerLink='/auth/signup'>Create account?</a>
                         </div>
 
                     </div>

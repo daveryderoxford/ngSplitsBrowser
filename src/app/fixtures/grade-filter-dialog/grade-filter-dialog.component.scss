@@ -4,7 +4,6 @@ mat-form-field {
   width: 45px;
 }
 
-
 td {
   margin: 0;
   border: 0;
@@ -13,6 +12,10 @@ td {
 tr {
   margin: 0;
   border: 0;
+}
+
+.overflowy {
+  overflow-y: auto;
 }
 
 

@@ -13,11 +13,11 @@
 
       <ng-container *ngIf="authorised">
         <button mat-list-item (click)='closeSidenav( "/user")'>User settings</button>
-        <button mat-list-item (click)='closeSidenav("/change-password")'>Change password</button>
+        <button mat-list-item (click)='closeSidenav("/auth/change-password")'>Change password</button>
         <button mat-list-item (click)="logout()">Logout</button>
       </ng-container>
 
-      <button mat-list-item *ngIf="!authorised" (click)='closeSidenav("/login")'>Login</button>
+      <button mat-list-item *ngIf="!authorised" (click)='closeSidenav("/auth/login")'>Login</button>
 
       <mat-divider></mat-divider>
       <button mat-list-item (click)='closeSidenav("/about")'>About</button>

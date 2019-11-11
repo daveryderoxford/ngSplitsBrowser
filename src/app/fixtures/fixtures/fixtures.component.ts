@@ -1,14 +1,11 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Fixture } from 'app/model';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
-import { Observable, interval } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { FixturesService } from '../fixtures.service';
-import { FixtureActionPopupComponent } from './fixture-action-popup.component';
-import { FixturesMapComponent } from '../fixtures-map/fixtures-map.component';
 
 @Component( {
    selector: 'app-fixtures',
@@ -55,13 +52,6 @@ export class FixturesComponent implements OnInit {
 
    toggleMobileFilter() {
       this.hideMobleFilter = !this.hideMobleFilter;
-   }
-
-   displayMobileActions( fixture: Fixture ) {
-
-      this.dialog.open( FixtureActionPopupComponent, {
-         data: fixture,
-      } );
    }
 }
 

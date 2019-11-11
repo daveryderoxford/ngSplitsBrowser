@@ -3,8 +3,11 @@ import { SidenavService } from 'app/shared/services/sidenav.service';
 
 @Component({
   selector: 'app-sidenav-button',
-  templateUrl: './sidenav-button.component.html',
-  styleUrls: ['./sidenav-button.component.scss']
+  template: `
+  <a mat-icon-button class="menu" (click)='openSidenav()'>
+    <mat-icon class= "material-icons md-26"> menu </mat-icon>
+  </a>
+    `
 })
 export class SidenavButtonComponent implements OnInit {
 
@@ -16,5 +19,4 @@ export class SidenavButtonComponent implements OnInit {
   openSidenav() {
     this.sidenavService.open();
   }
-
 }
