@@ -12,7 +12,7 @@ import { ResultsSelectionService } from "app/results/results-selection.service";
 import { DialogsService, Utils } from "app/shared";
 import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
 import { UserDataService } from "app/user/user-data.service";
-import * as _ from 'lodash';
+import isEqual from 'lodash/isequal';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 
@@ -187,7 +187,7 @@ export class UserComponent implements OnInit {
 
     // Find results for any ecards that have changed.
     for (const ecard of updatedUser.ecards) {
-      if (!originalUser || !originalUser.ecards.find(origEcard => _.isEqual(ecard, origEcard))) {
+      if (!originalUser || !originalUser.ecards.find(origEcard => isEqual(ecard, origEcard))) {
         resultsFound = resultsFound.concat(await this.usd.findUserResults(ecard));
       }
     }
