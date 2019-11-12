@@ -1,8 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { AngularFirestoreModule } from '@angular/fire/firestore';
-import { AngularFireStorageModule } from '@angular/fire/storage';
 import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from 'app/shared/shared.module';
 import { FilterPipeModuleModule } from './fixture-pipes';
@@ -34,8 +32,6 @@ import { FixtureActionsComponent } from './fixtures/fixture-actions/fixture-acti
     CommonModule,
     SharedModule,
     ReactiveFormsModule,
-    AngularFirestoreModule,
-    AngularFireStorageModule,
     HttpClientModule,
     FilterPipeModuleModule,
     FixturesRoutingModule
