@@ -17,34 +17,34 @@
       </tr>
     </thead>
     <tbody>
-      <tr *cdkVirtualFor="let row of fixtures; trackBy: trackBy" style="width:100%; min-height: 30px;"
-        (click)=eventClicked(row) [ngClass]="{ 'selected': selected(row) }">
+      <tr *cdkVirtualFor="let fixture of fixtures; trackBy: trackBy" style="width:100%; min-height: 30px;"
+        (click)=eventClicked(fixture) [ngClass]="{ 'selected': selected(fixture) }">
         <td class="liked">
-          <mat-icon *ngIf="isLiked(row.id)" class="red">favorite</mat-icon>
+          <mat-icon *ngIf="isLiked(fixture.id)" class="red">favorite</mat-icon>
         </td>
-        <td class="date"> {{row.date | fixturedate }} </td>
-        <td class="distance"> {{row.distance | distance }}</td>
-        <td class="name"> {{row.name}} </td>
+        <td class="date"> {{fixture.date | fixturedate }} </td>
+        <td class="distance" [style.color]="fixture.distance | distancecolor"> {{fixture.distance | distance }}</td>
+        <td class="name"> {{fixture.name}} </td>
         <td class="club">
-          <a href={{row.clubURL}} target="_blank"> {{row.club}} </a>
+          <a href={{fixture.clubURL}} target="_blank"> {{fixture.club}} </a>
         </td>
-        <td class="level">{{row.grade}} </td>
+        <td class="level">{{fixture.grade}} </td>
         <td class="area">
-          <div *ngIf="row.latLong; then arealink else nolink"></div>
-          <ng-template #arealink><a href="{{row | bingURL}}" target="_blank">{{row.area}}</a></ng-template>
-          <ng-template #nolink>{{row.area}}</ng-template>
+          <div *ngIf="fixture.latLong; then arealink else nolink"></div>
+          <ng-template #arealink><a href="{{fixture | bingURL}}" target="_blank">{{fixture.area}}</a></ng-template>
+          <ng-template #nolink>{{fixture.area}}</ng-template>
         </td>
         <td class="location">
-          <div *ngIf="row.latLong; then googlelink else nolink1"></div>
-          <ng-template #googlelink> <a href="{{row | googleURL}}" target="_blank">{{row.postcode}}</a></ng-template>
-          <ng-template #nolink1>{{row.postcode}}</ng-template>
+          <div *ngIf="fixture.latLong; then googlelink else nolink1"></div>
+          <ng-template #googlelink> <a href="{{fixture | googleURL}}" target="_blank">{{fixture.postcode}}</a></ng-template>
+          <ng-template #nolink1>{{fixture.postcode}}</ng-template>
         </td>
         <td class="directions">
-          <a href="{{row.latLong | googleDirectionsURL:homeLocation }}" target="_blank" *ngIf="row.latLong">
+          <a href="{{fixture.latLong | googleDirectionsURL:homeLocation }}" target="_blank" *ngIf="fixture.latLong">
             Directions</a>
         </td>
         <td class="actions">
-          <app-fixture-actions [fixture]="row" [handset]="handset"></app-fixture-actions>
+          <app-fixture-actions [fixture]="fixture" [handset]="handset"></app-fixture-actions>
         </td>
       </tr>
     </tbody>
@@ -59,7 +59,7 @@
       <div mat-line>
         <span fxFlex=50>{{fixture.date | fixturedate }}</span>
         <span fxFlex=30> {{fixture.club}}</span>
-        <span fxFlex *ngIf="fixture.distance !== -1;">
+        <span fxFlex *ngIf="fixture.distance !== -1;" [style.color]="fixture.distance | distancecolor">
           {{fixture.distance}}miles
         </span>
       </div>
@@ -70,7 +70,7 @@
         {{fixture.area | ellipsis: 30}}
         <span fxFlex></span>
 
-        <mat-icon *ngIf="isLiked(fixture.id)" inline=true>favorite</mat-icon>
+        <mat-icon *ngIf="isLiked(fixture.id)" class="red" inline=true>favorite</mat-icon>
       </p>
 
       <app-fixture-actions #actions [handset]="handset" [fixture]="fixture"></app-fixture-actions>

@@ -7,7 +7,7 @@
 
     <ng-container *ngIf="handset">
       <a mat-menu-item href="{{fixture.clubURL}}"> Club website</a>
-      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | bingURL}}">OS map</a>
+      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | bingURL}}" target="_blank">OS map</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleURL}}" target="_blank">Google map</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleDirectionsURL:homeLocation}}" target="_blank">Directions</a>
       <mat-divider></mat-divider>

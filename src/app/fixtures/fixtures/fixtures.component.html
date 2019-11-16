@@ -31,8 +31,9 @@
   <!-- Handset -->
   <div *ngIf="handset" fxLayout="column" class=handset>
 
-    <div class="mat-elevation-z2 handset-filter-options">
-      <app-sidenav-button> </app-sidenav-button>
+  <!--  <div class="mat-elevation-z2 handset-filter-options"> -->
+
+    <app-toolbar>
       <span fxFlex></span>
       <button mat-button (click)="mapview=false">
         <mat-icon>list</mat-icon>
@@ -45,9 +46,11 @@
         <mat-icon *ngIf="hideMobleFilter">arrow_drop_down</mat-icon>
         <mat-icon *ngIf="!hideMobleFilter">arrow_drop_up</mat-icon>
       </button>
-    </div>
+    </app-toolbar>
 
-    <app-fixtures-options [hidden]="hideMobleFilter" class="mat-elevation-z2 handset-filter-options "
+  <!-- </div> -->
+
+    <app-fixtures-options *ngIf="!hideMobleFilter" class="mat-elevation-z2"
       [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
       (filterChanged)="filterChanged($event)">
     </app-fixtures-options>

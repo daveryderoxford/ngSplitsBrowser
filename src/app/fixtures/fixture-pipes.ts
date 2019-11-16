@@ -91,11 +91,30 @@ export class EllipsisPipe implements PipeTransform {
    name: 'distance'
 })
 export class FixtureDistancePipe implements PipeTransform {
-   transform(distance: number) {
+   transform(distance: number): string {
       if (distance === -1) {
          return "";
       } else {
          return distance.toString();
+      }
+   }
+}
+
+@Pipe( {
+   name: 'distancecolor',
+   pure: true
+} )
+export class FixtureDistanceColorPipe implements PipeTransform {
+   transform( distance: number ): string {
+
+      if ( distance === -1 ) {
+         return "#000000";
+      } else if ( distance < 20 ) {
+         return "#FF0000";
+      } else if ( distance < 40 ) {
+         return "#0000FF";
+      } else {
+         return "#000000";
       }
    }
 }
@@ -123,6 +142,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       FixtureDatePipe,
       EllipsisPipe,
       FixtureDistancePipe,
+      FixtureDistanceColorPipe,
       LikedPipe,
    ],
    exports: [
@@ -132,6 +152,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       FixtureDatePipe,
       EllipsisPipe,
       FixtureDistancePipe,
+      FixtureDistanceColorPipe,
       LikedPipe,
    ]
 })
