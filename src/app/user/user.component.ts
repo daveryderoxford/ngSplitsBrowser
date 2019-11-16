@@ -1,7 +1,7 @@
 
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
-import { FormArray, FormBuilder, FormGroup } from "@angular/forms";
+import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { EventService } from "app/events/event.service";
@@ -16,11 +16,11 @@ import isEqual from 'lodash/isequal';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 
-@Component({
+@Component( {
   selector: "app-user",
   templateUrl: "./user.component.html",
   styleUrls: ["./user.component.scss"]
-})
+} )
 export class UserComponent implements OnInit {
   originalUserData: UserData = null;
   userForm: FormGroup;
@@ -35,7 +35,7 @@ export class UserComponent implements OnInit {
 
   cardclass: "mat-card-mobile";
 
-  constructor(
+  constructor (
     private formBuilder: FormBuilder,
     private afAuth: AngularFireAuth,
     private router: Router,
@@ -45,42 +45,42 @@ export class UserComponent implements OnInit {
     private dialog: MatDialog,
     private dialogService: DialogsService
   ) {
-    this.userForm = this.formBuilder.group({
+    this.userForm = this.formBuilder.group( {
       firstname: [""],
       surname: [""],
-      club: [""],
+      club: ["", [Validators.minLength( 2 ), Validators.maxLength( 10 )]],
       nationality: [""],
-      postcode: [ "" ],
+      postcode: [""],
       nationalId: [""],
       autoFind: [""],
-      ecards: this.formBuilder.array([]) as FormArray
-    });
+      ecards: this.formBuilder.array( [] ) as FormArray
+    } );
   }
 
   ngOnInit() {
-    this.afAuth.authState.subscribe(loggedIn => this.loginChanged(loggedIn));
-    this.usd.userData().subscribe(userData => this.userChanged(userData));
+    this.afAuth.authState.subscribe( loggedIn => this.loginChanged( loggedIn ) );
+    this.usd.userData().subscribe( userData => this.userChanged( userData ) );
   }
 
   private _ecardsControl(): FormArray {
     return this.userForm.controls['ecards'] as FormArray;
   }
 
-  loginChanged(loggedIn: firebase.User) {
-    if (!loggedIn) {
-      this.router.navigate(["/"]);
+  loginChanged( loggedIn: firebase.User ) {
+    if ( !loggedIn ) {
+      this.router.navigate( ["/"] );
     }
   }
 
-  private userChanged(userData: UserData) {
+  private userChanged( userData: UserData ) {
     this.originalUserData = userData;
-    if (userData) {
+    if ( userData ) {
 
       // Clear form by removing ecards and resetting
-      this.userForm.setControl('ecards', new FormArray([]));
+      this.userForm.setControl( 'ecards', new FormArray( [] ) );
       this.userForm.reset();
 
-      this.userForm.setValue({
+      this.userForm.setValue( {
         firstname: userData.firstname,
         surname: userData.surname,
         club: userData.club,
@@ -89,32 +89,39 @@ export class UserComponent implements OnInit {
         nationalId: userData.nationalId,
         autoFind: userData.autoFind,
         ecards: [],
-      });
+      } );
 
-      for (const ecard of userData.ecards) {
-        this._ecardsControl().push(this._createEcard(ecard.id, ecard.type));
+      for ( const ecard of userData.ecards ) {
+        this._ecardsControl().push( this._createEcard( ecard.id, ecard.type ) );
       }
     }
   }
 
-  private _createEcard(id: string, type: string): FormGroup {
-    return this.formBuilder.group({
-      id: id,
-      type: type,
-    });
+  private _createEcard( id: string, type: string ): FormGroup {
+    return this.formBuilder.group( {
+      id: [id, [Validators.required, Validators.pattern( "[0-9]+")]],
+      type: [type, [Validators.required]]
+    } );
   }
 
   addEcard(): void {
-    this._ecardsControl().push(this._createEcard('', ''));
+    this._ecardsControl().push( this._createEcard( '', '' ) );
+
+    // Need to explicitly mark the form as diirty as removing an element in code does not mark it as dirty.
+    this.userForm.markAsDirty();
   }
 
-  removeEcard(i: number) {
+  removeEcard( i: number ) {
     // remove address from the list
-    this._ecardsControl().removeAt(i);
+    this._ecardsControl().removeAt( i );
+
+    // Need to explicitly mark the form as diirty as removing an element in code does not mark it as dirty.
+    this.userForm.markAsDirty();
+
   }
 
   ecardControls() {
-    return this.userForm.get('ecards')['controls'];
+    return this.userForm.get( 'ecards' )['controls'];
   }
 
 
@@ -124,19 +131,19 @@ export class UserComponent implements OnInit {
 
     this.busy = true;
 
-    this.usd.updateDetails(this.userForm.value).pipe(
-      tap(userData => updatedUserData = userData),
-      switchMap(() => this.findUserResults(updatedUserData)),
-      map(foundResults => this.removeAlreadyInUserResults(foundResults, updatedUserData.results)),
-      switchMap((foundResults) => this.selectResultsToSave(foundResults)),
-      switchMap(selectedResults => this.saveCompetitorResults(selectedResults))
+    this.usd.updateDetails( this.userForm.value ).pipe(
+      tap( userData => updatedUserData = userData ),
+      switchMap( () => this.findUserResults( updatedUserData ) ),
+      map( foundResults => this.removeAlreadyInUserResults( foundResults, updatedUserData.results ) ),
+      switchMap( ( foundResults ) => this.selectResultsToSave( foundResults ) ),
+      switchMap( selectedResults => this.saveCompetitorResults( selectedResults ) )
     ).subscribe(
       () => {
-        console.log('UserComponnet: User results saved');
+        console.log( 'UserComponnet: User results saved' );
       },
-      (err) => {
-        console.log('UserComponnet: Error encountered saving user results' + err.message);
-        this.dialogService.message('Error saving user results', 'Error saving user results');
+      ( err ) => {
+        console.log( 'UserComponnet: Error encountered saving user results' + err.message );
+        this.dialogService.message( 'Error saving user results', 'Error saving user results' );
       },
       () => {
         this.busy = false;
@@ -145,50 +152,50 @@ export class UserComponent implements OnInit {
   }
 
   /** Returns found results that are not already in the users results based on ecardId and type  */
-  removeAlreadyInUserResults(foundResults: UserResult[], allResults: UserResult[]): UserResult[] {
+  removeAlreadyInUserResults( foundResults: UserResult[], allResults: UserResult[] ): UserResult[] {
 
-    for (const userResult of allResults) {
-      foundResults = foundResults.filter(found => {
+    for ( const userResult of allResults ) {
+      foundResults = foundResults.filter( found => {
         const duplicate =
           userResult.event.key === found.event.key &&
           userResult.ecardId === found.ecardId;
         return !duplicate;
-      });
+      } );
     }
-    return (foundResults);
+    return ( foundResults );
   }
 
   /** Saves all competitor results emiting a value when all have been saved. */
-  saveCompetitorResults(userResults: UserResult[]): Observable<void> {
+  saveCompetitorResults( userResults: UserResult[] ): Observable<void> {
     const requests: Observable<void>[] = [];
-    for (const found of userResults) {
-      requests.push(this.usd.addResult(found));
+    for ( const found of userResults ) {
+      requests.push( this.usd.addResult( found ) );
     }
 
-    return forkJoin(requests).pipe(map(() => { }));
+    return forkJoin( requests ).pipe( map( () => { } ) );
   }
 
   /** Displays dialog with user results found and returns the results the user has selected */
-  selectResultsToSave(foundResults: UserResult[]): Observable<UserResult[]> {
-    if (foundResults.length > 0) {
-      const dialogRef = this.dialog.open(ResultsFoundDialogComponent, { width: '300px', data: foundResults });
+  selectResultsToSave( foundResults: UserResult[] ): Observable<UserResult[]> {
+    if ( foundResults.length > 0 ) {
+      const dialogRef = this.dialog.open( ResultsFoundDialogComponent, { width: '300px', data: foundResults } );
       return dialogRef.afterClosed();
     } else {
-      return of([]);
+      return of( [] );
     }
   }
 
   /** Finds results based on any unchanged field.
    *  Matches based on ecard
    */
-  async findUserResults(updatedUser: UserData): Promise<UserResult[]> {
+  async findUserResults( updatedUser: UserData ): Promise<UserResult[]> {
     const originalUser = this.originalUserData;
     let resultsFound: Array<UserResult> = [];
 
     // Find results for any ecards that have changed.
-    for (const ecard of updatedUser.ecards) {
-      if (!originalUser || !originalUser.ecards.find(origEcard => isEqual(ecard, origEcard))) {
-        resultsFound = resultsFound.concat(await this.usd.findUserResults(ecard));
+    for ( const ecard of updatedUser.ecards ) {
+      if ( !originalUser || !originalUser.ecards.find( origEcard => isEqual( ecard, origEcard ) ) ) {
+        resultsFound = resultsFound.concat( await this.usd.findUserResults( ecard ) );
       }
     }
 
@@ -209,7 +216,7 @@ export class UserComponent implements OnInit {
     } */
 
     // Remove duplicated from found results as may have been found for ecard and name
-    Utils.removeDuplicates(resultsFound);
+    Utils.removeDuplicates( resultsFound );
 
     return resultsFound;
   }

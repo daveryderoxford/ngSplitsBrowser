@@ -1,0 +1,8 @@
+<mat-form-field class="example-chip-list">
+   <mat-chip-list #chipList aria-label="Course selection">
+      <mat-chip *ngFor="let course of courses" selectable="true" removable="true"  (removed)="remove(course)">
+         {{course.name}}
+         <mat-icon matChipRemove>cancel</mat-icon>
+      </mat-chip>
+   </mat-chip-list>
+</mat-form-field>

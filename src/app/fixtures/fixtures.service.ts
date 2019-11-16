@@ -34,6 +34,8 @@ export class FixturesService {
       catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
    );
 
+   _selectedFixture$ = new BehaviorSubject<Fixture | null>(null);
+
    constructor (
       private afAuth: AngularFireAuth,
       protected usd: UserDataService,
@@ -83,6 +85,14 @@ export class FixturesService {
          const d = new Date( fix.date );
          return isToday( d ) || isFuture( d );
       } );
+   }
+
+   getSelectedFixture$(): Observable<Fixture> {
+      return this._selectedFixture$.asObservable();
+   }
+
+   setSelectedFixture(fixture: Fixture) {
+      this._selectedFixture$.next(fixture);
    }
 
    private showFixture( fix: Fixture, userdata: UserData, ftr: FixtureFilter ): boolean {

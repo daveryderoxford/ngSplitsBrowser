@@ -20,6 +20,7 @@ export class FixturesComponent implements OnInit {
    postcode$: Observable<string>;
    fixtures$: Observable<Fixture[]>;
    filteredFixtures$: Observable<Fixture[]>;
+   selectedFixture$: Observable<Fixture>;
 
    hideMobleFilter = true;
 
@@ -33,13 +34,15 @@ export class FixturesComponent implements OnInit {
       this.homeLocation$ = this.fs.getHomeLocation();
       this.postcode$ = this.fs.getPostcode();
       this.fixtures$ = this.fs.getFixtures();
+      this.selectedFixture$ = this.fs.getSelectedFixture$();
    }
 
    ngOnInit() {
    }
 
-   onFeatureSelected( fixture: Fixture ) {
+   onFixtureSelected( fixture: Fixture ) {
       this.selectedFixture = fixture;
+      this.fs.setSelectedFixture( fixture);
    }
 
    postcodeChanged( p: string ) {
