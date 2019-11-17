@@ -4,7 +4,8 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Fixture, LatLong } from 'app/model/fixture';
 import { UserDataService } from 'app/user/user-data.service';
-import { EntryService } from '../entry-service';
+import { EntryService } from 'app/entry/entry.service';
+import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 
 @Component( {
    selector: 'app-fixture-actions',
@@ -25,7 +26,8 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
    constructor ( private afAuth: AngularFireAuth,
       private usd: UserDataService,
       private es: EntryService,
-      private snackBar: MatSnackBar ) {
+      private snackBar: MatSnackBar,
+      private loginSnackBar: LoginSnackbarService ) {
 
       this.afAuth.authState.subscribe( user => this.loggedIn = ( user !== null ) );
    }
@@ -54,7 +56,7 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
 
    async toggleReminder() {
       if ( !this.loggedIn ) {
-         this.snackBar.open( 'Must be logged in to like fixture', '', { duration: 2000 });
+         this.loginSnackBar.open('Must be logged in to like fixture');
       } else {
          try {
             if ( this.liked() ) {
@@ -70,6 +72,10 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
             console.log( "FixtureActions: Error liking/unliking event  " + e.message );
          }
       }
+   }
+
+   async addMapReservation() {
+
    }
 
    async reserveMap() {

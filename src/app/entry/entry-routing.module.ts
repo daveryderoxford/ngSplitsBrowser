@@ -1,9 +1,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { MapRegistrationAdminComponent } from './map-registration-admin/map-registration-admin.component';
+import { AuthGuard } from 'app/auth/guards/auth-guard';
 
 const routes: Routes = [
-  { path: "mapregistration", component: MapRegistrationAdminComponent}
+  {
+    path: "",
+    canActivate: [AuthGuard],
+    children: [ {
+      path: "mapregistration:id",  component: MapRegistrationAdminComponent  }
+    ]
+  }
 ];
 
 @NgModule({

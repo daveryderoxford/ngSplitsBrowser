@@ -6,6 +6,8 @@ import { BehaviorSubject, combineLatest } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { GradeFilterComponent } from '../grade-filter-dialog/grade-filter-dialog.component';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 
 @Component( {
    selector: 'app-fixtures-options',
@@ -27,7 +29,9 @@ export class FixturesOptionsComponent implements OnInit {
    postcodeFormControl: FormControl;
    gradesEnabledControl: FormControl;
 
-   constructor ( public dialog: MatDialog ) { }
+   constructor ( private dialog: MatDialog,
+                 private auth: AngularFireAuth,
+                 private loginSnackBar: LoginSnackbarService ) { }
 
    ngOnInit() {
       this.postcodeFormControl = new FormControl( this.postcode, [this.validatePostcode, Validators.required] );
@@ -62,6 +66,10 @@ export class FixturesOptionsComponent implements OnInit {
    }
 
    likeClicked(event: MatButtonToggleChange) {
+      if (!this.auth.auth.currentUser) {
+         this.loginSnackBar.open("Must be logged in to filter liked events");
+         return;
+      }
       this.liked$.next(event.source.checked);
    }
 

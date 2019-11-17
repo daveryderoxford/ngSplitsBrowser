@@ -1,8 +1,20 @@
-<mat-form-field class="example-chip-list">
-   <mat-chip-list #chipList aria-label="Course selection">
-      <mat-chip *ngFor="let course of courses" selectable="true" removable="true"  (removed)="remove(course)">
-         {{course.name}}
-         <mat-icon matChipRemove>cancel</mat-icon>
-      </mat-chip>
-   </mat-chip-list>
-</mat-form-field>
+<app-toolbar>Event Registration Admin</app-toolbar>
+
+<form (submit)="onSubmit()">
+
+   <mat-form-field [formControlName="closingDate" ]>
+      <input matInput [min]="new Date()" [matDatepicker]="picker" placeholder="Choose a date">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+   </mat-form-field>
+
+   <mat-form-field>
+      <mat-chip-list #chipList orientation="vertcal" aria-label="Course selection">
+         <mat-chip *ngFor="let course of courses" selectable="true" [value]="course" removable="true" (removed)="remove(course)">
+            {{course.name}}
+            <mat-icon matChipRemove>cancel</mat-icon>
+         </mat-chip>
+      </mat-chip-list>
+   </mat-form-field>
+
+</form>

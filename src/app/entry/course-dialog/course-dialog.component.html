@@ -1,0 +1,29 @@
+<h1 mat-dialog-title>Course Edit</h1>
+
+<div mat-dialog-content>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <mat-form-field>
+      <input matInput formControlName="name">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput formControlName="distance" type="number">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput formControlName="climb" type="number">
+    </mat-form-field>
+
+    <mat-form-field *ngIf="hasAgeClasses">
+      <input matInput formControlName="ageClasses">
+    </mat-form-field>
+
+  </form>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button mat-dialog-close>CANCEL</button>
+  <button mat-button type="submit" (click)="onSubmit()" cdkFocusInitial>OK</button>
+</div>

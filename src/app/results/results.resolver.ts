@@ -18,7 +18,7 @@ export class ResultsResolver implements Resolve<Results> {
         const id = route.paramMap.get('id');
         // Returning Obsrvable of empty does not navigate
 
-        // If Id not specified just retrun the current results
+        // If Id not specified just return the current results
         if (!id) {
             return this.rs.selectedResults;
         } else {

@@ -1,55 +1,103 @@
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/core';
-import { MatChipInputEvent, MatChipList } from '@angular/material/chips';
-import { Course } from 'app/results/model';
+/** Edit  map reservation details from the database
+ *  Takes fixture id as a route parameter.
+ *  Uses EntryService to create FixtureEntryDetails for the fixture of they do not already exist
+*/
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatChipList } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import { EntryCourse, FixtureEntryDetails } from 'app/model/entry';
+import { Observable } from 'rxjs';
+import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
+import { EntryService } from '../entry.service';
+import { switchMap, tap } from 'rxjs/operators';
 
-@Component({
+@Component( {
   selector: 'app-map-registration-admin',
   templateUrl: './map-registration-admin.component.html',
   styleUrls: ['./map-registration-admin.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
+} )
 export class MapRegistrationAdminComponent implements OnInit {
 
-  visible = true;
-  selectable = true;
-  removable = true;
-  addOnBlur = true;
+  @ViewChild( "MatChipList", { static: true } ) matChipList: MatChipList;
 
-  @ViewChild( "MatChipList", { static: true } ) matChipList: MatChipList ;
+  form: FormGroup;
+  details: FixtureEntryDetails;
 
-  courses = [];
-
-  constructor() { }
+  constructor ( private route: ActivatedRoute,
+    private formBuilder: FormBuilder,
+    public dialog: MatDialog,
+    public snackbar: MatSnackBar,
+    private es: EntryService ) { }
 
   ngOnInit() {
 
-    this.matChipList.chipSelectionChanges.subscribe( (evt) => {
-        // If chip was selected display edit dialog
-    });
+    this.route.paramMap.pipe(
+      tap( ( params: ParamMap ) => this.es.setSelectedEntry( params.get( 'id' ) ) )
+    );
+
+    this.es.selectedEntryDetails$.subscribe( ( details ) => this.details = details );
+
+    this.form = this.formBuilder.group( {
+      closingDate: [this.details.closeingDate, [Validators.required]],
+    } );
+
+    this.matChipList.chipSelectionChanges.subscribe( ( evt ) => {
+      const course = evt.source.value as EntryCourse;
+      this._displayCourseDialog( course);
+    } );
+
+    // Subscribe to router events to display dialog
+
   }
 
   /** Add Course via dialog */
-  add( event: MatChipInputEvent ): void {
-    const input = event.input;
-    const value = event.value;
+  addCourse(): void {
+    const course: EntryCourse = {
+      name: "",
+      maxMaps: 0,
+      reservedMaps: 0,
+    };
 
-    // Show courses dialog to add course
+    this._displayCourseDialog( course );
 
-    if ( ( value || '' ).trim() ) {
-      this.courses.push( { name: value.trim() } );
-    }
+    this.details.courses.push( course );
 
-    if ( input ) {
-      input.value = '';
-    }
   }
 
-  remove( course: Course ): void {
-    const index = this.courses.indexOf( course );
+  removeCourse( course: EntryCourse ): void {
+    const index = this.details.courses.indexOf( course );
 
     if ( index >= 0 ) {
-      this.courses.splice( index, 1 );
+      this.details.courses.splice( index, 1 );
     }
   }
 
+  private _displayCourseDialog( course: EntryCourse ): Observable<EntryCourse> {
+
+    const dialogRef = this.dialog.open( CourseDialogComponent, {
+      width: '320px',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      data: { hasAgeClasses: false, course: course },
+    } );
+
+    return dialogRef.afterClosed();
+  }
+
+  /** Validate course name is unique */
+  validateCourses( courses: EntryCourse[] ) {
+    const names = courses.map( ( course => course.name ) );
+    return names.filter( ( name, index ) => names.indexOf( name ) !== index );
+  }
+
+  async onSubmit() {
+    if ( !this.validateCourses( this.details.courses ) ) {
+      this.snackbar.open( "Duplicate course names", "", { duration: 2000 } );
+      return;
+    }
+    await this.es.updateEntryDetails( this.details );
+  }
 }

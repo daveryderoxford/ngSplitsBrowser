@@ -3,18 +3,22 @@ export type EntryType = "MapReservation" | "OnlineEntry";
 
 export type PreferedStart = "Early" | "Middle" | "Late";
 
+export interface EntryCourse {
+    name: string;
+    maxMaps: number;
+    reservedMaps: number;
+    distance?: number;
+    climb?: number;
+    ageClasses?: string[];
+}
 
 export interface FixtureEntryDetails {
     fixtureId: string;         // Related to BOF event ID
     userId: string;          // Administrator for the entry
     type: EntryType;         // Type of entry allowed
     closeingDate: string;    // Closing Date
-    courses: {               // Array of course details
-        name: string;
-        maxMaps: number;
-        distance?: number;
-        ageClasses?: string[];
-    }[];
+    hasAgeClasses: boolean;
+    courses: EntryCourse[];
 }
 
 export interface Entry {
