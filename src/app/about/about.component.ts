@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { versions } from 'environments/versions';
 
 @Component({
   selector: "app-about",
@@ -8,6 +9,8 @@ import { Component, OnInit } from "@angular/core";
 export class AboutComponent implements OnInit {
 
   constructor() { }
+
+  ver = versions;
 
   ngOnInit() {
   }

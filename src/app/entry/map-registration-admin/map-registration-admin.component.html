@@ -1,16 +1,17 @@
 <app-toolbar>Event Registration Admin</app-toolbar>
 
-<form (submit)="onSubmit()">
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
 
    <mat-form-field [formControlName="closingDate" ]>
-      <input matInput [min]="new Date()" [matDatepicker]="picker" placeholder="Choose a date">
+      <input matInput [matDatepicker]="picker" placeholder="Choose a date">
       <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
    </mat-form-field>
 
    <mat-form-field>
       <mat-chip-list #chipList orientation="vertcal" aria-label="Course selection">
-         <mat-chip *ngFor="let course of courses" selectable="true" [value]="course" removable="true" (removed)="remove(course)">
+         <mat-chip *ngFor="let course of details.courses" selectable="true" [value]="course" removable="true"
+            (removed)="removeCourse(course)">
             {{course.name}}
             <mat-icon matChipRemove>cancel</mat-icon>
          </mat-chip>

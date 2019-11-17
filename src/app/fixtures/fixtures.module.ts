@@ -30,9 +30,9 @@ import { FixtureActionsComponent } from './fixture-actions/fixture-actions.compo
   ],
   imports: [
     CommonModule,
-    SharedModule,
     ReactiveFormsModule,
     HttpClientModule,
+    SharedModule,
     FilterPipeModuleModule,
     FixturesRoutingModule
   ],

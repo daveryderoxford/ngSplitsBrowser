@@ -2,5 +2,14 @@
   "projects": {
     "default": "splitsbrowser-b5948",
     "splitsbrowsertest": "splitsbrowsertest-94938"
+  },
+  "targets": {
+    "splitsbrowser-b5948": {
+      "hosting": {
+        "splitsbrowser": [
+          "splitsbrowser-b5948"
+        ]
+      }
+    }
   }
 }
