@@ -28,16 +28,15 @@ export class FixturesComponent implements OnInit {
    mapview = false;
 
    constructor ( public fs: FixturesService,
-      breakpointObserver: BreakpointObserver,
-      public dialog: MatDialog ) {
-      this.handset = breakpointObserver.isMatched( Breakpoints.Handset );
+      private breakpointObserver: BreakpointObserver,
+      public dialog: MatDialog ) {}
+
+   ngOnInit() {
+      this.handset = this.breakpointObserver.isMatched( Breakpoints.Handset );
       this.homeLocation$ = this.fs.getHomeLocation();
       this.postcode$ = this.fs.getPostcode();
       this.fixtures$ = this.fs.getFixtures();
       this.selectedFixture$ = this.fs.getSelectedFixture$();
-   }
-
-   ngOnInit() {
    }
 
    onFixtureSelected( fixture: Fixture ) {

@@ -23,7 +23,8 @@ export class EntryService {
       private afs: AngularFirestore ) {
       auth.user.subscribe( ( u ) => {
          this.user = u;
-         this.userEnteries$ = this.afs.collectionGroup<Entry>( "/enteries" ).valueChanges();
+          // TODO need to upgrafe firebase for collection query support
+    //     this.userEnteries$ = this.afs.collectionGroup<Entry>( "/enteries" ).valueChanges();
       } );
 
       this.fixtureEntryDetails$ = this.afs.collection<FixtureEntryDetails>( "/enteries" ).valueChanges();

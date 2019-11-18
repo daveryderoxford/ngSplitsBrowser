@@ -31,8 +31,6 @@
   <!-- Handset -->
   <div *ngIf="handset" fxLayout="column" class=handset>
 
-  <!--  <div class="mat-elevation-z2 handset-filter-options"> -->
-
     <app-toolbar>
       <span fxFlex></span>
       <button mat-button (click)="mapview=false">
@@ -47,8 +45,6 @@
         <mat-icon *ngIf="!hideMobleFilter">arrow_drop_up</mat-icon>
       </button>
     </app-toolbar>
-
-  <!-- </div> -->
 
     <app-fixtures-options *ngIf="!hideMobleFilter" class="mat-elevation-z2"
       [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
