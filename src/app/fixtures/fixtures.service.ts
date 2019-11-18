@@ -160,7 +160,7 @@ export class FixturesService {
          { name: 'IOF', enabled: true, distance: 1000, time: 48 },
          { name: 'International', enabled: true, distance: 1000, time: 48 },
          { name: 'National', enabled: true, distance: 500, time: 12 },
-         { name: 'Regional', enabled: true, distance: 1000, time: 12 },
+         { name: 'Regional', enabled: true, distance: 100, time: 12 },
          { name: 'Club', enabled: true, distance: 60, time: 6 },
          { name: 'Local', enabled: true, distance: 40, time: 2 },
       ];

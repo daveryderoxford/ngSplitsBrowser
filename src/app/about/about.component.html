@@ -2,91 +2,93 @@
 
 <div fxLayout="row" fxLayoutAlign="center center">
   <mat-accordion fxFlex="0 1 800px">
-  
-    <app-about-item title="Introduction">
-      Splitsbrowser was origane
-      Display of UK fixtures
-    </app-about-item>
 
-    <app-about-item title="Fixture features">
+    <app-about-item title="Introduction">
+      <p> This application displays UK Orienteering fixtures.</p>
       Fixtures are displayed from:
       <ul>
-        <li>British orienteering fixture list</li>
-        <li>British Army Orineteering Association fixtures</li>
+        <li>British Orienteering fixtures</li>
+        <li>British Army Orienteering Association fixtures</li>
       </ul>
-      There are two views of 
 
-      Filtering of fixtures by 
-          <ul>
-            <li>Weekday</li>
-            <li>British Army Orineteering Association fixtures</li>
-          </ul>
-
-        The following actions may be perfomed on fixtures
-            <ul>
-              <li>Weekday</li>
-              <li>British Army Orineteering Association fixtures</li>
-            </ul>
-
+      <p>The user may logon to allow them to 'like' fixtures. In future there is an intention to allow for the
+        reservation of maps</p>
+      The fixture list may be filtered by:
+      <ul>
+        <li>Day of week (Sat/Sun/Weekday) </li>
+        <li>'Liked' fixtures </li>
+        <li>Distance from home postcode for various grades of event. </li>
+      </ul>
     </app-about-item>
 
     <app-about-item title="Install as Application">
-      Splitsbrowser may be installed as an application on both mobile, tablet and desktop devices. 
-      Select instrictions below for installation instructions.
-      <mat-accordion fxFlex="0 1 800px">
-        <app-about-item title="Apple mobile/tablet" >
-         
+      <p>Splitsbrowser may be installed as an application on the desktop on both mobile, tablet and desktop devices.
+      Select instrictions below for installation instructions.</p>
+
+      <mat-accordion>
+        <app-about-item title="Laptop/desktop with Chrome">
+          To install as an application on the desktp on either Mac or PC from Chrome select "Install Splitsbrowser
+          from Chrome's main menu"
         </app-about-item>
+
         <app-about-item title="Android mobile/tablet">
-        
+          TBC
         </app-about-item>
-         <app-about-item title="PC with Chrome">
-              
+
+        <app-about-item title="Apple mobile/tablet">
+          The support for progressive web applications is not mature as on Android devices.
+          It is only recomented to install as an application if you are running iOS verson 13 or higher.
         </app-about-item>
-        <app-about-item title="PC with Safari">
-                    
-         </app-about-item>
-            <app-about-item title="PC with Edge">
-            
-            </app-about-item>
-                <app-about-item title="PC with Firefox">
-                
-                </app-about-item>
+
+        <app-about-item title="Laptop/desktop with Safari">
+          TBC
+        </app-about-item>
+
+        <app-about-item title="Laptop/desktop  with Edge">
+          TBC
+        </app-about-item>
+
+        <app-about-item title="PC with Firefox">
+          TBC
+        </app-about-item>
 
       </mat-accordion>
 
     </app-about-item>
 
+  
+    <app-about-item title="Acknowledgements">
+      The fixture map is based on mp by Ollie O'Brien <a href="https://map.oobrien.com/">https://map.oobrien.com/</a>
+      <br>
+      British Otrinteering  fixtures
+    </app-about-item>
+
+    <app-about-item title="Privacy policy">
+      Our privacy policy is documented <a routerLink="/about/privacy">here</a>
+    </app-about-item>
+
+    <app-about-item title="Contact details">
+      Please mail <a href="support@splitsbrowser.org.uk">support@splitsbrowser.org.uk</a> with any comment problems or
+      issues.
+    </app-about-item>
+
       <app-about-item title="Development">
-         Splitsbrowser source code is located at <a href="https://github.com/daveryderoxford/ngSplitsBrowser">Github</a>
-         It runs on Firebase/Google Cloud.  
-         It make use of the following open source packages 
-            <ul>
-              <li>Leaflet</li>
-              <li></li>
-            </ul>
-         It is written in Typescript. 
+        Splitsbrowser source code is located at <a href="https://github.com/daveryderoxford/ngSplitsBrowser">Github</a>
+        It runs on Firebase/Google Cloud.
+        It make use of the following open source packages:
+        <ul>
+          <li>Leaflet is used for charting</li>
+          <li>Angualar is used for </li>
+        </ul>
+        It is written in Typescript.
       </app-about-item>
 
-          <app-about-item title="Acknoledgements">
-             The fixture map is based on mp by Ollie O'Brien <a href="https://map.oobrien.com/">https://map.oobrien.com/</a>
-             British oreinteering fixtures are 
-          </app-about-item>
+    <app-about-item title="Version">
+      Version: {{ver.version}} <br>
+      Revision: {{ver.revision}} <br>
+      Branch: {{ver.branch}} <br>
+    </app-about-item>
 
-          <app-about-item title="Privacy policy">
-              Our privacy policy is documented <a routerLink="/about/privacy">here</a>
-           </app-about-item>
-
-      <app-about-item title="Contact details">
-        Please mail <a href="support@splitsbrowser.org.uk">support@splitsbrowser.org.uk</a> with any comment problems or issues. 
-      </app-about-item>
-
-      <app-about-item title="Version">
-          Version: {{ver.version}}  <br>
-          Revision: {{ver.revision}} <br> 
-          Branch: {{ver.branch}} <br>
-      </app-about-item>
-      
   </mat-accordion>
 
 </div>
