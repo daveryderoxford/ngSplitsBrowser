@@ -1,12 +1,12 @@
 {
-  "name": "Splitsbrowser Alpha 1",
+  "name": "Splitsbrowser",
   "short_name": "Splitsbrowser",
   "description": "Orienteering fixtures and results managament application",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
   "scope": "/",
-  "start_url": "/?utm_source=a2hs",
+  "start_url": "https://splitsbrowser-b5948.web.app/",
   "icons": [
     {
       "src": "assets/icons/d78cc26e-00e2-933a-868a-194632a809ff.webPlatform.png",
