@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { FixtureEntryDetails, Entry } from 'app/model/entry';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { switchMap } from 'rxjs/operators';
+import { switchMap, map, take,  } from 'rxjs/operators';
 
 @Injectable( {
    providedIn: 'root'
@@ -13,32 +13,23 @@ export class EntryService {
    fixtureEntryDetails$: Observable<FixtureEntryDetails[]>;
    userEnteries$: Observable<Entry[]>;
 
-   selectedEntryDetails$: Observable<FixtureEntryDetails>;
-
-   private selectedEntryDetailsId$ = new BehaviorSubject<string>("-1");
-
    user: firebase.User = null;
 
    constructor ( private auth: AngularFireAuth,
       private afs: AngularFirestore ) {
       auth.user.subscribe( ( u ) => {
          this.user = u;
-         this.userEnteries$ = this.afs.collectionGroup<Entry>( "enteries" ).valueChanges();
+         if ( this.user ) {
+            this.userEnteries$ = this.afs.collectionGroup<Entry>( "entries",
+               ref => ref.where( 'userId', '==', this.user.uid ) ).valueChanges();
+         }
       } );
 
-      this.fixtureEntryDetails$ = this.afs.collection<FixtureEntryDetails>( "/enteries" ).valueChanges();
+      this.fixtureEntryDetails$ = this.afs.collection<FixtureEntryDetails>( "/entries" ).valueChanges();
 
-      this.selectedEntryDetails$ = this.selectedEntryDetailsId$.pipe(
-         switchMap( ( id ) => this.afs.doc<FixtureEntryDetails>("/enteries/" + id.toString()).valueChanges())
-      );
    }
 
-   /** Sets the selected entry Id */
-   setSelectedEntry( fixtureId: string ) {
-      this.selectedEntryDetailsId$.next( fixtureId);
-   }
-
-   async addEntryDetails( fixtureEntryDetails: Partial<FixtureEntryDetails> ): Promise<void> {
+   async createEntryDetails( fixtureEntryDetails: Partial<FixtureEntryDetails> ): Promise<void> {
       if ( !this.user ) {
          throw new Error( "Must be logged on to add map reservation" );
       }
@@ -46,6 +37,11 @@ export class EntryService {
       fixtureEntryDetails.userId = this.user.uid;
 
       await this.afs.doc( "/enteries/" + fixtureEntryDetails.fixtureId ).set( fixtureEntryDetails );
+   }
+
+   /** Gets an observable for an existing entry */
+   getEntryDetails( id: string ): Observable<FixtureEntryDetails> {
+      return this.afs.doc<FixtureEntryDetails>( "/entries/" + id.toString()).valueChanges();
    }
 
    async updateEntryDetails( fixtureEntryDetails: FixtureEntryDetails ): Promise<void> {
@@ -63,7 +59,7 @@ export class EntryService {
    }
 
    /** Delete a map reservation -  the collection of competitorEnteries will be deleted by a cloud function */
-   async removeEntryDetails( fixtureEntryDetails: FixtureEntryDetails ) {
+   async removeEntryDetails( fixtureEntryDetails: FixtureEntryDetails ): Promise<void> {
       if ( this.user.uid !== fixtureEntryDetails.userId ) {
          throw new Error( "Must be owner of map reservation to remove it " );
       }
@@ -77,7 +73,7 @@ export class EntryService {
       }
    }
 
-   /** Reserves a map for an event */
+   /** Enter or reserve a map for an event */
    async enter( fixture: FixtureEntryDetails, entry: Partial<Entry> ): Promise<Entry> {
 
       if ( !this.user ) {
@@ -103,12 +99,15 @@ export class EntryService {
 
    /** Returns observable of enteries for an event. These are stored in a single array object in child colledtion of the event
     */
-   getEntries$( fixture: FixtureEntryDetails ): Observable<Entry[]> {
-      return this.afs.collection<Entry>( "entries/" + fixture.fixtureId ).valueChanges();
-   }
+   getEntries$( fixtureId: string ): Observable<{details: FixtureEntryDetails, entries: Entry[] } > {
 
-   /** Throws an exception  */
-   private ensureLoggedOn() {
+      const details = this.getEntryDetails( fixtureId);
+      const entries = this.afs.collection<Entry>( "entries/" + fixtureId ).valueChanges();
 
+      // TODO combine entries and details queries.
+     //  return combineLatest( [details, entries ]).pipe(
+     //    map( ([d , e] ) => { details:d, entries: e  });
+    //  );
+    return;
    }
 }

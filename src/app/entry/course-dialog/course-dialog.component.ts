@@ -25,16 +25,16 @@ export class CourseDialogComponent implements OnInit {
     this.hasAgeClasses = this.data.hasAgeClasses;
 
     this.form = this.formBuilder.group( {
-      name: [course.name, [Validators.required]],
-      maxMaps: [course.maxMaps, [Validators.required, Validators.min( 1 )]],
-      distance: [course.distance, [Validators.min( 0 )]],
-      climb: [course.climb, [Validators.min( 0 )]],
+      name: [course.name, Validators.required],
+      maxMaps: [course.maxMaps, [Validators.min( 0 ), Validators.pattern( "^[0-9]+$" )]],
+      distance: [course.distance, [Validators.min( 0 ), Validators.pattern( "^[0-9]+$" )]],
+      climb: [course.climb, [Validators.min( 0 ), Validators.pattern( "^[0-9]+$" )]],
       ageClasses: [course.ageClasses],
     } );
   }
 
   onSubmit() {
-    this.dialogRef.close( this.form );
+    this.dialogRef.close( this.form.value );
   }
 
 }

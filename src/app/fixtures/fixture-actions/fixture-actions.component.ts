@@ -6,6 +6,7 @@ import { Fixture, LatLong } from 'app/model/fixture';
 import { UserDataService } from 'app/user/user-data.service';
 import { EntryService } from 'app/entry/entry.service';
 import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
+import { Router } from '@angular/router';
 
 @Component( {
    selector: 'app-fixture-actions',
@@ -24,6 +25,7 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
    @ViewChild( MatMenuTrigger, { static: true } ) menu: MatMenuTrigger;
 
    constructor ( private afAuth: AngularFireAuth,
+      private router: Router,
       private usd: UserDataService,
       private es: EntryService,
       private snackBar: MatSnackBar,
@@ -74,8 +76,12 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
       }
    }
 
-   async addMapReservation() {
-
+   async addMapReservation(fixture: Fixture) {
+      if ( !this.loggedIn ) {
+         this.loginSnackBar.open( "Must be logged in to add map reservation");
+      } else {
+         this.router.navigate( ["/entry/mapregistration", { id: fixture.id, new: true }  ]);
+      }
    }
 
    async reserveMap() {

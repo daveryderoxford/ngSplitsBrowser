@@ -22,4 +22,9 @@ describe('MapRegistrationAdminComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+
+  it ('should validate non-unique course names', () => {
+     
+  })
 });

@@ -36,22 +36,17 @@ export class UserDataService {
     });
   }
 
-  /** Gets user data for a user Id */
-  getUser(uid: string): Observable<UserData> {
-    return this.afs.doc<UserData>("users/" + uid).valueChanges();
-  }
-
-  /** Get a reference to use data for a user, creating it if it does not exist
-   * Returns null if user is not
-  */
+  /** Get a reference to use data for a user*/
   userData(): Observable<UserData | null> {
     return this._currentUserData.asObservable();
   }
 
+  /** Get current user data  */
   get currentUserData(): UserData {
     return this._currentUserData.value;
   }
 
+  /** get obervable for the current data ct=rattin g */
   private _getUserData$(): Observable<UserData | null> {
     const user = this._getUserDoc().snapshotChanges().pipe(
         map(ret => {
@@ -68,7 +63,8 @@ export class UserDataService {
   updateDetails(details: Partial<UserInfo>): Observable<UserData> {
 
     return observableOf(this._getUserDoc().update(details)).pipe(
-      switchMap(() => this._getUserDoc().valueChanges())
+      switchMap(() => this._getUserDoc().valueChanges()),
+      take(1)
     );
   }
 

@@ -8,7 +8,7 @@ const routes: Routes = [
     path: "",
     canActivate: [AuthGuard],
     children: [ {
-      path: "mapregistration:id",  component: MapRegistrationAdminComponent  }
+      path: "mapregistration/:id",  component: MapRegistrationAdminComponent  }
     ]
   }
 ];

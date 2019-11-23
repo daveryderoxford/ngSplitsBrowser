@@ -127,17 +127,23 @@ export class UserComponent implements OnInit {
 
   save() {
 
-    let updatedUserData: UserData = null;
+    const updatedUserData: UserData = null;
 
     this.busy = true;
 
-    this.usd.updateDetails( this.userForm.value ).pipe(
+
+
+
+    this.usd.updateDetails( this.userForm.value )
+    /*
+    .pipe(
       tap( userData => updatedUserData = userData ),
       switchMap( () => this.findUserResults( updatedUserData ) ),
       map( foundResults => this.removeAlreadyInUserResults( foundResults, updatedUserData.results ) ),
       switchMap( ( foundResults ) => this.selectResultsToSave( foundResults ) ),
       switchMap( selectedResults => this.saveCompetitorResults( selectedResults ) )
-    ).subscribe(
+    )*/
+    .subscribe(
       () => {
         console.log( 'UserComponnet: User results saved' );
       },

@@ -1,21 +1,54 @@
 <app-toolbar>Event Registration Admin</app-toolbar>
 
-<form [formGroup]="form" (ngSubmit)="onSubmit()">
+<!-- Put form in middle of page -->
+<div fxLayout="row" fxLayoutAlign="center space-around">
 
-   <mat-form-field [formControlName="closingDate" ]>
-      <input matInput [matDatepicker]="picker" placeholder="Choose a date">
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-   </mat-form-field>
+   <mat-card>
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
-   <mat-form-field>
-      <mat-chip-list #chipList orientation="vertcal" aria-label="Course selection">
-         <mat-chip *ngFor="let course of details.courses" selectable="true" [value]="course" removable="true"
-            (removed)="removeCourse(course)">
-            {{course.name}}
-            <mat-icon matChipRemove>cancel</mat-icon>
-         </mat-chip>
-      </mat-chip-list>
-   </mat-form-field>
+         <mat-card-content>
 
-</form>
+
+            <div fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=15px>
+
+               <mat-form-field>
+                  <input matInput formControlName="closingDate" [min]="minDate" [matDatepicker]="picker" placeholder="Cosing Date">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+               </mat-form-field>
+
+               <div fxLayoutAlign="start space-around">
+                  Courses
+                  <span fxFlex></span>
+                  <button mat-button type="button" (click)="addCourse()">
+                     ADD
+                     <mat-icon [ngStyle]="{'color':'green'}">add_circle</mat-icon>
+                  </button>
+               </div>
+
+               <mat-chip-list #chipList class="mat-chip-list-stacked">
+                  <mat-chip *ngFor="let course of details.courses" selected="true" selectable="true" removable="true"
+                     (removed)="removeCourse(course)" (click)="courseSelected(course)">
+                     {{course.name}}
+                     <span fxFlex></span>
+                     <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+               </mat-chip-list>
+
+            </div>
+
+         </mat-card-content>
+
+         <mat-card-actions>
+
+            <div fxLayout="row" fxLayoutAlign="space-between center">
+               <button [disabled]="form.invalid || (!form.dirty && !coursesChanged)" mat-raised-button color=primary
+                  type="submit">Save</button>
+            </div>
+
+         </mat-card-actions>
+
+      </form>
+
+   </mat-card>
+</div>

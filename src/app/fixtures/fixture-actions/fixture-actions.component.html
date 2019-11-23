@@ -9,7 +9,8 @@
       <a mat-menu-item href="{{fixture.clubURL}}"> Club website</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | bingURL}}" target="_blank">OS map</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleURL}}" target="_blank">Google map</a>
-      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleDirectionsURL:homeLocation}}" target="_blank">Directions</a>
+      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleDirectionsURL:homeLocation}}"
+        target="_blank">Directions</a>
       <mat-divider></mat-divider>
     </ng-container>
 
@@ -19,6 +20,11 @@
 
     <button *ngIf="liked()" (click)="toggleReminder()" mat-menu-item>
       UnLike
+    </button>
+
+    <mat-divider></mat-divider>
+    <button (click)="addMapReservation(fixture)" mat-menu-item>
+      Add map reservation
     </button>
 
   </ng-template>

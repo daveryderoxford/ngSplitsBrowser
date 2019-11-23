@@ -1,23 +1,27 @@
-<h1 mat-dialog-title>Course Edit</h1>
+<h1 mat-dialog-title>Course</h1>
 
 <div mat-dialog-content>
 
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
     <mat-form-field>
-      <input matInput formControlName="name">
+      <input matInput required formControlName="name" placeholder="Name">
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput formControlName="distance" type="number">
+      <input matInput formControlName="maxMaps"  placeholder="Number of maps">
     </mat-form-field>
 
     <mat-form-field>
-      <input matInput formControlName="climb" type="number">
+      <input matInput formControlName="distance" placeholder="Distance">
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput formControlName="climb" placeholder="Climb">
     </mat-form-field>
 
     <mat-form-field *ngIf="hasAgeClasses">
-      <input matInput formControlName="ageClasses">
+      <input matInput formControlName="ageClasses" placeholder="Age Classes">
     </mat-form-field>
 
   </form>
@@ -25,5 +29,5 @@
 
 <div mat-dialog-actions>
   <button mat-button mat-dialog-close>CANCEL</button>
-  <button mat-button type="submit" (click)="onSubmit()" cdkFocusInitial>OK</button>
+  <button mat-button type="submit" [disabled]="form.invalid || !form.dirty" (click)="onSubmit()" cdkFocusInitial>OK</button>
 </div>

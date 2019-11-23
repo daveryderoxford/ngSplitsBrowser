@@ -2,102 +2,132 @@
  *  Takes fixture id as a route parameter.
  *  Uses EntryService to create FixtureEntryDetails for the fixture of they do not already exist
 */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MatChipList } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { EntryCourse, FixtureEntryDetails } from 'app/model/entry';
 import { Observable } from 'rxjs';
+import { tap, take } from 'rxjs/operators';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import { EntryService } from '../entry.service';
-import { switchMap, tap } from 'rxjs/operators';
 
 @Component( {
-  selector: 'app-map-registration-admin',
-  templateUrl: './map-registration-admin.component.html',
-  styleUrls: ['./map-registration-admin.component.scss'],
+   selector: 'app-map-registration-admin',
+   templateUrl: './map-registration-admin.component.html',
+   styleUrls: ['./map-registration-admin.component.scss'],
 } )
 export class MapRegistrationAdminComponent implements OnInit {
 
-  @ViewChild( "MatChipList", { static: true } ) matChipList: MatChipList;
+   form: FormGroup;
+   details: Observable<FixtureEntryDetails>;
+   error = '';
+   coursesChanged = false;
+   minDate = new Date();
 
-  form: FormGroup;
-  details: FixtureEntryDetails;
 
-  constructor ( private route: ActivatedRoute,
-    private formBuilder: FormBuilder,
-    public dialog: MatDialog,
-    public snackbar: MatSnackBar,
-    private es: EntryService ) { }
 
-  ngOnInit() {
+   constructor ( private route: ActivatedRoute,
+      private router: Router,
+      private formBuilder: FormBuilder,
+      public dialog: MatDialog,
+      public snackbar: MatSnackBar,
+      private es: EntryService ) { }
 
-    this.route.paramMap.pipe(
-      tap( ( params: ParamMap ) => this.es.setSelectedEntry( params.get( 'id' ) ) )
-    );
+   private new = false;
 
-    this.es.selectedEntryDetails$.subscribe( ( details ) => this.details = details );
+   ngOnInit() {
 
-    this.form = this.formBuilder.group( {
-      closingDate: [this.details.closeingDate, [Validators.required]],
-    } );
+      //  this.es.selectedEntryDetails$.subscribe( ( details ) => this.details = details );
 
-    this.matChipList.chipSelectionChanges.subscribe( ( evt ) => {
-      const course = evt.source.value as EntryCourse;
-      this._displayCourseDialog( course);
-    } );
 
-    // Subscribe to router events to display dialog
+      this.route.paramMap.subscribe( ( params: ParamMap ) => {
+         this.new = params.has( 'new' );
+         if (this.new) {
+            this.details = {
+               fixtureId: params.get( 'id' ),
+               userId: "1",
+               type: 'MapReservation',
+               closeingDate: new Date().toISOString(),
+               hasAgeClasses: false,
+               courses: []
+            };
+            this.form.patchValue( this.details );
 
-  }
+         } else {
+            this.es.getEntryDetails( params.get( 'id' ) ).pipe(
+               take( 1 ) ),
+               tap( details => this.form.patchValue( details );
+               this.details = details;
+            );
+         }
+      )
 
-  /** Add Course via dialog */
-  addCourse(): void {
-    const course: EntryCourse = {
-      name: "",
-      maxMaps: 0,
-      reservedMaps: 0,
-    };
+      this.form = this.formBuilder.group( {
+         closingDate: ["", [Validators.required]],
+      } );
+   }
 
-    this._displayCourseDialog( course );
+   /** Add Course via dialog */
+   addCourse(); {
+      const course: EntryCourse = {
+         name: "",
+         maxMaps: 0,
+         reservedMaps: 0,
+      };
 
-    this.details.courses.push( course );
+      this._displayCourseDialog( course ).subscribe( c => {
+         if ( c ) {
+            this.details.courses.push( c );
+            this.coursesChanged = true;
+         }
+      } );
+   }
 
-  }
+   removeCourse( course: EntryCourse ); {
+      const index = this.details.courses.indexOf( course );
 
-  removeCourse( course: EntryCourse ): void {
-    const index = this.details.courses.indexOf( course );
+      if ( index >= 0 ) {
+         this.details.courses.splice( index, 1 );
+         this.coursesChanged = true;
+      }
+   }
 
-    if ( index >= 0 ) {
-      this.details.courses.splice( index, 1 );
-    }
-  }
+   courseSelected( course: EntryCourse ); {
+      this._displayCourseDialog( course ).subscribe( c => {
+         if ( c ) {
+            course = c;
+            this.coursesChanged = true;
+         }
+      } );
+   }
 
-  private _displayCourseDialog( course: EntryCourse ): Observable<EntryCourse> {
+   private _displayCourseDialog( course: EntryCourse ); : Observable < EntryCourse > {
 
-    const dialogRef = this.dialog.open( CourseDialogComponent, {
-      width: '320px',
-      maxWidth: '100vw',
-      maxHeight: '100vh',
-      data: { hasAgeClasses: false, course: course },
-    } );
+      const dialogRef = this.dialog.open( CourseDialogComponent, {
+         width: '250px',
+         maxWidth: '100vw',
+         maxHeight: '100vh',
+         data: { hasAgeClasses: false, course: course },
+      } );
 
-    return dialogRef.afterClosed();
-  }
+      return dialogRef.afterClosed();
+   };
 
-  /** Validate course name is unique */
-  validateCourses( courses: EntryCourse[] ) {
-    const names = courses.map( ( course => course.name ) );
-    return names.filter( ( name, index ) => names.indexOf( name ) !== index );
-  }
+   /** Returns array of duplicate course names */
+   private _duplicateCourseNames( courses: EntryCourse[] ); : string[]; {
+      const names = courses.map( ( course => course.name ) );
+      const duplicateNames = names.filter( ( name, index ) => names.indexOf( name ) !== index );
+      return duplicateNames;
+   }
 
-  async onSubmit() {
-    if ( !this.validateCourses( this.details.courses ) ) {
-      this.snackbar.open( "Duplicate course names", "", { duration: 2000 } );
-      return;
-    }
-    await this.es.updateEntryDetails( this.details );
-  }
+   async; onSubmit(); {
+      if ( this._duplicateCourseNames( this.details.courses ).length !== 0 ) {
+         this.snackbar.open( "Error - Course names numst be unique", "", { duration: 2000 } );
+         return;
+      }
+      await this.es.updateEntryDetails( this.details );
+      await this.router.navigateByUrl( "/fixtures" );
+   }
 }
