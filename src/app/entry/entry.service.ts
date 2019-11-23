@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
-import { FixtureEntryDetails, Entry } from 'app/model/entry';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
-import { switchMap, map, take,  } from 'rxjs/operators';
+import { Entry, FixtureEntryDetails } from 'app/model/entry';
+import { Observable } from 'rxjs';
 
 @Injectable( {
    providedIn: 'root'

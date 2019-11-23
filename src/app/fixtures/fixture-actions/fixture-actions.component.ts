@@ -7,12 +7,12 @@ import { UserDataService } from 'app/user/user-data.service';
 import { EntryService } from 'app/entry/entry.service';
 import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 import { Router } from '@angular/router';
+import { FixtureEntryDetails } from 'app/model/entry';
 
 @Component( {
    selector: 'app-fixture-actions',
    templateUrl: './fixture-actions.component.html',
    styleUrls: ['./fixture-actions.component.scss'],
-   changeDetection: ChangeDetectionStrategy.OnPush
 } )
 export class FixtureActionsComponent implements OnInit, AfterViewInit {
 
@@ -20,7 +20,11 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
    @Input() handset = false;
    @Input() homeLocation: LatLong;
 
+   //TODO TEMP comment out map reservation
+   mapReservationSupported = false;
+
    loggedIn: boolean;
+   fixtureEntryDetails: FixtureEntryDetails[] = [];
 
    @ViewChild( MatMenuTrigger, { static: true } ) menu: MatMenuTrigger;
 
@@ -32,6 +36,10 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
       private loginSnackBar: LoginSnackbarService ) {
 
       this.afAuth.authState.subscribe( user => this.loggedIn = ( user !== null ) );
+
+      this.es.fixtureEntryDetails$.subscribe( arr => {
+         this.fixtureEntryDetails = arr;
+      });
    }
 
    ngOnInit() {
@@ -80,8 +88,12 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
       if ( !this.loggedIn ) {
          this.loginSnackBar.open( "Must be logged in to add map reservation");
       } else {
-         this.router.navigate( ["/entry/mapregistration", { id: fixture.id, new: true }  ]);
+         this.router.navigate( ["/entry/mapregistration", fixture.id, { new: true } ] );
       }
+   }
+
+   hasMapReservation(fixture: Fixture): boolean  {
+      return this.fixtureEntryDetails.filter( details => fixture.id === details.fixtureId).length !== 0;
    }
 
    async reserveMap() {

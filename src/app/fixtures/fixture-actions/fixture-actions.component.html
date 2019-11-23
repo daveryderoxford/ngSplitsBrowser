@@ -22,10 +22,19 @@
       UnLike
     </button>
 
+  <div *ngIf="mapReservationSupported">
+
     <mat-divider></mat-divider>
     <button (click)="addMapReservation(fixture)" mat-menu-item>
-      Add map reservation
+      Add Map Reservation
     </button>
+
+    <button *ngIf="hasMapReservation(fixture)" (click)="editMapReservation(fixture)" mat-menu-item>
+      Edit Map Reservation
+    </button>
+    
+  </div>
+
 
   </ng-template>
 

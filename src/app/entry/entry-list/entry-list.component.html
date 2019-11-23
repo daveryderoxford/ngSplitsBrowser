@@ -1,0 +1,15 @@
+<app-toolbar>Entry list </app-toolbar>
+<!--
+<div *ngIf="fixture = es.selectedFixtureEntries$ | async else loading">
+
+    <div *ngFor="let course of fixture.details.courses">
+        {{course.name}} {{course.distance}} {{course.length}}
+        <div *ngFor="let entry of entriesForCourse(course, fixture.entries)">
+            {{entry.name}}
+        </div>
+    </div>
+</div>
+ -->
+<div #loading>
+    <app-spinner>Loading entries</app-spinner>
+</div>

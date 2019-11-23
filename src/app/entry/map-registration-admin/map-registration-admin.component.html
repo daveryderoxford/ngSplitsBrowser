@@ -8,11 +8,10 @@
 
          <mat-card-content>
 
-
             <div fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=15px>
 
                <mat-form-field>
-                  <input matInput formControlName="closingDate" [min]="minDate" [matDatepicker]="picker" placeholder="Cosing Date">
+                  <input matInput formControlName="closingDate" [min]="minDate" [matDatepicker]="picker" placeholder="Closing Date">
                   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                </mat-form-field>

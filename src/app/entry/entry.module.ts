@@ -5,11 +5,13 @@ import { SharedModule } from 'app/shared/shared.module';
 import { CourseDialogComponent } from './course-dialog/course-dialog.component';
 import { EntryRoutingModule } from './entry-routing.module';
 import { MapRegistrationAdminComponent } from './map-registration-admin/map-registration-admin.component';
+import { EntryListComponent } from './entry-list/entry-list.component';
 
 @NgModule({
   declarations: [
     MapRegistrationAdminComponent,
-    CourseDialogComponent
+    CourseDialogComponent,
+    EntryListComponent
   ],
   imports: [
     CommonModule,
@@ -19,6 +21,7 @@ import { MapRegistrationAdminComponent } from './map-registration-admin/map-regi
   ],
   exports: [
     MapRegistrationAdminComponent,
+    EntryListComponent
   ],
   entryComponents: [CourseDialogComponent]
 })

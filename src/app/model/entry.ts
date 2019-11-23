@@ -16,7 +16,7 @@ export interface FixtureEntryDetails {
     fixtureId: string;         // Related to BOF event ID
     userId: string;          // Administrator for the entry
     type: EntryType;         // Type of entry allowed
-    closeingDate: string;    // Closing Date
+    closingDate: string;    // Closing Date
     hasAgeClasses: boolean;
     courses: EntryCourse[];
 }
