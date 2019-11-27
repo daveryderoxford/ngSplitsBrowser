@@ -3,6 +3,7 @@ import { Fixture, LatLong } from "app/model/fixture";
 
 import format from 'date-fns/format';
 import differenceInCalendarDays from 'date-fns/difference_in_calendar_days';
+import { EventGrade } from 'app/model';
 
 /**
  * Pipes to display fixture fields used for both
@@ -132,6 +133,15 @@ export class LikedPipe implements PipeTransform {
    }
 }
 
+@Pipe( {
+   name: 'gradeIconName'
+} )
+export class GradeIconNamePipe implements PipeTransform {
+   transform( grade: EventGrade ): string {
+      return 'grade-' + grade.toLowerCase();
+   }
+}
+
 function latLongStr(loc: LatLong, seperator = ","): string {
    return loc.lat.toString() + seperator + loc.lng.toString();
 }
@@ -146,6 +156,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       FixtureDistancePipe,
       FixtureDistanceColorPipe,
       LikedPipe,
+      GradeIconNamePipe
    ],
    exports: [
       GoogleURLPipe,
@@ -156,6 +167,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       FixtureDistancePipe,
       FixtureDistanceColorPipe,
       LikedPipe,
+      GradeIconNamePipe
    ]
 })
 export class FilterPipeModuleModule {

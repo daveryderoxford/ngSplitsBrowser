@@ -9,35 +9,35 @@ import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service
 import { Router } from '@angular/router';
 import { FixtureEntryDetails } from 'app/model/entry';
 
-@Component( {
+@Component({
    selector: 'app-fixture-actions',
    templateUrl: './fixture-actions.component.html',
    styleUrls: ['./fixture-actions.component.scss'],
-} )
+})
 export class FixtureActionsComponent implements OnInit, AfterViewInit {
 
    @Input() fixture: Fixture;
    @Input() handset = false;
    @Input() homeLocation: LatLong;
 
-   //TODO TEMP comment out map reservation
+   // TODO TEMP comment out map reservation
    mapReservationSupported = false;
 
    loggedIn: boolean;
    fixtureEntryDetails: FixtureEntryDetails[] = [];
 
-   @ViewChild( MatMenuTrigger, { static: true } ) menu: MatMenuTrigger;
+   @ViewChild(MatMenuTrigger, { static: true }) menu: MatMenuTrigger;
 
-   constructor ( private afAuth: AngularFireAuth,
+   constructor(private afAuth: AngularFireAuth,
       private router: Router,
       private usd: UserDataService,
       private es: EntryService,
       private snackBar: MatSnackBar,
-      private loginSnackBar: LoginSnackbarService ) {
+      private loginSnackBar: LoginSnackbarService) {
 
-      this.afAuth.authState.subscribe( user => this.loggedIn = ( user !== null ) );
+      this.afAuth.authState.subscribe(user => this.loggedIn = (user !== null));
 
-      this.es.fixtureEntryDetails$.subscribe( arr => {
+      this.es.fixtureEntryDetails$.subscribe(arr => {
          this.fixtureEntryDetails = arr;
       });
    }
@@ -57,55 +57,56 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
 
    liked(): boolean {
       const userData = this.usd.currentUserData;
-      if ( userData ) {
-         return userData.reminders.includes( this.fixture.id );
+      if (userData) {
+         return userData.reminders.includes(this.fixture.id);
       } else {
          return false;
       }
    }
 
    async toggleReminder() {
-      if ( !this.loggedIn ) {
+      if (!this.loggedIn) {
          this.loginSnackBar.open('Must be logged in to like fixture');
       } else {
          try {
-            if ( this.liked() ) {
-               await this.usd.removeFixtureReminder( this.fixture.id );
-               this.snackBar.open( 'Event Unliked', '', { duration: 2000 } );
+            if (this.liked()) {
+               await this.usd.removeFixtureReminder(this.fixture.id);
+               this.snackBar.open('Event Unliked', '', { duration: 2000 });
 
             } else {
-               await this.usd.addFixtureReminder( this.fixture.id );
-               this.snackBar.open( 'Event Liked', '', { duration: 2000 } );
+               await this.usd.addFixtureReminder(this.fixture.id);
+               this.snackBar.open('Event Liked', '', { duration: 2000 });
             }
-         } catch ( e ) {
-            this.snackBar.open( 'Error encountered liking event', '', { duration: 2000 } );
-            console.log( "FixtureActions: Error liking/unliking event  " + e.message );
+         } catch (e) {
+            this.snackBar.open('Error encountered liking event', '', { duration: 2000 });
+            console.log("FixtureActions: Error liking/unliking event  " + e.message);
          }
       }
    }
 
-   async addMapReservation(fixture: Fixture) {
-      if ( !this.loggedIn ) {
-         this.loginSnackBar.open( "Must be logged in to add map reservation");
+   async addMapReservation() {
+      if (!this.loggedIn) {
+         this.loginSnackBar.open("Must be logged in to add map reservation");
       } else {
-         this.router.navigate( ["/entry/mapregistration", fixture.id, { new: true } ] );
+         this.router.navigate(["/entry/mapregistration", this.fixture.id, { new: true, fixture: JSON.stringify(this.fixture) }]);
       }
    }
 
-   hasMapReservation(fixture: Fixture): boolean  {
-      return this.fixtureEntryDetails.filter( details => fixture.id === details.fixtureId).length !== 0;
+   hasMapReservation(): boolean {
+      return this.fixtureEntryDetails.filter(details => this.fixture.id === details.fixtureId).length !== 0;
    }
 
-   async reserveMap() {
+   async reserveMap(): Promise<void> {
+      // TODO add map reservation
 
    }
 
    async editMapReservation() {
-
+      this.router.navigate(["/entry/mapregistration", this.fixture.id]);
    }
 
-   async viewEnteries() {
-
+   async viewEntries() {
+      this.router.navigate(["/entry/entrylist", this.fixture.id]);
    }
 
 }

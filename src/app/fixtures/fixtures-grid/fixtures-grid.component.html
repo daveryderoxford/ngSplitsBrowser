@@ -70,7 +70,10 @@
         {{fixture.area | ellipsis: 30}}
         <span fxFlex></span>
 
-        <mat-icon *ngIf="isLiked(fixture.id)" class="red" inline=true>favorite</mat-icon>
+        <mat-icon *ngIf="isLiked(fixture.id)" class="red handset-icon-size">favorite</mat-icon>
+
+        <mat-icon [svgIcon]="fixture.grade | gradeIconName" class="handset-icon-size"></mat-icon>
+
       </p>
 
       <app-fixture-actions #actions [handset]="handset" [fixture]="fixture"></app-fixture-actions>

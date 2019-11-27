@@ -26,7 +26,7 @@
                </div>
 
                <mat-chip-list #chipList class="mat-chip-list-stacked">
-                  <mat-chip *ngFor="let course of details.courses" selected="true" selectable="true" removable="true"
+                  <mat-chip *ngFor="let course of courses" selected="true" selectable="true" removable="true"
                      (removed)="removeCourse(course)" (click)="courseSelected(course)">
                      {{course.name}}
                      <span fxFlex></span>

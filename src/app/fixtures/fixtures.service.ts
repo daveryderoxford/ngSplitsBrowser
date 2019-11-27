@@ -105,7 +105,7 @@ export class FixturesService {
 
       let gradeOK: boolean;
       if ( ftr.gradesEnabled ) {
-         const gradeFilter = ftr.grades.find( ( g ) => fix.grade === g.name );
+         const gradeFilter = ftr.grades.find( ( grade ) => grade.name === fix.grade);
 
          gradeOK = gradeFilter.enabled &&
             differenceInMonths( fixdate, new Date() ) <= gradeFilter.time &&

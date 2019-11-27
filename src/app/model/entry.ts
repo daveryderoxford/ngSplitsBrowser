@@ -13,6 +13,10 @@ export interface EntryCourse {
 }
 
 export interface FixtureEntryDetails {
+    name: string;
+    date: string;
+    club: string;
+    createdAt: string;
     fixtureId: string;         // Related to BOF event ID
     userId: string;          // Administrator for the entry
     type: EntryType;         // Type of entry allowed
@@ -35,9 +39,10 @@ export interface Entry {
     startTime?: string;
     hiredCard: boolean;
 }
-
-export interface EntryGroup {
+/** A transaction to make a number of entries */
+export interface EntryTransaction {
    userId: string;
+   madeAt: string;
    price: number;
 }
 

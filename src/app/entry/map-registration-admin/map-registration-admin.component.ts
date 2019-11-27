@@ -7,6 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { Fixture } from 'app/model';
 import { EntryCourse, FixtureEntryDetails } from 'app/model/entry';
 import { Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
@@ -21,10 +22,15 @@ import { EntryService } from '../entry.service';
 export class MapRegistrationAdminComponent implements OnInit {
 
    form: FormGroup;
-   details: FixtureEntryDetails;
    error = '';
    coursesChanged = false;
    minDate = new Date();
+
+   // Edit date
+   courses: EntryCourse[];
+   id: string;
+   new = false;
+   fixture: Fixture = null;
 
    constructor(private route: ActivatedRoute,
       private router: Router,
@@ -33,38 +39,29 @@ export class MapRegistrationAdminComponent implements OnInit {
       public snackbar: MatSnackBar,
       private es: EntryService) { }
 
-   private new = false;
-
    ngOnInit() {
-
       this.form = this.formBuilder.group({
          closingDate: ["", [Validators.required]],
       });
 
       this.route.paramMap.subscribe((params: ParamMap) => {
+         this.id = params.get('id');
          this.new = params.has('new');
-         if (this.new) {
-            this.details = {
-               fixtureId: params.get('id'),
-               userId: "1",
-               type: 'MapReservation',
-               closingDate: new Date().toISOString(),
-               hasAgeClasses: false,
-               courses: []
-            };
-            this.form.patchValue(this.details);
+         if (params.has('fixture')) {
+            this.fixture = JSON.parse(params.get('fixture'));
+         }
 
+         if (this.new) {
+            this.courses = [];
+            this.form.patchValue({ closingDate: new Date().toISOString() });
          } else {
-            this.es.getEntryDetails(params.get('id')).pipe(
-               take(1),
-               tap((details) => {
+            this.es.getEntryDetails(this.id).pipe(take(1))
+               .subscribe(details => {
                   this.form.patchValue(details);
-                  this.details = details;
-               })
-            );
+                  this.courses = JSON.parse(JSON.stringify(details.courses));
+               });
          }
       });
-
    }
 
    /** Add Course via dialog */
@@ -77,17 +74,17 @@ export class MapRegistrationAdminComponent implements OnInit {
 
       this._displayCourseDialog(course).subscribe(c => {
          if (c) {
-            this.details.courses.push(c);
+            this.courses.push(c);
             this.coursesChanged = true;
          }
       });
    }
 
    removeCourse(course: EntryCourse) {
-      const index = this.details.courses.indexOf(course);
+      const index = this.courses.indexOf(course);
 
       if (index >= 0) {
-         this.details.courses.splice(index, 1);
+         this.courses.splice(index, 1);
          this.coursesChanged = true;
       }
    }
@@ -121,14 +118,32 @@ export class MapRegistrationAdminComponent implements OnInit {
    }
 
    async onSubmit() {
-      if (this._duplicateCourseNames(this.details.courses).length !== 0) {
-         this.snackbar.open("Error - Course names numst be unique", "", { duration: 2000 });
+      if (this.courses.length === 0) {
+         this.snackbar.open("Error - At least one course must be defined", "", { duration: 2000 });
          return;
       }
+
+      if (this._duplicateCourseNames(this.courses).length !== 0) {
+         this.snackbar.open("Error - Course names must be unique", "", { duration: 2000 });
+         return;
+      }
+
+      // TODO Make the control return an ISO string
+      // Temp workaround
+      const closingDate = new Date(this.form.get('closingDate').value).toISOString();
+
       if (this.new) {
-         await this.es.createEntryDetails(this.details);
+         // Create new instance and save it
+         const details = this.es.createNewEntryDetails(this.id, this.fixture);
+         details.closingDate = closingDate;
+         details.courses = this.courses;
+         await this.es.saveNewEntryDetails(details);
       } else {
-         await this.es.updateEntryDetails(this.details);
+         const update: Partial<FixtureEntryDetails> = {
+            closingDate: closingDate,
+            courses: this.courses
+         };
+         await this.es.updateEntryDetails(this.id, update);
       }
       await this.router.navigateByUrl("/fixtures");
    }

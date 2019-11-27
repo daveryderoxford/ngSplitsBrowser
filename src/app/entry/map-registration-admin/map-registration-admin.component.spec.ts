@@ -25,6 +25,6 @@ describe('MapRegistrationAdminComponent', () => {
 
 
   it ('should validate non-unique course names', () => {
-     
-  })
+
+  });
 });
