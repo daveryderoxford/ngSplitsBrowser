@@ -3,11 +3,17 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as firebase from 'firebase/app';
+import { Utils } from 'app/shared';
 
 export type AuthProvider = "EmailAndPassword" | "Google" | "Facebook";
 
 const facebookAuthProvider = new firebase.auth.FacebookAuthProvider();
 const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
+
+interface LoginCredentials {
+   email: string;
+   passord: string;
+}
 
 @Component({
    selector: 'app-login',
@@ -59,11 +65,11 @@ export class LoginComponent implements OnInit {
                break;
 
             case "Google":
-               user = await this.afAuth.auth.signInWithPopup(googleAuthProvider);
+               user = await this._thirdPartySignIn(googleAuthProvider);
                break;
 
             case "Facebook":
-               await this.afAuth.auth.signInWithPopup(facebookAuthProvider);
+               user = await this._thirdPartySignIn(facebookAuthProvider);
                break;
          }
          this._handleSignInSuccess();
@@ -71,6 +77,19 @@ export class LoginComponent implements OnInit {
          this._handleSigninError(err);
       } finally {
          this.loading = false;
+      }
+   }
+
+   /** Sign in with redirect for PWA and popup for browser.
+    * Sign in with popup avoids re-loading the application on the browser.
+    * TODO Review which method is better for mobile devices where popups are not handled as well
+   */
+   private async _thirdPartySignIn(provider): Promise<firebase.auth.UserCredential> {
+      if (Utils.isInStandaloneMode()) {
+         firebase.auth().signInWithRedirect(provider);
+         return await firebase.auth().getRedirectResult();
+      } else {
+         return await this.afAuth.auth.signInWithPopup(provider);
       }
    }
 
@@ -85,3 +104,4 @@ export class LoginComponent implements OnInit {
       this.router.navigateByUrl(this.returnUrl);
    }
 }
+

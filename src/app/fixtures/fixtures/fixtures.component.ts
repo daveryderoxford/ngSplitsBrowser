@@ -6,6 +6,7 @@ import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
 import { Observable } from 'rxjs';
 import { FixturesService } from '../fixtures.service';
+import { tap } from 'rxjs/operators';
 
 @Component( {
    selector: 'app-fixtures',
@@ -32,7 +33,10 @@ export class FixturesComponent implements OnInit {
       public dialog: MatDialog ) {}
 
    ngOnInit() {
-      this.handset = this.breakpointObserver.isMatched( Breakpoints.Handset );
+      this.breakpointObserver.observe([ '(min-width: 500px) and (min-height: 400px)'])
+             .pipe( tap( state => console.log('state: ' + state.matches.toString())))
+             .subscribe( state => this.handset = !state.matches);
+
       this.homeLocation$ = this.fs.getHomeLocation();
       this.postcode$ = this.fs.getPostcode();
       this.fixtures$ = this.fs.getFixtures();
