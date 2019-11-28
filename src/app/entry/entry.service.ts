@@ -64,7 +64,7 @@ export class EntryService {
       const s = "entry/" + id;
       return this.afs.doc<FixtureEntryDetails>(s).valueChanges();
    }
-
+ 
    async updateEntryDetails(id: string, fixtureEntryDetails: Partial<FixtureEntryDetails> ): Promise<void> {
       try {
          const doc = this.afs.doc( "entry/" + id);
@@ -87,7 +87,7 @@ export class EntryService {
    }
 
    /** Enter or reserve a map for an event */
-   async enter( fixture: FixtureEntryDetails, entry: Partial<Entry> ): Promise<Entry> {
+   async enter( fixture: FixtureEntryDetails, entry: Partial<Entry> ): Promise<void> {
 
       if ( !this.user ) {
          throw new Error( "Must be logged on to add map reservation" );
@@ -95,18 +95,24 @@ export class EntryService {
 
       entry.userId = this.auth.auth.currentUser.uid;
       entry.madeAt = new Date().toISOString();
+      entry.fixtureId = fixture.fixtureId;
 
       await this._entriesCollection(fixture.fixtureId).add( entry );
-      return Promise.resolve( <Entry> entry );
+
+      return;
    }
 
-   private _entriesCollection(id: string) {
-      return this.afs.doc( "entry/" + id).collection( "entries/");
+   getEntry$(fixtureId: string, id): Observable<Entry> {
+      return this._entriesCollection(fixtureId).doc<Entry>(id).valueChanges();
+   }
+
+   private _entriesCollection(fixtureId: string) {
+      return this.afs.doc( "entry/" + fixtureId).collection( "entries/");
    }
 
    /** Update entry details */
-   async updateEntry( fixture: FixtureEntryDetails, entry: Entry ): Promise<void> {
-      return this._entriesCollection(fixture.fixtureId).doc( entry.id ).update( entry );
+   async updateEntry( fixtureId: string, id: string, update: Partial<Entry> ): Promise<void> {
+      return this._entriesCollection(fixtureId).doc(id ).update( update );
    }
 
    /** Delete an entry */

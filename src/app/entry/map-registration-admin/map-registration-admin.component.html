@@ -4,7 +4,7 @@
 <div fxLayout="row" fxLayoutAlign="center space-around">
 
    <mat-card>
-      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <form *ngIf="form" [formGroup]="form" (ngSubmit)="onSubmit()">
 
          <mat-card-content>
 

@@ -24,7 +24,7 @@ export class MapRegistrationAdminComponent implements OnInit {
    form: FormGroup;
    error = '';
    coursesChanged = false;
-   minDate = new Date();
+   readonly minDate = new Date();
 
    // Edit date
    courses: EntryCourse[];
@@ -35,32 +35,36 @@ export class MapRegistrationAdminComponent implements OnInit {
    constructor(private route: ActivatedRoute,
       private router: Router,
       private formBuilder: FormBuilder,
-      public dialog: MatDialog,
-      public snackbar: MatSnackBar,
+      private dialog: MatDialog,
+      private snackbar: MatSnackBar,
       private es: EntryService) { }
 
    ngOnInit() {
-      this.form = this.formBuilder.group({
-         closingDate: ["", [Validators.required]],
-      });
 
       this.route.paramMap.subscribe((params: ParamMap) => {
          this.id = params.get('id');
          this.new = params.has('new');
+
          if (params.has('fixture')) {
             this.fixture = JSON.parse(params.get('fixture'));
          }
 
          if (this.new) {
+            this._createForm({ closingDate: new Date().toISOString() });
             this.courses = [];
-            this.form.patchValue({ closingDate: new Date().toISOString() });
          } else {
             this.es.getEntryDetails(this.id).pipe(take(1))
                .subscribe(details => {
-                  this.form.patchValue(details);
+                  this._createForm(details);
                   this.courses = JSON.parse(JSON.stringify(details.courses));
                });
          }
+      });
+   }
+
+   private _createForm(data) {
+      this.form = this.formBuilder.group({
+         closingDate: [data.closingDate, [Validators.required]],
       });
    }
 
