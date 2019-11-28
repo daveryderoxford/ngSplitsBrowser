@@ -21,7 +21,7 @@
         (click)=eventClicked(fixture) [ngClass]="{ 'selected': selected(fixture) }">
 
         <td class="liked">
-          <button mat-icon-button title="Like fixture" (click)="toggleReminder(fixture)">
+          <button mat-icon-button  matTooltip="Like/Unlike fixture" (click)="toggleReminder(fixture)">
             <mat-icon [class.red]="isLiked(fixture) ">favorite</mat-icon>
           </button>
 <!--  

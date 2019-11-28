@@ -24,7 +24,6 @@ export class FixturesComponent implements OnInit {
    homeLocation$: Observable<LatLong>;
    postcode$: Observable<string>;
    fixtures$: Observable<Fixture[]>;
-   filteredFixtures$: Observable<Fixture[]>;
    selectedFixture$: Observable<Fixture>;
    entries$: Observable<FixtureEntryDetails[]>;
 
@@ -56,9 +55,9 @@ export class FixturesComponent implements OnInit {
       this.selectedFixture$ = this.fs.getSelectedFixture$();
 
       /* Array of of entries expanded for the fixtures */
-      this.entries$ = combineLatest(this.filteredFixtures$, this.es.fixtureEntryDetails$).pipe(
+      this.entries$ = combineLatest(this.fixtures$, this.es.fixtureEntryDetails$).pipe(
          map(([fixtures, entries]) =>
-            fixtures.map(fix => entries.find(details => details.fixtureId === fix.id)))
+            fixtures.map(fix => entries.find(details => details.fixtureId === fix.id))),
       );
    }
 
