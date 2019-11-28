@@ -1,4 +1,4 @@
-<app-toolbar>Event Registration Admin</app-toolbar>
+<app-toolbar>Map Reservation</app-toolbar>
 
 <!-- Put form in middle of page -->
 <div fxLayout="row" fxLayoutAlign="center space-around">
@@ -11,7 +11,8 @@
             <div fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=15px>
 
                <mat-form-field>
-                  <input matInput formControlName="closingDate" [min]="minDate" [matDatepicker]="picker" placeholder="Closing Date">
+                  <input matInput formControlName="closingDate" [min]="minDate" [matDatepicker]="picker"
+                     placeholder="Closing Date">
                   <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                   <mat-datepicker #picker></mat-datepicker>
                </mat-form-field>

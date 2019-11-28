@@ -64,7 +64,7 @@ export class EntryService {
       const s = "entry/" + id;
       return this.afs.doc<FixtureEntryDetails>(s).valueChanges();
    }
- 
+
    async updateEntryDetails(id: string, fixtureEntryDetails: Partial<FixtureEntryDetails> ): Promise<void> {
       try {
          const doc = this.afs.doc( "entry/" + id);

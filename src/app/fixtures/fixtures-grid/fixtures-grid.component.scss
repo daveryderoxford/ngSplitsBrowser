@@ -46,10 +46,10 @@ td {
   text-align: center;
 }
 
-.liked {
-  width: 20px;
-  max-width: 20px;
-  min-width: 20px;
+.actions {
+  width: 80px;
+  max-width: 80px;
+  min-width: 80px;
   padding-left: 15px;
 }
 
@@ -100,15 +100,23 @@ td {
   max-width: 100%;
 }
 
-.actions {
+.admin {
   width: 30px;
   max-width: 30px;
   min-width: 30px;
   padding-right: 12px;
 }
 
+mat-icon {
+  color: rgb(200, 200, 200);
+}
+
 .red {
   color: red;
+}
+
+.green {
+  color: rgb(0,255,0)
 }
 
 // Dynamic  styles

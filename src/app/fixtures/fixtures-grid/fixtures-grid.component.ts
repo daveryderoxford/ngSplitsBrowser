@@ -5,6 +5,9 @@ import { LatLong } from 'app/model/fixture';
 import { UserDataService } from 'app/user/user-data.service';
 import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
+import { FixtureEntryDetails } from 'app/model/entry';
+import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
    selector: 'app-fixtures-grid',
@@ -20,6 +23,7 @@ export class FixturesGridComponent implements OnInit, OnChanges {
    itemSize: number;
 
    @Input() fixtures: Fixture[];
+   @Input() entries: FixtureEntryDetails[] = [];
 
    @Input() set selectedFixture(f: Fixture) {
       if (f !== this._selectedFixture) {
@@ -29,7 +33,8 @@ export class FixturesGridComponent implements OnInit, OnChanges {
    }
 
    @Input() homeLocation: LatLong;
-   @Input() handset;
+   @Input() handset: boolean;
+   @Input() loggedIn: boolean;
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
@@ -37,11 +42,16 @@ export class FixturesGridComponent implements OnInit, OnChanges {
 
    likedEvents: string[] = [];
 
-   constructor(private usd: UserDataService, iconRegistry: MatIconRegistry, sanitizer: DomSanitizer) {
+   constructor(private usd: UserDataService,
+      private loginSnackBar: LoginSnackbarService,
+      private snackBar: MatSnackBar,
+      iconRegistry: MatIconRegistry,
+      sanitizer: DomSanitizer) {
       this._registerGradeIcons(iconRegistry, sanitizer);
    }
 
    ngOnInit() {
+
       this.usd.userData().subscribe(userdata => {
          if (userdata) {
             this.likedEvents = userdata.reminders;
@@ -56,7 +66,6 @@ export class FixturesGridComponent implements OnInit, OnChanges {
          this.itemSize = 38;
       }
    }
-
 
    eventClicked(row: Fixture) {
       this._selectedFixture = row;
@@ -105,8 +114,32 @@ export class FixturesGridComponent implements OnInit, OnChanges {
       }
    }
 
-   isLiked(eventId: string): boolean {
+   isLiked(fixture: Fixture): boolean {
       if (!this.likedEvents) { return false; }
-      return this.likedEvents.includes(eventId);
+      return this.likedEvents.includes(fixture.id);
+   }
+
+   async toggleReminder(fixture: Fixture) {
+      if (!this.loggedIn) {
+         this.loginSnackBar.open('Must be logged in to like fixture');
+      } else {
+         try {
+            if (this.isLiked(fixture)) {
+               await this.usd.removeFixtureReminder(fixture.id);
+               this.snackBar.open('Event Unliked', '', { duration: 2000 });
+            } else {
+               await this.usd.addFixtureReminder(fixture.id);
+               this.snackBar.open('Event Liked', '', { duration: 2000 });
+            }
+         } catch (e) {
+            this.snackBar.open('Error encountered liking event', '', { duration: 2000 });
+            console.log("FixtureActions: Error liking/unliking event  " + e.message);
+         }
+      }
+   }
+
+   enter(fixture) {
+      
    }
 }
+
