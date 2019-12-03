@@ -16,17 +16,17 @@ import { UserData } from 'app/model';
 } )
 export class FixturesService {
 
-   _postcode$ = new BehaviorSubject<string>( "TW18 2AB" );
-   _homeLocation$ = new BehaviorSubject<LatLong>( { "lat": 51.43116, "lng": -0.508227, } );
+   private _postcode$ = new BehaviorSubject<string>( "TW18 2AB" );
+   private _homeLocation$ = new BehaviorSubject<LatLong>( { "lat": 51.43116, "lng": -0.508227, } );
 
-   _filter$ = new BehaviorSubject<FixtureFilter>( {
+   private _filter$ = new BehaviorSubject<FixtureFilter>( {
       time: { sat: true, sun: true, weekday: true },
       gradesEnabled: true,
       grades: this.makeDefaultGrades(),
       likedOnly: false
    } );
 
-   _fileContents: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
+   private _fileContents$: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
       switchMap( url => this.http.get<Fixture[]>( url ) ),
       map( fixtures => this.futureFixtures( fixtures ) ),
       shareReplay(),
@@ -34,7 +34,7 @@ export class FixturesService {
       catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
    );
 
-   _selectedFixture$ = new BehaviorSubject<Fixture | null>(null);
+   private _selectedFixture$ = new BehaviorSubject<Fixture | null>(null);
 
    constructor (
       private afAuth: AngularFireAuth,
@@ -61,7 +61,7 @@ export class FixturesService {
 
    getFixtures(): Observable<Fixture[]> {
 
-      const fixturesWithDistance$ = combineLatest( [ this._fileContents, this._homeLocation$ ] ).pipe(
+      const fixturesWithDistance$ = combineLatest( [ this._fileContents$, this._homeLocation$ ] ).pipe(
          map( ( [ fixtures, loc ] ) => {
             const n = fixtures.map( fix => {
                fix.distance = this.distanceFromHome( fix, loc );

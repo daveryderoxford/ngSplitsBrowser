@@ -21,7 +21,7 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
    @Input() homeLocation: LatLong;
 
    // TODO TEMP comment out map reservation
-   mapReservationSupported = false;
+   mapReservationSupported = true;
 
    loggedIn: boolean;
    fixtureEntryDetails: FixtureEntryDetails[] = [];

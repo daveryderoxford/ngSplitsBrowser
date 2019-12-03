@@ -21,13 +21,13 @@
         (click)=eventClicked(fixture) [ngClass]="{ 'selected': selected(fixture) }">
 
         <td class="liked">
-          <button mat-icon-button  matTooltip="Like/Unlike fixture" (click)="toggleReminder(fixture)">
+          <button mat-icon-button matTooltip="Like/Unlike fixture" (click)="toggleReminder(fixture)">
             <mat-icon [class.red]="isLiked(fixture) ">favorite</mat-icon>
           </button>
-<!--  
-          <button mat-icon-button (click)="enter(fixture)">
-              <mat-icon  [class.green]=" entries && entries.length > i && entries[i] !== null">event_available</mat-icon>
-            </button>  -->
+
+          <button mat-icon-button *ngIf="entries && i < entries.length && entries[i] !== null" matTooltip="Enter" (click)="enter(fixture)">
+            <mat-icon class="green">event_available</mat-icon>
+          </button>
 
         </td>
 
@@ -38,7 +38,7 @@
           <a href={{fixture.clubURL}} target="_blank"> {{fixture.club}} </a>
         </td>
         <td class="level">
-            <mat-icon [svgIcon]="fixture.grade | gradeIconName" class="handset-icon-size"></mat-icon>
+          <mat-icon [svgIcon]="fixture.grade | gradeIconName" class="handset-icon-size"></mat-icon>
         </td>
         <td class="area">
           <div *ngIf="fixture.latLong; then arealink else nolink"></div>

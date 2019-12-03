@@ -1,10 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { EntryService } from 'app/entry/entry.service';
-import { map, switchMap, tap } from 'rxjs/operators';
-import { Observable } from 'rxjs';
-import { Entry } from 'app/model/entry';
+import { FixtureDetailsAndEntries, Entry } from 'app/model/entry';
 import { Course } from 'app/results/model';
+import { map, switchMap } from 'rxjs/operators';
 
 /** Display all the entries for a fixture */
 @Component({
@@ -15,17 +14,30 @@ import { Course } from 'app/results/model';
 })
 export class EntryListComponent implements OnInit {
 
+   entryDetails: FixtureDetailsAndEntries = { details: null, entries: null};
+   entries: Entry[];
+
    constructor(private route: ActivatedRoute,
       private es: EntryService) { }
 
    ngOnInit() {
-      this.route.params.pipe(
+
+     this.route.params.pipe(
          map(params => params.get('id')),
          switchMap(fixtureId => this.es.getEntries$(fixtureId))
-      );
+      ).subscribe( details => this.entryDetails = details );
    }
 
-   entriesForCourse(course: Course, entries: Entry[]): Entry[] {
-      return entries.filter((entry) => entry.course === course.name);
+   applyFilter(filterValue: string) {
+     const str = filterValue.trim().toLowerCase();
+     this.entries = this.entryDetails.entries.filter( (entry) => {
+        return entry.firstname.startsWith( str) ||
+            entry.surname.startsWith(str) ||
+            entry.club.startsWith(str);
+     });
+   }
+
+   entriesForCourse(course: Course): Entry[] {
+      return this.entries.filter((entry) => entry.course === course.name);
    }
 }

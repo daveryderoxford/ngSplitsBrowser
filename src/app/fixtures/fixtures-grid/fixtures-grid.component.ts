@@ -8,6 +8,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { FixtureEntryDetails } from 'app/model/entry';
 import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { EntryService } from 'app/entry/entry.service';
+import { Router } from '@angular/router';
 
 @Component({
    selector: 'app-fixtures-grid',
@@ -43,6 +45,8 @@ export class FixturesGridComponent implements OnInit, OnChanges {
    likedEvents: string[] = [];
 
    constructor(private usd: UserDataService,
+      private es:  EntryService,
+      private router: Router,
       private loginSnackBar: LoginSnackbarService,
       private snackBar: MatSnackBar,
       iconRegistry: MatIconRegistry,
@@ -138,8 +142,21 @@ export class FixturesGridComponent implements OnInit, OnChanges {
       }
    }
 
-   enter(fixture) {
-      
+   async enter(fixture: Fixture) {
+      if (!this.loggedIn) {
+         this.loginSnackBar.open("Must be logged in to add map reservation");
+      } else {
+         this.router.navigate(["/entry/enter", fixture.id ]);
+      }
    }
+
+   async editEntry(fixture: Fixture) {
+      this.router.navigate(["/entry/mapregistration", fixture.id]);
+   }
+
+   async viewEntries(fixture: Fixture) {
+      this.router.navigate(["/entry/entrylist", fixture.id]);
+   }
+
 }
 

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore } from '@angular/fire/firestore';
-import { Entry, FixtureEntryDetails } from 'app/model/entry';
-import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { Entry, FixtureEntryDetails, FixtureDetailsAndEntries } from 'app/model/entry';
+import { Observable, forkJoin } from 'rxjs';
+import { share, map, take} from 'rxjs/operators';
 import { Fixture } from 'app/model';
 
 @Injectable( {
@@ -97,17 +97,13 @@ export class EntryService {
       entry.madeAt = new Date().toISOString();
       entry.fixtureId = fixture.fixtureId;
 
-      await this._entriesCollection(fixture.fixtureId).add( entry );
+      await this._entriesCollection(fixture.fixtureId).add( entry as Entry );
 
       return;
    }
 
    getEntry$(fixtureId: string, id): Observable<Entry> {
       return this._entriesCollection(fixtureId).doc<Entry>(id).valueChanges();
-   }
-
-   private _entriesCollection(fixtureId: string) {
-      return this.afs.doc( "entry/" + fixtureId).collection( "entries/");
    }
 
    /** Update entry details */
@@ -122,15 +118,19 @@ export class EntryService {
 
    /** Returns observable of entries for an event. These are stored in a single array object in child colledtion of the event
     */
-   getEntries$( fixtureId: string ): Observable<{details: FixtureEntryDetails, entries: Entry[] } > {
+   getEntries$( fixtureId: string ): Observable<FixtureDetailsAndEntries> {
 
-      const details$ = this.getEntryDetails(fixtureId);
-      const entries$ = this._entriesCollection(fixtureId).valueChanges();
+      const details$ = this.getEntryDetails(fixtureId).pipe(take(1));
+      const entries$ = this._entriesCollection(fixtureId).valueChanges().pipe(take(1));
 
-      // TODO combine entries and details queries.
-     //  return forkJoin( [details, entries ]).pipe(
-     //    map( ([d , e] ) => { details:d, entries: e  });
-    //  );
-    return;
+       return forkJoin( [details$, entries$]).pipe(
+         map( ([d , e]) => {
+           return { details: d, entries: e };
+         })
+      );
+   }
+
+   private _entriesCollection(fixtureId: string): AngularFirestoreCollection<Entry> {
+      return this.afs.doc( "entry/" + fixtureId).collection<Entry>( "entries/");
    }
 }

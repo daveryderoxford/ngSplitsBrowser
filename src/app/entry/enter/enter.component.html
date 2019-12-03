@@ -13,7 +13,7 @@
           <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
 
             <mat-form-field fxFlex="calc(50%-20px)">
-              <input matInput required formControlName="firstname" placeholder="First Name">
+              <input matInput required formControlName="firstname" cdkFocusInitial placeholder="First Name">
             </mat-form-field>
 
             <mat-form-field fxFlex="calc(50%-20px)">
@@ -24,17 +24,21 @@
 
           <mat-form-field>
             <input matInput formControlName="club" placeholder="Club">
+            <mat-hint align="end">Between 2 and 10 characters</mat-hint>
           </mat-form-field>
 
           <mat-form-field>
             <mat-label>Course</mat-label>
-            <mat-select [formControl]="course" required>
-              <mat-option>--</mat-option>
-              <mat-option *ngFor="let c of details.courses" [value]="c.name">
+            <mat-select formControlName="course" #courseControl required>
+              <mat-select-trigger> {{courseControl.value}} </mat-select-trigger>
+              <mat-option>---</mat-option>
+              <mat-option *ngFor="let c of fixture.courses" [value]="c.name">
                 {{c.name}}
+                <span fxFlex></span>
+                <span *ngIf="c.maxMaps">{{c.maxMaps - c.reservedMaps}} maps left</span>
               </mat-option>
             </mat-select>
-            <mat-error *ngIf="course.hasError('required')">Please choose a course</mat-error>
+            <mat-error *ngIf="course && course.hasError('required')">Please choose a course</mat-error>
           </mat-form-field>
 
         </div>
@@ -44,8 +48,9 @@
       <mat-card-actions>
 
         <div fxLayout="row" fxLayoutAlign="space-between center">
-          <button [disabled]="form.invalid || (!form.dirty && !coursesChanged)" mat-raised-button color=primary
-            type="submit">Save</button>
+          <button [disabled]="form.invalid || (!form.dirty)" mat-raised-button color=primary type="submit">Save</button>
+          <span fxFlex></span>
+          <button mat-button type="reset">CLEAR </button>
         </div>
 
       </mat-card-actions>

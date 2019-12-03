@@ -1,16 +1,15 @@
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
+import { EntryService } from 'app/entry/entry.service';
 import { Fixture } from 'app/model';
+import { FixtureEntryDetails } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
-import { Observable, combineLatest } from 'rxjs';
+import { combineLatest, Observable } from 'rxjs';
+import { map, tap, startWith } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
-import { tap, map } from 'rxjs/operators';
-import { FixtureEntryDetails } from 'app/model/entry';
-import { EntryService } from 'app/entry/entry.service';
-import { ThrowStmt } from '@angular/compiler';
-import { AngularFireAuth } from '@angular/fire/auth';
 
 @Component({
    selector: 'app-fixtures',
@@ -57,7 +56,12 @@ export class FixturesComponent implements OnInit {
       /* Array of of entries expanded for the fixtures */
       this.entries$ = combineLatest(this.fixtures$, this.es.fixtureEntryDetails$).pipe(
          map(([fixtures, entries]) =>
-            fixtures.map(fix => entries.find(details => details.fixtureId === fix.id))),
+            fixtures.map(fix => {
+               const index = entries.findIndex(details => details.fixtureId === fix.id);
+               return (index === -1) ? null : entries[index];
+            })),
+            startWith([]),
+          tap( entries => console.log("Entries length: " + entries.length + "\n" + JSON.stringify(entries)) )
       );
    }
 

@@ -40,6 +40,12 @@ export interface Entry {
     startTime?: string;
     hiredCard: boolean;
 }
+
+export interface FixtureDetailsAndEntries {
+    details: FixtureEntryDetails;
+    entries: Entry[];
+}
+
 /** A transaction to make a number of entries */
 export interface EntryTransaction {
    userId: string;
