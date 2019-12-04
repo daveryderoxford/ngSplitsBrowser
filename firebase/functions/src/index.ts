@@ -8,6 +8,7 @@ import * as clubIndex from "./club-index";
 import { Fixtures } from "./fixtures/fixtures";
 import * as mapReg from "./fixtures/mapRegistration";
 import * as sysAdmin from "./admin/admin";
+import * as entry from "./entry/entry";
 
 
 const firebaseAdmin = admin.initializeApp();
@@ -32,3 +33,7 @@ export const rebuildClubs = clubIndex.rebuildClubs;
 export const userUpdated = mapReg.userUpdated;
 
 export const grantAdmin = sysAdmin.grantAdmin;
+
+export const createEntry = entry.createEntry;
+export const deleteEntry = entry.deleteEntry;
+export const changeEntry = entry.changeClass;
