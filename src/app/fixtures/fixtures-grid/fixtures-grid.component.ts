@@ -25,7 +25,7 @@ export class FixturesGridComponent implements OnInit, OnChanges {
    itemSize: number;
 
    @Input() fixtures: Fixture[];
-   @Input() entries: FixtureEntryDetails[] = [];
+   @Input() entries: FixtureEntryDetails[];
 
    @Input() set selectedFixture(f: Fixture) {
       if (f !== this._selectedFixture) {
@@ -121,6 +121,13 @@ export class FixturesGridComponent implements OnInit, OnChanges {
    isLiked(fixture: Fixture): boolean {
       if (!this.likedEvents) { return false; }
       return this.likedEvents.includes(fixture.id);
+   }
+
+   // TODO temp 
+   isEntryAvalaible( fixture: Fixture ): boolean {
+      if ( !this.entries ) { return false; }
+      const index =  this.entries.findIndex( entry => fixture.id === entry.fixtureId);
+      return index !== -1;
    }
 
    async toggleReminder(fixture: Fixture) {

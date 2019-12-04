@@ -28,13 +28,13 @@ export class FixturesComponent implements OnInit {
 
    hideMobleFilter = true;
 
-   handset: boolean;
+   handset = false;
    mapview = false;
    loggedIn: boolean;
 
    constructor(
       private auth: AngularFireAuth,
-      private fs: FixturesService,
+      public fs: FixturesService,
       private es: EntryService,
       private breakpointObserver: BreakpointObserver,
       public dialog: MatDialog) { }
@@ -52,17 +52,17 @@ export class FixturesComponent implements OnInit {
       this.postcode$ = this.fs.getPostcode();
       this.fixtures$ = this.fs.getFixtures();
       this.selectedFixture$ = this.fs.getSelectedFixture$();
+      this.entries$ = this.es.fixtureEntryDetails$;
 
       /* Array of of entries expanded for the fixtures */
-      this.entries$ = combineLatest(this.fixtures$, this.es.fixtureEntryDetails$).pipe(
+     /* this.entries$ = combineLatest([this.fixtures$, this.es.fixtureEntryDetails$]).pipe(
          map(([fixtures, entries]) =>
             fixtures.map(fix => {
                const index = entries.findIndex(details => details.fixtureId === fix.id);
                return (index === -1) ? null : entries[index];
             })),
-            startWith([]),
-          tap( entries => console.log("Entries length: " + entries.length + "\n" + JSON.stringify(entries)) )
-      );
+         )
+      ); */
    }
 
    onFixtureSelected(fixture: Fixture) {

@@ -22,12 +22,23 @@
 
         <td class="liked">
           <button mat-icon-button matTooltip="Like/Unlike fixture" (click)="toggleReminder(fixture)">
-            <mat-icon [class.red]="isLiked(fixture) ">favorite</mat-icon>
+            <mat-icon [class.red]="isLiked(fixture)">favorite</mat-icon>
           </button>
-
+          <!--
           <button mat-icon-button *ngIf="entries && i < entries.length && entries[i] !== null" matTooltip="Enter" (click)="enter(fixture)">
             <mat-icon class="green">event_available</mat-icon>
-          </button>
+          </button> -->
+          <div *ngIf="isEntryAvalaible(fixture)">
+
+            <button mat-icon-button  matTooltip="Enter" (click)="enter(fixture)">
+              <mat-icon class="green">event_available</mat-icon>
+            </button>
+
+            <button mat-icon-button matTooltip="Entry list" (click)="viewEntries(fixture)">
+              <mat-icon>list</mat-icon>
+            </button>
+
+          </div>
 
         </td>
 

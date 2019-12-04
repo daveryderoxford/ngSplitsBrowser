@@ -14,8 +14,10 @@ import { map, switchMap } from 'rxjs/operators';
 })
 export class EntryListComponent implements OnInit {
 
-   entryDetails: FixtureDetailsAndEntries = { details: null, entries: null};
+   fixture: FixtureDetailsAndEntries = { details: null, entries: null};
    entries: Entry[];
+
+   displayedColumns = ["id", "name", "class", ];
 
    constructor(private route: ActivatedRoute,
       private es: EntryService) { }
@@ -25,12 +27,12 @@ export class EntryListComponent implements OnInit {
      this.route.params.pipe(
          map(params => params.get('id')),
          switchMap(fixtureId => this.es.getEntries$(fixtureId))
-      ).subscribe( details => this.entryDetails = details );
+     ).subscribe( entry => this.fixture = entry );
    }
 
    applyFilter(filterValue: string) {
      const str = filterValue.trim().toLowerCase();
-     this.entries = this.entryDetails.entries.filter( (entry) => {
+      this.entries = this.fixture.entries.filter( (entry) => {
         return entry.firstname.startsWith( str) ||
             entry.surname.startsWith(str) ||
             entry.club.startsWith(str);

@@ -3,7 +3,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Entry, FixtureEntryDetails, FixtureDetailsAndEntries } from 'app/model/entry';
 import { Observable, forkJoin } from 'rxjs';
-import { share, map, take} from 'rxjs/operators';
+import { share, map, take, shareReplay, switchMap, startWith} from 'rxjs/operators';
 import { Fixture } from 'app/model';
 
 @Injectable( {
@@ -12,24 +12,33 @@ import { Fixture } from 'app/model';
 export class EntryService {
 
    fixtureEntryDetails$: Observable<FixtureEntryDetails[]>;
-   userentries$: Observable<Entry[]>;
+   userEntries$: Observable<Entry[]>;
 
    user: firebase.User = null;
 
    constructor ( private auth: AngularFireAuth,
       private afs: AngularFirestore ) {
-      auth.user.subscribe( ( u ) => {
-         this.user = u;
-         if ( this.user ) {
-            this.userentries$ = this.afs.collectionGroup<Entry>( "entries",
-               ref => ref
-                  .where( 'userId', '==', this.user.uid )
-                  .where ( 'date', '<', new Date().toISOString() ) ).valueChanges();
-         }
-      } );
+
+      this.userEntries$ = auth.user.pipe(
+            switchMap( ( u ) => {
+               this.user = u;
+               if ( this.user ) {
+
+                  const query = (ref) => ref.where( 'userId', '==', this.user.uid )
+                                             .where( 'date', '<', new Date().toISOString());
+
+                  return this.afs.collectionGroup<Entry>( "entries", query ).valueChanges();
+               }
+            }),
+            shareReplay( 1 ),
+            startWith([])
+         );
 
       /** All fixtures that may be entered */
-      this.fixtureEntryDetails$ = this.afs.collection<FixtureEntryDetails>( "entry" ).valueChanges().pipe(share());
+      this.fixtureEntryDetails$ = this.afs.collection<FixtureEntryDetails>( "entry" ).valueChanges().pipe(
+         shareReplay( 1 ),
+         startWith([])
+      );
 
    }
 
@@ -57,6 +66,10 @@ export class EntryService {
 
    async saveNewEntryDetails( fixtureEntryDetails: FixtureEntryDetails ): Promise<void> {
       await this.afs.doc( "entry/" + fixtureEntryDetails.fixtureId ).set( fixtureEntryDetails );
+   }
+
+   getEntries(): Observable<FixtureEntryDetails[]> {
+      return this.afs.collection<FixtureEntryDetails>( "entry" ).valueChanges();
    }
 
    /** Gets an observable for an existing entry */
