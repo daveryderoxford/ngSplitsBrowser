@@ -5,7 +5,7 @@
 
 /** Stripe customer - used to store Stripe transactions and tokens that point to credit cards */
 export interface StripeCustomer {
-   email: string;         // Email is used to link the Stripe customer with
+   email: string;         // Email is used to link the Stripe customer with a user
    customer_id: string;
 }
 

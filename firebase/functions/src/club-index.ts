@@ -160,7 +160,6 @@ async function readClubs(): Promise<Club[]> {
 async function writeClubs(clubs: Club[]) {
    await admin.firestore().doc('clubs').set(clubs);
 }
-
 // Key functions
 function makeKey(evt: OEvent): string {
    let key = padRight(evt.club.toLowerCase(), 10) + evt.nationality;
