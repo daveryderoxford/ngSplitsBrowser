@@ -19,18 +19,19 @@ export class EntryService {
    constructor ( private auth: AngularFireAuth,
       private afs: AngularFirestore ) {
 
-      this.userEntries$ = auth.user.pipe(
-            switchMap( ( u ) => {
-               this.user = u;
-               if ( this.user ) {
 
+      auth.user.subscribe( user => this.user = user );
+
+      this.userEntries$ = auth.user.pipe(
+            switchMap( ( user ) => {
+               if (user ) {
                   const query = (ref) => ref.where( 'userId', '==', this.user.uid )
                                              .where( 'date', '<', new Date().toISOString());
 
                   return this.afs.collectionGroup<Entry>( "entries", query ).valueChanges();
                }
             }),
-            shareReplay( 1 ),
+            shareReplay(1),
             startWith([])
          );
 
@@ -54,7 +55,8 @@ export class EntryService {
          hasAgeClasses: false,
          courses: [],
          userId: this.user.uid,
-         createdAt: new Date().toISOString()
+         createdAt: new Date().toISOString(),
+         latestEntry: 0,
       };
       if (fixture) {
          details.name = fixture.name;
@@ -74,8 +76,7 @@ export class EntryService {
 
    /** Gets an observable for an existing entry */
    getEntryDetails( id: string ): Observable<FixtureEntryDetails> {
-      const s = "entry/" + id;
-      return this.afs.doc<FixtureEntryDetails>(s).valueChanges();
+      return this.afs.doc<FixtureEntryDetails>( "entry/" + id).valueChanges();
    }
 
    async updateEntryDetails(id: string, fixtureEntryDetails: Partial<FixtureEntryDetails> ): Promise<void> {

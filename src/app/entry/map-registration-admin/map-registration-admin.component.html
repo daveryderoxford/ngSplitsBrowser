@@ -27,12 +27,14 @@
                </div>
 
                <mat-chip-list #chipList class="mat-chip-list-stacked">
-                  <mat-chip *ngFor="let course of courses" selected="true" selectable="true" removable="true"
-                     (removed)="removeCourse(course)" (click)="courseSelected(course)">
-                     {{course.name}}
-                     <span fxFlex></span>
-                     <mat-icon matChipRemove>cancel</mat-icon>
-                  </mat-chip>
+                 
+                     <mat-chip *ngFor="let course of courses; index as i" selected="true" selectable="true" removable="true" (removed)="removeCourse(course)"
+                        (click)="editCourse(course, i)">
+                        {{course.name}}
+                        <span fxFlex></span>
+                        <mat-icon matChipRemove>cancel</mat-icon>
+                     </mat-chip>
+               
                </mat-chip-list>
 
             </div>

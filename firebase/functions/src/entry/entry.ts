@@ -18,22 +18,23 @@ export const createEntry = functions.firestore
             const fixture = fixSnapshot.data() as FixtureEntryDetails;
             const courses = fixture.courses;
 
-            const index = fixture.courses.findIndex(c => c.name = entry.course);
+            const index = fixture.courses.findIndex(c => c.name === entry.course);
             // Add one to the course
             if (index === -1) {
                 throw Error("Course not found");
             }
 
             courses[index].reservedMaps++;
-            const entryId = fixture.latestEntry++;
-            const latestEntry = entryId;
+            console.log( "latestEntry read " + fixture.latestEntry );
+            const entryId = fixture.latestEntry + 1;
+            console.log( "latestEntry updated " + entryId);
 
-            snap.ref.update({ id: entryId });
-            fixSnapshot.ref.update({ latestEntry: latestEntry, courses: courses });
+            await snap.ref.update({ id: entryId });
+            await fixSnapshot.ref.update( { latestEntry: entryId, courses: courses });
 
         } catch (err) {
             await snap.ref.update({ 'error': userFacingMessage(err) });
-            return console.error("Error incrementing course details", { fixture: context.params.userId });
+            return console.error( "Error when creating entry", { fixture: context.params.userId, err: JSON.stringify( err ) } );
         }
     });
 
@@ -49,7 +50,7 @@ export const deleteEntry = functions.firestore
             const fixture = fixSnapshot.data() as FixtureEntryDetails;
             const courses = fixture.courses;
 
-            const index = fixture.courses.findIndex(c => c.name = entry.course);
+            const index = fixture.courses.findIndex(c => c.name === entry.course);
             // Add one to the course
             if (index === -1) {
                 throw Error("Error adding entry - Course not found");
@@ -57,11 +58,11 @@ export const deleteEntry = functions.firestore
 
             courses[index].reservedMaps--;
 
-            fixSnapshot.ref.update({ courses: courses });
+            await fixSnapshot.ref.update({ courses: courses });
 
         } catch (err) {
             await snap.ref.update({ 'error': userFacingMessage(err) });
-            return console.error("Error incrementing course details", { fixture: context.params.userId });
+            return console.error( "Error when deteting entry", { fixture: context.params.userId, err: JSON.stringify( err ) });
         }
     });
 
@@ -77,8 +78,8 @@ export const changeClass = functions.firestore
                 const fixture = fixSnapshot.data() as FixtureEntryDetails;
                 const courses = fixture.courses;
 
-                const oldCourseIndex = fixture.courses.findIndex(c => c.name = oldEntry.course);
-                const newCourseIndex = fixture.courses.findIndex(c => c.name = newEntry.course);
+                const oldCourseIndex = fixture.courses.findIndex(c => c.name === oldEntry.course);
+                const newCourseIndex = fixture.courses.findIndex(c => c.name === newEntry.course);
 
                 if (oldCourseIndex === -1 || newCourseIndex === -1) {
                     throw Error("Error adding entry - Course not found");
@@ -87,13 +88,13 @@ export const changeClass = functions.firestore
                 courses[oldCourseIndex].reservedMaps--;
                 courses[newCourseIndex].reservedMaps++;
 
-                fixSnapshot.ref.update({ courses: courses });
+                await fixSnapshot.ref.update({ courses: courses });
 
             }
 
         } catch (err) {
             await change.after.ref.update({ 'error': userFacingMessage(err) });
-            return console.error("Error incrementing course details", { fixture: context.params.userId });
+            return console.error( "Error when changing entry", { fixture: context.params.userId, err: JSON.stringify( err ) } );
         }
     });
 

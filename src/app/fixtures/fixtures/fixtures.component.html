@@ -19,7 +19,7 @@
       </as-split-area>
 
       <as-split-area>
-        <app-fixtures-grid [fixtures]="fixtures" [entries]="entries$ | async" [homeLocation]="homeLocation$ | async"
+        <app-fixtures-grid [fixtures]="fixtures" [entries]="entries$ | async" [userEntries]="userEntries$ | async" [homeLocation]="homeLocation$ | async"
           [selectedFixture]="selectedFixture" [handset]='false' [loggedIn]= 'loggedIn' (fixtureSelected)="onFixtureSelected($event)">
         </app-fixtures-grid>
       </as-split-area>

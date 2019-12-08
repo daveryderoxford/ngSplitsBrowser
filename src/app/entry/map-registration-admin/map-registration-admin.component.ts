@@ -93,10 +93,10 @@ export class MapRegistrationAdminComponent implements OnInit {
       }
    }
 
-   courseSelected(course: EntryCourse) {
+   editCourse(course: EntryCourse, index: number) {
       this._displayCourseDialog(course).subscribe(c => {
          if (c) {
-            course = c;
+            this.courses[index] = c;
             this.coursesChanged = true;
          }
       });

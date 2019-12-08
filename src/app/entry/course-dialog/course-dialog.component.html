@@ -14,10 +14,12 @@
 
     <mat-form-field>
       <input matInput formControlName="distance" placeholder="Distance">
+      <mat-hint align="end">distance in km</mat-hint>
     </mat-form-field>
 
     <mat-form-field>
       <input matInput formControlName="climb" placeholder="Climb">
+            <mat-hint align="end">climb in m</mat-hint>
     </mat-form-field>
 
     <mat-form-field *ngIf="hasAgeClasses">

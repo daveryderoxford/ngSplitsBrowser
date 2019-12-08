@@ -28,10 +28,10 @@
           <button mat-icon-button *ngIf="entries && i < entries.length && entries[i] !== null" matTooltip="Enter" (click)="enter(fixture)">
             <mat-icon class="green">event_available</mat-icon>
           </button> -->
-          <div *ngIf="isEntryAvalaible(fixture)">
+          <div *ngIf="isEntryAvalaible(fixture)">45
 
             <button mat-icon-button  matTooltip="Enter" (click)="enter(fixture)">
-              <mat-icon class="green">event_available</mat-icon>
+              <mat-icon [class]="isEnteredClass(fixture)">event_available</mat-icon>
             </button>
 
             <button mat-icon-button matTooltip="Entry list" (click)="viewEntries(fixture)">

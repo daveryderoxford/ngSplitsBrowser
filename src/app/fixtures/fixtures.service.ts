@@ -3,13 +3,13 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { AngularFireStorage } from "@angular/fire/storage";
+import { UserData } from 'app/model';
 import { Fixture, LatLong } from 'app/model/fixture';
 import { FixtureFilter, GradeFilter } from 'app/model/fixture-filter';
 import { UserDataService } from 'app/user/user-data.service';
 import { differenceInMonths, isFuture, isSaturday, isSunday, isToday, isWeekend } from 'date-fns';
 import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
 import { catchError, filter, map, shareReplay, startWith, switchMap, tap } from 'rxjs/operators';
-import { UserData } from 'app/model';
 
 @Injectable( {
    providedIn: 'root'
@@ -29,7 +29,7 @@ export class FixturesService {
    private _fileContents$: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
       switchMap( url => this.http.get<Fixture[]>( url ) ),
       map( fixtures => this.futureFixtures( fixtures ) ),
-      shareReplay(),
+      shareReplay(1),
       startWith( [] ),
       catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
    );
@@ -70,7 +70,7 @@ export class FixturesService {
             return n;
          }
          ),
-         shareReplay(),
+         shareReplay(1),
       );
 
       const fixturesObs$ = combineLatest( [ fixturesWithDistance$, this.usd.userData(), this._filter$ ] ).pipe(
@@ -165,7 +165,6 @@ export class FixturesService {
          { name: 'Local', enabled: true, distance: 40, time: 2 },
       ];
    }
-
 
    private calcLatLong( postcode: string ): Observable<LatLong> {
       const obs = this.http.get<any>( "https://api.postcodes.io/postcodes/" + postcode ).pipe(

@@ -4,7 +4,7 @@ import { AngularFireAuth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
 import { EntryService } from 'app/entry/entry.service';
 import { Fixture } from 'app/model';
-import { FixtureEntryDetails } from 'app/model/entry';
+import { FixtureEntryDetails, Entry } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
 import { combineLatest, Observable } from 'rxjs';
@@ -25,6 +25,7 @@ export class FixturesComponent implements OnInit {
    fixtures$: Observable<Fixture[]>;
    selectedFixture$: Observable<Fixture>;
    entries$: Observable<FixtureEntryDetails[]>;
+   userEntries: Observable<Entry[]>;
 
    hideMobleFilter = true;
 
@@ -53,6 +54,7 @@ export class FixturesComponent implements OnInit {
       this.fixtures$ = this.fs.getFixtures();
       this.selectedFixture$ = this.fs.getSelectedFixture$();
       this.entries$ = this.es.fixtureEntryDetails$;
+      this.userEntries = this.es.userEntries$;
 
       /* Array of of entries expanded for the fixtures */
      /* this.entries$ = combineLatest([this.fixtures$, this.es.fixtureEntryDetails$]).pipe(

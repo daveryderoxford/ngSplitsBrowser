@@ -23,6 +23,7 @@ export interface FixtureEntryDetails {
     closingDate: string;    // Closing Date
     hasAgeClasses: boolean;
     courses: EntryCourse[];
+    latestEntry: number;
 }
 
 export interface Entry {
@@ -38,7 +39,7 @@ export interface Entry {
     ecard?: number;
     preferedStart?: PreferedStart;
     startTime?: string;
-    hiredCard: boolean;
+    hiredCard?: boolean;
 }
 
 export interface FixtureDetailsAndEntries {
@@ -48,9 +49,9 @@ export interface FixtureDetailsAndEntries {
 
 /** A transaction to make a number of entries */
 export interface EntryTransaction {
-   userId: string;
-   madeAt: string;
-   price: number;
+    userId: string;
+    madeAt: string;
+    price: number;
 }
 
 

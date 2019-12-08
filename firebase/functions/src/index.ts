@@ -1,14 +1,12 @@
 /**
  * Splitsbrowser Google clould functions exports
  */
-
 import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
-import * as clubIndex from "./club-index";
-import { Fixtures } from "./fixtures/fixtures";
-import * as mapReg from "./fixtures/mapRegistration";
 import * as sysAdmin from "./admin/admin";
+import * as clubIndex from "./club-index";
 import * as entry from "./entry/entry";
+import { Fixtures } from "./fixtures/fixtures";
 
 
 const firebaseAdmin = admin.initializeApp();
@@ -29,8 +27,6 @@ export const eventClubReferencesCreate = clubIndex.created;
 export const eventClubReferencesUpdate = clubIndex.updated;
 export const eventClubReferencesDelete = clubIndex.deleted;
 export const rebuildClubs = clubIndex.rebuildClubs;
-
-export const userUpdated = mapReg.userUpdated;
 
 export const grantAdmin = sysAdmin.grantAdmin;
 

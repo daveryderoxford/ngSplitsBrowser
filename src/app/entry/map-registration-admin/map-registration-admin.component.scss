@@ -1,3 +1,9 @@
 mat-chip {
   max-width: 200px;
 }
+
+mat-card { 
+   max-width: 300px !important;
+   width: 100vw !important;
+   min-width: 150px !important;
+}

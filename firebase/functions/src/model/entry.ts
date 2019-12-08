@@ -39,7 +39,7 @@ export interface Entry {
     ecard?: number;
     preferedStart?: PreferedStart;
     startTime?: string;
-    hiredCard: boolean;
+    hiredCard?: boolean;
 }
 
 export interface FixtureDetailsAndEntries {

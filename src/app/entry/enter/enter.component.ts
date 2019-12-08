@@ -46,7 +46,7 @@ export class EnterComponent implements OnInit {
 
          // Read event details (for courses)
 
-         const fixture$ = this.es.getEntryDetails(this.fixtureId).pipe(take(1));
+         const fixture$ = this.es.getEntryDetails(this.fixtureId);
 
          if (!this.id) {
             fixture$.subscribe(fix => {
@@ -66,7 +66,7 @@ export class EnterComponent implements OnInit {
             });
          } else {
             const entry$ = this.es.getEntry$(this.fixtureId, this.id).pipe(take(1));
-            forkJoin(fixture$, entry$).subscribe(([fix, entry]) => {
+            forkJoin([fixture$, entry$]).subscribe(([fix, entry]) => {
                this.fixture = fix;
                this._createForm(entry);
             });
