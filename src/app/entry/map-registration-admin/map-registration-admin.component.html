@@ -44,7 +44,7 @@
          <mat-card-actions>
 
             <div fxLayout="row" fxLayoutAlign="space-between center">
-               <button [disabled]="form.invalid || (!form.dirty && !coursesChanged)" mat-raised-button color=primary
+               <button [disabled]="form.invalid || (!form.dirty && !coursesChanged) || busy" mat-raised-button color=primary
                   type="submit">Save</button>
             </div>
 

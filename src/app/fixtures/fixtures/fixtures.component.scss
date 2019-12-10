@@ -19,11 +19,18 @@
   background: rgba(255, 255, 255, 1.0);
 }
 
- /* Top left right */
  .top-left {
   position: absolute;
   top: 10px;
   left: 10px;
+  z-index: 1000; // This is the same z order as the leaflet controls. 
+  background: rgba(255, 255, 255, 0.8);
+}
+
+ .postcode-position {
+  position: absolute;
+  top: 10px;
+  left: 80px;
   z-index: 1000; // This is the same z order as the leaflet controls. 
   background: rgba(255, 255, 255, 0.8);
 }

@@ -17,28 +17,35 @@
       </tr>
     </thead>
     <tbody>
-      <tr *cdkVirtualFor="let fixture of fixtures; trackBy: trackBy let i = index" style="width:100%; min-height: 30px;"
+      <tr *cdkVirtualFor="let fixture of fixtures" style="width:100%; min-height: 30px;"
         (click)=eventClicked(fixture) [ngClass]="{ 'selected': selected(fixture) }">
 
         <td class="liked">
           <button mat-icon-button matTooltip="Like/Unlike fixture" (click)="toggleReminder(fixture)">
             <mat-icon [class.red]="isLiked(fixture)">favorite</mat-icon>
           </button>
-          <!--
-          <button mat-icon-button *ngIf="entries && i < entries.length && entries[i] !== null" matTooltip="Enter" (click)="enter(fixture)">
-            <mat-icon class="green">event_available</mat-icon>
-          </button> -->
-          <div *ngIf="isEntryAvalaible(fixture)">45
 
-            <button mat-icon-button  matTooltip="Enter" (click)="enter(fixture)">
-              <mat-icon [class]="isEnteredClass(fixture)">event_available</mat-icon>
-            </button>
+          <span *ngIf="isEntryAvalaible(fixture)">
+
+            <span *ngIf="isEntered(fixture); then editEntryButton else addEntryButton"></span>
+
+            <ng-template #addEntryButton>
+              <button mat-icon-button matTooltip="Enter" (click)="enter(fixture)">
+                <mat-icon class="green">event_available</mat-icon>
+              </button>
+            </ng-template>
+
+            <ng-template #editEntryButton>
+              <button mat-icon-button matTooltip="Edit entry" (click)="editEntry(fixture)">
+                <mat-icon class="red">event_available</mat-icon>
+              </button>
+            </ng-template>
 
             <button mat-icon-button matTooltip="Entry list" (click)="viewEntries(fixture)">
               <mat-icon>list</mat-icon>
             </button>
 
-          </div>
+          </span>
 
         </td>
 

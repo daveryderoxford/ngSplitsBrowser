@@ -25,7 +25,7 @@ export class FixturesComponent implements OnInit {
    fixtures$: Observable<Fixture[]>;
    selectedFixture$: Observable<Fixture>;
    entries$: Observable<FixtureEntryDetails[]>;
-   userEntries: Observable<Entry[]>;
+   userEntries$: Observable<Entry[]>;
 
    hideMobleFilter = true;
 
@@ -54,7 +54,7 @@ export class FixturesComponent implements OnInit {
       this.fixtures$ = this.fs.getFixtures();
       this.selectedFixture$ = this.fs.getSelectedFixture$();
       this.entries$ = this.es.fixtureEntryDetails$;
-      this.userEntries = this.es.userEntries$;
+      this.userEntries$ = this.es.userEntries$;
 
       /* Array of of entries expanded for the fixtures */
      /* this.entries$ = combineLatest([this.fixtures$, this.es.fixtureEntryDetails$]).pipe(

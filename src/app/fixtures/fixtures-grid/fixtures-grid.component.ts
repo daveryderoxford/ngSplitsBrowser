@@ -43,7 +43,7 @@ export class FixturesGridComponent implements OnInit, OnChanges {
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
-   @ViewChild( CdkVirtualScrollViewport, { static: false } ) viewPort: CdkVirtualScrollViewport;
+   @ViewChild(CdkVirtualScrollViewport) viewPort: CdkVirtualScrollViewport;
 
    likedEvents: string[] = [];
 
@@ -161,14 +161,14 @@ export class FixturesGridComponent implements OnInit, OnChanges {
    }
 
    /** retuns observable of css class to apply  */
-   isEnteredClass( fixture: Fixture ): string {
-      if (!this.userEntries) { return "gray"; }
-      const entry = this.userEntries.find( e => e.fixtureId === fixture.id );
-      return entry ? "red" : "green";
+   isEntered( fixture: Fixture ): boolean {
+      if (!this.userEntries) { return false; }
+      const index = this.userEntries.findIndex( entry => entry.fixtureId === fixture.id );
+      return index !== -1;
    }
 
    async editEntry( fixture: Fixture ) {
-      this.router.navigate( ["/entry/mapregistration", fixture.id] );
+      this.router.navigate( ["/entry/enter", fixture.id] );
    }
 
    async viewEntries( fixture: Fixture ) {

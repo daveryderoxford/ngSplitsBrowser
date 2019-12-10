@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { Entry, FixtureEntryDetails, FixtureDetailsAndEntries } from 'app/model/entry';
-import { Observable, forkJoin } from 'rxjs';
-import { share, map, take, shareReplay, switchMap, startWith} from 'rxjs/operators';
+import { Observable, forkJoin, of } from 'rxjs';
+import { share, map, take, shareReplay, switchMap, startWith, tap} from 'rxjs/operators';
 import { Fixture } from 'app/model';
 
 @Injectable( {
@@ -25,12 +25,19 @@ export class EntryService {
       this.userEntries$ = auth.user.pipe(
             switchMap( ( user ) => {
                if (user ) {
-                  const query = (ref) => ref.where( 'userId', '==', this.user.uid )
-                                             .where( 'date', '<', new Date().toISOString());
+                  const query = ( ref: firebase.firestore.CollectionReference ) => ref.where( 'userId', '==', user.uid );
+                                           // .where( 'fixtureDate', '>', new Date().toISOString())
+                                          //  .orderBy( 'fixtureDate');
 
-                  return this.afs.collectionGroup<Entry>( "entries", query ).valueChanges();
+                                          console.log();
+
+                  return this.afs.collectionGroup<Entry>( "entries",
+                        ref => ref.where( 'userId', '==', user.uid ).orderBy( 'fixtureDate' ) ).valueChanges();
+               } else {
+                  return of([]);
                }
             }),
+            tap( u => console.log( 'User entries' + JSON.stringify( u ) )),
             shareReplay(1),
             startWith([])
          );
@@ -110,6 +117,7 @@ export class EntryService {
       entry.userId = this.auth.auth.currentUser.uid;
       entry.madeAt = new Date().toISOString();
       entry.fixtureId = fixture.fixtureId;
+      entry.fixtureDate = fixture.date;
 
       await this._entriesCollection(fixture.fixtureId).add( entry as Entry );
 

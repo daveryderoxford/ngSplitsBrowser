@@ -38,7 +38,6 @@
                 <span *ngIf="c.maxMaps">{{c.maxMaps - c.reservedMaps}} maps left</span>
               </mat-option>
             </mat-select>
-            <mat-error *ngIf="course && course.hasError('required')">Please choose a course</mat-error>
           </mat-form-field>
 
         </div>
@@ -48,7 +47,7 @@
       <mat-card-actions>
 
         <div fxLayout="row" fxLayoutAlign="space-between center">
-          <button [disabled]="form.invalid || (!form.dirty)" mat-raised-button color=primary type="submit">Save</button>
+          <button [disabled]="form.invalid || (!form.dirty) || this.busy" mat-raised-button color=primary type="submit">Save</button>
           <span fxFlex></span>
           <button mat-button type="reset">CLEAR </button>
         </div>

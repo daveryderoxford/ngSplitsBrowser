@@ -29,6 +29,7 @@ export interface FixtureEntryDetails {
 export interface Entry {
     id: string;         // ID for the entry - generated from course Id plus count
     fixtureId: string;
+    fixtureDate: string;
     userId: string;     // User Id of competitor
     course: string;
     ageClass?: string;

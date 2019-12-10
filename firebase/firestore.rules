@@ -16,6 +16,10 @@ service cloud.firestore {
           allow read;
       }
     }
+    
+    match /{path=**}/entries/{entryId} {
+       allow read;
+    }
 
     match /payments/{eventId} {
       allow create: if request.auth.uid != null;

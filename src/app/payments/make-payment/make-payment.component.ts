@@ -3,7 +3,7 @@ import { PaymentService } from '../payment.service';
 
 declare var StripeCheckout;
 
-/** Button component that displays stripe payment dialog thta captures card deteils and saves entryy
+/** Button component that displays stripe payment dialog that captures card details and saves entry
  * details on the headend that triggers charging the card */
 @Component( {
    selector: 'make-payment',

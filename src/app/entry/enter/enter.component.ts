@@ -16,11 +16,11 @@ interface FormData {
    course?: string;
 }
 
-@Component({
+@Component( {
    selector: 'app-enter',
    templateUrl: './enter.component.html',
    styleUrls: ['./enter.component.scss'],
-})
+} )
 export class EnterComponent implements OnInit {
 
    form: FormGroup;
@@ -30,79 +30,92 @@ export class EnterComponent implements OnInit {
    entry: Entry;
    fixture: FixtureEntryDetails;
    user: UserData;
+   busy = false;
 
-   constructor(private route: ActivatedRoute,
+   constructor ( private route: ActivatedRoute,
       private router: Router,
       private formBuilder: FormBuilder,
       private snackbar: MatSnackBar,
       private es: EntryService,
-      private usd: UserDataService) { }
+      private usd: UserDataService ) { }
 
    ngOnInit() {
 
-      this.route.paramMap.subscribe((params: ParamMap) => {
-         this.fixtureId = params.get('fixtureId');
-         this.id = params.get('entryId');
+      this.route.paramMap.subscribe( ( params: ParamMap ) => {
+         this.fixtureId = params.get( 'fixtureId' );
+         this.id = params.get( 'entryId' );
 
          // Read event details (for courses)
 
-         const fixture$ = this.es.getEntryDetails(this.fixtureId);
+         const fixture$ = this.es.getEntryDetails( this.fixtureId );
 
-         if (!this.id) {
-            fixture$.subscribe(fix => {
+         if ( !this.id ) {
+            fixture$.subscribe( fix => {
                this.fixture = fix;
 
-               if (this.usd.currentUserData) {
+               if ( this.usd.currentUserData ) {
                   const user = this.usd.currentUserData;
-                  this._createForm({
+                  this._createForm( {
                      firstname: user.firstname,
                      surname: user.surname,
                      club: user.club,
                      course: ""
-                  });
+                  } );
                } else {
-                  this._createForm({});
+                  this._createForm( {} );
                }
-            });
+            } );
          } else {
-            const entry$ = this.es.getEntry$(this.fixtureId, this.id).pipe(take(1));
-            forkJoin([fixture$, entry$]).subscribe(([fix, entry]) => {
+            const entry$ = this.es.getEntry$( this.fixtureId, this.id ).pipe( take( 1 ) );
+            forkJoin( [fixture$, entry$] ).subscribe( ( [fix, entry] ) => {
                this.fixture = fix;
-               this._createForm(entry);
-            });
+               this._createForm( entry );
+            } );
          }
-      });
+      } );
    }
 
-
-   private _createForm(data: FormData | null) {
-      this.form = this.formBuilder.group({
+   private _createForm( data: FormData | null ) {
+      this.form = this.formBuilder.group( {
          firstname: [data.firstname, Validators.required],
          surname: [data.surname, Validators.required],
          club: [data.club, [Validators.minLength( 2 ), Validators.maxLength( 10 )]],
          course: [data.course, Validators.required]
-      });
+      } );
    }
 
    async onSubmit() {
 
       // Check entry limit
 
-      if (!this.id) {
-         // Create new instance and save it
-         //   const details = this.es.createEntry();
-         await this.es.enter(this.fixture, this.form.value);
-      } else {
-         await this.es.updateEntry(this.fixtureId, this.id, this.form.value);
+      this.busy = true;
+
+      try {
+
+         if ( !this.id ) {
+            await this.es.enter( this.fixture, this.form.value );
+         } else {
+            await this.es.updateEntry( this.fixtureId, this.id, this.form.value );
+         }
+         this.snackbar.open( "Entry Saved", "", { duration: 2000 });
+         this.form.reset();
+      } catch ( err ) {
+         this.snackbar.open( "Error Saving Entry", "", { duration: 2000 } );
+      } finally {
+         this.busy = false;
       }
    }
 
-   numMapValidator(control: FormControl) {
-      const course: EntryCourse = (this.fixture.courses.find(control.value));
-      if (course.reservedMaps < course.maxMaps) {
+   numMapValidator( control: FormControl ) {
+      const course: EntryCourse = ( this.fixture.courses.find( control.value ) );
+      if ( course.reservedMaps < course.maxMaps ) {
          return null;
       } else {
          return { 'maxMapsExceeded': true };
       }
+   }
+
+   canDeactivate(): boolean {
+      return !this.form.dirty;
    }
 }

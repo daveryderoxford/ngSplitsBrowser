@@ -4,17 +4,12 @@ import { MapRegistrationAdminComponent } from './map-registration-admin/map-regi
 import { AuthGuard } from 'app/auth/guards/auth-guard';
 import { EntryListComponent } from './entry-list/entry-list.component';
 import { EnterComponent } from './enter/enter.component';
+import { PendingChangesGuard } from 'app/shared/services/pending-changes-guard-service.guard';
 
 const routes: Routes = [
-  {
-    path: "",
-    canActivate: [AuthGuard],
-    children: [
-      { path: "mapregistration/:id", component: MapRegistrationAdminComponent },
-      { path: "entrylist/:id", component: EntryListComponent },
-      { path: "enter/:fixtureId", component: EnterComponent }
-    ]
-  }
+  { path: "entrylist/:id", component: EntryListComponent },
+  { path: "mapregistration/:id", component: MapRegistrationAdminComponent, canDeactivate: [PendingChangesGuard], canActivate: [AuthGuard] },
+  { path: "enter/:fixtureId", component: EnterComponent, canDeactivate: [PendingChangesGuard], canActivate: [AuthGuard]  }
 ];
 
 @NgModule({
