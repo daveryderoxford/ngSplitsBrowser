@@ -1,5 +1,5 @@
 import { HttpClientModule } from "@angular/common/http";
-import { NgModule } from "@angular/core";
+import { NgModule, ErrorHandler } from "@angular/core";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AngularFireStorageModule } from "@angular/fire/storage";
@@ -14,6 +14,7 @@ import { AppComponent } from "./app.component";
 import { firebaseConfig } from "./app.firebase-config";
 import { FixturesModule } from './fixtures/fixtures.module';
 import { SharedModule } from "./shared/shared.module";
+import { GlobalErrorHandler } from './errorHandler';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { SharedModule } from "./shared/shared.module";
     HttpClientModule,
     FixturesModule,
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  providers: [{ provide: ErrorHandler, useClass: GlobalErrorHandler }]
 })
 export class AppModule { }
