@@ -2,11 +2,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { MatSidenav } from '@angular/material/sidenav';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { BulkImportService } from 'scripts/bulk-import';
 import { SidenavService } from './shared/services/sidenav.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
+@UntilDestroy( { checkProperties: true } )
 @Component( {
    selector: 'app-root',
    templateUrl: './app.component.html',

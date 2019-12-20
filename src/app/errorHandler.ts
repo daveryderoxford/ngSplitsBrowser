@@ -1,6 +1,5 @@
-import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import * as firebase from "firebase/app";
+import { ErrorHandler, Injectable, Injector } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
@@ -14,7 +13,7 @@ export class GlobalErrorHandler implements ErrorHandler {
    constructor ( private injector: Injector ) { }
 
    snackBar = this.injector.get( MatSnackBar );
-   router = this.injector.get( Router );
+//   router = this.injector.get( Router );
 
    handleError( error: Error | HttpErrorResponse ) {
 
@@ -26,6 +25,8 @@ export class GlobalErrorHandler implements ErrorHandler {
 
       if ( error instanceof HttpErrorResponse ) {
          this._handleHTTPError( error );
+      } else if ( error.message && error.message.startsWith("ExpressionChangedAfterItHasBeenCheckedError" )) {
+
       } else {
          this._showError("An unexpected error occurred");
       }
@@ -51,7 +52,7 @@ export class GlobalErrorHandler implements ErrorHandler {
 
       switch ( httpErrorCode ) {
          case 401:  // Unauthorised navigate to login page if not logged in.
-            this.router.navigateByUrl( "/login" );
+         //   this.router.navigateByUrl( "/login" );
             break;
          case 403: // Forbidden
             this._showError( error.message );

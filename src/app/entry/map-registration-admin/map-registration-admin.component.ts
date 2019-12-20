@@ -7,13 +7,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { Fixture } from 'app/model';
 import { EntryCourse, FixtureEntryDetails } from 'app/model/entry';
 import { Observable } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import { EntryService } from '../entry.service';
 
+@UntilDestroy( { checkProperties: true } )
 @Component( {
    selector: 'app-map-registration-admin',
    templateUrl: './map-registration-admin.component.html',

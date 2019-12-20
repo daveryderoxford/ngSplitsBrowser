@@ -1,12 +1,12 @@
 /** Componnet to results for club class or */
 // tslint:disable:quotemark
-import { Component, OnInit, HostBinding, ViewChild } from '@angular/core';
+import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { UntilDestroy } from '@ngneat/until-destroy';
+import { Subscription } from 'rxjs/Subscription';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
-import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
-import {Subscription} from 'rxjs/Subscription';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 
@@ -15,6 +15,7 @@ interface FilterPanelGroup {
   options: Array<SearchSelectedItem>;
 }
 
+@UntilDestroy( { checkProperties: true } )
 @Component({
   selector: 'app-results-search',
   templateUrl: './results-search.component.html',

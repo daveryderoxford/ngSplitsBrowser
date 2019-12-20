@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { Club, Nations } from 'app/model';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -9,6 +10,7 @@ import { EventService } from '../../events/event.service';
 import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
 import { EventAdminService } from '../event-admin.service';
 
+@UntilDestroy( { checkProperties: true } )
 @Component( {
    selector: 'app-event-edit',
    templateUrl: './event-edit.component.html',

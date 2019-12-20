@@ -32,6 +32,7 @@
     "@angular/pwa": "^0.10.7",
     "@angular/router": "9.0.0-rc.5",
     "@angular/service-worker": "9.0.0-rc.5",
+    "@ngneat/until-destroy": "^7.1.0",
     "angular-split": "^3.0.2",
     "d3": "^5.7.0",
     "d3-collection": "^1.0.7",

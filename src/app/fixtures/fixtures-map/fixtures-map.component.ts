@@ -1,17 +1,11 @@
-import {
-   AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
-   EventEmitter, Input, OnInit, Output, ViewEncapsulation
-} from '@angular/core';
-
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
+         EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { Fixture, LatLong } from 'app/model/fixture';
-
-import {
-   Canvas, circle, Circle, CircleMarker, CircleMarkerOptions, control,
-   FeatureGroup, Map, tileLayer, TileLayer, Util
-} from "leaflet";
+import { Canvas, circle, Circle, CircleMarker, CircleMarkerOptions, control, FeatureGroup, Map, tileLayer, TileLayer, Util } from "leaflet";
 import { interval } from 'rxjs';
 
-
+@UntilDestroy( { checkProperties: true } )
 @Component( {
    selector: 'app-fixtures-map',
    templateUrl: './fixtures-map.component.html',

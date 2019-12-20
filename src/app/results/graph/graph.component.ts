@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation, OnInit } from "@angular/core";
-import { ActivatedRoute, Params } from "@angular/router";
-import { DialogsService } from '../../shared';
-import { displayGraph } from "./splitsbrowser/splitsbrowser";
-import { Results } from "app/results/model";
-import { ResultsSelectionService } from "../results-selection.service";
+import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { OEvent } from "app/model";
+import { Results } from "app/results/model";
+import { DialogsService } from '../../shared';
+import { ResultsSelectionService } from "../results-selection.service";
+import { displayGraph } from "./splitsbrowser/splitsbrowser";
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -12,6 +13,7 @@ interface SplitsBrowserOptions {
   topBar?: string;
 }
 
+@UntilDestroy( { checkProperties: true } )
 @Component({
   selector: "app-graph",
   templateUrl: "./graph.component.html",

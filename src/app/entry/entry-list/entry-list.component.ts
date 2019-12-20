@@ -4,8 +4,10 @@ import { EntryService } from 'app/entry/entry.service';
 import { Entry, FixtureDetailsAndEntries } from 'app/model/entry';
 import { Course } from 'app/results/model';
 import { map, switchMap } from 'rxjs/operators';
+import { UntilDestroy } from '@ngneat/until-destroy';
 
 /** Display all the entries for a fixture */
+@UntilDestroy( { checkProperties: true } )
 @Component({
    selector: 'app-entry-list',
    templateUrl: './entry-list.component.html',

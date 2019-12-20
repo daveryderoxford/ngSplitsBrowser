@@ -1,18 +1,18 @@
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
-import { Fixture } from 'app/model';
-import { LatLong } from 'app/model/fixture';
-import { UserDataService } from 'app/user/user-data.service';
 import { MatIconRegistry } from '@angular/material/icon';
-import { DomSanitizer } from '@angular/platform-browser';
-import { FixtureEntryDetails, Entry } from 'app/model/entry';
-import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { EntryService } from 'app/entry/entry.service';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { UntilDestroy } from '@ngneat/until-destroy';
+import { EntryService } from 'app/entry/entry.service';
+import { Fixture } from 'app/model';
+import { Entry, FixtureEntryDetails } from 'app/model/entry';
+import { LatLong } from 'app/model/fixture';
+import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
+import { UserDataService } from 'app/user/user-data.service';
 
+@UntilDestroy( { checkProperties: true } )
 @Component( {
    selector: 'app-fixtures-grid',
    templateUrl: './fixtures-grid.component.html',

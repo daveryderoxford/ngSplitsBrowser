@@ -1,13 +1,14 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, FormControl, NgForm } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { UserData } from 'app/model';
 import { Entry, EntryCourse, FixtureEntryDetails } from 'app/model/entry';
-import { take } from 'rxjs/operators';
-import { EntryService } from '../entry.service';
 import { UserDataService } from 'app/user/user-data.service';
 import { forkJoin } from 'rxjs';
+import { take } from 'rxjs/operators';
+import { EntryService } from '../entry.service';
 
 interface FormData {
    firstname?: string;
@@ -16,6 +17,7 @@ interface FormData {
    course?: string;
 }
 
+@UntilDestroy( { checkProperties: true } )
 @Component( {
    selector: 'app-enter',
    templateUrl: './enter.component.html',

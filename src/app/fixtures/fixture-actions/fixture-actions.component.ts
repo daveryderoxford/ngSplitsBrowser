@@ -1,14 +1,16 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Fixture, LatLong } from 'app/model/fixture';
-import { UserDataService } from 'app/user/user-data.service';
-import { EntryService } from 'app/entry/entry.service';
-import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 import { Router } from '@angular/router';
+import { UntilDestroy } from '@ngneat/until-destroy';
+import { EntryService } from 'app/entry/entry.service';
 import { FixtureEntryDetails } from 'app/model/entry';
+import { Fixture, LatLong } from 'app/model/fixture';
+import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
+import { UserDataService } from 'app/user/user-data.service';
 
+@UntilDestroy( { checkProperties: true } )
 @Component({
    selector: 'app-fixture-actions',
    templateUrl: './fixture-actions.component.html',

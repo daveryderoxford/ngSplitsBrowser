@@ -1,14 +1,16 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
 import { FormControl, Validators } from '@angular/forms';
+import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { FixtureFilter, FixtureTimeFilter, GradeFilter } from 'app/model/fixture-filter';
+import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 import { BehaviorSubject, combineLatest } from 'rxjs';
 import { startWith } from 'rxjs/operators';
 import { GradeFilterComponent } from '../grade-filter-dialog/grade-filter-dialog.component';
-import { MatButtonToggleChange } from '@angular/material/button-toggle';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 
+@UntilDestroy( { checkProperties: true } )
 @Component( {
    selector: 'app-fixtures-options',
    templateUrl: './fixtures-options.component.html',

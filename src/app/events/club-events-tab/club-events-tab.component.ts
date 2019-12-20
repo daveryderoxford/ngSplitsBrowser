@@ -1,11 +1,13 @@
 
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { MatSelectChange } from "@angular/material/select";
-import { Club, EventGrades, Nations, OEvent, Nation } from "app/model";
-import { BehaviorSubject, combineLatest, Observable, Subject } from "rxjs";
-import { filter, map, switchMap, tap } from 'rxjs/operators';
+import { UntilDestroy } from '@ngneat/until-destroy';
+import { Club, EventGrades, Nation, Nations, OEvent } from "app/model";
+import { BehaviorSubject, combineLatest, Observable } from "rxjs";
+import { map, tap } from 'rxjs/operators';
 import { EventService } from "../event.service";
 
+@UntilDestroy( { checkProperties: true } )
 @Component({
    selector: "app-club-events-tab",
    templateUrl: "./club-events-tab.component.html",

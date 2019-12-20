@@ -4,10 +4,11 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
-import { distinctUntilChanged } from 'rxjs/operators';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
 import { ResultsSelectionService } from "../results-selection.service";
 
+@UntilDestroy( { checkProperties: true } )
 @Component({
    selector: "app-splits-grid",
    templateUrl: "./splits-grid.component.html",

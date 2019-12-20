@@ -1,11 +1,13 @@
 
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { OEvent, UserResult } from "app/model";
 import { UserDataService } from "app/user/user-data.service";
 import { Observable } from "rxjs";
 import { filter, map } from 'rxjs/operators';
 
+@UntilDestroy( { checkProperties: true } )
 @Component({
    selector: "app-my-events-tab",
    templateUrl: "./my-events-tab.component.html",

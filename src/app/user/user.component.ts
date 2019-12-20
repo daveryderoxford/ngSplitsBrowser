@@ -4,6 +4,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { EventService } from "app/events/event.service";
 import { ControlCardTypes, UserData } from "app/model";
 import { Nations } from "app/model/nations";
@@ -14,8 +15,9 @@ import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/resul
 import { UserDataService } from "app/user/user-data.service";
 import isEqual from 'lodash/isequal';
 import { forkJoin, Observable, of } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
+@UntilDestroy( { checkProperties: true } )
 @Component( {
   selector: "app-user",
   templateUrl: "./user.component.html",
@@ -124,16 +126,11 @@ export class UserComponent implements OnInit {
     return this.userForm.get( 'ecards' )['controls'];
   }
 
-
   save() {
 
     const updatedUserData: UserData = null;
 
     this.busy = true;
-
-
-
-
     this.usd.updateDetails( this.userForm.value )
     /*
     .pipe(

@@ -2,15 +2,17 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { MatDialog } from '@angular/material/dialog';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { EntryService } from 'app/entry/entry.service';
 import { Fixture } from 'app/model';
-import { FixtureEntryDetails, Entry } from 'app/model/entry';
+import { Entry, FixtureEntryDetails } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
-import { combineLatest, Observable } from 'rxjs';
-import { map, tap, startWith } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
 
+@UntilDestroy( { checkProperties: true } )
 @Component({
    selector: 'app-fixtures',
    templateUrl: './fixtures.component.html',
