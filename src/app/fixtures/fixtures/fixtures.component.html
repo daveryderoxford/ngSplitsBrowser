@@ -5,9 +5,11 @@
 
     <app-sidenav-button class="top-left"> </app-sidenav-button>
 
-    <app-fixtures-options class="top-right mat-elevation-z2" [postcode]="postcode$ | async"
-      (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
-      (filterChanged)="filterChanged($event)">
+    <app-postcode class="top-left-2 mat-elevation-z2" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" >
+
+    </app-postcode>
+
+    <app-fixtures-options class="top-right mat-elevation-z2"  [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)">
     </app-fixtures-options>
 
     <as-split direction="vertical">
@@ -47,7 +49,7 @@
     </app-toolbar>
 
     <app-fixtures-options *ngIf="!hideMobleFilter" class="mat-elevation-z2"
-      [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
+       (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
       (filterChanged)="filterChanged($event)">
     </app-fixtures-options>
 

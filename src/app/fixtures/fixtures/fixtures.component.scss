@@ -27,6 +27,14 @@
   background: rgba(255, 255, 255, 0.8);
 }
 
+ .top-left-2 {
+  position: absolute;
+  top: 8px;
+  left: 80px;
+  z-index: 1000; // This is the same z order as the leaflet controls. 
+  background: rgba(255, 255, 255, 0.8);
+}
+
  .postcode-position {
   position: absolute;
   top: 10px;

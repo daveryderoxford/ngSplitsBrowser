@@ -1,24 +1,18 @@
-<div class="container">
+<div  fxLayout="column" fxLayoutAlign="space-between none" fxLayoutGap="5px" class="container">
   <div>
-    <mat-button-toggle disableRipple [checked]="this.filter.likedOnly" (change)="likeClicked($event)">
-      Liked
+    <mat-button-toggle disableRipple matTooltip="Filter my fixtures" [checked]="this.outputFilter.likedOnly"
+      (change)="likeClicked($event)">
+      <mat-icon>account_box</mat-icon>
     </mat-button-toggle>
-
-    <mat-form-field appearance="outline">
-      <mat-label>Postcode</mat-label>
-      <input matInput [formControl]="postcodeFormControl" [value]="postcode" (keydown.enter)="postcodeEntered()">
-    </mat-form-field>
-
-    <button mat-button (click)="postcodeEntered()">GO</button>
   </div>
 
-  <app-fixture-week-filter [timeFilter]="filter.time" (filterChanged)="timeFilterChanged($event)">
+  <app-fixture-week-filter [timeFilter]="outputFilter.time" (filterChanged)="timeFilterChanged($event)">
   </app-fixture-week-filter>
 
   <div>
 
-    <mat-slide-toggle labelPosition=before [formControl]="gradesEnabledControl">Filter events</mat-slide-toggle>
-    <button mat-button  (click)="displayGrades()">OPTIONS</button>
+    <mat-slide-toggle labelPosition=before [formControl]="gradesEnabledControl">Level filter</mat-slide-toggle>
+    <button mat-button (click)="displayGrades()">SET</button>
 
   </div>
 

@@ -13,6 +13,7 @@ import { FixturesComponent } from './fixtures/fixtures.component';
 import { GradeFilterComponent } from './grade-filter-dialog/grade-filter-dialog.component';
 import { FixtureKeyComponent } from './fixtures-map/fixture-key.component';
 import { FixtureActionsComponent } from './fixture-actions/fixture-actions.component';
+import { PostcodeComponent } from './postcode/postcode.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { FixtureActionsComponent } from './fixture-actions/fixture-actions.compo
     FixtureWeekFilterComponent,
     FixtureKeyComponent,
     FixtureActionsComponent,
+    PostcodeComponent,
   ],
   entryComponents: [
     GradeFilterComponent,

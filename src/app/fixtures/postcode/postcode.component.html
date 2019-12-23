@@ -1,0 +1,6 @@
+<mat-form-field appearance="standard">
+  <mat-label>Postcode</mat-label>
+  <input matInput [formControl]="postcodeFormControl" [value]="postcode" (keydown.enter)="postcodeEntered()">
+</mat-form-field>
+
+<button mat-button (click)="postcodeEntered()">GO</button>

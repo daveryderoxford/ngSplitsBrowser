@@ -1,13 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { UntilDestroy } from '@ngneat/until-destroy';
-import { FixtureFilter, FixtureTimeFilter, GradeFilter } from 'app/model/fixture-filter';
+import { FixtureFilter, FixtureTimeFilter } from 'app/model/fixture-filter';
 import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { startWith } from 'rxjs/operators';
 import { GradeFilterComponent } from '../grade-filter-dialog/grade-filter-dialog.component';
 
 @UntilDestroy( { checkProperties: true } )
@@ -18,76 +16,42 @@ import { GradeFilterComponent } from '../grade-filter-dialog/grade-filter-dialog
 } )
 export class FixturesOptionsComponent implements OnInit {
 
-   timeFilter$: BehaviorSubject<FixtureTimeFilter>;
-   gradeOptions$: BehaviorSubject<GradeFilter[]>;
-   liked$: BehaviorSubject<boolean>;
+   outputFilter: FixtureFilter;
 
-   @Input() postcode: string;
-   @Input() filter: FixtureFilter;
+   @Input()
+   set filter( f: FixtureFilter ) {
+      this.outputFilter = Object.assign( f );
+   }
 
-   @Output() postcodeChanged = new EventEmitter<string>();
    @Output() filterChanged = new EventEmitter<FixtureFilter>();
 
-   postcodeFormControl: FormControl;
    gradesEnabledControl: FormControl;
 
    constructor ( private dialog: MatDialog,
-                 private auth: AngularFireAuth,
-                 private loginSnackBar: LoginSnackbarService ) { }
+      private auth: AngularFireAuth,
+      private loginSnackBar: LoginSnackbarService ) { }
 
    ngOnInit() {
-      this.postcodeFormControl = new FormControl( this.postcode, [this.validatePostcode, Validators.required] );
-      this.gradesEnabledControl = new FormControl( this.filter.gradesEnabled );
+      this.gradesEnabledControl = new FormControl( this.outputFilter.gradesEnabled );
 
-      this.timeFilter$ = new BehaviorSubject( this.filter.time );
-      this.gradeOptions$ = new BehaviorSubject( this.filter.grades );
-      this.liked$ = new BehaviorSubject( this.filter.likedOnly );
-
-      combineLatest( [
-         this.timeFilter$,
-         this.liked$,
-         this.gradesEnabledControl.valueChanges.pipe( startWith( this.filter.gradesEnabled ) ),
-         this.gradeOptions$] ).subscribe( ( [time, likedOnly, gradeEnabled, gradeOptions] ) => {
-            const filter: FixtureFilter = {
-               time: time,
-               likedOnly: likedOnly,
-               gradesEnabled: gradeEnabled,
-               grades: gradeOptions
-            };
-            this.filterChanged.emit( filter );
-         } );
+      this.gradesEnabledControl.valueChanges.subscribe( ( val ) => {
+         this.outputFilter.gradesEnabled = val;
+         this.filterChanged.emit( this.outputFilter );
+      } );
    }
 
-   postcodeEntered() {
-
-      if ( !this.postcodeFormControl.valid ) {
+   likeClicked( event: MatButtonToggleChange ) {
+      if ( !this.auth.auth.currentUser ) {
+         this.loginSnackBar.open( "Must be logged in to filter liked events" );
          return;
       }
-      const portcode = this.postcodeFormControl.value.trim().toUpperCase();
-      this.postcodeChanged.emit( portcode );
-   }
-
-   likeClicked(event: MatButtonToggleChange) {
-      if (!this.auth.auth.currentUser) {
-         this.loginSnackBar.open("Must be logged in to filter liked events");
-         return;
-      }
-      this.liked$.next(event.source.checked);
-   }
-
-   validatePostcode( input: FormControl ) {
-      const text = input.value.trim();
-
-      if ( text === "" ) {
-         return null;
-      }
-      const regex = /^[A-Z]{1,2}([0-9]{1,2}|[0-9][A-Z])\s*[0-9][A-Z]{2}$/gi;
-
-      return regex.test( text ) ? null : { postcodeInvalid: true };
+      this.outputFilter.likedOnly = event.source.checked;
+      this.filterChanged.emit( this.outputFilter );
    }
 
    timeFilterChanged( val: FixtureTimeFilter ) {
-      this.timeFilter$.next( val );
+      this.outputFilter.time = val;
+      this.filterChanged.emit( this.outputFilter );
    }
 
    displayGrades() {
@@ -97,13 +61,14 @@ export class FixturesOptionsComponent implements OnInit {
          width: '320px',
          maxWidth: '100vw',
          maxHeight: '100vh',
-         data: this.gradeOptions$.value,
+         data: this.outputFilter.grades,
          panelClass: 'sb-highzorder-dialog'
       } );
 
       dialogRef.afterClosed().subscribe( gradeFilter => {
          if ( gradeFilter ) {
-            this.gradeOptions$.next( gradeFilter );
+            this.outputFilter.grades = gradeFilter;
+            this.filterChanged.emit( this.outputFilter );
          }
       } );
    }
