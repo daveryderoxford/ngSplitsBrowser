@@ -34,7 +34,7 @@ export class GlobalErrorHandler implements ErrorHandler {
 
    private _showError( message: string ) {
       if ( this.snackBar ) {
-         this.snackBar.open( message, "", {} );
+         this.snackBar.open( message, "Dismiss", {} );
       }
    }
 

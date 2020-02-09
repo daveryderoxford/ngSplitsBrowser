@@ -27,6 +27,7 @@
     "@types/mocha": "^5.2.6",
     "chai": "^4.2.0",
     "chai-spies": "^1.0.0",
+    "firebase-functions-test": "^0.1.7",
     "mocha": "^6.1.4",
     "ts-node": "^8.0.3",
     "tslint": "^5.14.0",

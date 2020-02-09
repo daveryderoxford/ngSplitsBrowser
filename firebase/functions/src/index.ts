@@ -7,6 +7,7 @@ import * as sysAdmin from "./admin/admin";
 import * as clubIndex from "./club-index";
 import * as entry from "./entry/entry";
 import { Fixtures } from "./fixtures/fixtures";
+import * as user from "./user/user";
 
 
 const firebaseAdmin = admin.initializeApp();
@@ -33,3 +34,5 @@ export const grantAdmin = sysAdmin.grantAdmin;
 export const createEntry = entry.createEntry;
 export const deleteEntry = entry.deleteEntry;
 export const changeEntry = entry.changeClass;
+
+export const createUsder = user.createUser;
