@@ -27,9 +27,6 @@ import { PostcodeComponent } from './postcode/postcode.component';
     FixtureActionsComponent,
     PostcodeComponent,
   ],
-  entryComponents: [
-    GradeFilterComponent,
-  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,

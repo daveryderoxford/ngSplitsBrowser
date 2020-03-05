@@ -25,6 +25,5 @@ import { EnterComponent } from './enter/enter.component';
     MapRegistrationAdminComponent,
     EntryListComponent
   ],
-  entryComponents: [CourseDialogComponent]
 })
 export class EntryModule { }

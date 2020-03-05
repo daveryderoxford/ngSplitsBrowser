@@ -22,8 +22,5 @@ import { ReactiveFormsModule } from '@angular/forms';
     ResultsFoundDialogComponent,
     UserComponent
   ],
-  entryComponents: [
-    ResultsFoundDialogComponent,
-  ]
 } )
 export class UserModule { }

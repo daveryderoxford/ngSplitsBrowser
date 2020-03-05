@@ -26,5 +26,8 @@
       "stripe-v3",
       "stripe-checkout"
     ]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true,
   }
 }
