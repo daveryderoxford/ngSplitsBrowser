@@ -29,7 +29,7 @@
         </mat-expansion-panel-header>
 
         <ng-template matExpansionPanelContent>
-          <app-events-table [dataSource]="clubEvents" [displayedColumns]=" ['date', 'name', 'grade', 'discipline', 'type']"
+          <app-events-table [events]="clubEvents" [displayedColumns]=" ['date', 'name', 'grade', 'discipline', 'type']"
             (eventSelected)="eventClicked($event)"></app-events-table>
         </ng-template>
 

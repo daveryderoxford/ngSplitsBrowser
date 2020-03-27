@@ -88,7 +88,7 @@ export class EventEditComponent implements OnInit, OnChanges {
       return ret;
    }
 
-   displayClub( club?: Club ): string | undefined {
+   displayClub( club?: Club ): string  {
       return club ? club.name : undefined;
    }
 

@@ -103,14 +103,16 @@ export class SplitsGridComponent implements OnInit {
    }
 
    /** Select cell color based on time loss */
-   cellColor(enabled: boolean, control: number, competitor: Competitor): string {
+   cellColor(enabled: boolean, control: string, competitor: Competitor): string {
 
       let ret: string;
       const maxLoss = 180;
       const maxGain = 100;
 
+      const c = Number.parseInt(control);
+
       if (enabled && competitor.timeLosses) {
-         let percent = (maxLoss - competitor.timeLosses[control]) * 100 / (maxLoss + maxGain);
+         let percent = (maxLoss - competitor.timeLosses[c]) * 100 / (maxLoss + maxGain);
          percent = Math.min(percent, 100);
          percent = Math.max(percent, 0);
          ret = this.colorScale(percent);

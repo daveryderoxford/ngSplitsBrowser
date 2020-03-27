@@ -6,7 +6,6 @@
     <app-sidenav-button class="top-left"> </app-sidenav-button>
 
     <app-postcode class="top-left-2 mat-elevation-z2" [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" >
-
     </app-postcode>
 
     <app-fixtures-options class="top-right mat-elevation-z2"  [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)">
@@ -48,10 +47,11 @@
       </button>
     </app-toolbar>
 
-    <app-fixtures-options *ngIf="!hideMobleFilter" class="mat-elevation-z2"
-       (postcodeChanged)="postcodeChanged($event)" [filter]="fs.getFilter() | async"
-      (filterChanged)="filterChanged($event)">
-    </app-fixtures-options>
+    <div fxFlex class="mat-elevation-z2" *ngIf="!hideMobleFilter">
+       <app-postcode [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" ></app-postcode>
+
+       <app-fixtures-options [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)"></app-fixtures-options>
+    </div>
 
     <app-fixtures-grid fxFlex *ngIf="!mapview" [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
       [selectedFixture]="selectedFixture" [handset]='true' (fixtureSelected)="onFixtureSelected($event)">
@@ -60,7 +60,6 @@
     <app-fixtures-map fxFlex *ngIf="mapview" [fixtures]="fixtures" [homeLocation]="homeLocation$ | async"
       [selectedFixture]="selectedFixture" (fixtureSelected)="onFixtureSelected($event)">
     </app-fixtures-map>
-
 
   </div>
 </ng-container>

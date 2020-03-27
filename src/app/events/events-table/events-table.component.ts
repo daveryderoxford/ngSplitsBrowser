@@ -9,7 +9,9 @@ import { DataSource } from '@angular/cdk/table';
 })
 export class EventsTableComponent implements OnInit {
 
-  @Input() dataSource: Array<OEvent>;
+   currentRow: number;
+
+  @Input() events: Array<OEvent> | DataSource<OEvent>;
   @Input() displayedColumns = ["date", "name", "nationality", "club", "grade", "discipline", "type", "website", "actions"];
 
   @Output() eventSelected = new EventEmitter<OEvent>();

@@ -70,7 +70,7 @@
           <ng-template #nolink1>{{fixture.postcode}}</ng-template>
         </td>
         <td class="directions">
-          <a href="{{fixture.latLong | googleDirectionsURL:homeLocation }}" target="_blank" *ngIf="fixture.latLong">
+          <a href="{{fixture | googleDirectionsURL:homeLocation }}" target="_blank" *ngIf="fixture.latLong">
             Directions</a>
         </td>
         <td class="actions">

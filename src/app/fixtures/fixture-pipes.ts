@@ -15,14 +15,14 @@ import { EventGrade } from 'app/model';
    pure: true
 })
 export class GoogleDirectionsURLPipe implements PipeTransform {
-   transform(latLong: LatLong, homeLocation: LatLong): string {
+   transform(fixture: Fixture, homeLocation: LatLong): string {
 
-      if (!homeLocation || homeLocation === undefined) {
+      if (!homeLocation || homeLocation === undefined || !fixture) {
          return "";
       }
 
       return "https://www.google.com/maps/dir/?api=1&origin=" + latLongStr(homeLocation)
-         + "&destination= " + latLongStr(latLong);
+         + "&destination= " + latLongStr(fixture.latLong);
    }
 }
 

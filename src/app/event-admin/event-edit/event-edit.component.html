@@ -30,7 +30,7 @@
        <mat-hint align="end">Between 2 and 10 characters</mat-hint>
         <mat-error>Club required</mat-error>
 
-        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub()">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub">
             <mat-option *ngFor="let club of filteredClubs$ | async" [value]="club.name">
               {{ club.name }}
             </mat-option>

@@ -35,6 +35,8 @@ export class FixturesComponent implements OnInit {
    mapview = false;
    loggedIn: boolean;
 
+   currentRow: number;
+
    constructor(
       private auth: AngularFireAuth,
       public fs: FixturesService,

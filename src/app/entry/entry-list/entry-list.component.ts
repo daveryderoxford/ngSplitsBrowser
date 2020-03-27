@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EntryService } from 'app/entry/entry.service';
-import { Entry, FixtureDetailsAndEntries } from 'app/model/entry';
+import { Entry, FixtureDetailsAndEntries, EntryCourse } from 'app/model/entry';
 import { Course } from 'app/results/model';
 import { map, switchMap } from 'rxjs/operators';
 import { UntilDestroy } from '@ngneat/until-destroy';
@@ -35,7 +35,8 @@ export class EntryListComponent implements OnInit {
       });
    }
 
-   applyFilter(filterValue: string) {
+   applyFilter(event: any) {
+     const filterValue = event.target.value;
      const str = filterValue.trim().toLowerCase();
       this.entries = this.fixture.entries.filter( (entry) => {
          return entry.firstname.toLowerCase().startsWith( str) ||
@@ -44,7 +45,7 @@ export class EntryListComponent implements OnInit {
      });
    }
 
-   entriesForCourse(course: Course): Entry[] {
+   entriesForCourse(course: EntryCourse): Entry[] {
       return this.entries.filter((entry) => entry.course === course.name);
    }
 }
