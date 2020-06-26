@@ -72,7 +72,6 @@ export class AppComponent implements OnInit {
       return null;
    }
 
-
    private setLoading( routerEvent: Event ): void {
       if ( routerEvent instanceof NavigationStart ) {
          this.loading = true;

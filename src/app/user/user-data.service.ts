@@ -52,7 +52,8 @@ export class UserDataService {
         map(ret => {
           const snapshot = ret.payload;
           if (!snapshot.exists) {
-            this.createUser();
+            console.error( "UserDateService: Error UserData does not exist for user " + this.afAuth.auth.currentUser.uid);
+            return null;
           }
           return snapshot.data() as UserData;
         }));

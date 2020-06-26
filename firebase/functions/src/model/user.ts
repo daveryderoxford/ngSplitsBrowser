@@ -11,6 +11,7 @@ export interface ECard {
 
 /** Information set by the users abouth themselves */
 export interface UserInfo {
+    email: string;
     firstname: string;
     surname: string;
     club: string;

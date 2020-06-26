@@ -19,7 +19,6 @@ export class EntryService {
    constructor ( private auth: AngularFireAuth,
       private afs: AngularFirestore ) {
 
-
       auth.user.subscribe( user => this.user = user );
 
       this.userEntries$ = auth.user.pipe(

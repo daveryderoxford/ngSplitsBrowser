@@ -1,5 +1,5 @@
 import { HttpClientModule } from "@angular/common/http";
-import { NgModule, ErrorHandler } from "@angular/core";
+import { ErrorHandler, NgModule } from "@angular/core";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFirestoreModule } from "@angular/fire/firestore";
 import { AngularFireStorageModule } from "@angular/fire/storage";
@@ -12,9 +12,9 @@ import "hammerjs";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { firebaseConfig } from "./app.firebase-config";
+import { GlobalErrorHandler } from './errorHandler';
 import { FixturesModule } from './fixtures/fixtures.module';
 import { SharedModule } from "./shared/shared.module";
-import { GlobalErrorHandler } from './errorHandler';
 
 @NgModule({
   declarations: [
