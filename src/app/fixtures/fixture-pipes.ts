@@ -1,8 +1,8 @@
 import { NgModule, Pipe, PipeTransform } from "@angular/core";
 import { Fixture, LatLong } from "app/model/fixture";
 
-import format from 'date-fns/format';
-import differenceInCalendarDays from 'date-fns/difference_in_calendar_days';
+// import format from 'date-fns/format';
+import { format, differenceInCalendarDays} from 'date-fns';
 import { EventGrade } from 'app/model';
 
 /**
