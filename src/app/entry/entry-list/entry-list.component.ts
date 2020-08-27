@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { UntilDestroy } from '@ngneat/until-destroy';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { EntryService } from 'app/entry/entry.service';
 import { Entry, EntryCourse, FixtureDetailsAndEntries } from 'app/model/entry';
 import { map, switchMap } from 'rxjs/operators';
 
 /** Display all the entries for a fixture */
-@UntilDestroy( { checkProperties: true } )
+@UntilDestroy()
 @Component( {
    selector: 'app-entry-list',
    templateUrl: './entry-list.component.html',
@@ -17,7 +17,7 @@ export class EntryListComponent implements OnInit {
    fixture: FixtureDetailsAndEntries;
    entries: Entry[];
 
-   displayedColumns = ["id", "name", "club", "class", ];
+   displayedColumns = ["id", "name", "club", "class", ]; 
 
    constructor ( private route: ActivatedRoute,
       private es: EntryService ) { }
@@ -26,7 +26,8 @@ export class EntryListComponent implements OnInit {
 
       this.route.paramMap.pipe(
          map( params => params.get( 'id' ) ),
-         switchMap( fixtureId => this.es.getEntries$( fixtureId ) )
+         switchMap( fixtureId => this.es.getEntries$( fixtureId ) ),
+         untilDestroyed(this)
       ).subscribe( entry => {
          this.fixture = entry;
          this.applyFilter( "" );

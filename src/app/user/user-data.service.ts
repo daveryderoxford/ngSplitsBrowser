@@ -36,7 +36,31 @@ export class UserDataService {
     });
   }
 
-  /** Get a reference to use data for a user*/
+  /** Creates new user data and saves it to the database */
+  async createUser(): Promise<void> {
+
+   // if (this.afAuth.auth.currentUser.displayName);
+
+    const userdata: UserData = {
+      key: this.afAuth.auth.currentUser.uid,
+      firstname: "",
+      surname: "",
+      club: "",
+      nationality: "",
+      nationalId: "",
+      autoFind: true,
+      results: [],
+      reminders: [],
+      ecards: [],
+      resultsLastupDated: new Date().toISOString(),
+      postcode: ""
+    };
+    const user = await this._getUserDoc().set( userdata );
+
+    return user;
+  }
+
+  /** Get a reference to use data for a specified user */
   userData(): Observable<UserData | null> {
     return this._currentUserData.asObservable();
   }
@@ -46,7 +70,7 @@ export class UserDataService {
     return this._currentUserData.value;
   }
 
-  /** get obervable for the current data ct=rattin g */
+  /** get obervable for the current data */
   private _getUserData$(): Observable<UserData | null> {
     const user = this._getUserDoc().snapshotChanges().pipe(
         map(ret => {
@@ -67,27 +91,6 @@ export class UserDataService {
       switchMap(() => this._getUserDoc().valueChanges()),
       take(1)
     );
-  }
-
-  /** Creates new user data and saves it to the database */
-  private createUser(): Promise<void> {
-    const userdata: UserData = {
-      key: this.afAuth.auth.currentUser.uid,
-      firstname: "",
-      surname: "",
-      club: "",
-      nationality: "",
-      nationalId: "",
-      autoFind: true,
-      results: [],
-      reminders: [],
-      ecards: [],
-      resultsLastupDated: new Date().toISOString(),
-      postcode: ""
-    };
-    const user = this._getUserDoc().set(userdata);
-
-    return user;
   }
 
   /** Get the database documents associated with the user
@@ -217,5 +220,4 @@ export class UserDataService {
       result: null,
     };
   }
-
 }

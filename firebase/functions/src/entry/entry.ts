@@ -3,6 +3,9 @@ import * as functions from "firebase-functions";
 import { Entry, FixtureEntryDetails } from "../model/entry";
 import * as builder from 'xmlbuilder';
 
+interface ExtendedElement extends builder.XMLElement {
+   controlCardElement?: any;
+}
 
 function userFacingMessage(err: Error): string {
    return "An error occurred saving this entry";
@@ -104,19 +107,20 @@ export const changeClass = functions.firestore
 /** Returns string of IOF EntryList XML document as a string */
 export function iofXMLEntryList(fix: FixtureEntryDetails, entries: Entry[]): string {
 
-   const controlCardElement = (entry: Entry, doc) => {
+   const controlCardElement = (entry: Entry, doc1) => {
       if (entry) {
-         return doc.ele('ControlCard', entry.ecard).up()
+         return doc1.ele('ControlCard', entry.ecard).up();
       } else {
-         return doc
+         return doc1;
       }
-   }
+   };
 
-   const doc = builder.create('EntryList', "http://www.orienteering.org/datastandard/3.0", "http://www.w3.org/2001/XMLSchema-instance",
+   const doc: any =
+      builder.create( 'EntryList')
+  //  builder.create('EntryList', "http://www.orienteering.org/datastandard/3.0", "http://www.w3.org/2001/XMLSchema-instance",
       //    'iofVersion': "3.0",
       //    'createTime': new Date().toISOString(),
       //     'creator': 'Splitsbrowser'
-   )
       .ele('Event')
       .ele('Name', fix.name).up()
       .ele('StartTime', fix.date)
@@ -126,15 +130,15 @@ export function iofXMLEntryList(fix: FixtureEntryDetails, entries: Entry[]): str
 
    for (const entry of entries) {
       doc.ele('PersonEntry')
-         .ele('Person')
-         .ele('Id', entry.id).up()
-         .ele('Name')
-         .ele('Family', entry.surname).up()
-         .ele('Given', entry.firstname).up()
-         .up()
+           .ele('Person')
+             .ele('Id', entry.id).up()
+             .ele('Name')
+             .ele('Family', entry.surname).up()
+             .ele('Given', entry.firstname).up()
+           .up()
          .up()
          .ele('Organisation')
-         .ele('Name', entry.club).up()
+           .ele('Name', entry.club).up()
          .up()
          .controlCardElement(entry, doc)
          .ele('Class')

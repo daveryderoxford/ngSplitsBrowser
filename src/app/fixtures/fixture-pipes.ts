@@ -59,10 +59,10 @@ export class FixtureDatePipe implements PipeTransform {
       // For the next week display days in the future
       const d = new Date(date);
 
-      const daysFrom = differenceInCalendarDays(d, Date());
+      const daysFrom = differenceInCalendarDays(d, new Date());
 
       if (daysFrom >= 7) {
-         return format(d, "ddd DD-MMM-YY");
+         return format(d, "ddd dd-MMM-yy");
       } else if (daysFrom <= 7 && daysFrom > 1) {
          return "Next " + format(d, "ddd Do");
       } else if (daysFrom === 1) {

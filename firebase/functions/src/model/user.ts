@@ -60,7 +60,6 @@ export interface UserFixture {
     date: string;
     name: string;
 }
-
 export interface UserReservation extends UserFixture {
     course: string;
     waitinglist?: number;
