@@ -137,17 +137,17 @@ export class FixturesService {
       return this._homeLocation$.asObservable();
    }
 
-   /** Sets the postcode - does not ste the postcode and throws an error if lat/long for postcode can not be determined */
-   setPostcode( postcode: string ) {
+   /** Sets the postcode - Retruns an obsevable of the calculated lat long or null f the latlong could not be calculated   */
+   setPostcode( postcode: string ): Observable<LatLong | null>  {
 
-      this.calcLatLong( postcode )
-         .subscribe( latlong => {
-            if (!latlong) {
-               throw new Error('Lat/ong for postcode could not be determined.  Postcode not set');
+      return this.calcLatLong( postcode ).pipe(
+         tap ( latlong => {
+            if (latlong) {
+               this._postcode$.next( postcode );
+               this._homeLocation$.next( latlong );
             }
-            this._postcode$.next( postcode );
-            this._homeLocation$.next( latlong );
-         } );
+         } ) );
+ 
    }
 
    setFilter( f: FixtureFilter ) {
@@ -170,11 +170,12 @@ export class FixturesService {
       ];
    }
 
-   private calcLatLong( postcode: string ): Observable<LatLong> {
+   /** Calculate lat long from postcase, returning null if lat/long could not be calculated  */
+   private calcLatLong( postcode: string ): Observable<LatLong | null> {
       const obs = this.http.get<any>( "https://api.postcodes.io/postcodes/" + postcode ).pipe(
          catchError( this.handleError<LatLong>( 'FixturesService: Postcode location failed', null ) ),
          map( obj => {
-            if ( !obj.result || obj.result.latitude === null ) {
+            if ( obj === null || obj.result === null || obj.result.latitude === null) {
                return null;
             }
             const loc: LatLong = {
@@ -184,7 +185,7 @@ export class FixturesService {
             return loc;
          }
          ),
-         tap( obj => console.log( "FixturesService::  lat: " + obj.lat + "long: " + obj.lng ) )
+         tap( obj => console.log( "FixturesService::  lat: " + obj?.lat + "long: " + obj?.lng ) )
       );
 
       return obs;
@@ -226,7 +227,7 @@ export class FixturesService {
       return ( error: any ): Observable<T> => {
 
          // TODO: send the error to remote logging infrastructure
-         console.error( operation + error );
+         console.log( operation + error );
 
          // TODO: better job of transforming error for user consumption
          //  this.log( `${operation} failed: ${error.message}` );

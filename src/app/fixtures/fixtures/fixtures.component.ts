@@ -9,7 +9,7 @@ import { Entry, FixtureEntryDetails } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, take } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -78,12 +78,13 @@ export class FixturesComponent implements OnInit {
       this.fs.setSelectedFixture(fixture);
    }
 
-   postcodeChanged(p: string) {
-      try {
-         this.fs.setPostcode(p);
-      } catch {
-         this.snackbar.open('Lat/Long for postcode could not be determined.  Postcode not set');
-      }
+   async postcodeChanged(p: string) {
+     this.fs.setPostcode(p).pipe(take(1)).subscribe( latlong => {
+        if ( !latlong ) {
+           this.snackbar.open( 'Lat/Long for postcode could not be determined.', '', {duration: 2 * 1000} );
+        }
+     });
+
    }
 
    filterChanged(f: FixtureFilter) {

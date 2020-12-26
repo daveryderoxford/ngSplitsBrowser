@@ -9,6 +9,6 @@
     "test.ts",
     "**/*.spec.ts",
     "**/*.node.ts",
-    "./results/**"
+    "results/**/*.ts"
   ],
 }
