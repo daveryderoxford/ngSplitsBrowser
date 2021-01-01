@@ -22,10 +22,11 @@ function createUserData(): UserData {
         resultsLastupDated: new Date().toISOString(),
         postcode: "",
         email: "",
+        archived: false,
     };
     return userdata;
 }
-/*
+
 export const createUser = functions.auth.user().onCreate( async ( user: admin.auth.UserRecord, context ) => {
     // Create user data when a user is created
     const userdata = createUserData();
@@ -47,4 +48,4 @@ export const deleteUser = functions.auth.user().onDelete( async ( user: admin.au
         console.error( 'deleteUser: Error encountered marking deleted user as archived' + err.toString() );
     }
 } );
-*/
+

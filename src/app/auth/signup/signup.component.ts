@@ -53,8 +53,6 @@ export class SignupComponent {
          // User is automatically signed in so get the current user and send verification email
          await auth.currentUser.sendEmailVerification();
 
-         await this.uds.createUser();
-
          this.router.navigateByUrl( '/user' );
 
       } catch ( error ) {

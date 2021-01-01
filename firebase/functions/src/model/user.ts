@@ -29,6 +29,7 @@ export interface UserData extends UserInfo {
     key: string;  // Matches with the users Firebase reference
     results: UserResult[];
     fixtures: UserFixture[] | UserReservation[];
+    archived: boolean;
 }
 
 /** Information on the results for a user.

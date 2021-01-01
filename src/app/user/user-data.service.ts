@@ -36,30 +36,6 @@ export class UserDataService {
     });
   }
 
-  /** Creates new user data and saves it to the database */
-  async createUser(): Promise<void> {
-
-   // if (this.afAuth.auth.currentUser.displayName);
-
-    const userdata: UserData = {
-      key: this.afAuth.auth.currentUser.uid,
-      firstname: "",
-      surname: "",
-      club: "",
-      nationality: "",
-      nationalId: "",
-      autoFind: true,
-      results: [],
-      reminders: [],
-      ecards: [],
-      resultsLastupDated: new Date().toISOString(),
-      postcode: ""
-    };
-    const user = await this._getUserDoc().set( userdata );
-
-    return user;
-  }
-
   /** Get a reference to use data for a specified user */
   userData(): Observable<UserData | null> {
     return this._currentUserData.asObservable();
