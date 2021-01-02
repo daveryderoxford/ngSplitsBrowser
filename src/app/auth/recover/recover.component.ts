@@ -25,13 +25,12 @@ export class RecoverComponent implements OnInit {
   }
 
   async recover() {
-    const auth = this.afAuth.auth;
     const emailAddress = this.recoverForm.get('email').value;
 
     this.error = '';
 
     try {
-      await auth.sendPasswordResetEmail(emailAddress);
+      await this.afAuth.sendPasswordResetEmail(emailAddress);
     } catch (err) {
       console.log('RecoverComponent: Error requesting password reset for email');
       this.error = 'Error requesting password reset for email';

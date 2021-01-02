@@ -16,6 +16,7 @@ import { map, switchMap, take, tap } from 'rxjs/operators';
 export class UserDataService {
 
   private _currentUserData = new BehaviorSubject<UserData>(null);
+  private uid: string;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -27,9 +28,11 @@ export class UserDataService {
 
     this.afAuth.authState.subscribe((user: firebase.User) => {
       if (user === null) {
+        this.uid = "";
         this._currentUserData.next(null);
       } else {
         this._getUserData$().subscribe((userData) => {
+          this.uid = user.uid;
           this._currentUserData.next(userData);
         });
       }
@@ -52,7 +55,7 @@ export class UserDataService {
         map(ret => {
           const snapshot = ret.payload;
           if (!snapshot.exists) {
-            console.error( "UserDateService: Error UserData does not exist for user " + this.afAuth.auth.currentUser.uid);
+            console.error( "UserDateService: Error UserData does not exist for user " + this.uid);
             return null;
           }
           return snapshot.data() as UserData;
@@ -73,8 +76,7 @@ export class UserDataService {
    * The user must be logged in to use this function.
    */
   private _getUserDoc(): AngularFirestoreDocument<UserData> {
-    const uid = this.afAuth.auth.currentUser.uid;
-    const userDoc = this.afs.doc<UserData>("users/" + uid);
+    const userDoc = this.afs.doc<UserData>("users/" + this.uid);
     return userDoc;
   }
 
@@ -156,7 +158,7 @@ export class UserDataService {
   }
 
   async removeResult(user: UserData, result: UserResult): Promise<void> {
-    if (user.key !== this.afAuth.auth.currentUser.uid) {
+    if (user.key !== this.uid) {
       throw new InvalidData("User data key must match signed in user");
     }
 

@@ -40,8 +40,8 @@ export class FixturesOptionsComponent implements OnInit {
       } );
    }
 
-   likeClicked( event: MatButtonToggleChange ) {
-      if ( !this.auth.auth.currentUser ) {
+   async likeClicked( event: MatButtonToggleChange ) {
+      if ( ! (await this.auth.currentUser) ) {
          this.loginSnackBar.open( "Must be logged in to filter liked events" );
          return;
       }

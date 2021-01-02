@@ -113,7 +113,7 @@ export class EntryService {
          throw new Error( "Must be logged on to add map reservation" );
       }
 
-      entry.userId = this.auth.auth.currentUser.uid;
+      entry.userId = (await this.auth.currentUser).uid;
       entry.madeAt = new Date().toISOString();
       entry.fixtureId = fixture.fixtureId;
       entry.fixtureDate = fixture.date;
