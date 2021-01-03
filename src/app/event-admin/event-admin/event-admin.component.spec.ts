@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { EventAdminComponent } from './event-admin.component';
 import 'jasmine-expect';
 
@@ -6,7 +6,7 @@ xdescribe('EventAdminComponent', () => {
   let component: EventAdminComponent;
   let fixture: ComponentFixture<EventAdminComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ EventAdminComponent ]
     })
