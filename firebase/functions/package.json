@@ -13,7 +13,7 @@
     "@types/request-promise": "^4.1.47",
     "@types/stripe": "^7.13.25",
     "cheerio": "^1.0.0-rc.2",
-    "firebase-admin": "^8.13.0",
+    "firebase-admin": "^11.4.1",
     "firebase-functions": "^3.13.0",
     "request": "^2.88.2",
     "request-debug": "^0.2.0",
