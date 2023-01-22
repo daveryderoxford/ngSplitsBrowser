@@ -753,7 +753,7 @@ class Viewer {
     * Updates whether a number of controls are enabled.
     */
     updateControlEnabledness() {
-        const chartType = this.chartTypeSelector.getChartType();
+        const chartType: ChartType = this.chartTypeSelector.getChartType();
         this.classSelector.setOtherClassesEnabled( !chartType.isResultsTable );
         this.comparisonSelector.setEnabled( !chartType.isResultsTable );
         this.statisticsSelector.setEnabled( !chartType.isResultsTable );

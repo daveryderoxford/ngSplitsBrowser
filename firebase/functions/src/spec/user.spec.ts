@@ -16,10 +16,10 @@ function makeEntry(e: Partial<Entry>): Entry {
         club: 'HAVOC',
         madeAt: '2001-01-03',
         hiredCard: false
-    }
+    };
     if (e.ecard) {
         entry.ecard = e.ecard;
-    } 
+    }
     return entry;
 }
 
@@ -31,10 +31,10 @@ describe('Fxtures', () => {
             date: '2018-01-02',
             club: 'Club',
             createdAt: '2018-03-01',
-            fixtureId: 'abcd',         
-            userId: 'UserA',        
-            type: "MapReservation",      
-            closingDate: '2018-04-02',  
+            fixtureId: 'abcd',
+            userId: 'UserA',
+            type: "MapReservation",
+            closingDate: '2018-04-02',
             hasAgeClasses: false,
             courses: [
                 { name: 'Blue', maxMaps: 12, reservedMaps: 5 },
@@ -43,7 +43,7 @@ describe('Fxtures', () => {
 
             ],
             latestEntry: 2,
-        }
+        };
 
         const entries: Entry[] = [];
         entries.push(makeEntry({ id: '1', course: 'Blue', firstname: 'Fred', surname: 'Bloggs', ecard: 1234 }));

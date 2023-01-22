@@ -1,7 +1,7 @@
 import { ascending as d3_ascending } from "d3-array";
 import { NextControlsDataArr } from "../graph/splitsbrowser/splits-popup-data";
 import { Competitor } from "./competitor";
-import { Course } from "./course";
+import { CompetitorSummaryDetails, Course } from "./course";
 import { CourseClass } from "./course-class";
 import { sbTime } from "./time";
 
@@ -107,8 +107,8 @@ export class Results {
     *     null for the finish.
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
-    public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<any> {
-        const competitors = [];
+    public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<CompetitorSummaryDetails> {
+        const competitors: Array<CompetitorSummaryDetails> = [];
         this.courses.forEach((course) => {
             course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach((comp) => {
                 competitors.push(comp);

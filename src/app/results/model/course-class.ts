@@ -10,6 +10,11 @@ export interface FastestSplitInfo {
     split: sbTime;
 }
 
+export interface FastestTimeInfo {
+   name: string;
+   time: sbTime;
+}
+
 export class CourseClass {
     course: any = null;
     hasDubiousData = false;
@@ -109,7 +114,7 @@ export class CourseClass {
     */
     public getCompetitorsAtControlInTimeRange(controlNum: number,
         intervalStart: sbTime,
-        intervalEnd: sbTime) {
+        intervalEnd: sbTime): Array<FastestTimeInfo> {
         if (typeof controlNum !== "number" || isNaN(controlNum) || controlNum < 0 || controlNum > this.numControls + 1) {
             throw new InvalidData("Control number must be a number between 0 and " + this.numControls + " inclusive");
         }

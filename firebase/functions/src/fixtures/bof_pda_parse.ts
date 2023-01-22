@@ -1,5 +1,6 @@
 /** Parse out a BOF  PDA data fixtures data (https://www.britishorienteering.org.uk/event_diary_pda.php) */
 import * as cheerio from "cheerio";
+import { CipherOCBOptions } from "crypto";
 import { URL } from "url";
 
 export type BOFLevel = 'Activity' | 'Local' | 'Regional' | 'National' | 'Major' | "International";
@@ -21,7 +22,7 @@ export interface BOFPDParseData {
 export class BOFPDParser {
    // tslint:disable:radix
 
-   $: CheerioStatic;
+   $: cheerio.Root;
 
    /** Parse BOF fixtures 'PDA data fixtures page file */
    public parseBOFPDAFile( text: string ): BOFPDParseData[] {
@@ -55,7 +56,7 @@ export class BOFPDParser {
       6    Near Town   <td>Grange over Sands</td>
       7    Grid Ref    <td><a href="http://www.streetmap.co.uk/newsearch.srf?name=SD393805&amp;z=126">SD393805</a></td>
    */
-   private parseRow( row: CheerioElement ): BOFPDParseData {
+   private parseRow( row: cheerio.Element ): BOFPDParseData {
       const fixture: Partial<BOFPDParseData> = {};
 
       const cells = this.$( "td", row ).toArray();
@@ -106,11 +107,17 @@ export class BOFPDParser {
       return id;
    }
 
-   private text( el: CheerioElement ): string {
+   private text( el: cheerio.Element ): string {
+   //   if ( el.type !== 'text' ) {
+  //       throw (new Error('BOF parser: Unexpected element.  Expected text element' + el.data) );
+  //    }
       return this.$(el).text();
    }
 
-   private href( el: CheerioElement ): string {
+   private href( el: cheerio.Element ): string {
+   //   if ( el.type !== 'text' ) {
+  //       throw ( new Error( 'BOF parser: Unexpected element.  Expected text element' + el.data) );
+  //    }
       return this.$( "a", this.$( el ) ).attr( "href" );
    }
 

@@ -94,7 +94,7 @@ export class ChartTypeSelector {
     * Returns the currently-selected chart type.
     * @sb-return {Object} The currently-selected chart type.
     */
-    getChartType() {
+    getChartType(): ChartType {
         return this.chartTypes[ Math.max( this.dropDown.selectedIndex, 0 ) ];
     }
 
@@ -103,7 +103,7 @@ export class ChartTypeSelector {
     * happens.
     * @sb-param {Object} chartType - The chart type selected.
     */
-    setChartType( chartType ) {
+    setChartType( chartType: ChartType ) {
         const index = this.chartTypes.indexOf( chartType );
         if ( index >= 0 ) {
             this.dropDown.selectedIndex = index;

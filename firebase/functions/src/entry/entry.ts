@@ -36,7 +36,7 @@ export const createEntry = functions.firestore
 
       } catch (err) {
          await snap.ref.update({ 'error': userFacingMessage(err) });
-         return console.error("Error when creating entry", { fixture: context.params.userId, err: JSON.stringify(err) });
+         return console.error("Error when creating entry", { fixture: context.params.id, err: JSON.stringify(err) });
       }
    });
 
@@ -64,7 +64,7 @@ export const deleteEntry = functions.firestore
 
       } catch (err) {
          await snap.ref.update({ 'error': userFacingMessage(err) });
-         return console.error("Error when deteting entry", { fixture: context.params.userId, err: JSON.stringify(err) });
+         return console.error("Error when deteting entry", { fixture: context.params.id, err: JSON.stringify(err) });
       }
    });
 
@@ -96,23 +96,26 @@ export const changeClass = functions.firestore
 
       } catch (err) {
          await change.after.ref.update({ 'error': userFacingMessage(err) });
-         return console.error("Error when changing entry", { fixture: context.params.userId, err: JSON.stringify(err) });
+         return console.error("Error when changing entry", { fixture: context.params.id, err: JSON.stringify(err) });
       }
    });
 
 
 /** Returns string of IOF EntryList XML document as a string */
 export function iofXMLEntryList(fix: FixtureEntryDetails, entries: Entry[]): string {
+   /*
 
-   const controlCardElement = (entry: Entry, doc) => {
+   const controlCardElement = (entry: Entry, doc1) => {
       if (entry) {
-         return doc.ele('ControlCard', entry.ecard).up()
+         return doc1.ele('ControlCard', entry.ecard).up();
       } else {
-         return doc
+         return doc1;
       }
-   }
+   };
 
-   const doc = builder.create('EntryList', "http://www.orienteering.org/datastandard/3.0", "http://www.w3.org/2001/XMLSchema-instance",
+   const doc = builder.create('EntryList',
+     // "http://www.orienteering.org/datastandard/3.0",
+      // "http://www.w3.org/2001/XMLSchema-instance",
       //    'iofVersion': "3.0",
       //    'createTime': new Date().toISOString(),
       //     'creator': 'Splitsbrowser'
@@ -144,8 +147,8 @@ export function iofXMLEntryList(fix: FixtureEntryDetails, entries: Entry[]): str
          .up();
    }
 
-   const xml = doc.end({ pretty: true });
-   return (xml);
+   const xml = doc.end({ pretty: true }); */
+   return ("");
 }
 
 /** Returns entry ist for a specific event in a given format */

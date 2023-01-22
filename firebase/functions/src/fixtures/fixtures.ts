@@ -4,8 +4,8 @@ import { EventGrade } from "../model/oevent";
 import { BOFPDParseData, BOFPDParser } from "./bof_pda_parse";
 import { GT_OSGB } from "./geo_conversion";
 import { LatLong as LatLongPIO, PostCodeLookup } from "./postcode";
+import { convertPlace } from "./place_location";
 import * as admin from "firebase-admin";
-
 
 export class Fixtures {
    readonly BOFPDAURL =
@@ -53,8 +53,8 @@ export class Fixtures {
             type: "Foot",
             discipline: "Unknown",
             webpage: bof.BOFLink,
+            approxlocation: false
          };
-
 
          return fixture;
       } );
@@ -65,7 +65,7 @@ export class Fixtures {
       return fixtures as Fixture[];
    }
 
-   /** Sets Fixture postcodes for bof data for all values, calculating from latlong where necessary */
+   /** Sets Fixture postcodes for bof data for all values, determining postcode from latlong where necessary */
    private async calcPostCodes( fixtures: Partial<Fixture>[], bofFixtures: BOFPDParseData[] ) {
       const latlongsToCalc: LatLongPIO[] = [];
       const fixturesToCalc: Partial<Fixture>[] = [];
@@ -95,16 +95,23 @@ export class Fixtures {
       const postcodesToCalc: string[] = [];
       const fixtuersToCalc: Partial<Fixture>[] = [];
 
-      // Set latlongs for ones avalible from BOF data and identify ones that need to be calculated using postcode.io
+      // Set latlongs for ones avalible from BOF data and identify ones that need to be calculated using postcode.io or google geolocation
       for ( let i = 0; i < fixtures.length; i++ ) {
-         if ( bofFixtures[ i ].gridRefStr !== "" ) {
-            fixtures[ i ].latLong = this.osgbToLatLong( bofFixtures[ i ].gridRefStr );
-         } else if ( bofFixtures[ i ].postcode !== "" ) {
-            postcodesToCalc.push( bofFixtures[ i ].postcode );
-            fixtuersToCalc.push( fixtures[ i ] );
+         const bof = bofFixtures[i];
+         const fix = fixtures[i];
+
+         if ( bof.gridRefStr !== "" ) {
+            fix.latLong = this.osgbToLatLong( bof.gridRefStr );
+         } else if ( bof.postcode !== "" ) {
+            postcodesToCalc.push( bof.postcode );
+            fixtuersToCalc.push( fix );
+         } else if ( bof.area || bof.nearestTown) {
+            fix.latLong = await convertPlace(bof.area, bof.nearestTown);
+            if (!bof.area) {
+               fix.approxlocation = true;
+            }
          } else {
             fixtures[ i ].latLong = null;
-
          }
       }
 

@@ -1,8 +1,16 @@
 
 import { Competitor } from "./competitor";
-import { CourseClass } from "./course-class";
+import { CourseClass, FastestSplitInfo, FastestTimeInfo } from "./course-class";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
+
+export interface CompetitorSummaryDetails extends FastestTimeInfo {
+   className: string;
+}
+
+export interface FastestSplitForClass extends FastestSplitInfo {
+   className: string;
+}
 
 export class Course {
 
@@ -13,8 +21,6 @@ export class Course {
    static FINISH = "__FINISH__";
 
    private _numSplits = -1;
-
-   private _competitors = new Array([]);
 
    /**
    * A collection of 'classes', all runners within which ran the same physical
@@ -196,7 +202,7 @@ export class Course {
    * @sb-return {Array} Array of fastest splits for each course-class using this
    *      course.
    */
-   public getFastestSplitsForLeg(startCode: string, endCode: string): Array<any> {
+   public getFastestSplitsForLeg(startCode: string, endCode: string): Array<FastestSplitForClass> {
 
       const legNumber = this.getLegNumber(startCode, endCode);
       if (legNumber < 0) {
@@ -205,7 +211,7 @@ export class Course {
       }
 
       const controlNum = legNumber;
-      const fastestSplits = [];
+      const fastestSplits: Array<FastestSplitForClass> = [];
       this.classes.forEach((courseClass) => {
          const classFastest = courseClass.getFastestSplitTo(controlNum);
          if (classFastest !== null) {
@@ -233,7 +239,7 @@ export class Course {
    * @sb-return  {Array} Array of all competitors visiting the given control
    *     within the given time interval.
    */
-   public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime) {
+   public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<CompetitorSummaryDetails> {
       if (this.controls === null) {
          // No controls means don't return any competitors.
          return [];
@@ -264,8 +270,8 @@ export class Course {
    * @sb-return  {Array} Array of all competitors visiting the given control
    *     within the given time interval.
    */
-   public getCompetitorsAtControlNumInTimeRange(controlNum: number, intervalStart: sbTime, intervalEnd: sbTime) {
-      const matchingCompetitors = [];
+   public getCompetitorsAtControlNumInTimeRange(controlNum: number, intervalStart: sbTime, intervalEnd: sbTime): Array<CompetitorSummaryDetails> {
+      const matchingCompetitors: Array<CompetitorSummaryDetails> = [];
       this.classes.forEach((courseClass) => {
          courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach((comp) => {
             matchingCompetitors.push({ name: comp.name, time: comp.time, className: courseClass.name });

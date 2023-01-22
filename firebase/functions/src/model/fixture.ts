@@ -14,6 +14,7 @@ export interface Fixture {
      clubURL?: string;
      area?: string;
      latLong?: LatLong;
+     approxlocation: boolean;
      postcode?: string;
      grade?: EventGrade;
      type?: EventType;

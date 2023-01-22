@@ -22,8 +22,8 @@ const expectedFixtures: Fixture[] = [
       postcode: "LA11 6HL",
       area: "Hampsfell",
       nearestTown: "Grange over Sands",
-      type: "Foot"
-
+      type: "Foot",
+      approxlocation: false
    },
    {
       id: "76012",
@@ -37,7 +37,8 @@ const expectedFixtures: Fixture[] = [
       nearestTown: "Whitehaven",
       postcode: "",
       latLong: null,
-      type: "Foot"
+      type: "Foot",
+      approxlocation: false
    },
    {
       id: "activity-26377",
@@ -51,8 +52,8 @@ const expectedFixtures: Fixture[] = [
       latLong: { lat: 51.010333, lng: -3.073797 },
       area: "Blackbrook and Holway",
       nearestTown: "Taunton",
-            type: "Foot"
-
+      type: "Foot",
+      approxlocation: false
    }
 ];
 
