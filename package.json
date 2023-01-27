@@ -3,7 +3,7 @@
   "version": "0.0.2-alpha2",
   "license": "MIT",
   "scripts": {
-    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
+    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points --tsconfig ./src/tsconfig.app.json",
     "serve": "ng serve",
     "build": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts && ng build",
     "prod": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts && ng build --prod",
@@ -56,7 +56,6 @@
     "@angular-devkit/build-angular": "~0.1100.5",
     "@angular/cli": "11.0.5",
     "@angular/compiler-cli": "11.0.5",
-    "@firebase/testing": "^0.3.3",
     "@types/d3": "^5.0.1",
     "@types/jasmine": "^3.5.11",
     "@types/jasmine-expect": "^3.8.1",
