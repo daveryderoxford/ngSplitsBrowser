@@ -38,7 +38,7 @@ export class ChangePasswordComponent {
 
   async changePassword() {
 
-    const user = this.afAuth.auth.currentUser;
+    const user = await this.afAuth.currentUser;
     const password = this.form.get('password').value;
 
     this.error = '';

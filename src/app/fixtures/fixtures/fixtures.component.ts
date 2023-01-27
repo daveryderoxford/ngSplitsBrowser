@@ -14,11 +14,11 @@ import { FixturesService } from '../fixtures.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @UntilDestroy( { checkProperties: true } )
-@Component({
+@Component( {
    selector: 'app-fixtures',
    templateUrl: './fixtures.component.html',
    styleUrls: ['./fixtures.component.scss']
-})
+} )
 
 export class FixturesComponent implements OnInit {
    selectedFixture: Fixture;
@@ -38,22 +38,22 @@ export class FixturesComponent implements OnInit {
 
    currentRow: number;
 
-   constructor(
+   constructor (
       private auth: AngularFireAuth,
       public fs: FixturesService,
       private es: EntryService,
       private breakpointObserver: BreakpointObserver,
       public dialog: MatDialog,
-      public snackbar: MatSnackBar) { }
+      public snackbar: MatSnackBar ) { }
 
    ngOnInit() {
-      this.breakpointObserver.observe(['(min-width: 500px) and (min-height: 400px)'])
-         .pipe(tap(state => console.log('state: ' + state.matches.toString())))
-         .subscribe(state => this.handset = !state.matches);
+      this.breakpointObserver.observe( ['(min-width: 500px) and (min-height: 400px)'] )
+         .pipe( tap( state => console.log( 'state: ' + state.matches.toString() ) ) )
+         .subscribe( state => this.handset = !state.matches );
 
-      this.auth.authState.subscribe((user: firebase.User) => {
-         this.loggedIn = (user !== null);
-      });
+      this.auth.authState.subscribe( ( user: firebase.User ) => {
+         this.loggedIn = ( user !== null );
+      } );
 
       this.homeLocation$ = this.fs.getHomeLocation();
       this.postcode$ = this.fs.getPostcode();
@@ -63,32 +63,30 @@ export class FixturesComponent implements OnInit {
       this.userEntries$ = this.es.userEntries$;
 
       /* Array of of entries expanded for the fixtures */
-     /* this.entries$ = combineLatest([this.fixtures$, this.es.fixtureEntryDetails$]).pipe(
-         map(([fixtures, entries]) =>
-            fixtures.map(fix => {
-               const index = entries.findIndex(details => details.fixtureId === fix.id);
-               return (index === -1) ? null : entries[index];
-            })),
-         )
-      ); */
+      /* this.entries$ = combineLatest([this.fixtures$, this.es.fixtureEntryDetails$]).pipe(
+          map(([fixtures, entries]) =>
+             fixtures.map(fix => {
+                const index = entries.findIndex(details => details.fixtureId === fix.id);
+                return (index === -1) ? null : entries[index];
+             })),
+          )
+       ); */
    }
 
-   onFixtureSelected(fixture: Fixture) {
+   onFixtureSelected( fixture: Fixture ) {
       this.selectedFixture = fixture;
-      this.fs.setSelectedFixture(fixture);
+      this.fs.updateSelectedFixture( fixture );
    }
 
-   async postcodeChanged(p: string) {
-     this.fs.setPostcode(p).pipe(take(1)).subscribe( latlong => {
-        if ( !latlong ) {
-           this.snackbar.open( 'Lat/Long for postcode could not be determined.', '', {duration: 2 * 1000} );
-        }
-     });
-
+   async postcodeChanged( p: string ) {
+      const latlong = await this.fs.updatePostcode( p );
+      if ( !latlong ) {
+         this.snackbar.open( 'Lat/Long for postcode could not be determined.', '', { duration: 2 * 1000 } );
+      }
    }
 
-   filterChanged(f: FixtureFilter) {
-      this.fs.setFilter(f);
+   filterChanged( f: FixtureFilter ) {
+      this.fs.updateFilter( f );
    }
 
    toggleMobileFilter() {

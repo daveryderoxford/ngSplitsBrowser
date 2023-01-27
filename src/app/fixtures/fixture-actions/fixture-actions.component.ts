@@ -110,5 +110,4 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
    async viewEntries() {
       this.router.navigate(["/entry/entrylist", this.fixture.id]);
    }
-
 }

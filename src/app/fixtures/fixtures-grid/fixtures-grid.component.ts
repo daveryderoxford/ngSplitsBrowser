@@ -59,9 +59,11 @@ export class FixturesGridComponent implements OnInit, OnChanges {
 
    ngOnInit() {
 
-      this.usd.userData().subscribe( userdata => {
+      this.usd.user$.subscribe( userdata => {
          if ( userdata ) {
             this.likedEvents = userdata.reminders;
+         } else {
+            this.likedEvents = [];
          }
       } );
    }

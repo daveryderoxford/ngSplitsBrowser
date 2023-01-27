@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
          switch (provider) {
 
             case "EmailAndPassword":
-               user = await this.afAuth.auth.signInWithEmailAndPassword( credentials.email, credentials.password );
+               user = await this.afAuth.signInWithEmailAndPassword( credentials.email, credentials.password );
                break;
 
             case "Google":

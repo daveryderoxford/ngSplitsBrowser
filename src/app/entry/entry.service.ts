@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { Entry, FixtureEntryDetails, FixtureDetailsAndEntries } from 'app/model/entry';
-import { Observable, forkJoin, of } from 'rxjs';
-import { share, map, take, shareReplay, switchMap, startWith, tap} from 'rxjs/operators';
 import { Fixture } from 'app/model';
+import { Entry, FixtureDetailsAndEntries, FixtureEntryDetails } from 'app/model/entry';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 
 @Injectable( {
    providedIn: 'root'
@@ -113,7 +113,8 @@ export class EntryService {
          throw new Error( "Must be logged on to add map reservation" );
       }
 
-      entry.userId = this.auth.auth.currentUser.uid;
+      const user = await this.auth.currentUser;
+      entry.userId = user.uid;
       entry.madeAt = new Date().toISOString();
       entry.fixtureId = fixture.fixtureId;
       entry.fixtureDate = fixture.date;

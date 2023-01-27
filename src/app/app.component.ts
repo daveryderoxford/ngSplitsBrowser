@@ -116,7 +116,7 @@ export class AppComponent implements OnInit {
       if ( this.router.url.includes( "admin" ) ) {
          await this.router.navigate( ["/"] );
       }
-      await this.afAuth.auth.signOut();
+      await this.afAuth.signOut();
       await this.sidenav.close();
    }
 

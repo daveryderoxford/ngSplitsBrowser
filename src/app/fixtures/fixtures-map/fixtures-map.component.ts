@@ -1,3 +1,4 @@
+import { CompileShallowModuleMetadata } from '@angular/compiler';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
          EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { UntilDestroy } from '@ngneat/until-destroy';
@@ -83,6 +84,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
       if ( !this.map ) {
          return;
       }
+      console.log( "***** setting home locations to: lat: " + latLng.lat + "   long: " + latLng.lng);
 
       this._homeMarkers.clearLayers();
 

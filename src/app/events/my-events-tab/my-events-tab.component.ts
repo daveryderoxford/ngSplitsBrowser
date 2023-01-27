@@ -24,7 +24,7 @@ export class MyEventsTabComponent implements OnInit {
 
          this.afAuth.authState.subscribe( user => this.loggedIn = (user !== null));
 
-         this.myResults$ = this.us.userData().pipe(
+         this.myResults$ = this.us.user$.pipe(
             filter( userdata => userdata !== null ),
             map(userdata => userdata.results)
          );

@@ -39,17 +39,17 @@ export class SignupComponent {
 
     async signup() {
 
-        const auth = this.afAuth.auth;
         const email = this.signupForm.get('email').value;
         const password = this.signupForm.get('password').value;
 
         this.error = '';
 
         try {
-            await auth.createUserWithEmailAndPassword(email, password);
+            await this.afAuth.createUserWithEmailAndPassword(email, password);
 
             // User is automatically signed in so get the current user and send verification email
-            await auth.currentUser.sendEmailVerification();
+            const user = await this.afAuth.currentUser;
+            user.sendEmailVerification();
 
             this.router.navigateByUrl('/user');
 

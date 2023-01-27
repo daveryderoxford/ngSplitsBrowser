@@ -2,10 +2,6 @@ import * as admin from "firebase-admin";
 import * as functions from "firebase-functions";
 import { UserData } from "../model/user";
 
-function userFacingMessage( err: Error ): string {
-    return "An error occurred saving this entry";
-}
-
 /** Creates new user data and saves it to the database */
 function createUserData(): UserData {
     const userdata: UserData = {
@@ -36,7 +32,7 @@ export const createUser = functions.auth.user().onCreate(async (user: any, conte
         await admin.firestore().doc( 'users/' + user.uid ).set( userdata );
         console.log( 'Creating user data for ' + user.uid );
     } catch ( err ) {
-        console.error( 'createUser: Error encountered creating user data ' + err.toString() );
+        console.error( 'createUser: Error encountered creating user data.  User Id: ' + user.uid + "  " + err.toString() );
     }
 } );
 
@@ -45,7 +41,6 @@ export const deleteUser = functions.auth.user().onDelete(async (user: any) => {
     try {
         await admin.firestore().doc( 'users/' + user.uid ).update( { archived: true } );
     } catch ( err ) {
-        console.error( 'deleteUser: Error encountered marking deleted user as archived' + err.toString() );
+        console.error( 'deleteUser: Error encountered marking deleted user as archived.  User Id: ' + user.uid + "  " + err.toString() );
     }
 } );
-

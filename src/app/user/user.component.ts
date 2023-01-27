@@ -6,6 +6,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { EventService } from "app/events/event.service";
+import { FixturesService } from "app/fixtures/fixtures.service";
 import { ControlCardTypes, UserData } from "app/model";
 import { Nations } from "app/model/nations";
 import { UserResult } from "app/model/user";
@@ -45,6 +46,7 @@ export class UserComponent implements OnInit {
     private usd: UserDataService,
     private rs: ResultsSelectionService,
     private es: EventService,
+    private fs: FixturesService, 
     private dialog: MatDialog,
     private dialogService: DialogsService
   ) {
@@ -65,7 +67,7 @@ export class UserComponent implements OnInit {
          .pipe( untilDestroyed(this))
          .subscribe( loggedIn => this.loginChanged( loggedIn ) );
 
-    this.usd.userData()
+    this.usd.user$
           .pipe( untilDestroyed( this ) )
           .subscribe( userData => this.userChanged( userData ) );
   }
@@ -132,12 +134,18 @@ export class UserComponent implements OnInit {
     return this.userForm.get( 'ecards' )['controls'];
   }
 
-  save() {
+ async save() {
 
     const updatedUserData: UserData = null;
 
-    this.busy = true;
-    this.usd.updateDetails( this.userForm.value )
+   this.busy = true;
+   try {
+   await this.usd.updateDetails( this.userForm.value );
+   console.log( 'UserComponnet: User results saved' );
+   this.fs.updatePostcode( this.userForm.value.postcode );
+   } finally {
+      this.busy = false;
+   }
     /*
     .pipe(
       tap( userData => updatedUserData = userData ),
@@ -146,18 +154,6 @@ export class UserComponent implements OnInit {
       switchMap( ( foundResults ) => this.selectResultsToSave( foundResults ) ),
       switchMap( selectedResults => this.saveCompetitorResults( selectedResults ) )
     )*/
-    .subscribe(
-      () => {
-        console.log( 'UserComponnet: User results saved' );
-      },
-      ( err ) => {
-        console.log( 'UserComponnet: Error encountered saving user results' + err.message );
-        this.dialogService.message( 'Error saving user results', 'Error saving user results' );
-      },
-      () => {
-        this.busy = false;
-      }
-    );
   }
 
   /** Returns found results that are not already in the users results based on ecardId and type  */
