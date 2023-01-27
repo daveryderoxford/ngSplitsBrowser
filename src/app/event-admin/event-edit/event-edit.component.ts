@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { UntilDestroy } from '@ngneat/until-destroy';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Club, Nations } from 'app/model';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -10,7 +10,7 @@ import { EventService } from '../../events/event.service';
 import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
 import { EventAdminService } from '../event-admin.service';
 
-@UntilDestroy( { checkProperties: true } )
+@UntilDestroy()
 @Component( {
    selector: 'app-event-edit',
    templateUrl: './event-edit.component.html',
@@ -58,12 +58,12 @@ export class EventEditComponent implements OnInit, OnChanges {
    ngOnInit() {
 
       this.filteredClubs$ = combineLatest( [ this.es.getClubs(),
-      this.f.controls.club.valueChanges.pipe( startWith( '' ) ),
-      this.f.controls.nationality.valueChanges.pipe( startWith( '' ) ) ] )
-         .pipe(
-            filter( club => ( club !== null || club !== [] ) ),
-            map( ( [ clubs, name, nat ] ) => this.filterClubs( clubs, name, nat ) )
-         );
+             this.f.controls.club.valueChanges.pipe( startWith( '' ) ),
+             this.f.controls.nationality.valueChanges.pipe( startWith( '' ) ) ] )
+               .pipe(
+                  filter( club => ( club !== null || club !== [] ) ),
+                  map( ( [ clubs, name, nat ] ) => this.filterClubs( clubs, name, nat ) )
+         ).pipe(untilDestroyed(this));
 
       this.filteredClubs$.subscribe( ( clubs ) => {
          this.clubs = clubs;

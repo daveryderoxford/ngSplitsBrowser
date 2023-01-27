@@ -28,7 +28,7 @@ export class FixtureActionsComponent implements OnInit, AfterViewInit {
    loggedIn: boolean;
    fixtureEntryDetails: FixtureEntryDetails[] = [];
 
-   @ViewChild(MatMenuTrigger, { static: true }) menu: MatMenuTrigger;
+   @ViewChild(MatMenuTrigger) menu: MatMenuTrigger;
 
    constructor(private afAuth: AngularFireAuth,
       private router: Router,

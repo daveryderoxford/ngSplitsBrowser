@@ -9,7 +9,7 @@ import { CourseClass } from 'app/results/model';
      <mat-icon>arrow_drop_down</mat-icon>
 </button>
 <mat-menu #classPicker="matMenu">
-  <button mat-menu-item *ngFor="let oclass of oclasses" (click)="onSelect.emit(oclass)">
+  <button mat-menu-item *ngFor="let oclass of oclasses" (click)="select.emit(oclass)">
     {{oclass.name}}
   </button>
 </mat-menu>
@@ -19,7 +19,7 @@ export class ClassMenuButtonComponent implements OnInit, OnChanges {
 
    @Input() oclasses: CourseClass[];
    @Input() selectedClass: CourseClass;
-   @Output() onSelect = new EventEmitter<CourseClass>();
+   @Output() select = new EventEmitter<CourseClass>();
 
    buttonText: string;
 

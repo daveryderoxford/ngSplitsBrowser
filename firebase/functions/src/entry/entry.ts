@@ -3,6 +3,9 @@ import * as functions from "firebase-functions";
 import { Entry, FixtureEntryDetails } from "../model/entry";
 import * as builder from 'xmlbuilder';
 
+interface ExtendedElement extends builder.XMLElement {
+   controlCardElement?: any;
+}
 
 function userFacingMessage(err: Error): string {
    return "An error occurred saving this entry";
@@ -113,13 +116,18 @@ export function iofXMLEntryList(fix: FixtureEntryDetails, entries: Entry[]): str
       }
    };
 
+<<<<<<< HEAD
    const doc = builder.create('EntryList',
      // "http://www.orienteering.org/datastandard/3.0",
       // "http://www.w3.org/2001/XMLSchema-instance",
+=======
+   const doc: any =
+      builder.create( 'EntryList')
+  //  builder.create('EntryList', "http://www.orienteering.org/datastandard/3.0", "http://www.w3.org/2001/XMLSchema-instance",
+>>>>>>> 1b95b70270417d2e3aa753fdd4e5d3ac73bf2869
       //    'iofVersion': "3.0",
       //    'createTime': new Date().toISOString(),
       //     'creator': 'Splitsbrowser'
-   )
       .ele('Event')
       .ele('Name', fix.name).up()
       .ele('StartTime', fix.date)
@@ -129,15 +137,15 @@ export function iofXMLEntryList(fix: FixtureEntryDetails, entries: Entry[]): str
 
    for (const entry of entries) {
       doc.ele('PersonEntry')
-         .ele('Person')
-         .ele('Id', entry.id).up()
-         .ele('Name')
-         .ele('Family', entry.surname).up()
-         .ele('Given', entry.firstname).up()
-         .up()
+           .ele('Person')
+             .ele('Id', entry.id).up()
+             .ele('Name')
+             .ele('Family', entry.surname).up()
+             .ele('Given', entry.firstname).up()
+           .up()
          .up()
          .ele('Organisation')
-         .ele('Name', entry.club).up()
+           .ele('Name', entry.club).up()
          .up()
          .controlCardElement(entry, doc)
          .ele('Class')

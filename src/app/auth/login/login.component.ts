@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
          switch (provider) {
 
             case "EmailAndPassword":
-              user = await this.afAuth.auth.signInWithEmailAndPassword(credentials.email, credentials.password);
+               user = await this.afAuth.auth.signInWithEmailAndPassword( credentials.email, credentials.password );
                break;
 
             case "Google":
@@ -89,7 +89,7 @@ export class LoginComponent implements OnInit {
          firebase.auth().signInWithRedirect(provider);
          return await firebase.auth().getRedirectResult();
       } else {
-         return await this.afAuth.auth.signInWithPopup(provider);
+         return await this.afAuth.signInWithPopup(provider);
       }
    }
 

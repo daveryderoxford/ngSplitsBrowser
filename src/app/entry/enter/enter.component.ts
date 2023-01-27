@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { UntilDestroy } from '@ngneat/until-destroy';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { UserData } from 'app/model';
 import { Entry, EntryCourse, FixtureEntryDetails } from 'app/model/entry';
 import { UserDataService } from 'app/user/user-data.service';
@@ -17,7 +17,7 @@ interface FormData {
    course?: string;
 }
 
-@UntilDestroy( { checkProperties: true } )
+@UntilDestroy()
 @Component( {
    selector: 'app-enter',
    templateUrl: './enter.component.html',
@@ -52,7 +52,7 @@ export class EnterComponent implements OnInit {
          const fixture$ = this.es.getEntryDetails( this.fixtureId );
 
          if ( !this.id ) {
-            fixture$.subscribe( fix => {
+            fixture$.pipe(untilDestroyed(this)).subscribe( fix => {
                this.fixture = fix;
 
                if ( this.usd.currentUserData ) {
@@ -69,7 +69,7 @@ export class EnterComponent implements OnInit {
             } );
          } else {
             const entry$ = this.es.getEntry$( this.fixtureId, this.id ).pipe( take( 1 ) );
-            forkJoin( [fixture$, entry$] ).subscribe( ( [fix, entry] ) => {
+            forkJoin( [fixture$, entry$] ).pipe( untilDestroyed( this ) ).subscribe( ( [fix, entry] ) => {
                this.fixture = fix;
                this._createForm( entry );
             } );

@@ -9,8 +9,9 @@ import { Entry, FixtureEntryDetails } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, take } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
@@ -42,7 +43,8 @@ export class FixturesComponent implements OnInit {
       public fs: FixturesService,
       private es: EntryService,
       private breakpointObserver: BreakpointObserver,
-      public dialog: MatDialog) { }
+      public dialog: MatDialog,
+      public snackbar: MatSnackBar) { }
 
    ngOnInit() {
       this.breakpointObserver.observe(['(min-width: 500px) and (min-height: 400px)'])
@@ -76,8 +78,13 @@ export class FixturesComponent implements OnInit {
       this.fs.setSelectedFixture(fixture);
    }
 
-   postcodeChanged(p: string) {
-      this.fs.setPostcode(p);
+   async postcodeChanged(p: string) {
+     this.fs.setPostcode(p).pipe(take(1)).subscribe( latlong => {
+        if ( !latlong ) {
+           this.snackbar.open( 'Lat/Long for postcode could not be determined.', '', {duration: 2 * 1000} );
+        }
+     });
+
    }
 
    filterChanged(f: FixtureFilter) {

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ResultsFoundDialogComponent } from './results-found-dialog.component';
 import { UserResult, OEvent } from 'app/model';
@@ -44,7 +44,7 @@ describe('ResultsFoundDialogComponent', () => {
   let component: ResultsFoundDialogComponent;
   let fixture: ComponentFixture<ResultsFoundDialogComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ResultsFoundDialogComponent]
     })

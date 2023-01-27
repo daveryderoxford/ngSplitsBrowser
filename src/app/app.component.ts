@@ -4,11 +4,11 @@ import { AngularFirestore } from '@angular/fire/firestore';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
-import { UntilDestroy } from '@ngneat/until-destroy';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { BulkImportService } from 'scripts/bulk-import';
 import { SidenavService } from './shared/services/sidenav.service';
 
-@UntilDestroy( { checkProperties: true } )
+@UntilDestroy()
 @Component( {
    selector: 'app-root',
    templateUrl: './app.component.html',
@@ -39,13 +39,17 @@ export class AppComponent implements OnInit {
 
       this.configureFirebase();
 
-      this.afAuth.authState.subscribe( ( user: firebase.User ) => {
-         this.authorised = ( user !== null );
-         this.user = user;
-      } );
    }
 
    ngOnInit() {
+
+      this.afAuth.authState
+              .pipe( untilDestroyed( this ) )
+              .subscribe( ( user: firebase.User ) => {
+         this.authorised = ( user !== null );
+         this.user = user;
+      } );
+
       this.sidebarService.setSidenav( this.sidenav );
       this.cookieConsent();
    }
@@ -71,7 +75,6 @@ export class AppComponent implements OnInit {
       }
       return null;
    }
-
 
    private setLoading( routerEvent: Event ): void {
       if ( routerEvent instanceof NavigationStart ) {

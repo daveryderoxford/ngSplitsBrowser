@@ -23,10 +23,20 @@ type PartialEvent = Partial<OEvent>;
 } )
 export class EventAdminService {
 
+   uid = "";
+
    constructor ( protected afAuth: AngularFireAuth,
       protected afs: AngularFirestore,
       protected storage: AngularFireStorage,
-      protected csd: CompetitorDataService ) { }
+      protected csd: CompetitorDataService ) {
+         afAuth.user.subscribe( user => {
+            if (user) {
+               this.uid = user.uid;
+            } else {
+               this.uid = "";
+            }
+         });
+      }
 
    /** Get observable for event key */
    getEvent( key: string ): Observable<OEvent> {
@@ -42,7 +52,7 @@ export class EventAdminService {
 
       // Ensure date is an ISO date string
       event.date = new Date( event.date ).toISOString();
-      event.userId = this.afAuth.auth.currentUser.uid;
+      event.userId =  this.uid;
       event.key = this.afs.createId();
 
       this.setIndexProperties( event );
@@ -138,8 +148,7 @@ export class EventAdminService {
          event.summary = this.populateSummary( results );
 
          // Save file to users area on Google Clould  Storage
-         const uid = this.afAuth.auth.currentUser.uid;
-         const path = "results/" + uid + "/" + event.key + "-results";
+         const path = "results/" + this.uid + "/" + event.key + "-results";
          await this._uploadToGoogle( text, path );
 
          // Update event object with stored file location
@@ -192,7 +201,7 @@ export class EventAdminService {
 
       const query = this.afs.collection<OEvent>( "/events", ref => {
          return ref.orderBy( "date", "desc" )
-            .where( "userId", "==", this.afAuth.auth.currentUser.uid );
+            .where( "userId", "==", this.uid );
       } );
 
       return query.valueChanges();

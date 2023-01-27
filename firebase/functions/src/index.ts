@@ -36,3 +36,4 @@ export const deleteEntry = entry.deleteEntry;
 export const changeEntry = entry.changeClass;
 
 export const createUsder = user.createUser;
+export const deleteUsder = user.deleteUser;

@@ -108,16 +108,10 @@ export class BOFPDParser {
    }
 
    private text( el: cheerio.Element ): string {
-   //   if ( el.type !== 'text' ) {
-  //       throw (new Error('BOF parser: Unexpected element.  Expected text element' + el.data) );
-  //    }
       return this.$(el).text();
    }
 
    private href( el: cheerio.Element ): string {
-   //   if ( el.type !== 'text' ) {
-  //       throw ( new Error( 'BOF parser: Unexpected element.  Expected text element' + el.data) );
-  //    }
       return this.$( "a", this.$( el ) ).attr( "href" );
    }
 

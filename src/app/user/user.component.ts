@@ -4,7 +4,7 @@ import { AngularFireAuth } from "@angular/fire/auth";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
-import { UntilDestroy } from '@ngneat/until-destroy';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { EventService } from "app/events/event.service";
 import { ControlCardTypes, UserData } from "app/model";
 import { Nations } from "app/model/nations";
@@ -14,10 +14,10 @@ import { DialogsService, Utils } from "app/shared";
 import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
 import { UserDataService } from "app/user/user-data.service";
 import isEqual from 'lodash/isequal';
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-@UntilDestroy( { checkProperties: true } )
+@UntilDestroy()
 @Component( {
   selector: "app-user",
   templateUrl: "./user.component.html",
@@ -29,6 +29,7 @@ export class UserComponent implements OnInit {
   ecardTypes = ControlCardTypes.types;
 
   error = "";
+  subscription: Subscription;
 
   showProgressBar = false;
   busy = false;
@@ -60,8 +61,13 @@ export class UserComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.afAuth.authState.subscribe( loggedIn => this.loginChanged( loggedIn ) );
-    this.usd.userData().subscribe( userData => this.userChanged( userData ) );
+    this.afAuth.authState
+         .pipe( untilDestroyed(this))
+         .subscribe( loggedIn => this.loginChanged( loggedIn ) );
+
+    this.usd.userData()
+          .pipe( untilDestroyed( this ) )
+          .subscribe( userData => this.userChanged( userData ) );
   }
 
   private _ecardsControl(): FormArray {

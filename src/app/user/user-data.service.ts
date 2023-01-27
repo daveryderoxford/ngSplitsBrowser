@@ -16,6 +16,7 @@ import { map, switchMap, take, tap } from 'rxjs/operators';
 export class UserDataService {
 
   private _currentUserData = new BehaviorSubject<UserData>(null);
+  private uid: string;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -27,16 +28,18 @@ export class UserDataService {
 
     this.afAuth.authState.subscribe((user: firebase.User) => {
       if (user === null) {
+        this.uid = "";
         this._currentUserData.next(null);
       } else {
         this._getUserData$().subscribe((userData) => {
+          this.uid = user.uid;
           this._currentUserData.next(userData);
         });
       }
     });
   }
 
-  /** Get a reference to use data for a user*/
+  /** Get a reference to use data for a specified user */
   userData(): Observable<UserData | null> {
     return this._currentUserData.asObservable();
   }
@@ -46,13 +49,14 @@ export class UserDataService {
     return this._currentUserData.value;
   }
 
-  /** get obervable for the current data ct=rattin g */
+  /** get obervable for the current data */
   private _getUserData$(): Observable<UserData | null> {
     const user = this._getUserDoc().snapshotChanges().pipe(
         map(ret => {
           const snapshot = ret.payload;
           if (!snapshot.exists) {
-            this.createUser();
+            console.error( "UserDateService: Error UserData does not exist for user " + this.uid);
+            return null;
           }
           return snapshot.data() as UserData;
         }));
@@ -68,33 +72,11 @@ export class UserDataService {
     );
   }
 
-  /** Creates new user data and saves it to the database */
-  private createUser(): Promise<void> {
-    const userdata: UserData = {
-      key: this.afAuth.auth.currentUser.uid,
-      firstname: "",
-      surname: "",
-      club: "",
-      nationality: "",
-      nationalId: "",
-      autoFind: true,
-      results: [],
-      reminders: [],
-      ecards: [],
-      resultsLastupDated: new Date().toISOString(),
-      postcode: ""
-    };
-    const user = this._getUserDoc().set(userdata);
-
-    return user;
-  }
-
   /** Get the database documents associated with the user
    * The user must be logged in to use this function.
    */
   private _getUserDoc(): AngularFirestoreDocument<UserData> {
-    const uid = this.afAuth.auth.currentUser.uid;
-    const userDoc = this.afs.doc<UserData>("users/" + uid);
+    const userDoc = this.afs.doc<UserData>("users/" + this.uid);
     return userDoc;
   }
 
@@ -176,7 +158,7 @@ export class UserDataService {
   }
 
   async removeResult(user: UserData, result: UserResult): Promise<void> {
-    if (user.key !== this.afAuth.auth.currentUser.uid) {
+    if (user.key !== this.uid) {
       throw new InvalidData("User data key must match signed in user");
     }
 
@@ -216,5 +198,4 @@ export class UserDataService {
       result: null,
     };
   }
-
 }

@@ -10,7 +10,7 @@ import { ComparisionOption, ALL_COMPARISON_OPTIONS } from 'app/results/graph/spl
        <mat-icon>arrow_drop_down</mat-icon>
   </button>
   <mat-menu #picker="matMenu">
-    <button mat-menu-item *ngFor="let option of options" (click)="onSelect.emit(option)">
+    <button mat-menu-item *ngFor="let option of options" (click)="select.emit(option)">
       {{option.nameKey}}
     </button>
   </mat-menu>
@@ -19,7 +19,7 @@ import { ComparisionOption, ALL_COMPARISON_OPTIONS } from 'app/results/graph/spl
 export class CompareWithComponent implements OnInit, OnChanges {
 
   @Input() selected: ComparisionOption;
-  @Output() onSelect = new EventEmitter<ComparisionOption>();
+  @Output() select = new EventEmitter<ComparisionOption>();
 
   buttonText: string;
   options = ALL_COMPARISON_OPTIONS;

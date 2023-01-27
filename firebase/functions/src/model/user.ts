@@ -11,6 +11,7 @@ export interface ECard {
 
 /** Information set by the users abouth themselves */
 export interface UserInfo {
+    email: string;
     firstname: string;
     surname: string;
     club: string;
@@ -28,6 +29,7 @@ export interface UserData extends UserInfo {
     key: string;  // Matches with the users Firebase reference
     results: UserResult[];
     fixtures: UserFixture[] | UserReservation[];
+    archived: boolean;
 }
 
 /** Information on the results for a user.
@@ -59,7 +61,6 @@ export interface UserFixture {
     date: string;
     name: string;
 }
-
 export interface UserReservation extends UserFixture {
     course: string;
     waitinglist?: number;
