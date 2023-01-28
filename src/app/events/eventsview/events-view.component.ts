@@ -27,7 +27,7 @@ export class EventsViewComponent implements OnInit {
     }
   }
 
-  // tslint:disable-next-line:use-life-cycle-interface
+  // eslint-disable-next-line
   ngOnInit() {
 
   }

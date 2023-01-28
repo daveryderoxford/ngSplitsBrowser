@@ -128,7 +128,7 @@ export class SplitsGridComponent implements OnInit {
 
    /** Format title for split time */
    splitTitle(indexStr: string): string {
-      // tslint:disable-next-line:radix
+      // eslint-disable-next-line radix
       const index = Number.parseInt(indexStr);
       if (index === 0) {
          return 'S-1';

@@ -1,5 +1,5 @@
-// tslint:disable:quotemark
-// tslint:disable:max-line-length
+/* eslint-disable @typescript-eslint/quotes */
+/* eslint-disable max-len */
 
 export interface ImportData {
    id: number;

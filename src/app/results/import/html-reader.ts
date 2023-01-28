@@ -735,7 +735,7 @@ NewHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLine, secondL
     const nonZeroCumTimeCount = cumulativeTimes.filter(isNotNull).length;
 
     if (nonZeroCumTimeCount !== splitTimes.length) {
-        // tslint:disable-next-line:max-line-length
+        // eslint-disable-next-line max-len
         throw new InvalidData("Cumulative and split times do not have the same length: " + nonZeroCumTimeCount + " cumulative times, " + splitTimes.length + " split times");
     }
 
@@ -970,7 +970,7 @@ OEventTabularHtmlFormatRecognizer.prototype.parseCompetitor = function (firstLin
     removeExtraControls(cumulativeTimes, splitTimes);
 
     if (cumulativeTimes.length !== splitTimes.length) {
-        // tslint:disable-next-line:max-line-length
+        // eslint-disable-next-line max-len
         throw new InvalidData("Cumulative and split times do not have the same length: " + cumulativeTimes.length +
             " cumulative times, " + splitTimes.length + " split times");
     }

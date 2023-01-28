@@ -419,7 +419,7 @@ export class Chart {
          if (this.isRaceGraph && (event.which === JQUERY_EVENT_LEFT_BUTTON || event.which === JQUERY_EVENT_RIGHT_BUTTON)) {
             if (this.hasControls) {
                this.setCurrentChartTime(event);
-               // tslint:disable-next-line:max-line-length
+               // eslint-disable-next-line max-len
                this.popupUpdateFunc = () => this.popup.setData(this.getCompetitorsVisitingCurrentControlPopupData(), true);
                showPopup = true;
             }
@@ -428,7 +428,7 @@ export class Chart {
             showPopup = true;
          } else if (event.which === JQUERY_EVENT_RIGHT_BUTTON) {
             if (this.hasControls) {
-               // tslint:disable-next-line:max-line-length
+               // eslint-disable-next-line max-len
                this.popupUpdateFunc = () => this.popup.setData(this.getFastestSplitsForCurrentLegPopupData(), true);
                showPopup = true;
             }

@@ -287,7 +287,7 @@ function parseClassData(element, reader, warnings) {
             const actualControlCount = competitor.getAllOriginalCumulativeTimes().length - 2;
             let warning = null;
             if (actualControlCount !== cls.course.numberOfControls) {
-                // tslint:disable-next-line:max-line-length
+                // eslint-disable-next-line max-len
                 warning = "Competitor '" + competitor.name + "' in class '" + className + "' has an unexpected number of controls: expected "
                     + cls.course.numberOfControls + ", actual " + actualControlCount;
             } else {

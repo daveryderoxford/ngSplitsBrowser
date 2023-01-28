@@ -147,7 +147,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {String} The competitors date of birth, as a string.
     */
     readDateOfBirth(element) {
-        // tslint:disable-next-line:radix
+        // eslint-disable-next-line radix
         return Number.parseInt($("> Person > BirthDate > Date", element).text());
     }
 

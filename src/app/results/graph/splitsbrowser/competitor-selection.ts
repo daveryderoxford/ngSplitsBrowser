@@ -12,7 +12,7 @@ export interface CompetitorDetails {
 export type  ChangeHandlerFunction = (indices: number[]) => void;
 export class CompetitorSelection {
 
-    // tslint:disable-next-line:no-shadowed-variable
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     private static NUMBER_TYPE = typeof 0;
 
     currentIndexes: Array<number> = [];
@@ -260,7 +260,7 @@ export class CompetitorSelection {
         } else if (oldCompetitors.length !== this.count) {
             throw new InvalidData("CompetitorSelection.migrate: oldCompetitors list must have the same length as the current count");
         } else if (newCompetitors.length === 0 && this.currentIndexes.length > 0) {
-            // tslint:disable-next-line:max-line-length
+            // eslint-disable-next-line max-len
             throw new InvalidData("CompetitorSelection.migrate: newCompetitors list must not be empty if current list has competitors selected");
         }
 

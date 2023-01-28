@@ -191,7 +191,7 @@ export class SplitsPopupData {
     * @sb-param {Number} controlIndex - The index of the control.
     * @sb-return {Object} Next-control data.
     */
-    // tslint:disable-next-line:max-line-length
+    // eslint-disable-next-line max-len
     public getNextControlData(course: Course, eventData: Results, controlIndex: number): NextControlData {
 
         const controlIdx = Math.min(controlIndex, course.controls.length);

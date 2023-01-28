@@ -1,5 +1,5 @@
 /** Componnet to results for club class or */
-// tslint:disable:quotemark
+/* eslint-disable @typescript-eslint/quotes */
 import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';

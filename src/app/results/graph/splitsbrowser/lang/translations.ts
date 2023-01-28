@@ -71,7 +71,7 @@ export class Lang {
             if (messages[currentLanguage].hasOwnProperty(key)) {
                 return messages[currentLanguage][key];
             } else {
-                // tslint:disable-next-line:quotemark
+                // eslint-disable-next-line @typescript-eslint/quotes
                 this.warn("Message not found for key '" + key + '\' in language \'' + currentLanguage + "'");
                 return "?????";
             }

@@ -19,7 +19,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// tslint:disable:max-line-length
+/* eslint-disable max-len */
 import { } from "jasmine";
 import { Course, CourseClass, CourseClassSet, Results, TimeUtilities } from "../../model";
 import { TestSupport } from "../../test-support.spec";

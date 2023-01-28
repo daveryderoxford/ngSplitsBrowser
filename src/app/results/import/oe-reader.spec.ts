@@ -18,7 +18,7 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-// tslint:disable:max-line-length
+/* eslint-disable max-len */
 import { } from "jasmine";
 import { Course, CourseClass, Results, TimeUtilities } from "../model";
 import { parseOEEventData } from "./oe-reader";

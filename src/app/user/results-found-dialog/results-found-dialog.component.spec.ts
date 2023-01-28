@@ -11,11 +11,11 @@ import { DialogsModule } from 'app/shared/dialogs/dialogs.module';
 const event1: OEvent = null;
 
 
-// tslint:disable-next-line:max-line-length
+// eslint-disable-next-line max-len
 const comp1: UserResult = { event: event1, firstname: 'Fred', surname: 'Bloggs', club: 'SN', ecardId: '111111111', result: null };
-// tslint:disable-next-line:max-line-length
+// eslint-disable-next-line max-len
 const comp2: UserResult = { event: event1,  firstname: 'Jame', surname: 'Tims', club: 'HAVOC', ecardId: '22222222', result: null };
-// tslint:disable-next-line:max-line-length
+// eslint-disable-next-line max-len
 const comp3: UserResult = { event: event1, firstname: 'This is a long christina name', surname: 'Bloggs', club: 'BKO', ecardId: '33333333', result: null };
 
 const found: UserResult[] = [comp1, comp2, comp3];

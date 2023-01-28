@@ -216,7 +216,7 @@ export class Competitor {
             this.surname = name.surname.trim();
         }
 
-        // tslint:disable-next-line:max-line-length
+        // eslint-disable-next-line max-len
         this.totalTime = (originalCumTimes === null || originalCumTimes.indexOf(null) > -1) ? null : originalCumTimes[originalCumTimes.length - 1];
     }
 
@@ -491,7 +491,7 @@ export class Competitor {
     */
     public getCumTimesAdjustedToReference(referenceCumTimes: Array<sbTime>): Array<sbTime> {
         if (referenceCumTimes.length !== this.cumTimes.length) {
-            // tslint:disable-next-line:max-line-length
+            // eslint-disable-next-line max-len
             throw new InvalidData("Cannot adjust competitor times because the numbers of times are different (" + this.cumTimes.length + " and " + referenceCumTimes.length + ")");
         } else if (referenceCumTimes.indexOf(null) > -1) {
             throw new InvalidData("Cannot adjust competitor times because a null value is in the reference data");
@@ -531,7 +531,7 @@ export class Competitor {
     */
     public getSplitPercentsBehindReferenceCumTimes(referenceCumTimes: Array<sbTime>): Array<sbTime> {
         if (referenceCumTimes.length !== this.cumTimes.length) {
-            // tslint:disable-next-line:max-line-length
+            // eslint-disable-next-line max-len
             throw new InvalidData("Cannot determine percentages-behind because the numbers of times are different (" + this.cumTimes.length + " and " + referenceCumTimes.length + ")");
         } else if (referenceCumTimes.indexOf(null) > -1) {
             throw new InvalidData("Cannot determine percentages-behind because a null value is in the reference data");
@@ -561,7 +561,7 @@ export class Competitor {
     public determineTimeLosses(fastestSplitTimes: Array<sbTime>): void {
         if (this.completed()) {
             if (fastestSplitTimes.length !== this.splitTimes.length) {
-                // tslint:disable-next-line:max-line-length
+                // eslint-disable-next-line max-len
                 throw new InvalidData("Cannot determine time loss of competitor with " + this.splitTimes.length + " split times using " + fastestSplitTimes.length + " fastest splits");
             } else if (fastestSplitTimes.some(isNaNStrict)) {
                 throw new InvalidData("Cannot determine time loss of competitor when there is a NaN value in the fastest splits");

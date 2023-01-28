@@ -127,9 +127,9 @@ class OEReader {
     * @sb-return {String} The string with any leading and trailing quotes removed.
     */
     private dequote(value: string): string {
-        // tslint:disable-next-line:quotemark
+        // eslint-disable-next-line @typescript-eslint/quotes
         if (value[0] === '"' && value[value.length - 1] === '"') {
-            // tslint:disable-next-line:quotemark
+            // eslint-disable-next-line @typescript-eslint/quotes
             value = value.substring(1, value.length - 1).replace(/""/g, '"').trim();
         }
 
@@ -476,7 +476,7 @@ class OEReader {
         // Check the row is long enough to have all the data besides the
         // controls data.
         if (row.length < MIN_CONTROLS_OFFSET) {
-            // tslint:disable-next-line:max-line-length
+            // eslint-disable-next-line max-len
             throw new InvalidData("Too few items on line " + lineNumber + " of the input file: expected at least " + MIN_CONTROLS_OFFSET + ", got " + row.length);
         }
 

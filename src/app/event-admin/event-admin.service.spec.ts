@@ -1,6 +1,6 @@
-// tslint:disable:max-line-length
+/* eslint-disable max-len */
 
-// tslint:disable:quotemark
+/* eslint-disable @typescript-eslint/quotes */
 import { HttpClient } from "@angular/common/http";
 import { inject, TestBed } from "@angular/core/testing";
 import { AngularFireModule } from "@angular/fire";

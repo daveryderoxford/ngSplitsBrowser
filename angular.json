@@ -59,8 +59,7 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
-          "options": {
-          },
+          "options": {},
           "configurations": {
             "production": {
               "browserTarget": "splitsbrowser:build:production"
@@ -96,13 +95,12 @@
           }
         },
         "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
+          "builder": "@angular-eslint/builder:lint",
           "options": {
-            "tsConfig": [
-              "./tsconfig.app.json",
-              "./tsconfig.spec.json"
-            ],
-            "exclude": []
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
           }
         },
         "deploy": {
@@ -111,7 +109,7 @@
         }
       }
     },
-    "splitsbrowser-e2e": {
+    " splitsbrowser-e2e": {
       "root": "",
       "sourceRoot": "",
       "projectType": "application",

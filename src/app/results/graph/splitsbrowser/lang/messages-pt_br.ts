@@ -19,7 +19,7 @@
  * este programa; se não, escreva para a Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 EUA.
  */
-// tslint:disable:max-line-length
+/* eslint-disable max-len */
 
 export const pt_br = {
 

@@ -19,7 +19,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-// tslint:disable:max-line-length
+/* eslint-disable max-len */
 import { select as d3_select, selectAll as d3_selectAll } from "d3-selection";
 import * as $ from "jquery";
 import { CourseClassSet, Results, CourseClass, Competitor } from "../../model";

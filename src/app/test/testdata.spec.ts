@@ -1,4 +1,4 @@
-// tslint:disable:max-line-length
+/* eslint-disable max-len */
 
 import { UserData, OEvent, SplitsFileInfo, EventSummary } from "app/model";
 

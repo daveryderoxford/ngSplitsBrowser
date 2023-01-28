@@ -17,7 +17,7 @@ interface ColumnFormat {
     allowMultipleCompetitorNames;
 }
 
-// tslint:disable:max-line-length
+/* eslint-disable max-len */
 
 const parseTime = TimeUtilities.parseTime;
 

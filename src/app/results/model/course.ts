@@ -35,7 +35,7 @@ export class Course {
    * @sb-param {?Array} controls - Array of codes of the controls that make
    *     up this course.  This may be null if no such information is provided.
    */
-   // tslint:disable-next-line:no-shadowed-variable
+   // eslint-disable-next-line @typescript-eslint/no-shadow
    constructor(public name: string,
       public classes: Array<CourseClass>,
       public length?: number,
