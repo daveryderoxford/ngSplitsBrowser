@@ -22,8 +22,8 @@ import { Component, OnInit } from '@angular/core';
   `,
   styles: [
     ' .button { background-color: transparent; border: none; outline: none; font-size: 16px; }',
-    ' .button: focus { border: none;}',
-    ' .button: hover { background-color: rgb(255,255,255, 0.5); }',
+    ' .button:focus { border: none;}',
+    ' .button:hover { background-color: rgb(255,255,255, 0.5); }',
     ' .box { width:10px; height:10px; border:1px solid; display: inline-block}',
     ' .container { padding:8px; color: gray; }',
     ' .small { font-size: 10px; }'
