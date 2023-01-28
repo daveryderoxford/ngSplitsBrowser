@@ -10,8 +10,8 @@ const MIN_COURSE_LENGTH_METRES = 500;
 * This can be specified as a decimal number of kilometres or metres, with
 * either a full stop or a comma as the decimal separator.
 *
-* @sb-param {String} stringValue - The course length to parse, as a string.
-* @sb-return {?Number} The parsed course length, or null if not valid.
+* @param {String} stringValue - The course length to parse, as a string.
+* @return {?Number} The parsed course length, or null if not valid.
 */
 export function parseCourseLength(stringValue: string): number | null {
     let courseLength = parseFloat(stringValue.replace(",", "."));
@@ -29,8 +29,8 @@ export function parseCourseLength(stringValue: string): number | null {
 /**
 * Parses a course climb, specified as a whole number of metres.
 *
-* @sb-param {String} stringValue - The course climb to parse, as a string.
-* @sb-return {?Number} The parsed course climb, or null if not valid.
+* @param {String} stringValue - The course climb to parse, as a string.
+* @return {?Number} The parsed course climb, or null if not valid.
 */
 export function parseCourseClimb(stringValue: string): number | null {
     const courseClimb = parseInt(stringValue, 10);
@@ -44,12 +44,19 @@ export function parseCourseClimb(stringValue: string): number | null {
 /**
 * Normalise line endings so that all lines end with LF, instead of
 * CRLF or CR.
-* @sb-param {String} stringValue - The string value to normalise line endings
+* @sparam {String} stringValue - The string value to normalise line endings
 *     within
-* @sb-return {String} String value with the line-endings normalised.
+* @return {String} String value with the line-endings normalised.
 */
 export function normaliseLineEndings(stringValue: string): string {
     return stringValue.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
 }
 
-
+/**
+   * Returns whether the given value is undefined.
+   * @param {any} value The value to check.
+   * @return {Boolean} True if the value is undefined, false otherwise.
+   */
+export function isUndefined( value: any ): boolean {
+    return typeof value === "undefined";
+}

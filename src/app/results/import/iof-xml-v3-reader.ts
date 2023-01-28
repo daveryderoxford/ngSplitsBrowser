@@ -1,5 +1,5 @@
 import * as $ from "jquery";
-import { isUndefined } from "util";
+import { isUndefined } from "./util";
 import { InvalidData, sbTime, WrongFileFormat } from "../model";
 import { isNaNStrict } from "../model/util";
 
