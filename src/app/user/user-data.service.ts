@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/auth";
-import { AngularFirestore, AngularFirestoreDocument } from "@angular/fire/firestore";
+import { AngularFireAuth } from "@angular/fire/compat/auth";
+import { AngularFirestore, AngularFirestoreDocument } from "@angular/fire/compat/firestore";
 import { EventService } from "app/events/event.service";
 import { CompetitorSearchData, ECard, OEvent, UserData, UserInfo, UserResult } from "app/model";
 import { Competitor, Course, InvalidData, Results } from "app/results/model";
 import { ResultsSelectionService } from "app/results/results-selection.service";
 import { CompetitorDataService } from "app/shared/services/competitor-data.service";
-import * as firebase from "firebase/app";
+import firebase from "firebase/compat/app";
 import { Observable, of } from 'rxjs';
 import { shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 

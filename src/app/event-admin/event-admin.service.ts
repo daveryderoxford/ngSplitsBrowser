@@ -3,18 +3,18 @@
  */
 
 import { Injectable } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/auth";
-import { AngularFirestore } from "@angular/fire/firestore";
-import { AngularFireStorage } from "@angular/fire/storage";
+import { AngularFireAuth } from "@angular/fire/compat/auth";
+import { AngularFirestore, DocumentReference, DocumentData, SetOptions } from "@angular/fire/compat/firestore";
+import { AngularFireStorage } from "@angular/fire/compat/storage";
 import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/model/oevent";
 import { parseEventData } from "app/results/import";
 import { Results } from "app/results/model/results";
 import { Utils } from "app/shared";
-import { firestore } from "firebase/app";
 import { Observable } from "rxjs";
 import { take } from 'rxjs/operators';
 import { CompetitorSearchData } from "app/model";
 import { CompetitorDataService } from "../shared/services/competitor-data.service";
+import firebase from "firebase/compat/app";
 
 type PartialEvent = Partial<OEvent>;
 
@@ -114,7 +114,7 @@ export class EventAdminService {
       }
    }
 
-   public async deleteEventResultsFromDB( event: OEvent, fs: firestore.Firestore, batch: LargeBatch ): Promise<void> {
+   public async deleteEventResultsFromDB( event: OEvent, fs: firebase.firestore.Firestore, batch: LargeBatch ): Promise<void> {
 
       const exisitngCompetitors = await this._getExistingCompetitors( event );
 
@@ -208,7 +208,7 @@ export class EventAdminService {
    }
 
    /** Get a reference to search data for a given competitor */
-   private _resultRef( eventkey: string, resultkey: string ): firestore.DocumentReference {
+   private _resultRef( eventkey: string, resultkey: string ): DocumentReference {
       return this.afs.doc( '/events/' + eventkey + '/results/' + resultkey ).ref;
    }
 
@@ -290,7 +290,7 @@ export class EventAdminService {
  * Note it does nto support collback of committed batches
 */
 export class LargeBatch {
-   batch: firestore.WriteBatch;
+   batch: firebase.firestore.WriteBatch;
    count = 0;
    MAX_BATCH_OPERATIONS = 500;
 
@@ -299,19 +299,19 @@ export class LargeBatch {
    }
 
    /** Add set operstion to a batch */
-   async set( ref: firestore.DocumentReference, data: firestore.DocumentData, options?: firestore.SetOptions ): Promise<void> {
+   async set( ref: DocumentReference, data: DocumentData, options?: SetOptions ): Promise<void> {
       await this._checkBatch();
       this.batch.set( ref, data, options );
    }
 
    /** Add update operation ot a batch, */
-   async update( ref: firestore.DocumentReference, data: any ): Promise<void> {
+   async update( ref: DocumentReference, data: any ): Promise<void> {
       await this._checkBatch();
       this.batch.update( ref, data );
    }
 
    /** Add delete operation to a batch */
-   async delete( ref: firestore.DocumentReference ): Promise<void> {
+   async delete( ref: DocumentReference ): Promise<void> {
       await this._checkBatch();
       this.batch.delete( ref );
    }

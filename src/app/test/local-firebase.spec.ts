@@ -1,5 +1,5 @@
-import { AngularFireAuth } from "@angular/fire/auth";
-import { AngularFirestore, QueryDocumentSnapshot } from "@angular/fire/firestore";
+import { AngularFireAuth } from "@angular/fire/compat/auth";
+import { AngularFirestore, QueryDocumentSnapshot } from "@angular/fire/compat/firestore";
 import { testUser1Password } from "app/app.firebase-config";
 import { Observable, Observer, from } from "rxjs";
 import { test_events, test_results, test_userdata, test_clubs } from './testdata.spec';

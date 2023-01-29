@@ -1,0 +1,5 @@
+
+> splitsbrowser@0.0.2-alpha2 build
+> ts-node -O '{"module": "commonjs"}' git.version.ts && ng build
+
+version: '0.0.2-alpha2', revision: '6fc5d09', branch: 'master'

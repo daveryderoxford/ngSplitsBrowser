@@ -1,8 +1,8 @@
 
 /** Service to paganate Firebase queries */
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-import * as firebase from 'firebase/app';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
+import firebase from "firebase/compat/app";
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 
@@ -31,7 +31,10 @@ export class PaganationService<T> {
   done: Observable<boolean> = this._done.asObservable();
   loading: Observable<boolean> = this._loading.asObservable();
 
-  private _cursor: firebase.firestore.QueryDocumentSnapshot;
+  
+  // TODO private _cursor: firebase.firestore.QueryDocumentSnapshot;
+  private _cursor: any;
+
 
   constructor(private afs: AngularFirestore) { }
 

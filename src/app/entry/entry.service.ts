@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { Fixture } from 'app/model';
 import { Entry, FixtureDetailsAndEntries, FixtureEntryDetails } from 'app/model/entry';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
+import firebase from "firebase/compat/app";
 
 @Injectable( {
    providedIn: 'root'

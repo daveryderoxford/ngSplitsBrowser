@@ -1,7 +1,9 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
+import firebase from "firebase/compat/app";
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { EntryService } from 'app/entry/entry.service';
 import { Fixture } from 'app/model';
@@ -9,9 +11,8 @@ import { Entry, FixtureEntryDetails } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { FixtureFilter } from 'app/model/fixture-filter';
 import { Observable } from 'rxjs';
-import { tap, take } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @UntilDestroy( { checkProperties: true } )
 @Component( {

@@ -1,6 +1,6 @@
 
 import { Component, OnInit } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/auth";
+import { AngularFireAuth } from "@angular/fire/compat/auth";
 import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
@@ -14,6 +14,7 @@ import { ResultsSelectionService } from "app/results/results-selection.service";
 import { DialogsService, Utils } from "app/shared";
 import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
 import { UserDataService } from "app/user/user-data.service";
+import firebase from "firebase/compat/app";
 import isEqual from 'lodash/isequal';
 import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';

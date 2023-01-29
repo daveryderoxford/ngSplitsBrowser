@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import * as firebase from 'firebase/app';
+import firebase from "firebase/compat/app";
 import { Utils } from 'app/shared';
 
 export type AuthProvider = "EmailAndPassword" | "Google" | "Facebook";

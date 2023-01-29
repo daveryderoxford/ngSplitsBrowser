@@ -3,9 +3,9 @@
 /* eslint-disable @typescript-eslint/quotes */
 import { HttpClient } from "@angular/common/http";
 import { inject, TestBed } from "@angular/core/testing";
-import { AngularFireModule } from "@angular/fire";
-import { AngularFirestoreModule } from "@angular/fire/firestore";
-import { AngularFireStorageModule } from "@angular/fire/storage";
+import { AngularFireModule } from "@angular/fire/compat";
+import { AngularFirestoreModule } from "@angular/fire/compat/firestore";
+import { AngularFireStorageModule } from "@angular/fire/compat/storage";
 import { testFirebaseConfig } from "app/app.firebase-config";
 import { EventInfo } from "app/model";
 import { CompetitorDataService } from "app/shared/services/competitor-data.service";

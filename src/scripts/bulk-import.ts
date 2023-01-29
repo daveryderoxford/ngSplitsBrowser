@@ -5,9 +5,9 @@ import {switchMap} from 'rxjs/operators';
  * ts-node bulk-inoirt.node
 */
 import { HttpClient } from "@angular/common/http";
-import { AngularFireAuth } from "@angular/fire/auth";
-import { AngularFirestore } from "@angular/fire/firestore";
-import { AngularFireStorage } from "@angular/fire/storage";
+import { AngularFireAuth } from "@angular/fire/compat/auth";
+import { AngularFirestore } from "@angular/fire/compat/firestore";
+import { AngularFireStorage } from "@angular/fire/compat/storage";
 import { EventAdminService, LargeBatch } from "app/event-admin/event-admin.service";
 import { EventGrades, OEvent, SplitsFileFormat, EventGrade } from "app/model";
 import * as data from "./importdata.node";

@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/auth";
+import { AngularFireAuth } from "@angular/fire/compat/auth";
 import { DialogsService } from "../../shared/dialogs/dialogs.service";
 import { OEvent } from "../../model/oevent";
 import { EventAdminService } from "../event-admin.service";

@@ -1,7 +1,7 @@
 
 import {take} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { CompetitorSearchData, OEvent } from '../../model';
 import { Competitor } from 'app/results/model';
 

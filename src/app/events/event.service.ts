@@ -2,7 +2,7 @@
  * Event service
  */
 import { Injectable } from "@angular/core";
-import { AngularFirestore, QueryFn } from "@angular/fire/firestore";
+import { AngularFirestore, QueryFn } from "@angular/fire/compat/firestore";
 import { BehaviorSubject, merge, Observable } from "rxjs";
 import { take, tap } from 'rxjs/operators';
 import { Club, EventInfo, OEvent } from "app/model";

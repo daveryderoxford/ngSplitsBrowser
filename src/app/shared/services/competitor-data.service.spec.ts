@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { OEvent } from 'app/model';
 import { Competitor } from 'app/results/model';
 import { CompetitorDataService } from './competitor-data.service';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 class AngularFirestoreStub {
 

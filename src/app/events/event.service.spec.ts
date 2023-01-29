@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { EventService } from './event.service';
 import { FirestoreTestUtil } from 'app/test/local-firebase.spec';
-import { AngularFirestoreModule, AngularFirestore } from '@angular/fire/firestore';
+import { AngularFirestoreModule, AngularFirestore } from '@angular/fire/compat/firestore';
 import { AngularFireModule } from '@angular/fire';
 import { testFirebaseConfig } from 'app/app.firebase-config';
 import { PaganationService } from 'app/shared';
-import { AngularFireAuthModule, AngularFireAuth } from '@angular/fire/auth';
+import { AngularFireAuthModule, AngularFireAuth } from '@angular/fire/compat/auth';
 import { test_clubs, test_events, test_results } from 'app/test/testdata.spec';
 import { Club } from 'app/model';
 import { filter } from 'rxjs/operators';

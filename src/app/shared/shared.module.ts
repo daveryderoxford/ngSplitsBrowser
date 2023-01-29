@@ -2,7 +2,7 @@
 /** Shared componens and services  */
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { AngularFireAuthModule } from "@angular/fire/auth";
+import { AngularFireAuthModule } from "@angular/fire/compat/auth";
 import { AngularSplitModule } from 'angular-split';
 import { AppMaterialModule } from "./components/material/app-material.module";
 import { SidenavButtonComponent } from './components/sidenav-button.component';

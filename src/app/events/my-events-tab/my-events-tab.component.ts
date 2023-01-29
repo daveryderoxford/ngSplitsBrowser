@@ -1,6 +1,6 @@
 
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/auth";
+import { AngularFireAuth } from "@angular/fire/compat/auth";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { OEvent, UserResult } from "app/model";
 import { UserDataService } from "app/user/user-data.service";

@@ -1,8 +1,8 @@
 /** Node script to build the index of club */
 import {Inject, NgModule} from "@angular/core";
 
-import { AngularFireModule } from "@angular/fire";
-import { AngularFireDatabase } from "@angular/fire/database";
+import { AngularFireModule } from "@angular/fire/compat";
+import { AngularFireDatabase } from "@angular/fire/compat/database";
 import { LogEntry } from "app/model/log-entry";
 import { Club, EventGrades, EventSummary, OEvent, SplitsFileInfo } from "app/model";
 import { EventAdminService } from "app/event-admin/event-admin.service";
@@ -25,5 +25,3 @@ function buildClub( @Inject(EventAdminService) eventAdmin) {
 
 
 }
-
-
