@@ -1,4 +1,3 @@
-import { CompileShallowModuleMetadata } from '@angular/compiler';
 import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
          EventEmitter, Input, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { UntilDestroy } from '@ngneat/until-destroy';

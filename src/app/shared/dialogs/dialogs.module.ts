@@ -18,10 +18,6 @@ import { MessageDialogComponent } from './message-dialog.component';
     declarations: [
         ConfirmDialogComponent,
         MessageDialogComponent,
-    ],
-    entryComponents: [
-        ConfirmDialogComponent,
-        MessageDialogComponent,
-    ],
+    ]
 })
 export class DialogsModule { }
