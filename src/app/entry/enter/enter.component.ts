@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -25,7 +25,7 @@ interface FormData {
 } )
 export class EnterComponent implements OnInit {
 
-   form: FormGroup;
+   form: UntypedFormGroup;
 
    fixtureId: string;
    id: string;
@@ -36,7 +36,7 @@ export class EnterComponent implements OnInit {
 
    constructor ( private route: ActivatedRoute,
       private router: Router,
-      private formBuilder: FormBuilder,
+      private formBuilder: UntypedFormBuilder,
       private snackbar: MatSnackBar,
       private es: EntryService,
       private usd: UserDataService ) { }
@@ -108,7 +108,7 @@ export class EnterComponent implements OnInit {
       }
    }
 
-   numMapValidator( control: FormControl ) {
+   numMapValidator( control: UntypedFormControl ) {
       const course: EntryCourse = ( this.fixture.courses.find( control.value ) );
       if ( course.reservedMaps < course.maxMaps ) {
          return null;

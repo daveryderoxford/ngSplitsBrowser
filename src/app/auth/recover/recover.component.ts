@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 
@@ -9,11 +9,11 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
   styleUrls: ['./recover.component.scss']
 })
 export class RecoverComponent implements OnInit {
-  recoverForm: FormGroup;
+  recoverForm: UntypedFormGroup;
   error: string;
 
   constructor(private router: Router,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private afAuth: AngularFireAuth
   ) { }
 

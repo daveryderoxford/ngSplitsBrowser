@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { UntypedFormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-postcode',
@@ -14,10 +14,10 @@ export class PostcodeComponent implements OnInit {
   @Input() postcode: string;
   @Output() postcodeChanged = new EventEmitter<string>();
 
-  postcodeFormControl: FormControl;
+  postcodeFormControl: UntypedFormControl;
 
   ngOnInit() {
-    this.postcodeFormControl = new FormControl( this.postcode, [this.validatePostcode, Validators.required] );
+    this.postcodeFormControl = new UntypedFormControl( this.postcode, [this.validatePostcode, Validators.required] );
   }
 
   postcodeEntered() {
@@ -29,7 +29,7 @@ export class PostcodeComponent implements OnInit {
     this.postcodeChanged.emit( portcode );
   }
 
-  validatePostcode( input: FormControl ) {
+  validatePostcode( input: UntypedFormControl ) {
     const text = input.value.trim();
 
     if ( text === "" ) {

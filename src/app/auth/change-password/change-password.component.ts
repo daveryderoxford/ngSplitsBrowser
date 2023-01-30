@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,11 +9,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./change-password.component.scss']
 })
 export class ChangePasswordComponent {
-  form: FormGroup;
+  form: UntypedFormGroup;
   error = '';
 
   constructor(private router: Router,
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private afAuth: AngularFireAuth) {
     this.form = this.formBuilder.group({
       password: ['', Validators.required],
@@ -22,7 +22,7 @@ export class ChangePasswordComponent {
 
   }
 
-  passwordMissMatch(g: FormGroup): any {
+  passwordMissMatch(g: UntypedFormGroup): any {
     const p1 = g.get('password');
     const p2 = g.get('confirmPassword');
     let ret: { [error: string]: any } = {};

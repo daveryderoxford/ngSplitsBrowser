@@ -3,7 +3,7 @@
  *  Uses EntryService to create FixtureEntryDetails for the fixture of they do not already exist
 */
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
@@ -23,7 +23,7 @@ import { EntryService } from '../entry.service';
 } )
 export class MapRegistrationAdminComponent implements OnInit {
 
-   form: FormGroup;
+   form: UntypedFormGroup;
    error = '';
    coursesChanged = false;
    readonly minDate = new Date();
@@ -37,7 +37,7 @@ export class MapRegistrationAdminComponent implements OnInit {
 
    constructor ( private route: ActivatedRoute,
       private router: Router,
-      private formBuilder: FormBuilder,
+      private formBuilder: UntypedFormBuilder,
       private dialog: MatDialog,
       private snackbar: MatSnackBar,
       private es: EntryService ) { }

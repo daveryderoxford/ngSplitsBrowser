@@ -1,7 +1,7 @@
 
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { FormArray, FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -27,7 +27,7 @@ import { map } from 'rxjs/operators';
 } )
 export class UserComponent implements OnInit {
   originalUserData: UserData = null;
-  userForm: FormGroup;
+  userForm: UntypedFormGroup;
   ecardTypes = ControlCardTypes.types;
 
   error = "";
@@ -41,7 +41,7 @@ export class UserComponent implements OnInit {
   cardclass: "mat-card-mobile";
 
   constructor (
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private afAuth: AngularFireAuth,
     private router: Router,
     private usd: UserDataService,
@@ -59,7 +59,7 @@ export class UserComponent implements OnInit {
       postcode: [""],
       nationalId: [""],
       autoFind: [""],
-      ecards: this.formBuilder.array( [] ) as FormArray
+      ecards: this.formBuilder.array( [] ) as UntypedFormArray
     } );
   }
 
@@ -73,8 +73,8 @@ export class UserComponent implements OnInit {
           .subscribe( userData => this.userChanged( userData ) );
   }
 
-  private _ecardsControl(): FormArray {
-    return this.userForm.controls['ecards'] as FormArray;
+  private _ecardsControl(): UntypedFormArray {
+    return this.userForm.controls['ecards'] as UntypedFormArray;
   }
 
   loginChanged( loggedIn: firebase.User ) {
@@ -88,7 +88,7 @@ export class UserComponent implements OnInit {
     if ( userData ) {
 
       // Clear form by removing ecards and resetting
-      this.userForm.setControl( 'ecards', new FormArray( [] ) );
+      this.userForm.setControl( 'ecards', new UntypedFormArray( [] ) );
       this.userForm.reset();
 
       this.userForm.setValue( {
@@ -108,7 +108,7 @@ export class UserComponent implements OnInit {
     }
   }
 
-  private _createEcard( id: string, type: string ): FormGroup {
+  private _createEcard( id: string, type: string ): UntypedFormGroup {
     return this.formBuilder.group( {
       id: [id, [Validators.required, Validators.pattern( "[0-9]+")]],
       type: [type, [Validators.required]]

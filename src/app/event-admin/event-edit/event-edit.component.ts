@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -22,7 +22,7 @@ export class EventEditComponent implements OnInit, OnChanges {
    @Output() eventSubmitted = new EventEmitter<EventInfo>();
    showProgressBar = false;
 
-   f: FormGroup;
+   f: UntypedFormGroup;
    grades = EventGrades.grades;
    nations = Nations.getNations();
    types = EventTypes.types;
@@ -33,7 +33,7 @@ export class EventEditComponent implements OnInit, OnChanges {
    filteredClubs$: Observable<Club[]>;
 
    constructor ( private router: Router,
-      private formBuilder: FormBuilder,
+      private formBuilder: UntypedFormBuilder,
       private eventService: EventAdminService,
       private es: EventService,
       public snackBar: MatSnackBar

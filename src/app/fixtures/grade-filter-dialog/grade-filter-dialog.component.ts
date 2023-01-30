@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { EventGrades } from 'app/model';
 import { GradeFilter } from 'app/model/fixture-filter';
@@ -15,10 +15,10 @@ export class GradeFilterComponent implements OnInit {
 
    grades = EventGrades.grades;
 
-   form: FormGroup;
-   items: FormArray;
+   form: UntypedFormGroup;
+   items: UntypedFormArray;
 
-   constructor(private formBuilder: FormBuilder,
+   constructor(private formBuilder: UntypedFormBuilder,
       public dialogRef: MatDialogRef<GradeFilterComponent>,
       @Inject(MAT_DIALOG_DATA) public data: GradeFilter[]) { }
 
@@ -27,14 +27,14 @@ export class GradeFilterComponent implements OnInit {
          items: this.formBuilder.array([])
       });
 
-      this.items = this.form.get('items') as FormArray;
+      this.items = this.form.get('items') as UntypedFormArray;
 
       for (const gradeItem of this.data) {
          this.items.push(this.createItem(gradeItem));
       }
    }
 
-   createItem(grade: GradeFilter): FormGroup {
+   createItem(grade: GradeFilter): UntypedFormGroup {
       return this.formBuilder.group({
          name: grade.name,
          enabled: grade.enabled,

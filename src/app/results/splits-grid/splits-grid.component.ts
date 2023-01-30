@@ -1,7 +1,7 @@
 
 import { SelectionModel } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { UntilDestroy } from '@ngneat/until-destroy';
@@ -28,9 +28,9 @@ export class SplitsGridComponent implements OnInit {
    displayedColumns: string[] = [];
    splitsColumns: string[] = [];
 
-   classSelect = new FormControl();
-   courseToggle = new FormControl();
-   colorToggle = new FormControl();
+   classSelect = new UntypedFormControl();
+   courseToggle = new UntypedFormControl();
+   colorToggle = new UntypedFormControl();
 
    @ViewChild(MatSort) sort: MatSort;
 

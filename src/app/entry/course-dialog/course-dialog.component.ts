@@ -1,6 +1,6 @@
 /** Entry course dialog  */
 import { ChangeDetectionStrategy, Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { EntryCourse } from 'app/model/entry';
 
@@ -13,10 +13,10 @@ import { EntryCourse } from 'app/model/entry';
 } )
 export class CourseDialogComponent implements OnInit {
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   hasAgeClasses: boolean;
 
-  constructor ( private formBuilder: FormBuilder,
+  constructor ( private formBuilder: UntypedFormBuilder,
     public dialogRef: MatDialogRef<CourseDialogComponent>,
     @Inject( MAT_DIALOG_DATA ) public data: { hasAgeClasses: boolean, course: EntryCourse } ) { }
 

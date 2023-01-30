@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatButtonToggleChange } from '@angular/material/button-toggle';
 import { MatDialog } from '@angular/material/dialog';
 import { UntilDestroy } from '@ngneat/until-destroy';
@@ -25,14 +25,14 @@ export class FixturesOptionsComponent implements OnInit {
 
    @Output() filterChanged = new EventEmitter<FixtureFilter>();
 
-   gradesEnabledControl: FormControl;
+   gradesEnabledControl: UntypedFormControl;
 
    constructor ( private dialog: MatDialog,
       private auth: AngularFireAuth,
       private loginSnackBar: LoginSnackbarService ) { }
 
    ngOnInit() {
-      this.gradesEnabledControl = new FormControl( this.outputFilter.gradesEnabled );
+      this.gradesEnabledControl = new UntypedFormControl( this.outputFilter.gradesEnabled );
 
       this.gradesEnabledControl.valueChanges.subscribe( ( val ) => {
          this.outputFilter.gradesEnabled = val;

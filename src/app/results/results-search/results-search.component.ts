@@ -1,7 +1,7 @@
 /** Componnet to results for club class or */
 /* eslint-disable @typescript-eslint/quotes */
 import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { UntypedFormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Subscription } from 'rxjs/Subscription';
@@ -33,7 +33,7 @@ export class ResultsSearchComponent implements OnInit {
   // Filter panel contents consisting of groups for courses, classes and competitors
   filterPanelContents: Array<FilterPanelGroup> = [];
 
-  searchControl: FormControl = new FormControl('');
+  searchControl: UntypedFormControl = new UntypedFormControl('');
   subscription: Subscription;
 
   constructor(private rs: ResultsSelectionService) { }
