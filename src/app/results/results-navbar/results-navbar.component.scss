@@ -1,5 +1,5 @@
 // Import theming functions
-@use '~@angular/material' as mat;
+@use '@angular/material' as mat;
 
 // Include non-theme styles for core.
 @include mat.core();
