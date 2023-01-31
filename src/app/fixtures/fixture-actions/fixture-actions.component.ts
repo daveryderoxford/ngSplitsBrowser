@@ -96,8 +96,11 @@ export class FixtureActionsComponent implements AfterViewInit {
    }
 
    async reserveMap(): Promise<void> {
-      // TODO add map reservation
-
+      if ( !this.loggedIn ) {
+         this.loginSnackBar.open( "Must be logged in to add map reservation" );
+      } else {
+         this.router.navigate( ["/entry/enter", this.fixture.id] );
+      }
    }
 
    async editMapReservation() {
@@ -126,5 +129,9 @@ export class FixtureActionsComponent implements AfterViewInit {
       f.postcode ? ret += "%0D%0APost code: " + f.postcode : ret;
       f.grade ? ret += "%0D%0AGrade: " + f.grade : ret;
       return ret;
+   }
+
+   fixtureDate(): Date {
+      return new Date(this.fixture.date);
    }
 }

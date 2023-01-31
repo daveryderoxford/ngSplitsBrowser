@@ -24,11 +24,13 @@
 
     <mat-divider></mat-divider>
 
-    <app-add-to-calendar [date]="fixture.date" [title]=fixture.name [location]="calanderlocation()"
+    <app-add-to-calendar [date]="fixtureDate()" [title]=fixture.name [location]="calanderlocation()"
       [details]="calanderDetails()"></app-add-to-calendar>
 
 
     <div *ngIf="mapReservationSupported">
+
+      <mat-divider></mat-divider>
 
       <button *ngIf="hasMapReservation()" (click)="reserveMap()" mat-menu-item>
         Reserve Map

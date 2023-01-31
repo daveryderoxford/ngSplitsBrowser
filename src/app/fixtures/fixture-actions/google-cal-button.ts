@@ -7,7 +7,7 @@ import { addDays, format, parse } from 'date-fns'
 } )
 export class AddToGoogleCalendarButtonComponent  {
 
-   @Input() date: string = null;
+   @Input() date: Date = null;
    @Input() title = "";
    @Input() details = "";
    @Input() location = "";
@@ -17,8 +17,8 @@ export class AddToGoogleCalendarButtonComponent  {
          throw ( new Error( "Date and Title are required" ) );
       }
 
-      // for all day event,  20201231/20210101
-
+      // for all day event specifty date and dates+1 day
+      // format for dates is 20201231/20210101
       const startDate = new Date(this.date);
       const endDate = addDays( startDate, 1 )
       const period = format( startDate, "yyyyMMdd" ) + "/" + format( endDate, "yyyyMMdd" );
