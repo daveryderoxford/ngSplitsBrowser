@@ -64,7 +64,7 @@ export class FixtureDatePipe implements PipeTransform {
       if (daysFrom >= 7) {
          return format(d, "iii dd-MMM-yy");
       } else if (daysFrom <= 7 && daysFrom > 1) {
-         return "Next " + format(d, "iii Do");
+         return "Next " + format(d, "iii do");
       } else if (daysFrom === 1) {
          return "Tommorow ";
       } else if (daysFrom === 0) {
