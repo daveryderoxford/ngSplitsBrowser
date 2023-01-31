@@ -22,27 +22,33 @@
       UnLike
     </button>
 
-    <div *ngIf="mapReservationSupported">
-
-    <button *ngIf="hasMapReservation()" (click)="reserveMap()" mat-menu-item>
-      Reserve Map
-    </button>
-
-    <button *ngIf="hasMapReservation()" (click)="viewEntries()" mat-menu-item>
-      Entry List
-    </button>
-
     <mat-divider></mat-divider>
 
-    <button *ngIf="!hasMapReservation()" (click)="addMapReservation()" mat-menu-item>
-      Add Map Reservation
-    </button>
+    <app-add-to-calendar [date]="fixture.date" [title]=fixture.name [location]="calanderlocation()"
+      [details]="calanderDetails()"></app-add-to-calendar>
 
-    <button *ngIf="hasMapReservation()" (click)="editMapReservation()" mat-menu-item>
-      Edit Map Reservation
-    </button>
 
-  </div>
+    <div *ngIf="mapReservationSupported">
+
+      <button *ngIf="hasMapReservation()" (click)="reserveMap()" mat-menu-item>
+        Reserve Map
+      </button>
+
+      <button *ngIf="hasMapReservation()" (click)="viewEntries()" mat-menu-item>
+        Entry List
+      </button>
+
+      <mat-divider></mat-divider>
+
+      <button *ngIf="!hasMapReservation()" (click)="addMapReservation()" mat-menu-item>
+        Add Map Reservation
+      </button>
+
+      <button *ngIf="hasMapReservation()" (click)="editMapReservation()" mat-menu-item>
+        Edit Map Reservation
+      </button>
+
+    </div>
 
   </ng-template>
 

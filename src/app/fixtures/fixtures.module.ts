@@ -14,6 +14,7 @@ import { GradeFilterComponent } from './grade-filter-dialog/grade-filter-dialog.
 import { FixtureKeyComponent } from './fixtures-map/fixture-key.component';
 import { FixtureActionsComponent } from './fixture-actions/fixture-actions.component';
 import { PostcodeComponent } from './postcode/postcode.component';
+import { AddToGoogleCalendarButtonComponent } from './fixture-actions/google-cal-button';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { PostcodeComponent } from './postcode/postcode.component';
     FixtureKeyComponent,
     FixtureActionsComponent,
     PostcodeComponent,
+    AddToGoogleCalendarButtonComponent,
   ],
   imports: [
     CommonModule,
