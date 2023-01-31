@@ -41,17 +41,18 @@ export class FixturesService {
       protected fs: AngularFirestore,
       protected http: HttpClient ) {
 
-      /* When user changes - set filters to reflect user details */
+      /* When user changes - set filters to reflect user details and unset liked only */
       this.usd.user$.subscribe( user => {
          if ( user ) {
             if ( user.postcode && user.postcode !== "" ) {
                this.updatePostcode( user.postcode );
             }
             if ( user.fixtureGradeFilters ) {
-               const newFilter: FixtureFilter = Object.assign( {}, this._filter$.value );
-               newFilter.grades = user.fixtureGradeFilters;
-               this.updateFilter( newFilter );
+               this.updateFilter( { ...this._filter$.value, grades: user.fixtureGradeFilters } ); 
             }
+         } else {
+            // set likedonly to false on logout
+            this.updateFilter( { ...this._filter$.value, likedOnly: false } ) ;           
          }
       } );
 

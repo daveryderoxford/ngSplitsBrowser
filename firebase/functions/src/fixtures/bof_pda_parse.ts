@@ -97,14 +97,17 @@ export class BOFPDParser {
    /** The id parameter may either be an a event or activity id */
    private getId( bofURL: string): string {
 
-      let id = this.urlParam( bofURL, "amp;event" );
+      const eventId = this.urlParam( bofURL, "amp;event" );
+      const activityId = this.urlParam( bofURL, "amp;activity" );
 
-      // If event id is not found then it is an activity
-      if (!id) {
-         id = "activity-" + this.urlParam( bofURL, "amp;activity" );
+      if ( eventId ) {
+         return ( "bof-" + eventId );
+      } else if (activityId) {
+         return ( "bof-activity" + activityId );
+      } else {
+         console.error("BOFPDAPasrser: Could not parse id for event from URL" + bofURL); 
+         return ("Unknown");
       }
-
-      return id;
    }
 
    private text( el: cheerio.Element ): string {

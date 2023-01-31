@@ -14,7 +14,7 @@ describe( 'BOF PDA Fixtures fiile parser ', () => {
       // Row with grid reference
       expect( bofFixtures.length ).to.equal( 1267 );
       expect( bofFixtures[ 0 ].date ).to.equal( '2019-03-24T00:00:00.000Z' );
-      expect( bofFixtures[ 0 ].id ).to.equal( '72446' );
+      expect( bofFixtures[ 0 ].id ).to.equal( 'bof-72446' );
       expect( bofFixtures[ 0 ].name ).to.equal( 'SROC Red Rose Classic' );
 
       expect( bofFixtures[ 0 ].BOFLink ).to.equal( 'index.php?pg=event&amp;event=72446&bpg=' );
@@ -74,7 +74,7 @@ describe( 'BOF PDA Fixtures fiile parser ', () => {
       const bofFixtures: BOFPDParseData[] = parser.parseBOFPDAFile( testBOFPDAFile );
 
       expect( bofFixtures[ 2 ].name ).to.equal( 'Postcode' );
-      expect( bofFixtures[ 2 ].id ).to.equal( 'activity-26377' );
+      expect( bofFixtures[ 2 ].id ).to.equal( 'bof-activity26377' );
 
    } );
 
