@@ -16,6 +16,7 @@ function createUserData(): UserData {
         fixtures: [],
         ecards: [],
         resultsLastupDated: new Date().toISOString(),
+        reminders: [],
         postcode: "",
         email: "",
         archived: false,

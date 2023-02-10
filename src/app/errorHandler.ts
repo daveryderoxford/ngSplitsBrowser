@@ -1,19 +1,21 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorHandler, Injectable, Injector } from '@angular/core';
+import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { DialogsService } from './shared';
 
 
 /** Global error handler */
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
 
+   private zone: NgZone = this.injector.get( NgZone );
+   private ds: DialogsService = this.injector.get( DialogsService );
+   private snackBar: MatSnackBar = this.injector.get( MatSnackBar );
+
    // Error handling is important and needs to be loaded first.
    // Because of this we should manually inject the services with Injector.
-   constructor ( private injector: Injector ) { }
+   constructor (private injector: Injector) { }
 
-   snackBar = this.injector.get( MatSnackBar );
-//   router = this.injector.get( Router );
 
    handleError( error: Error | HttpErrorResponse ) {
 
@@ -26,15 +28,18 @@ export class GlobalErrorHandler implements ErrorHandler {
       if ( error instanceof HttpErrorResponse ) {
          this._handleHTTPError( error );
       } else if ( error.message && error.message.startsWith("ExpressionChangedAfterItHasBeenCheckedError" )) {
-
+         this._showError( error );
       } else {
-         this._showError("An unexpected error occurred");
+         this._showError(error);
       }
    }
 
-   private _showError( message: string ) {
-      if ( this.snackBar ) {
-         this.snackBar.open( message, "Dismiss", {} );
+   private _showError( error: Error ) {
+      if (this.ds) {
+         this.zone.run( () =>
+            this.ds.message(
+               error?.name,
+               `Message ${error?.message || 'Undefined client error'} \n ${error?.stack}` ));
       }
    }
 
@@ -55,16 +60,16 @@ export class GlobalErrorHandler implements ErrorHandler {
          //   this.router.navigateByUrl( "/login" );
             break;
          case 403: // Forbidden
-            this._showError( error.message );
+            this._showError( error );
             break;
          case 404: // Not found
-            this._showError( error.message );
+            this._showError( error );
             break;
          case 400: // bad request
-            this._showError( error.message );
+            this._showError( error );
             break;
          case 408: // Request timeout
-            this._showError( error.message );
+            this._showError( error );
             break;
          default:
             this._refreshPageMessage();

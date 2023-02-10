@@ -6,6 +6,11 @@ export interface LatLong {
    lng: number;
 }
 
+export interface Point {
+   east: number;
+   north: number;
+}
+
 export interface Fixture {
      id: string;
      date: ISODateString;
@@ -14,6 +19,7 @@ export interface Fixture {
      clubURL: string;
      area: string;
      latLong?: LatLong;
+     gridRef?: Point;
      postcode: string;
      grade: EventGrade;
      type: EventType;

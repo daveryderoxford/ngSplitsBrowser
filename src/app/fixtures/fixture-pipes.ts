@@ -48,6 +48,20 @@ export class BingURLPipe implements PipeTransform {
    }
 }
 
+/* 
+Returns a streetmap URL to display OS map for StreetMap website.
+UR is of the form https://streetmap.co.uk/loc/N52.038333,W4.578611
+*/
+@Pipe( {
+   name: 'streetmapURL'
+} )
+export class StreetmapURLPipe implements PipeTransform {
+   transform( fix: Fixture ): string {
+      return 'https://www.bing.com/maps/?cp=' + latLongStr( fix.latLong, '~' ) + "&lvl=15&style=s&sp=" +
+         latLongStr( fix.latLong, '_' ) + "_" + fix.area;
+   }
+}
+
 /** Reformat ISO date into displayed date string */
 @Pipe({
    name: 'fixturedate',
@@ -141,6 +155,7 @@ export class GradeIconNamePipe implements PipeTransform {
       return 'grade-' + grade.toLowerCase();
    }
 }
+
 
 function latLongStr(loc: LatLong, seperator = ","): string {
    return loc.lat.toString() + seperator + loc.lng.toString();

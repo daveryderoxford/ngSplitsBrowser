@@ -11,7 +11,7 @@ export interface ECard {
 
 /** Information set by the users abouth themselves */
 export interface UserInfo {
-    email: string;
+    email: string;         // Not on client
     firstname: string;
     surname: string;
     club: string;
@@ -29,6 +29,7 @@ export interface UserData extends UserInfo {
     key: string;  // Matches with the users Firebase reference
     results: UserResult[];
     fixtures: UserFixture[] | UserReservation[];
+    reminders: string[];  // array of eventIds
     archived: boolean;
 }
 

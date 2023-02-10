@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points --tsconfig ./tsconfig.app.json",
-    "serve": "ng serve",
-    "build": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts && ng build",
+    "serve": "ng serve --configuration development",
+    "build": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts && ng build --configuration development",
     "prod": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts && ng build --configuration production",
     "deploy": "npm run prod && firebase deploy",
     "test": "ng test",

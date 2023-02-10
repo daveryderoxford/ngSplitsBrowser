@@ -86,7 +86,7 @@ export class LoginComponent implements OnInit {
    */
    private async _thirdPartySignIn(provider): Promise<firebase.auth.UserCredential> {
       if (Utils.isInStandaloneMode()) {
-         firebase.auth().signInWithRedirect(provider);
+         await firebase.auth().signInWithRedirect(provider);
          return await firebase.auth().getRedirectResult();
       } else {
          return await this.afAuth.signInWithPopup(provider);
