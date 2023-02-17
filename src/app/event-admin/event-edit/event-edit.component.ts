@@ -61,7 +61,6 @@ export class EventEditComponent implements OnInit, OnChanges {
              this.f.controls.club.valueChanges.pipe( startWith( '' ) ),
              this.f.controls.nationality.valueChanges.pipe( startWith( '' ) ) ] )
                .pipe(
-                  filter( club => ( club !== null || club !== [] ) ),
                   map( ( [ clubs, name, nat ] ) => this.filterClubs( clubs, name, nat ) )
          ).pipe(untilDestroyed(this));
 

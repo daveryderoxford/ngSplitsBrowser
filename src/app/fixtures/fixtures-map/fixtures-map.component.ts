@@ -3,7 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component,
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Fixture, LatLong } from 'app/model/fixture';
 import { Canvas, circle, Circle, CircleMarker, CircleMarkerOptions, control, FeatureGroup, Map, tileLayer, TileLayer, Util } from "leaflet";
-import { interval } from 'rxjs';
+import { timer } from 'rxjs';
 
 @UntilDestroy( { checkProperties: true } )
 @Component( {
@@ -75,7 +75,7 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
    ngAfterViewInit() {
       /* Leaflet calculates the map size before angular is full initialise so we need to
          invalidate it once the view is complete. Short delay is required  see https://medium.com/ngconf/integrating-maps-into-your-angular-application-with-leaflet-b9aedb040735 */
-      interval( 10 ).subscribe( () => {
+      timer( 10 ).subscribe( () => {
          if (this.map) {
              this.map.invalidateSize();
          } else {
