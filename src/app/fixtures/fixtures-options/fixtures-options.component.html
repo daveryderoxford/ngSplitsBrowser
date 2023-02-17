@@ -1,8 +1,9 @@
-<div  fxLayout="column" fxLayoutAlign="space-between none" fxLayoutGap="5px" class="container">
+<div  fxLayout="column" fxLayoutAlign="space-between none" fxLayoutGap="7px" class="container">
   <div>
-    <mat-button-toggle disableRipple matTooltip="Filter my fixtures" [checked]="this.outputFilter.likedOnly"
+    <mat-button-toggle #likedToggle disableRipple [checked]="this.outputFilter.likedOnly"
       (change)="likeClicked($event)">
-      <mat-icon>account_box</mat-icon>
+         <mat-icon [class.red]="likedToggle.checked">favorite</mat-icon>
+      Liked only
     </mat-button-toggle>
   </div>
 
@@ -11,8 +12,8 @@
 
   <div>
 
-    <mat-slide-toggle labelPosition=before [formControl]="gradesEnabledControl">Level filter</mat-slide-toggle>
-    <button mat-button (click)="displayGrades()">SET</button>
+    <button mat-stroked-button (click)="displayGrades()">Event Grade Filter</button>&nbsp;&nbsp;
+    <mat-slide-toggle labelPosition=before [formControl]="gradesEnabledControl">on/off</mat-slide-toggle>
 
   </div>
 
