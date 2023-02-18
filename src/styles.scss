@@ -1,8 +1,24 @@
-/* You can add global styles to this file, and also import other style files */
-@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+@use '@angular/material' as mat;
 
-// @import url('https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css');
+@include mat.core();
 
+$my-primary: mat.define-palette(mat.$blue-palette);
+$my-accent: mat.define-palette(mat.$yellow-palette);
+
+$my-theme: mat.define-light-theme((color: (primary: $my-primary, accent: $my-accent,)));
+
+@include mat.all-component-themes($my-theme);
+
+// Theme toggle buttons
+@mixin mix-app-theme($my-theme) {
+
+  .mat-button-toggle-checked {
+     background-color: mat.get-color-from-palette($my-primary, 50);
+  }
+}
+
+// Include the mixin
+@include mix-app-theme($my-theme);
 
 //  Common colors
 $gray-background-color: rgb(209,209,209);

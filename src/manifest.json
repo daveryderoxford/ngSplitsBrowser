@@ -1,7 +1,7 @@
 {
-  "name": "Splitsbrowser",
-  "short_name": "Splitsbrowser",
-  "description": "Orienteering fixtures and results managament application",
+  "name": "O Fxtures",
+  "short_name": "OFixtures",
+  "description": "UK Orienteering fixtures",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
