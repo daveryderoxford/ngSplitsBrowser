@@ -13,6 +13,7 @@ import { FixtureFilter } from 'app/model/fixture-filter';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { FixturesService } from '../fixtures.service';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 
 @UntilDestroy( { checkProperties: true } )
 @Component( {
@@ -45,12 +46,17 @@ export class FixturesComponent implements OnInit {
       private es: EntryService,
       private breakpointObserver: BreakpointObserver,
       public dialog: MatDialog,
-      public snackbar: MatSnackBar ) { }
+      public snackbar: MatSnackBar,
+      public route: ActivatedRoute
+   ) { }
 
    ngOnInit() {
-      this.breakpointObserver.observe( ['(min-width: 500px) and (min-height: 400px)'] )
-         .pipe( tap( state => console.log( 'state: ' + state.matches.toString() ) ) )
-         .subscribe( state => this.handset = !state.matches );
+
+      this.breakpointObserver.observe( ['(min-width: 500px) and (min-height: 400px)'] ).subscribe( state => this.handset = !state.matches );
+
+      this.route.paramMap.subscribe( ( params: ParamMap ) => {
+         this.mapview = params.has( 'mapview' );
+      } );
 
       this.auth.authState.subscribe( ( user: firebase.User ) => {
          this.loggedIn = ( user !== null );

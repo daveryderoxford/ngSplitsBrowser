@@ -8,7 +8,6 @@ import { FixturesGridComponent } from './fixtures-grid/fixtures-grid.component';
 import { FixturesMapComponent } from './fixtures-map/fixtures-map.component';
 import { FixtureWeekFilterComponent } from './fixtures-options/fixture-week-filter.component';
 import { FixturesOptionsComponent } from './fixtures-options/fixtures-options.component';
-import { FixturesRoutingModule } from './fixtures-routing.module';
 import { FixturesComponent } from './fixtures/fixtures.component';
 import { GradeFilterComponent } from './grade-filter-dialog/grade-filter-dialog.component';
 import { FixtureKeyComponent } from './fixtures-map/fixture-key.component';
@@ -35,7 +34,6 @@ import { AddToGoogleCalendarButtonComponent } from './fixture-actions/google-cal
     HttpClientModule,
     SharedModule,
     FilterPipeModuleModule,
-    FixturesRoutingModule
   ],
   exports: [
     GradeFilterComponent

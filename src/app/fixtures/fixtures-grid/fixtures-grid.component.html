@@ -8,12 +8,12 @@
         <th class="date">Date</th>
         <th class="distance">Distance</th>
         <th class="name">Name</th>
-        <th class="club">Club</th>
+        <th class="club">Website</th>
         <th class="level">Level</th>
-        <th class="area">Area</th>
-        <th class="location">Location</th>
+        <th class="area">OS Map</th>
+        <th class="location">Google map</th>
         <th class="directions">Directions</th>
-        <th class="admin">Admin</th>
+        <th class="admin"></th>
       </tr>
     </thead>
     <tbody>
@@ -82,7 +82,7 @@
 
 
   <!-- Handset -->
-  <mat-list *ngIf="handset">
+  <mat-list *ngIf="handset" fxFill>
 
     <mat-list-item (click)="actions.openMenu()" *cdkVirtualFor="let fixture of fixtures">
 

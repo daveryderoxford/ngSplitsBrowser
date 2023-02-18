@@ -70,7 +70,7 @@ export class FixturesGridComponent implements OnInit, OnChanges {
 
    ngOnChanges() {
       if ( this.handset ) {
-         this.itemSize = 120;
+         this.itemSize = 88;
       } else {
          this.itemSize = 38;
       }

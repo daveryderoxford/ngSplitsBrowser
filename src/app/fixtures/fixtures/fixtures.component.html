@@ -47,7 +47,9 @@
       </button>
     </app-toolbar>
 
-    <div fxFlex class="mat-elevation-z2" *ngIf="!hideMobleFilter">
+    <div *ngIf="!hideMobleFilter" fxLayout="column" fxLayoutAlign="space-between none" fxLayoutGap="7px" class="mat-elevation-z2">
+
+  <!--   <div fxFlex class="mat-elevation-z2" *ngIf="!hideMobleFilter"> -->
        <app-postcode [postcode]="postcode$ | async" (postcodeChanged)="postcodeChanged($event)" ></app-postcode>
 
        <app-fixtures-options [filter]="fs.getFilter() | async" (filterChanged)="filterChanged($event)"></app-fixtures-options>

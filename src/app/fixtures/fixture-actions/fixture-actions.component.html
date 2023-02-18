@@ -7,7 +7,7 @@
 
     <ng-container *ngIf="handset">
       <a mat-menu-item href="{{fixture.clubURL}}"> Club website</a>
-      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | bingURL}}" target="_blank">OS map</a>
+      <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | streetmapURL}}" target="_blank">OS map</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleURL}}" target="_blank">Google map</a>
       <a mat-menu-item *ngIf="fixture.latLong;" href="{{fixture | googleDirectionsURL:homeLocation}}"
         target="_blank">Directions</a>
@@ -27,7 +27,6 @@
     <app-add-to-calendar [date]="fixtureDate()" [title]=fixture.name [location]="calanderlocation()"
       [details]="calanderDetails()"></app-add-to-calendar>
 
-
     <div *ngIf="mapReservationSupported">
 
       <mat-divider></mat-divider>
@@ -38,16 +37,6 @@
 
       <button *ngIf="hasMapReservation()" (click)="viewEntries()" mat-menu-item>
         Entry List
-      </button>
-
-      <mat-divider></mat-divider>
-
-      <button *ngIf="!hasMapReservation()" (click)="addMapReservation()" mat-menu-item>
-        Add Map Reservation
-      </button>
-
-      <button *ngIf="hasMapReservation()" (click)="editMapReservation()" mat-menu-item>
-        Edit Map Reservation
       </button>
 
     </div>

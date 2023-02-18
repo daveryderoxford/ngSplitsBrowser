@@ -5,11 +5,13 @@ import { NgModule } from '@angular/core';
 
 import { ConfirmDialogComponent } from './confirm-dialog.component';
 import { MessageDialogComponent } from './message-dialog.component';
+import { MatDividerModule } from '@angular/material/divider';
 
 @NgModule({
     imports: [
         MatDialogModule,
         MatButtonModule,
+        MatDividerModule,
     ],
     exports: [
         ConfirmDialogComponent,

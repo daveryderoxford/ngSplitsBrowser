@@ -8,6 +8,8 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { BulkImportService } from 'scripts/bulk-import';
 import { SidenavService } from './shared/services/sidenav.service';
 import firebase from "firebase/compat/app";
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { tap } from 'rxjs/operators';
 
 @UntilDestroy()
 @Component( {
@@ -22,6 +24,7 @@ export class AppComponent implements OnInit {
    loading = false;
    authorised = false;
    user: firebase.User;
+   handset = false;
 
    constructor ( private router: Router,
       private afs: AngularFirestore,
@@ -29,7 +32,8 @@ export class AppComponent implements OnInit {
       private sidebarService: SidenavService,
       private snackbar: MatSnackBar,
       private bs: BulkImportService,
-      private snackBar: MatSnackBar
+      private snackBar: MatSnackBar,
+      private breakpointObserver: BreakpointObserver,
    ) {
 
       // Send google analytics message when navigating to any route succeeds.
@@ -43,6 +47,10 @@ export class AppComponent implements OnInit {
    }
 
    ngOnInit() {
+
+      this.breakpointObserver.observe( ['(min-width: 500px) and (min-height: 400px)'] )
+         .pipe( tap( state => console.log( 'AppComponnet: state: ' + state.matches.toString() ) ) )
+         .subscribe( state => this.handset = !state.matches );
 
       this.afAuth.authState
               .pipe( untilDestroyed( this ) )
@@ -100,10 +108,10 @@ export class AppComponent implements OnInit {
       this.afs.firestore.settings( {} );
    }
 
-   async closeSidenav( target: string ) {
+   async closeSidenav( target: Array<any> ) {
       await this.sidenav.close();
-      if ( target ) {
-         await this.router.navigate( [target] );
+      if ( target)  {
+         await this.router.navigate( target );
       }
    }
 

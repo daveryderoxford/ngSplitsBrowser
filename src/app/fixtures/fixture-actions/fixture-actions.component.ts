@@ -24,7 +24,6 @@ export class FixtureActionsComponent implements AfterViewInit {
 
    // TODO TEMP comment out map reservation
    mapReservationSupported = true;
-
    loggedIn: boolean;
    fixtureEntryDetails: FixtureEntryDetails[] = [];
 
@@ -83,14 +82,6 @@ export class FixtureActionsComponent implements AfterViewInit {
       }
    }
 
-   async addMapReservation() {
-      if ( !this.loggedIn ) {
-         this.loginSnackBar.open( "Must be logged in to add map reservation" );
-      } else {
-         this.router.navigate( ["/entry/mapregistration", this.fixture.id, { new: true, fixture: JSON.stringify( this.fixture ) }] );
-      }
-   }
-
    hasMapReservation(): boolean {
       return this.fixtureEntryDetails.filter( details => this.fixture.id === details.fixtureId ).length !== 0;
    }
@@ -101,10 +92,6 @@ export class FixtureActionsComponent implements AfterViewInit {
       } else {
          this.router.navigate( ["/entry/enter", this.fixture.id] );
       }
-   }
-
-   async editMapReservation() {
-      this.router.navigate( ["/entry/mapregistration", this.fixture.id] );
    }
 
    async viewEntries() {

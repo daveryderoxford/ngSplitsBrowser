@@ -5,23 +5,36 @@
   <mat-sidenav>
 
     <mat-action-list>
-      <button mat-list-item (click)='closeSidenav("/fixtures")'>Fixtures</button>
+      <button mat-list-item (click)='closeSidenav(["/fixtures"])'>Fixtures</button>
+
+      <button *ngIf="handset" mat-list-item (click)='closeSidenav(["/fixtures/mapview"])'>Fixtures
+        Map</button>
+
       <!-- <button mat-list-item (click)='closeSidenav( "/events")'>Results</button> 
       <button mat-list-item (click)='closeSidenav( "/admin/event-admin" )'>Admin</button> -->
 
       <mat-divider></mat-divider>
 
       <ng-container *ngIf="authorised">
-        <button mat-list-item (click)='closeSidenav( "/user")'>User settings</button>
-        <button mat-list-item (click)='closeSidenav("/auth/change-password")'>Change password</button>
+        <button mat-list-item (click)='closeSidenav(["/user"])'>User settings</button>
+        <button mat-list-item (click)='closeSidenav(["/auth/change-password"])'>Change password</button>
         <button mat-list-item (click)="logout()">Logout</button>
       </ng-container>
 
-      <button mat-list-item *ngIf="!authorised" (click)='closeSidenav("/auth/login")'>Login</button>
+      <button mat-list-item *ngIf="!authorised" (click)='closeSidenav(["/auth/login"])'>Login</button>
 
       <mat-divider></mat-divider>
-      <button mat-list-item (click)='closeSidenav("/about")'>About</button>
+      <button mat-list-item (click)='closeSidenav(["/about"])'>About</button>
       <button mat-list-item (click)='contact()'>Contact</button>
+
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          Admin
+        </mat-expansion-panel-header>
+        <mat-action-list>
+          <button mat-list-item (click)='closeSidenav(["/entry/mapregistration"])'>Map Registration</button>
+        </mat-action-list>
+      </mat-expansion-panel>
 
       <ng-container *ngIf="isAdmin()">
         <button mat-button (click)="scriptsClicked()">Scripts</button>

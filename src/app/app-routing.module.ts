@@ -5,6 +5,7 @@ import { FixturesComponent } from './fixtures/fixtures/fixtures.component';
 const routes: Routes = [
    { path: "", component: FixturesComponent },
    { path: "fixtures", component: FixturesComponent },
+   { path: "fixtures/:mapview", component: FixturesComponent },
    { path: "auth", loadChildren: () => import( './auth/auth.module' ).then( m => m.AuthModule ) },
    { path: "events", loadChildren: () => import( './events/events.module' ).then( m => m.EventsModule ) },
    { path: "events-admin", loadChildren: () => import( './event-admin/event-admin.module' ).then( m => m.EventAdminModule ) },

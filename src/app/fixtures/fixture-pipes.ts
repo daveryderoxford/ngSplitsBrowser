@@ -57,8 +57,12 @@ UR is of the form https://streetmap.co.uk/loc/N52.038333,W4.578611
 } )
 export class StreetmapURLPipe implements PipeTransform {
    transform( fix: Fixture ): string {
-      return 'https://www.bing.com/maps/?cp=' + latLongStr( fix.latLong, '~' ) + "&lvl=15&style=s&sp=" +
-         latLongStr( fix.latLong, '_' ) + "_" + fix.area;
+      const l = fix.latLong;
+      if (l.lng < 0) {
+          return `https://streetmap.co.uk/loc/N${l.lat.toString()},W${(-l.lng).toString() }`;
+      } else {
+         return `https://streetmap.co.uk/loc/N${l.lat.toString()},E${( l.lng ).toString()}`;
+      }
    }
 }
 
@@ -166,6 +170,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       GoogleURLPipe,
       GoogleDirectionsURLPipe,
       BingURLPipe,
+      StreetmapURLPipe,
       FixtureDatePipe,
       EllipsisPipe,
       FixtureDistancePipe,
@@ -177,6 +182,7 @@ function latLongStr(loc: LatLong, seperator = ","): string {
       GoogleURLPipe,
       GoogleDirectionsURLPipe,
       BingURLPipe,
+      StreetmapURLPipe,
       FixtureDatePipe,
       EllipsisPipe,
       FixtureDistancePipe,
