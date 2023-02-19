@@ -17,8 +17,8 @@
       </tr>
     </thead>
     <tbody>
-      <tr *cdkVirtualFor="let fixture of fixtures" style="width:100%; min-height: 30px;"
-        (click)=eventClicked(fixture) [ngClass]="{ 'selected': selected(fixture) }">
+      <tr *cdkVirtualFor="let fixture of _fixtures" style="width:100%; min-height: 30px;"
+        (click)=eventClicked(fixture) [ngClass]="{ 'selected': selected(fixture), 'shaded': fixture.shaded }">
 
         <td class="liked">
           <button mat-icon-button matTooltip="Like/Unlike fixture" (click)="toggleReminder(fixture)">
@@ -84,7 +84,7 @@
   <!-- Handset -->
   <mat-list *ngIf="handset" fxFill>
 
-    <mat-list-item (click)="actions.openMenu()" *cdkVirtualFor="let fixture of fixtures">
+    <mat-list-item (click)="actions.openMenu()" *cdkVirtualFor="let fixture of _fixtures"  [ngClass]="{ 'shaded': fixture.shaded }">
 
       <div mat-line>
         <span fxFlex=50>{{fixture.date | fixturedate }}</span>

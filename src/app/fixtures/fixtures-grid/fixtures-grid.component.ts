@@ -11,6 +11,11 @@ import { Entry, FixtureEntryDetails } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 import { UserDataService } from 'app/user/user-data.service';
+import { isEqual } from 'date-fns';
+
+interface StyledFixture extends Fixture {
+   shaded?: boolean;
+}
 
 @UntilDestroy( { checkProperties: true } )
 @Component( {
@@ -23,10 +28,25 @@ import { UserDataService } from 'app/user/user-data.service';
 export class FixturesGridComponent implements OnInit, OnChanges {
 
    private _selectedFixture: Fixture;
+   public _fixtures: StyledFixture[];
+
    displayData: Array<any> = [];
    itemSize: number;
 
-   @Input() fixtures: Fixture[];
+   @Input() set fixtures( f: Fixture[] ) {
+      this._fixtures = [...f];
+      // Set Shaded property for date row styling
+      let shaded = false;
+      let previousFix = null;
+      for (const fix of this._fixtures) {
+         if ( previousFix && fix.date !== previousFix.date) {
+            shaded = !shaded;
+         }
+         fix.shaded = shaded;
+         previousFix = fix;
+      }
+   }
+
    @Input() entries: FixtureEntryDetails[];
    @Input() userEntries: Entry[];
 
@@ -116,7 +136,7 @@ export class FixturesGridComponent implements OnInit, OnChanges {
    }
 
    private showElement( fixture: Fixture ) {
-      const index = this.fixtures.findIndex( f => f === fixture );
+      const index = this._fixtures.findIndex( f => f === fixture );
 
       if ( index !== -1 && this.viewPort ) {
          this.viewPort.scrollToIndex( index );
