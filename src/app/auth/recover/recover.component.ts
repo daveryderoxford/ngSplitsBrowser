@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-recover',
@@ -14,26 +15,25 @@ export class RecoverComponent implements OnInit {
 
   constructor(private router: Router,
     private formBuilder: UntypedFormBuilder,
-    private afAuth: AngularFireAuth
+    private afAuth: AngularFireAuth, 
+    private snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
     this.recoverForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
     });
-    this.error = '';
   }
 
   async recover() {
     const emailAddress = this.recoverForm.get('email').value;
 
-    this.error = '';
-
     try {
       await this.afAuth.sendPasswordResetEmail( emailAddress );
+      this.router.navigate( ["/auth/login"]);
     } catch (err) {
       console.log('RecoverComponent: Error requesting password reset for email');
-      this.error = 'Error requesting password reset for email';
+      this.snackBar.open( 'Error requesting password reset for email', 'Close' , {duration: 3000});
     }
   }
 }

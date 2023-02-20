@@ -2,7 +2,7 @@
   <div>
     <mat-button-toggle #likedToggle disableRipple [checked]="this.outputFilter.likedOnly"
       (change)="likeClicked($event)">
-         <mat-icon [class.red]="likedToggle.checked">favorite</mat-icon>
+         <mat-icon [ngClass]="likedToggle.checked ? 'red': 'gray' ">favorite</mat-icon>
       Liked only
     </mat-button-toggle>
   </div>
