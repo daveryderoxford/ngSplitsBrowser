@@ -84,7 +84,7 @@
   <!-- Handset -->
   <mat-list *ngIf="handset" fxFill>
 
-    <mat-list-item (click)="actions.openMenu()" *cdkVirtualFor="let fixture of _fixtures"  [ngClass]="{ 'shaded': fixture.shaded }">
+    <mat-list-item (click)="actions.openMenu()" *cdkVirtualFor="let fixture of _fixtures"  [ngClass]="{ 'shaded': fixture?.shaded }">
 
       <div mat-line>
         <span fxFlex=50>{{fixture.date | fixturedate }}</span>

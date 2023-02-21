@@ -27,15 +27,15 @@
     <app-add-to-calendar [date]="fixtureDate()" [title]=fixture.name [location]="calanderlocation()"
       [details]="calanderDetails()"></app-add-to-calendar>
 
-    <div *ngIf="mapReservationSupported">
+    <div *ngIf="hasMapReservation()">
 
       <mat-divider></mat-divider>
 
-      <button *ngIf="hasMapReservation()" (click)="reserveMap()" mat-menu-item>
+      <button (click)="reserveMap()" mat-menu-item>
         Reserve Map
       </button>
 
-      <button *ngIf="hasMapReservation()" (click)="viewEntries()" mat-menu-item>
+      <button (click)="viewEntries()" mat-menu-item>
         Entry List
       </button>
 
