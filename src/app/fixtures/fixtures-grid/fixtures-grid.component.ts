@@ -38,8 +38,8 @@ export class FixturesGridComponent implements OnInit, OnChanges {
       // Set Shaded property for date row styling
       let shaded = false;
       let previousFix = null;
-      for (const fix of this._fixtures) {
-         if ( previousFix && fix.date !== previousFix.date) {
+      for ( const fix of this._fixtures ) {
+         if ( previousFix && fix.date !== previousFix.date ) {
             shaded = !shaded;
          }
          fix.shaded = shaded;
@@ -63,7 +63,7 @@ export class FixturesGridComponent implements OnInit, OnChanges {
 
    @Output() fixtureSelected = new EventEmitter<Fixture>();
 
-   @ViewChild(CdkVirtualScrollViewport) viewPort: CdkVirtualScrollViewport;
+   @ViewChild( CdkVirtualScrollViewport ) viewPort: CdkVirtualScrollViewport;
 
    likedEvents: string[] = [];
 
@@ -106,6 +106,14 @@ export class FixturesGridComponent implements OnInit, OnChanges {
          return this._selectedFixture.id === fixture.id;
       } else {
          return false;
+      }
+   }
+
+   rowClass( fixture: StyledFixture ): string {
+      if ( this.selected( fixture ) ) {
+         return 'selected';
+      } else {
+         return fixture.shaded ? 'shaded' : '';
       }
    }
 
@@ -184,7 +192,7 @@ export class FixturesGridComponent implements OnInit, OnChanges {
 
    /** retuns observable of css class to apply  */
    isEntered( fixture: Fixture ): boolean {
-      if (!this.userEntries) { return false; }
+      if ( !this.userEntries ) { return false; }
       const index = this.userEntries.findIndex( entry => entry.fixtureId === fixture.id );
       return index !== -1;
    }

@@ -120,12 +120,12 @@ mat-icon {
 }
 
 // Dynamic  styles
-tr:hover {
-  background: rgb(245,245,245);
-}
+//tr:hover {
+//  background: rgb(225, 225, 225);
+//}
 
 .selected {
-  background: rgb(225, 225, 225);
+  background: #90caf9 //  #E3F2FD; 
 }
 
 .handset-icon-size {
@@ -133,5 +133,5 @@ tr:hover {
 }
 
 .shaded {
-  background-color: #E3F2FD;
+  background-color: rgb(240, 240, 240);
 }

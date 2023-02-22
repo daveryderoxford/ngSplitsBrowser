@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <tr *cdkVirtualFor="let fixture of _fixtures" style="width:100%; min-height: 30px;"
-        (click)=eventClicked(fixture) [ngClass]="{ 'selected': selected(fixture), 'shaded': fixture.shaded }">
+        (click)=eventClicked(fixture) [ngClass]="rowClass(fixture)">
 
         <td class="liked">
           <button mat-icon-button matTooltip="Like/Unlike fixture" (click)="toggleReminder(fixture)">
