@@ -50,9 +50,9 @@ export class LoginComponent implements OnInit {
       }
    }
 
-   async signInWith(provider: AuthProvider, credentials?: any) {
+   async signInWith(provider: AuthProvider, credentials?: {email: string, password: string} ) {
 
-      let user: firebase.auth.UserCredential;
+      let userCredentials: firebase.auth.UserCredential;
 
       try {
          this.loading = true;
@@ -61,15 +61,15 @@ export class LoginComponent implements OnInit {
          switch (provider) {
 
             case "EmailAndPassword":
-               user = await this.afAuth.signInWithEmailAndPassword( credentials.email, credentials.password );
+               userCredentials = await this.afAuth.signInWithEmailAndPassword( credentials.email, credentials.password );
                break;
 
             case "Google":
-               user = await this._thirdPartySignIn(googleAuthProvider);
+               userCredentials = await this._thirdPartySignIn(googleAuthProvider);
                break;
 
             case "Facebook":
-               user = await this._thirdPartySignIn(facebookAuthProvider);
+               userCredentials = await this._thirdPartySignIn(facebookAuthProvider);
                break;
          }
          this._handleSignInSuccess();

@@ -37,7 +37,7 @@
         </mat-form-field>
 
         <mat-form-field>
-          <input matInput required formControlName="postcode" placeholder="Postcode">
+          <input matInput required formControlName="postcode" placeholder="Postcode" oninput="this.value = this.value.toUpperCase()">
           <mat-hint>For displaying fixture locations (UK)</mat-hint>
         </mat-form-field>
 

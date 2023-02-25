@@ -52,7 +52,7 @@ export class FixturesService {
             }
          } else {
             // set likedonly to false on logout
-            this.updateFilter( { ...this._filter$.value, likedOnly: false } ) ;           
+            this.updateFilter( { ...this._filter$.value, likedOnly: false } );
          }
       } );
 
@@ -94,37 +94,31 @@ export class FixturesService {
       this._selectedFixture$.next( fixture );
    }
 
-   private _showFixture( fix: Fixture, userdata: UserData, ftr: FixtureFilter ): boolean {
+   public _showFixture( fix: Fixture, userdata: UserData, ftr: FixtureFilter ): boolean {
 
       const fixdate = new Date( fix.date );
 
-      const timeOK = ( isSaturday( fixdate ) && ftr.time.sat === true ) ||
+      const timeFilterPassed = ( isSaturday( fixdate ) && ftr.time.sat === true ) ||
          ( isSunday( fixdate ) && ftr.time.sun === true ) ||
          ( !isWeekend( fixdate ) && ftr.time.weekday === true );
 
-      let gradeOK: boolean;
+      let gradeOFilterPassed: boolean;
       if ( ftr.gradesEnabled ) {
          const gradeFilter = ftr.grades.find( ( grade ) => grade.name === fix.grade );
 
-         gradeOK = gradeFilter.enabled &&
+         gradeOFilterPassed = gradeFilter.enabled &&
             differenceInMonths( fixdate, new Date() ) <= gradeFilter.time &&
             fix.distance < gradeFilter.distance;
       } else {
-         gradeOK = true;
+         gradeOFilterPassed = true;
       }
 
-      let likedOk: boolean;
-      if ( ftr.likedOnly ) {
-         if ( userdata ) {
-            likedOk = userdata.reminders.includes( fix.id );
-         } else {
-            likedOk = true;
-         }
-      } else {
-         likedOk = true;
-      }
-
-      return timeOK && gradeOK && likedOk;
+      let isLiked = false;
+      const likedOnly = ftr.likedOnly;
+      isLiked = userdata?.reminders.includes( fix.id );
+      
+      // For liked only show all liked events.  Otherwise filter based on time and grade fiilters
+      return likedOnly ? isLiked : timeFilterPassed && gradeOFilterPassed;
 
    }
 

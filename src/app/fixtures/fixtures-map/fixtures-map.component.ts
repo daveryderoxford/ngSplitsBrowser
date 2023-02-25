@@ -45,13 +45,18 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
    ngOnInit() {
 
-      // If the map is not null then reset it before creating new instance
-      if (this.map) {
-         this.map = this.map.remove();
-         console.log("FixtureMap:  Resetting null map");
-      }
 
-      //  const londonLatLng = { lat: 51.509865, lng: -0.118092 };
+   }
+
+
+   ngAfterViewInit() {
+
+      /* Leaflet calculates the map size before angular is full initialise so we need to
+        invalidate it once the view is complete. Short delay is required  see https://medium.com/ngconf/integrating-maps-into-your-angular-application-with-leaflet-b9aedb040735 */
+      this._loadMap();
+   }
+
+   private _loadMap() {
 
       this.map = new Map( 'map', { preferCanvas: true, zoomControl: false } ).setView( this._homeLocation, 9 );
 
@@ -70,18 +75,6 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
 
       this.setHomeLocation( this._homeLocation );
       this.setFixtures( this._fixtures );
-   }
-
-   ngAfterViewInit() {
-      /* Leaflet calculates the map size before angular is full initialise so we need to
-         invalidate it once the view is complete. Short delay is required  see https://medium.com/ngconf/integrating-maps-into-your-angular-application-with-leaflet-b9aedb040735 */
-      timer( 10 ).subscribe( () => {
-         if (this.map) {
-             this.map.invalidateSize();
-         } else {
-            console.log("FixtureMap: Initialiseing map null");
-         }
-      });
 
    }
 
