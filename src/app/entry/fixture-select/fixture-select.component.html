@@ -1,0 +1,42 @@
+<h1 mat-dialog-title>Select fixture</h1>
+
+<div mat-dialog-content>
+
+   <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input matInput [formControl]="filter" placeholder="Filter">
+      <mat-hint>Name, Club, Area</mat-hint>
+   </mat-form-field>
+
+   <mat-divider></mat-divider>
+
+   <ng-container *ngIf="fixtures$ | async as fixtures">
+
+      <cdk-virtual-scroll-viewport class="viewport" itemSize="72px">
+
+         <mat-selection-list #list [multiple]="multiselect">
+
+            <mat-list-option *cdkVirtualFor="let fixture of fixtures" [value]="fixture">
+               <div mat-line>
+                  <span fxFlex=50>{{fixture.date | date:'mediumDate' }}</span>
+                  <span fxFlex=30> {{fixture.club}}</span>
+               </div>
+               <p mat-line>
+                  {{fixture.name}}
+               </p>
+            <mat-divider></mat-divider>
+
+            </mat-list-option>
+
+         </mat-selection-list>
+      </cdk-virtual-scroll-viewport>
+
+
+      <div mat-dialog-actions>
+         <button mat-button mat-dialog-close>Cancel</button>
+         <button mat-button type="submit" (click)="onSubmit(list.selectedOptions)">OK</button>
+      </div>
+   </ng-container>
+
+
+</div>

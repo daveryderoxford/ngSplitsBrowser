@@ -27,14 +27,16 @@
       <button mat-list-item (click)='closeSidenav(["/about"])'>About</button>
       <button mat-list-item (click)='contact()'>Contact</button>
 
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          Admin
-        </mat-expansion-panel-header>
-        <mat-action-list>
-          <button mat-list-item (click)='closeSidenav(["/entry/mapregistration"])'>Map Registration</button>
-        </mat-action-list>
-      </mat-expansion-panel>
+      <ng-container *ngIf="authorised">
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            Admin
+          </mat-expansion-panel-header>
+          <mat-action-list>
+            <button mat-list-item (click)='closeSidenav(["/entry/mapregistration", { new: true}])'>Map Registration</button>
+          </mat-action-list>
+        </mat-expansion-panel>
+      </ng-container>
 
       <ng-container *ngIf="isAdmin()">
         <button mat-button (click)="scriptsClicked()">Scripts</button>

@@ -1,24 +1,67 @@
 {
   "index": "/index.html",
-  "assetGroups": [{
-    "name": "app",
-    "installMode": "prefetch",
-    "resources": {
-      "files": [
-        "/favicon.ico",
-        "/index.html",
-        "/*.css",
-        "/*.js"
-      ]
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "resources": {
+        "files": [
+          "/favicon.ico",
+          "/index.html",
+          "/*.css",
+          "/*.js"
+        ]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": [
+          "/assets/**"
+        ]
+      }
     }
-  }, {
-    "name": "assets",
-    "installMode": "lazy",
-    "updateMode": "prefetch",
-    "resources": {
-      "files": [
-        "/assets/**"
-      ]
+  ],
+  "dataGroups": [
+    {
+      "name": "Freshness - Fixtures",
+      "urls": [
+        "https://firebasestorage.googleapis.com/**/fixture**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 100,
+        "maxAge": "10d",
+        "timeout": "4s"
+      }
+    },
+    {
+      "name": "Performance - Fonts",
+      "urls": [
+        "https://fonts.gstatic.com**"
+      ],
+      "cacheConfig": {
+        "strategy": "performance",
+        "maxSize": 5,
+        "maxAge": "100d"
+      }
+    },
+    {
+      "name": "Freshness/staleWhileRevalidate - Map tiles - Not performance due to lack of CORS header",
+      "urls": [
+        "https://a.tile.osm.org**",
+        "https://b.tile.osm.org**",
+        "https://c.tile.osm.org**"
+      ],
+      "cacheConfig": {
+        "strategy": "freshness",
+        "maxSize": 100,
+        "maxAge": "100d",
+        "timeout": "0s"
+      }
     }
-  }]
+    }
+  ]
 }

@@ -14,6 +14,7 @@ import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import { EntryService } from '../entry.service';
+import { FixtureSelectComponent } from '../fixture-select/fixture-select.component';
 
 @UntilDestroy( { checkProperties: true } )
 @Component( {
@@ -44,7 +45,7 @@ export class MapRegistrationAdminComponent implements OnInit {
 
    ngOnInit() {
 
-      this.route.paramMap.subscribe( ( params: ParamMap ) => {
+       this.route.paramMap.subscribe( ( params: ParamMap ) => {
          this.id = params.get( 'id' );
          this.new = params.has( 'new' );
 
@@ -61,14 +62,32 @@ export class MapRegistrationAdminComponent implements OnInit {
                   this._createForm( details );
                   this.courses = JSON.parse( JSON.stringify( details.courses ) );
                } );
-         }
-      } );
+         } 
+      } ); 
    }
 
    private _createForm( data ) {
       this.form = this.formBuilder.group( {
          closingDate: [data.closingDate, [Validators.required]],
       } );
+   }
+
+   selectFixture() {
+      this._displayFixtureSelectDialog().subscribe( f => {
+         this.fixture = f[0];
+      });
+   }
+
+   private _displayFixtureSelectDialog(  ): Observable<Fixture[]> {
+
+      const dialogRef = this.dialog.open( FixtureSelectComponent, {
+         width: '350px',
+         maxWidth: '100vw',
+       //  maxHeight: '100vh',
+         data: { multiselect: false, initialFilter: "" },
+      } );
+
+      return dialogRef.afterClosed();
    }
 
    /** Add Course via dialog */
@@ -105,7 +124,7 @@ export class MapRegistrationAdminComponent implements OnInit {
       } );
    }
 
-   private _displayCourseDialog( course: EntryCourse ): Observable<EntryCourse> {
+     private _displayCourseDialog( course: EntryCourse ): Observable<EntryCourse> {
 
       const dialogRef = this.dialog.open( CourseDialogComponent, {
          width: '250px',
@@ -146,7 +165,7 @@ export class MapRegistrationAdminComponent implements OnInit {
 
          if ( this.new ) {
             // Create new instance and save it
-            const details = this.es.createNewEntryDetails( this.id, this.fixture );
+            const details = this.es.createNewEntryDetails( this.fixture.id, this.fixture );
             details.closingDate = closingDate;
             details.courses = this.courses;
             await this.es.saveNewEntryDetails( details );

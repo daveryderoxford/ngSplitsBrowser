@@ -28,8 +28,8 @@ export class FixturesService {
    private _fileContents$: Observable<Fixture[]> = this.storage.ref( "fixtures/uk" ).getDownloadURL().pipe(
       switchMap( url => this.http.get<Fixture[]>( url ) ),
       map( fixtures => this._futureFixtures( fixtures ) ),
-      shareReplay( 1 ),
       startWith( [] ),
+      shareReplay( 1 ),
       catchError( this.handleError<Fixture[]>( 'Fixture download', [] ) )
    );
 
@@ -56,6 +56,10 @@ export class FixturesService {
          }
       } );
 
+   }
+
+   allFixtues(): Observable<Fixture[]> {
+      return this._fileContents$;
    }
 
    getFixtures(): Observable<Fixture[]> {

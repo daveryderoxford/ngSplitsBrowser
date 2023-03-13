@@ -8,6 +8,7 @@ import { PendingChangesGuard } from 'app/shared/services/pending-changes-guard-s
 
 const routes: Routes = [
   { path: "entrylist/:id", component: EntryListComponent },
+  { path: "mapregistration", component: MapRegistrationAdminComponent, canDeactivate: [PendingChangesGuard], canActivate: [AuthGuard] },
   { path: "mapregistration/:id", component: MapRegistrationAdminComponent, canDeactivate: [PendingChangesGuard], canActivate: [AuthGuard] },
   { path: "enter/:fixtureId", component: EnterComponent, canDeactivate: [PendingChangesGuard], canActivate: [AuthGuard]  }
 ];

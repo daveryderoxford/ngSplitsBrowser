@@ -6,9 +6,23 @@
    <mat-card>
       <form *ngIf="form" [formGroup]="form" (ngSubmit)="onSubmit()">
 
+         <mat-card-header>
+            <mat-card-title>Map Reservation</mat-card-title>
+         </mat-card-header>
+
          <mat-card-content>
 
-            <div fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=15px>
+            <div fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=20px>
+               <mat-divider></mat-divider>
+
+               <p *ngIf="fixture">
+                  <b>{{ fixture.club}} - {{fixture.date | date:'mediumDate' }} </b>
+                   <br> {{ fixture.name | ellipsis: 40 }}
+               </p>
+
+               <button mat-flat-button color="primary" type=button (click)="selectFixture()">Select Fixture</button>
+
+               <mat-divider></mat-divider>
 
                <mat-form-field>
                   <input matInput formControlName="closingDate" [min]="minDate" [matDatepicker]="picker"
@@ -20,21 +34,21 @@
                <div fxLayoutAlign="start space-around">
                   Courses
                   <span fxFlex></span>
-                  <button mat-button type="button" (click)="addCourse()">
-                     ADD
+                  <button mat-stroked-button	type="button" (click)="addCourse()">
+                     Add
                      <mat-icon [ngStyle]="{'color':'green'}">add_circle</mat-icon>
                   </button>
                </div>
 
                <mat-chip-list #chipList class="mat-chip-list-stacked">
-                 
-                     <mat-chip *ngFor="let course of courses; index as i" selected="true" selectable="true" removable="true" (removed)="removeCourse(course)"
-                        (click)="editCourse(course, i)">
-                        {{course.name}}
-                        <span fxFlex></span>
-                        <mat-icon matChipRemove>cancel</mat-icon>
-                     </mat-chip>
-               
+
+                  <mat-chip *ngFor="let course of courses; index as i" selected="true" selectable="true"
+                     removable="true" color="accent" (removed)="removeCourse(course)" (click)="editCourse(course, i)">
+                     {{course.name}}
+                     <span fxFlex></span>
+                     <mat-icon matChipRemove>cancel</mat-icon>
+                  </mat-chip>
+
                </mat-chip-list>
 
             </div>
@@ -44,8 +58,8 @@
          <mat-card-actions>
 
             <div fxLayout="row" fxLayoutAlign="space-between center">
-               <button [disabled]="form.invalid || (!form.dirty && !coursesChanged) || busy" mat-raised-button color=primary
-                  type="submit">Save</button>
+               <button [disabled]="form.invalid || (!form.dirty && !coursesChanged) || busy" mat-raised-button
+                  color=primary type="submit">Save</button>
             </div>
 
          </mat-card-actions>

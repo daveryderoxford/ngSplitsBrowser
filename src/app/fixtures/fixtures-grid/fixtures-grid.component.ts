@@ -11,7 +11,6 @@ import { Entry, FixtureEntryDetails } from 'app/model/entry';
 import { LatLong } from 'app/model/fixture';
 import { LoginSnackbarService } from 'app/shared/services/login-snackbar.service';
 import { UserDataService } from 'app/user/user-data.service';
-import { isEqual } from 'date-fns';
 
 interface StyledFixture extends Fixture {
    shaded?: boolean;

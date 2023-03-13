@@ -108,7 +108,7 @@ export class AppComponent implements OnInit {
       this.afs.firestore.settings( {} );
    }
 
-   async closeSidenav( target: Array<any> ) {
+   async closeSidenav( target: Array<any>) {
       await this.sidenav.close();
       if ( target)  {
          await this.router.navigate( target );

@@ -67,7 +67,7 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "serviceWorker": true
+              "serviceWorker": false
             }
           },
           "defaultConfiguration": "production"
