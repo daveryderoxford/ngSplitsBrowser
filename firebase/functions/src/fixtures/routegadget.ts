@@ -1,9 +1,14 @@
 
 import { LatLng } from "@googlemaps/google-maps-services-js";
 import * as request from "request-promise";
+import { RGSITES, RGSite } from "./routegadgetclubs";
 
 type RGFormat = 'a' | 'b';
 type RGType = 'I' | 'N' | 'R' | 'L' | 'T';
+
+export interface RGSiteEvents extends RGSite {
+   events: RGEvent[]
+}
 
 
 export interface RGMap {
@@ -31,10 +36,7 @@ interface RGEventRaw {
    D: string;
    E: string;
    F: string;
-
 }
-
-const RGClubs = ['aire', 'sn'];
 
 class RGEvent {
    id: string;
@@ -51,56 +53,64 @@ class RGEvent {
       this.name = raw.name;
       this.club = raw.club;
       this.date = raw.date;
-      this.mapFilename = raw.mapid + '.' + (raw.suffix ?? 'jpg');
+      this.mapFilename = raw.mapid + '.' + ( raw.suffix ?? 'jpg' );
       this.worldFile = new Worldfile( raw );
    }
 }
 
-function RGBaseURL( club: string ) {
-   return "https://www." + club.toLowerCase() + ".routegadget.co.uk"
-}
-
-const skippedAreaWords = ['forest', 'wood', 'woods', 'common', 'heath', 'moor', 'moors', 'park', 'woods', 'valley', 'edge', 'country', 'hill', 'hills', 'university', 'town', 'city',
-   'north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest', 'tbc', 'tba'];
+const skippedAreaWords = ['forest', 'wood', 'woods', 'common', 'heath', 'moor', 'moors', 'park', 'valley', 'edge', 'country', 'hill', 'hills', 'estate', 'slieve', 'bryn', 'beck', 'crag', 'university', 'town', 'city',
+   'school', 'club', 'north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest', 'tbc', 'tba', 'and', 'the'];
 
 export class Routegadget {
-   clubs: Map< string, RGEvent[] > = new Map();
+   rgSitesMap: Map<string, RGSiteEvents> = new Map();
 
    constructor () { }
 
-   async initialise( clubs?: string[]) {
+   async initialise( sites?: RGSite[] ) {
 
-      if ( !clubs ) {
-         clubs = RGClubs;
+      if ( !sites ) {
+         sites = RGSITES;
       }
 
-      for ( const club of clubs ) {
-         const data = await this._readClubRouteGadgetEvents( club );
-         this.clubs.set( club.toLowerCase(), data) ; 
+      for ( const site of sites ) {
+         const events= await this._readRouteGadgetEvents( site );
+         this.rgSitesMap.set( site.shortName.toLowerCase(), { ...site, events: events } );
       }
    }
 
+   /**
+    *  Finds ficture area string in routegarget events for the club 
+    * The fixture area will match a rg event name if either:
+    *  1.  The complete area string in included in the event name OR
+    *  2.  Any word in area string (excluding  common names) is also occurs in the event name
+    *  All comparisons are case insensitive. 
+    */
    public findRoutemadgetMapByName( area: string, club: string ): RGMap[] {
-
-      const clubLower = club.toLowerCase();
-
-      const events = this.clubs.get( clubLower );
 
       const areaWords = area.toLowerCase().trim().split( " " ).filter( word => {
          return !skippedAreaWords.includes( word ) && word.length > 2;
       } );
+      // console.log( "Routgadget area:  " + area + "  Words: " + areaWords.toString());
 
-     // console.log( "Routgadget area:  " + area + "  Words: " + areaWords.toString());
+      const clubLower = club.toLowerCase();
+      const rgSite = this.rgSitesMap.get( clubLower );
 
-      const maps = events.filter( event => {
-         const ok = areaWords.some( word => event.name.toLowerCase().includes( word ) );
+      if ( !rgSite ) {
+         return([]);
+      }
+
+      const maps = rgSite.events.filter( event => {
+         const name = event.name.toLowerCase();
+         // either complete area string matches or filtered area worda occur in event name
+         const ok = name.includes( area ) ||
+                    areaWords.some( word => new RegExp( "\\b" + word + "\\b" ).test(name) );
          return ok;
       } ).map( event => {
-         const url = RGBaseURL( clubLower ) + "/kartat/" + event.mapFilename;
+         const url = rgSite.baseURL+ "kartat/" + event.mapFilename;
          return { eventid: event.id, mapid: event.mapid, name: event.name, URL: url }
       } );
 
-      console.log( "Routgadget maps:  " + JSON.stringify(maps) );
+      // console.log( "Routgadget maps:  " + JSON.stringify(maps) );
 
       return maps;
    }
@@ -111,18 +121,24 @@ export class Routegadget {
       return [];
    }
 
-   private async _readClubRouteGadgetEvents( club: string ): Promise<RGEvent[]> {
+   private async _readRouteGadgetEvents( site: RGSite ): Promise<RGEvent[]> {
 
-      const url = RGBaseURL( club ) + "/rg2/rg2api.php?type=events";
+      const url = site.baseURL + "rg2/rg2api.php?type=events";
 
-      console.log( url );
+      let rawEvents: RGEventRaw[] = [];
 
-      const jsonStr = await request( url, { method: "get" } );
-      const json = JSON.parse( jsonStr );
+      try {
+         const jsonStr = await request( url, { method: "get" } );
+         const json = JSON.parse( jsonStr );
 
-      const rawEvents: RGEventRaw[] = json?.data?.events;
+         rawEvents = json?.data?.events;
 
-      console.log( "Routgadget: Read Routegadget events. URL:" + url + "   Number of events:" + rawEvents.length );
+       //  console.log( "Routgadget: Club: " + site.shortName + " Number of events:" + rawEvents.length );
+      } catch ( e ) {
+         console.error( "Routgadget: Error encountered reading routegadget events for " + site.shortName + "   (" + url + ")\n" );
+         console.error( e.toString().slice( 0, 200 ) );
+         rawEvents = [];
+      }
 
       return rawEvents.map( raw => new RGEvent( raw ) );
    }
@@ -168,22 +184,22 @@ export class Worldfile {
       }
    }
 
-   getX( lng, lat ) {
+   getX( lng: number, lat: number ): number {
       return Math.round( ( ( this.E * lng ) - ( this.B * lat ) + this.xCorrection ) / this.AEDB );
    }
 
    // use worldfile to generate y value
-   getY( lng, lat ) {
+   getY( lng: number, lat: number ): number {
       return Math.round( ( ( -1 * this.D * lng ) + ( this.A * lat ) + this.yCorrection ) / this.AEDB );
    }
 
    // use worldfile to generate longitude
-   getLon( x, y ) {
+   getLon( x: number, y: number ): number {
       return ( this.A * x ) + ( this.B * y ) + this.C;
    }
 
    // use worldfile to generate latitude
-   getLat( x, y ) {
+   getLat( x: number, y: number ): number {
       return ( this.D * x ) + ( this.E * y ) + this.F;
    }
 

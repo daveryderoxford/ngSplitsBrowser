@@ -6,6 +6,7 @@ import { GT_OSGB } from "./geo_conversion";
 import { LatLong as LatLongPIO, PostCodeLookup } from "./postcode";
 import { convertPlace } from "./place_location";
 import * as admin from "firebase-admin";
+import { Routegadget } from "./routegadget";
 
 export class Fixtures {
    readonly BOFPDAURL =
@@ -27,6 +28,9 @@ export class Fixtures {
 
       console.log( "Making fixtures (includes getting postcodes)" );
       const fixtures = await this.makeFixtures( bofFixtures );
+
+      console.log( "Finding Routegadget maps)" );
+      await this.addRoutegadgetMaps(fixtures );
 
       console.log( "Saving fixtures" );
       await this.saveToStorage( fixtures );
@@ -146,6 +150,16 @@ export class Fixtures {
          default:
             throw new Error( "Fixtures: Unexpected bof grade encountered: " + bofGrade );
       }
+   }
+
+   async addRoutegadgetMaps(fixtures: Fixture[]) {
+      const rg = new Routegadget();
+      await rg.initialise();
+
+      for( const fixture of fixtures ) {
+         fixture.maps = rg.findRoutemadgetMapByName( fixture.area, fixture.club );
+      }
+
    }
 
    /** Save fixtures JSON file to Google Storage */

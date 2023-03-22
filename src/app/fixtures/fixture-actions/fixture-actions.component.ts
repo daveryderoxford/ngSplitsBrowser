@@ -121,4 +121,8 @@ export class FixtureActionsComponent implements AfterViewInit {
    fixtureDate(): Date {
       return new Date(this.fixture.date);
    }
+
+   mapView() {
+      this.router.navigate( ["/mapviewer"] );
+   }
 }

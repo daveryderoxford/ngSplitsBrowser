@@ -1,4 +1,4 @@
-import { GeoPoint } from 'firebase-admin/firestore';
+import { RGMap } from 'fixtures/routegadget';
 import { ISODateString } from './date';
 import { EventGrade, EventType, EventDiscipline } from './oevent';
 
@@ -29,4 +29,5 @@ export interface Fixture {
      webpage?: string;
      nearestTown?: string;
      association?: string;
+     maps? : RGMap[];
 }

@@ -13,6 +13,7 @@ const routes: Routes = [
    { path: "about", loadChildren: () => import( './about/about.module' ).then( m => m.AboutModule ) },
  //  { path: "graph", loadChildren: () => import( './results/results.module' ).then( m => m.ResultsModule ) },
    { path: "entry", loadChildren: () => import( './entry/entry.module' ).then( m => m.EntryModule ) },
+   { path: 'mapviewer', loadChildren: () => import('./mapviewer/mapviewer.module').then(m => m.MapviewerModule) },
 ];
 
 @NgModule( {

@@ -14,9 +14,9 @@
       <mat-divider></mat-divider>
     </ng-container>
 
-    <button *ngIf="!liked()" (click)="toggleReminder()" mat-menu-item>
-      Like
-    </button>
+  <button (click)="mapView()" mat-menu-item>
+    Maps
+  </button>
 
     <button *ngIf="liked()" (click)="toggleReminder()" mat-menu-item>
       UnLike
