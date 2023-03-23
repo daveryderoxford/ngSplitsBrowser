@@ -70,7 +70,7 @@ export class AngularImageViewerComponent implements OnInit, OnChanges {
   src: string[];
 
   @Input()
-  screenHeightOccupied: 0;             // In Px
+  screenHeightOccupied: number = 0;             // In Px
 
   @Input()
   index = 0;

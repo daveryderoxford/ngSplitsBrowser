@@ -1,19 +1,19 @@
 <div scroll="none">
    <mat-toolbar>
 
-      <button mat-button (click)="selected = selected -1" [disabled]="selected === 0">
+      <button mat-button (click)="imageViewer.prevImage(null)" [disabled]="imageViewer.index === 0">
          <mat-icon>arrow_back</mat-icon>
       </button>
 
-      <button mat-button [disabled]="selected >= rgData?.maps.length-1" (click)="selected = selected +1">
+      <button mat-button [disabled]="imageViewer.index >= rgData.maps.length-1" (click)="imageViewer.nextImage(null)">
          <mat-icon>arrow_forward</mat-icon>
       </button>
 
-      <span>{{rgData.maps[selected].name}}</span>
+      <span *ngIf="!handset">{{rgData.maps[imageViewer.index].name}}</span>
 
       <span fxFlex></span>
 
-      <a [href]="routegadgetURL()" mat-stroked-button color="primary" target="_blank">Routegadget</a>
+      <a [href]="routegadgetURL(imageViewer.index)" mat-stroked-button color="primary" target="_blank">Routegadget</a>
 
       <span fxFlex="20px"></span>
 
@@ -40,6 +40,6 @@
 
       </div>
 
-      <angular-image-viewer #imageViewer [src]="images" [config]="config" [(index)]="selected"></angular-image-viewer>
+      <angular-image-viewer #imageViewer [src]="images" [config]="config"></angular-image-viewer>
    </div>
 </div>
