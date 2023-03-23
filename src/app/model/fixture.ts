@@ -11,6 +11,11 @@ export interface Point {
    north: number;
 }
 
+export interface RGData {
+   baseURL: string;
+   maps: { id: string; name: string, mapfile: string }[];
+}
+
 export interface Fixture {
      id: string;
      date: ISODateString;
@@ -28,4 +33,5 @@ export interface Fixture {
      nearestTown: string;
      association: string;
      distance?: number;
+     rg: RGData;
 }

@@ -19,6 +19,8 @@ export class Fixtures {
    /** Read BOF PDA data from URL and parse it. */
    public async processFixtures() {
 
+      console.log("Fixtures version 1.0.1")
+
       console.log( "Loading BOF PDA Data" );
       const text = await this.loadBOFPDA();
 
@@ -29,7 +31,7 @@ export class Fixtures {
       console.log( "Making fixtures (includes getting postcodes)" );
       const fixtures = await this.makeFixtures( bofFixtures );
 
-      console.log( "Finding Routegadget maps)" );
+      console.log( "Finding Routegadget maps" );
       await this.addRoutegadgetMaps(fixtures );
 
       console.log( "Saving fixtures" );
@@ -157,7 +159,7 @@ export class Fixtures {
       await rg.initialise();
 
       for( const fixture of fixtures ) {
-         fixture.maps = rg.findRoutemadgetMapByName( fixture.area, fixture.club );
+         fixture.rg = rg.getRoutegadgetData( fixture.area, fixture.club );
       }
 
    }

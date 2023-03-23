@@ -1,4 +1,3 @@
-import { RGMap } from 'fixtures/routegadget';
 import { ISODateString } from './date';
 import { EventGrade, EventType, EventDiscipline } from './oevent';
 
@@ -10,6 +9,11 @@ export interface LatLong {
 export interface Point {
    east:number;
    north: number;
+}
+
+export interface RGData {
+   baseURL: string;
+   maps: { id: string; name: string, mapfile: string }[];
 }
 
 export interface Fixture {
@@ -29,5 +33,5 @@ export interface Fixture {
      webpage?: string;
      nearestTown?: string;
      association?: string;
-     maps? : RGMap[];
+     rg? : RGData;
 }

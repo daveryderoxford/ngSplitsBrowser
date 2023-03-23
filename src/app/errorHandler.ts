@@ -3,7 +3,6 @@ import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DialogsService } from './shared';
 
-
 /** Global error handler */
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {

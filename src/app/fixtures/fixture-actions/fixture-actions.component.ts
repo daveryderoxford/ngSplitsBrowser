@@ -123,6 +123,7 @@ export class FixtureActionsComponent implements AfterViewInit {
    }
 
    mapView() {
-      this.router.navigate( ["/mapviewer"] );
+      this.router.navigate( ["/mapviewer"], { queryParams: { rgdata: JSON.stringify(this.fixture.rg)}  }  );
    }
 }
+

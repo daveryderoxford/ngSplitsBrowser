@@ -1,0 +1,6 @@
+.top-left {
+   position: absolute;
+   top: 100px;
+   left: 20px;
+   z-index: 1000; // This is the same z order as the leaflet controls. 
+}

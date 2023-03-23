@@ -1,5 +1,5 @@
-
 import { LatLng } from "@googlemaps/google-maps-services-js";
+import { RGData } from "model/fixture";
 import * as request from "request-promise";
 import { RGSITES, RGSite } from "./routegadgetclubs";
 
@@ -8,14 +8,6 @@ type RGType = 'I' | 'N' | 'R' | 'L' | 'T';
 
 export interface RGSiteEvents extends RGSite {
    events: RGEvent[]
-}
-
-
-export interface RGMap {
-   eventid: string;
-   mapid: string;
-   name: string;
-   URL: string;
 }
 
 interface RGEventRaw {
@@ -40,20 +32,19 @@ interface RGEventRaw {
 
 class RGEvent {
    id: string;
-   mapid: string;
    name: string;
-   date: string;
    club: string;
-   mapFilename: string;
+   date: string;
+   mapfile: string;
+   mapext: string;
    worldFile: Worldfile;
 
    constructor ( raw: RGEventRaw ) {
       this.id = raw.id;
-      this.mapid = raw.mapid;
       this.name = raw.name;
       this.club = raw.club;
       this.date = raw.date;
-      this.mapFilename = raw.mapid + '.' + ( raw.suffix ?? 'jpg' );
+      this.mapfile = raw.mapid + '.' + ( raw.suffix ?? 'jpg' );
       this.worldFile = new Worldfile( raw );
    }
 }
@@ -73,7 +64,7 @@ export class Routegadget {
       }
 
       for ( const site of sites ) {
-         const events= await this._readRouteGadgetEvents( site );
+         const events = await this._readRouteGadgetEvents( site );
          this.rgSitesMap.set( site.shortName.toLowerCase(), { ...site, events: events } );
       }
    }
@@ -85,7 +76,7 @@ export class Routegadget {
     *  2.  Any word in area string (excluding  common names) is also occurs in the event name
     *  All comparisons are case insensitive. 
     */
-   public findRoutemadgetMapByName( area: string, club: string ): RGMap[] {
+   public getRoutegadgetData( area: string, club: string ): RGData {
 
       const areaWords = area.toLowerCase().trim().split( " " ).filter( word => {
          return !skippedAreaWords.includes( word ) && word.length > 2;
@@ -96,27 +87,30 @@ export class Routegadget {
       const rgSite = this.rgSitesMap.get( clubLower );
 
       if ( !rgSite ) {
-         return([]);
+         return ( null );
       }
 
       const maps = rgSite.events.filter( event => {
          const name = event.name.toLowerCase();
          // either complete area string matches or filtered area worda occur in event name
          const ok = name.includes( area ) ||
-                    areaWords.some( word => new RegExp( "\\b" + word + "\\b" ).test(name) );
+            areaWords.some( word => new RegExp( "\\b" + this.escapeRegExp( word ) + "\\b" ).test( name ) );
          return ok;
       } ).map( event => {
-         const url = rgSite.baseURL+ "kartat/" + event.mapFilename;
-         return { eventid: event.id, mapid: event.mapid, name: event.name, URL: url }
+         return { id: event.id, name: event.name, mapfile: event.mapfile }
       } );
 
       // console.log( "Routgadget maps:  " + JSON.stringify(maps) );
 
-      return maps;
+      return { baseURL: rgSite.baseURL, maps: maps };
+   }
+
+   escapeRegExp( string ) {
+      return string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // $& means the whole matched string
    }
 
    /** Returns URLs */
-   findRoutemadgetMapByLocation( latlong: LatLng ): RGMap[] {
+   findRoutemadgetMapByLocation( latlong: LatLng ): RGData[] {
       // TODO
       return [];
    }
@@ -133,7 +127,7 @@ export class Routegadget {
 
          rawEvents = json?.data?.events;
 
-       //  console.log( "Routgadget: Club: " + site.shortName + " Number of events:" + rawEvents.length );
+         //  console.log( "Routgadget: Club: " + site.shortName + " Number of events:" + rawEvents.length );
       } catch ( e ) {
          console.error( "Routgadget: Error encountered reading routegadget events for " + site.shortName + "   (" + url + ")\n" );
          console.error( e.toString().slice( 0, 200 ) );
@@ -157,7 +151,6 @@ export class Worldfile {
    D: number;
    E: number;
    F: number;
-
 
    constructor ( wf: { A: string; B: string; C: string; D: string; E: string; F: string; } ) {
 

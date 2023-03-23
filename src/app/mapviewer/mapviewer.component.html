@@ -1,20 +1,45 @@
-  <div scroll="none">
-  <mat-toolbar>
+<div scroll="none">
+   <mat-toolbar>
 
-   <button mat-button (click)="selected = selected -1" [disabled]="selected === 0" >
-      <mat-icon>arrow_back</mat-icon>
-   </button
-   
-   ><button mat-button [disabled]="selected >= maps.length-1" (click)="selected = selected +1">
-      <mat-icon>arrow_forward</mat-icon>
-   </button>
-   <span fxFlex></span>
-   <button mat-button (click)="location.back">
-      <mat-icon>close</mat-icon>
-  </button>
+      <button mat-button (click)="selected = selected -1" [disabled]="selected === 0">
+         <mat-icon>arrow_back</mat-icon>
+      </button>
 
-</mat-toolbar>
+      <button mat-button [disabled]="selected >= rgData?.maps.length-1" (click)="selected = selected +1">
+         <mat-icon>arrow_forward</mat-icon>
+      </button>
 
-<app-map-image [imageURL]="'https://www.sn.routegadget.co.uk/kartat/154.gif'"></app-map-image>
+      <span>{{rgData.maps[selected].name}}</span>
 
+      <span fxFlex></span>
+
+      <a [href]="routegadgetURL()" mat-stroked-button color="primary" target="_blank">Routegadget</a>
+
+      <span fxFlex="20px"></span>
+
+      <button mat-button (click)="location.back()">
+         <mat-icon>close</mat-icon>
+      </button>
+
+   </mat-toolbar>
+
+   <div>
+      <div class="top-left" fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=15px>
+
+         <button mat-fab color=primary (click)="imageViewer.zoomIn()">
+            <mat-icon>zoom_in</mat-icon>
+         </button>
+
+         <button mat-fab color=primary (click)="imageViewer.zoomOut()">
+            <mat-icon>zoom_out</mat-icon>
+         </button>
+
+         <button mat-fab color=primary (click)="imageViewer.reset()">
+            <mat-icon>crop_free</mat-icon>
+         </button>
+
+      </div>
+
+      <angular-image-viewer #imageViewer [src]="images" [config]="config" [(index)]="selected"></angular-image-viewer>
+   </div>
 </div>

@@ -50,8 +50,8 @@ export async function convertPlace( area: string, town: string ): Promise<LatLon
          if ( response.data.status === Status.OK ) {
             ret = response.data.results[0].geometry.location;
          } else if ( response.data.status === Status.ZERO_RESULTS || response.data.status === Status.NOT_FOUND ) {
-            console.log(
-               `GeoConversion:  Address not found: ${address}  Status: ${response.data.status}  Message: ${response.data.error_message} ` );
+       //     console.log(
+        //       `GeoConversion:  Address not found: ${address}  Status: ${response.data.status}  Message: ${response.data.error_message} ` );
             ret = null;
          } else {
             console.log(
@@ -64,7 +64,7 @@ export async function convertPlace( area: string, town: string ): Promise<LatLon
          ret = null;
       }
    } else {
-      console.log( `GeoConversion: No address specified.  Area: ${area}   Town:  ${town}` );
+ //     console.log( `GeoConversion: No address specified.  Area: ${area}   Town:  ${town}` );
       ret = null;
    }
 

@@ -21,7 +21,7 @@ const int = {
    "notes": ""
 };
 
-describe( 'Routegaedget', () => {
+describe.only( 'Routegaedget', () => {
 
    it( 'should read routegadget events for specified clubs', async () => {
 
@@ -36,7 +36,18 @@ describe( 'Routegaedget', () => {
 
       expect( gr.rgSitesMap.size ).to.equal( RGSITES.length );
 
+      const ret = gr.getRoutegadgetData( 'xxx', 'SN' );
+      expect( ret.baseURL ).to.equal( sn.baseURL );
+
    } ).timeout( 20000 );
+
+   it( 'should return null if event does not exist in routegagdte', async () => {
+      const gr = new Routegadget();
+
+      await gr.initialise( [sn] );
+
+
+   });
 
    it( 'should read clubs events for routegadget', async () => {
 
@@ -44,15 +55,11 @@ describe( 'Routegaedget', () => {
 
       await gr.initialise( [sn] );
 
-      expect( gr.rgSitesMap.size ).to.equal( 1 );
+      const ret = gr.getRoutegadgetData( 'Merrist', 'XXX' );
 
-      const c = gr.rgSitesMap;
-
-      const events = c.get( 'sn' ).events;
-
-      expect( events.length >= 157 );
-
+      expect( ret).to.equal(null);
    } );
+
 
    it( 'should load events for a specified area', async () => {
 
@@ -60,10 +67,11 @@ describe( 'Routegaedget', () => {
 
       await gr.initialise( [sn] );
 
-      const ret = gr.findRoutemadgetMapByName( 'Merrist', 'SN' );
+      const ret = gr.getRoutegadgetData( 'Merrist', 'SN' );
 
-      expect( ret.length ).to.equal( 4 );
-      expect( ret[0] ).to.deep.equal( { eventid: 26, mapid: 26, name: "Saturday Series - Merrist Wood", URL: 'https://www.sn.routegadget.co.uk/kartat/26.jpg' } );
+      expect( ret.baseURL ).to.equal( sn.baseURL );
+      expect( ret.maps.length ).to.equal( 4 );
+      expect( ret.maps[0] ).to.deep.equal( { id: 26, name: "Saturday Series - Merrist Wood", mapfile: "26.jpg"} );
 
    } );
 
@@ -73,10 +81,10 @@ describe( 'Routegaedget', () => {
 
       await gr.initialise( [sn] );
 
-      const ret = gr.findRoutemadgetMapByName( 'mErrist', 'SN' );
+      const ret = gr.getRoutegadgetData( 'mErrist', 'SN' );
 
-      expect( ret.length ).to.equal( 4 );
-      expect( ret[0] ).to.deep.equal( { eventid: 26, mapid: 26, name: "Saturday Series - Merrist Wood", URL: 'https://www.sn.routegadget.co.uk/kartat/26.jpg' } );
+      expect( ret.maps.length ).to.equal( 4 );
+      expect( ret.maps[0] ).to.deep.equal( { id: 26, name: "Saturday Series - Merrist Wood", mapfile: "26.jpg" } );
 
    } );
 
@@ -89,28 +97,28 @@ describe( 'Routegaedget', () => {
 
       // Ignore common keywords
       //Note: the whole area string will still match so we specify multipe skipped words
-      expect( gr.findRoutemadgetMapByName( 'Common Woods', 'SN' ).length ).to.equal( 0 );
-      expect( gr.findRoutemadgetMapByName( 'woods and', 'SN' ).length ).to.equal( 0 );
+      expect( gr.getRoutegadgetData( 'Common Woods', 'SN' ).maps.length ).to.equal( 0 );
+      expect( gr.getRoutegadgetData( 'woods and', 'SN' ).maps.length ).to.equal( 0 );
 
       // Southwood is found and country, part are ignored
-      ret = gr.findRoutemadgetMapByName( 'Southwood Country Park', 'SN' )
-      expect( ret.length ).to.equal( 2 );
-      expect( ret[1] ).to.deep.equal( { eventid: 156, mapid: 154, name: 'Southwood Country Park', URL: 'https://www.sn.routegadget.co.uk/kartat/154.gif' } );
+      ret = gr.getRoutegadgetData( 'Southwood Country Park', 'SN' )
+      expect( ret.maps.length ).to.equal( 2 );
+      expect( ret.maps[1] ).to.deep.equal( { id: 156, name: 'Southwood Country Park', mapfile: "154.gif" } );
 
       // Two letter word is ignored.  
-      expect( gr.findRoutemadgetMapByName( 'Common st', 'SN' ).length ).to.equal( 0 );
+      expect( gr.getRoutegadgetData( 'Common st', 'SN' ).maps.length ).to.equal( 0 );
    } );
 
-   it.only( 'and should be excluded (Interlopers test)', async () => {
+   it( 'and should be excluded (Interlopers test)', async () => {
 
       const gr = new Routegadget();
 
       await gr.initialise( [int] );
 
-      const ret = gr.findRoutemadgetMapByName( "Holyrood and Craigmillar", 'INT' );
+      const ret = gr.getRoutegadgetData( "Holyrood and Craigmillar", 'INT' );
 
       //  5 events expected for interlopers containg Craigmillar
-      expect( ret.length ).to.equal( 5 );
+      expect( ret.maps.length ).to.equal( 5 );
 
    } );
 
@@ -120,10 +128,10 @@ describe( 'Routegaedget', () => {
 
       await gr.initialise( [sn] );
 
-      const ret = gr.findRoutemadgetMapByName( 'Merrist Wisley', 'SN' );
+      const ret = gr.getRoutegadgetData( 'Merrist Wisley', 'SN' );
 
       //  11 events for both wisley and merrist
-      expect( ret.length ).to.equal( 11 );
+      expect( ret.maps.length ).to.equal( 11 );
 
    } );
 
