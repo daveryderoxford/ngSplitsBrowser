@@ -35,6 +35,7 @@ class RGEvent {
    name: string;
    club: string;
    date: string;
+   mapid: number;
    mapfile: string;
    mapext: string;
    worldFile: Worldfile;
@@ -44,13 +45,14 @@ class RGEvent {
       this.name = raw.name;
       this.club = raw.club;
       this.date = raw.date;
+      this.mapid = parseInt( raw.mapid );
       this.mapfile = raw.mapid + '.' + ( raw.suffix ?? 'jpg' );
       this.worldFile = new Worldfile( raw );
    }
 }
 
-const skippedAreaWords = ['forest', 'wood', 'woods', 'common', 'heath', 'moor', 'moors', 'park', 'valley', 'edge', 'country', 'hill', 'hills', 'estate', 'slieve', 'bryn', 'beck', 'crag', 'university', 'town', 'city',
-   'school', 'club', 'north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest', 'tbc', 'tba', 'and', 'the'];
+const skippedAreaWords = ['forest', 'wood', 'woods', 'common', 'heath', 'moor', 'moors', 'park', 'valley', 'edge', 'country', 'hill', 'hills', 'burrows', 'estate', 'slieve', 'bryn', 'beck', 'crag', 'university', 'town', 'city',
+   'school', 'club', 'north', 'south', 'east', 'west', 'northeast', 'northwest', 'southeast', 'southwest', 'tbc', 'tba', 'and', 'the', 'oxford'];
 
 export class Routegadget {
    rgSitesMap: Map<string, RGSiteEvents> = new Map();
@@ -96,17 +98,26 @@ export class Routegadget {
          const ok = name.includes( area ) ||
             areaWords.some( word => new RegExp( "\\b" + this.escapeRegExp( word ) + "\\b" ).test( name ) );
          return ok;
+      } ).sort( ( a, b ) => {
+         // Sort to have matches complete area string first followed by sort by event id order.  
+         const amatches = a.name.includes( area );
+         const bmatches = b.name.includes( area );
+         if ( amatches === bmatches ) {
+            return parseInt( b.id ) - parseInt( a.id);
+         } else {
+            return amatches ? 1 : -1;
+         }
       } ).map( event => {
          return { id: event.id, name: event.name, mapfile: event.mapfile }
-      } );
+      });
 
       // console.log( "Routgadget maps:  " + JSON.stringify(maps) );
 
       return { baseURL: rgSite.baseURL, maps: maps };
    }
 
-   escapeRegExp( string ) {
-      return string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // $& means the whole matched string
+   escapeRegExp( s: string ): string {
+      return s.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' ); // $& means the whole matched string
    }
 
    /** Returns URLs */
