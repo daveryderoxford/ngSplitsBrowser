@@ -3,17 +3,16 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import firebase from "firebase/compat/app";
-import { Utils } from 'app/shared';
 
 export type AuthProvider = "EmailAndPassword" | "Google" | "Facebook";
 
 const facebookAuthProvider = new firebase.auth.FacebookAuthProvider();
 const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
 
-interface LoginCredentials {
-   email: string;
-   passord: string;
-}
+ const isInStandaloneMode = () =>
+   ( window.matchMedia( '(display-mode: standalone)' ).matches ) ||
+   ( ( window.navigator as any ).standalone ) ||
+   document.referrer.includes( 'android-app://' )
 
 @Component({
    selector: 'app-login',
@@ -85,7 +84,7 @@ export class LoginComponent implements OnInit {
     * TODO Review which method is better for mobile devices where popups are not handled as well
    */
    private async _thirdPartySignIn(provider): Promise<firebase.auth.UserCredential> {
-      if (Utils.isInStandaloneMode()) {
+      if (isInStandaloneMode()) {
          await firebase.auth().signInWithRedirect(provider);
          return await firebase.auth().getRedirectResult();
       } else {
@@ -104,4 +103,3 @@ export class LoginComponent implements OnInit {
       this.router.navigateByUrl(this.returnUrl);
    }
 }
-

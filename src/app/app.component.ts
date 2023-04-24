@@ -5,7 +5,6 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { BulkImportService } from 'scripts/bulk-import';
 import { SidenavService } from './shared/services/sidenav.service';
 import firebase from "firebase/compat/app";
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -31,7 +30,6 @@ export class AppComponent implements OnInit {
       private afAuth: AngularFireAuth,
       private sidebarService: SidenavService,
       private snackbar: MatSnackBar,
-      private bs: BulkImportService,
       private snackBar: MatSnackBar,
       private breakpointObserver: BreakpointObserver,
    ) {
@@ -176,7 +174,6 @@ export class AppComponent implements OnInit {
    }
 
    async scriptsClicked() {
-      await this.bs.loadEvents();
       await this.sidenav.close();
 
    }

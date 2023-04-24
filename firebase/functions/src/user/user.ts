@@ -12,7 +12,6 @@ function createUserData(): UserData {
         nationality: "",
         nationalId: "",
         autoFind: true,
-        results: [],
         fixtures: [],
         ecards: [],
         resultsLastupDated: new Date().toISOString(),
@@ -24,7 +23,7 @@ function createUserData(): UserData {
     return userdata;
 }
 
-export const createUser = functions.auth.user().onCreate(async (user: any, context) => {
+export const createUser = functions.region( 'europe-west1' ).auth.user().onCreate(async (user: any, context) => {
     // Create user data when a user is created
     const userdata = createUserData();
     userdata.key = user.uid;
@@ -37,7 +36,7 @@ export const createUser = functions.auth.user().onCreate(async (user: any, conte
     }
 } );
 
-export const deleteUser = functions.auth.user().onDelete(async (user: any) => {
+export const deleteUser = functions.region( 'europe-west1' ).auth.user().onDelete(async (user: any) => {
     // When a user is deleted mark the user data as archived
     try {
         await admin.firestore().doc( 'users/' + user.uid ).update( { archived: true } );

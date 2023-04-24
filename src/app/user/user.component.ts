@@ -5,19 +5,13 @@ import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } fr
 import { MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { EventService } from "app/events/event.service";
 import { FixturesService } from "app/fixtures/fixtures.service";
 import { ControlCardTypes, UserData } from "app/model";
 import { Nations } from "app/model/nations";
-import { UserResult } from "app/model/user";
-import { ResultsSelectionService } from "app/results/results-selection.service";
-import { DialogsService, Utils } from "app/shared";
-import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
-import { UserDataService } from "app/user/user-data.service";
+import { DialogsService } from "app/shared";
 import firebase from "firebase/compat/app";
-import isEqual from 'lodash/isequal';
-import { forkJoin, Observable, of, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { UserDataService } from "./user-data.service";
 
 @UntilDestroy()
 @Component( {
@@ -45,9 +39,7 @@ export class UserComponent implements OnInit {
     private afAuth: AngularFireAuth,
     private router: Router,
     private usd: UserDataService,
-    private rs: ResultsSelectionService,
-    private es: EventService,
-    private fs: FixturesService, 
+    private fs: FixturesService,
     private dialog: MatDialog,
     private dialogService: DialogsService
   ) {
@@ -65,12 +57,12 @@ export class UserComponent implements OnInit {
 
   ngOnInit() {
     this.afAuth.authState
-         .pipe( untilDestroyed(this))
-         .subscribe( loggedIn => this.loginChanged( loggedIn ) );
+      .pipe( untilDestroyed( this ) )
+      .subscribe( loggedIn => this.loginChanged( loggedIn ) );
 
     this.usd.user$
-          .pipe( untilDestroyed( this ) )
-          .subscribe( userData => this.userChanged( userData ) );
+      .pipe( untilDestroyed( this ) )
+      .subscribe( userData => this.userChanged( userData ) );
   }
 
   private _ecardsControl(): UntypedFormArray {
@@ -110,7 +102,7 @@ export class UserComponent implements OnInit {
 
   private _createEcard( id: string, type: string ): UntypedFormGroup {
     return this.formBuilder.group( {
-      id: [id, [Validators.required, Validators.pattern( "[0-9]+")]],
+      id: [id, [Validators.required, Validators.pattern( "[0-9]+" )]],
       type: [type, [Validators.required]]
     } );
   }
@@ -135,96 +127,18 @@ export class UserComponent implements OnInit {
     return this.userForm.get( 'ecards' )['controls'];
   }
 
- async save() {
+  async save() {
 
     const updatedUserData: UserData = null;
 
-   this.busy = true;
-   try {
-   await this.usd.updateDetails( this.userForm.value );
-   console.log( 'UserComponnet: User results saved' );
-   this.fs.updatePostcode( this.userForm.value.postcode );
-   } finally {
+    this.busy = true;
+    try {
+      await this.usd.updateDetails( this.userForm.value );
+      console.log( 'UserComponnet: User results saved' );
+      this.fs.updatePostcode( this.userForm.value.postcode );
+    } finally {
       this.busy = false;
-   }
-    /*
-    .pipe(
-      tap( userData => updatedUserData = userData ),
-      switchMap( () => this.findUserResults( updatedUserData ) ),
-      map( foundResults => this.removeAlreadyInUserResults( foundResults, updatedUserData.results ) ),
-      switchMap( ( foundResults ) => this.selectResultsToSave( foundResults ) ),
-      switchMap( selectedResults => this.saveCompetitorResults( selectedResults ) )
-    )*/
-  }
-
-  /** Returns found results that are not already in the users results based on ecardId and type  */
-  removeAlreadyInUserResults( foundResults: UserResult[], allResults: UserResult[] ): UserResult[] {
-
-    for ( const userResult of allResults ) {
-      foundResults = foundResults.filter( found => {
-        const duplicate =
-          userResult.event.key === found.event.key &&
-          userResult.ecardId === found.ecardId;
-        return !duplicate;
-      } );
     }
-    return ( foundResults );
-  }
-
-  /** Saves all competitor results emiting a value when all have been saved. */
-  saveCompetitorResults( userResults: UserResult[] ): Observable<void> {
-    const requests: Observable<void>[] = [];
-    for ( const found of userResults ) {
-      requests.push( this.usd.addResult( found ) );
-    }
-
-    return forkJoin( requests ).pipe( map( () => { } ) );
-  }
-
-  /** Displays dialog with user results found and returns the results the user has selected */
-  selectResultsToSave( foundResults: UserResult[] ): Observable<UserResult[]> {
-    if ( foundResults.length > 0 ) {
-      const dialogRef = this.dialog.open( ResultsFoundDialogComponent, { width: '300px', data: foundResults } );
-      return dialogRef.afterClosed();
-    } else {
-      return of( [] );
-    }
-  }
-
-  /** Finds results based on any unchanged field.
-   *  Matches based on ecard
-   */
-  async findUserResults( updatedUser: UserData ): Promise<UserResult[]> {
-    const originalUser = this.originalUserData;
-    let resultsFound: Array<UserResult> = [];
-
-    // Find results for any ecards that have changed.
-    for ( const ecard of updatedUser.ecards ) {
-      if ( !originalUser || !originalUser.ecards.find( origEcard => isEqual( ecard, origEcard ) ) ) {
-        resultsFound = resultsFound.concat( await this.usd.findUserResults( ecard ) );
-      }
-    }
-
-    /** TO DO do we want to search by name as well?
-    if (
-      !originalUser ||
-      originalUser.firstName !== updatedUser.firstName ||
-      originalUser.lastName !== updatedUser.lastName ||
-      originalUser.club !== updatedUser.club
-    ) {
-      resultsFound = resultsFound.concat(
-        await this.cds.searchResultsByName(
-          updatedUser.firstName,
-          updatedUser.lastName,
-          updatedUser.club
-        )
-      );
-    } */
-
-    // Remove duplicated from found results as may have been found for ecard and name
-    Utils.removeDuplicates( resultsFound );
-
-    return resultsFound;
   }
 
   canDeactivate(): boolean {
