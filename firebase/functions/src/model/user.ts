@@ -2,7 +2,6 @@
 /** data associated with a user */
 import { ControlCardType, OEvent } from "./oevent";
 import { ISODateString } from "./date";
-import { GradeFilter } from "./fixture-filter";
 
 export interface ECard {
     id: string;
@@ -21,15 +20,12 @@ export interface UserInfo {
     autoFind: boolean;
     resultsLastupDated: ISODateString;
     postcode: string;
-    fixtureGradeFilters?: GradeFilter[];
 }
 
 /** All the user data stored for the user */
 export interface UserData extends UserInfo {
     key: string;  // Matches with the users Firebase reference
     results: UserResult[];
-    fixtures: UserFixture[] | UserReservation[];
-    reminders: string[];  // array of eventIds
     archived: boolean;
 }
 
@@ -56,13 +52,8 @@ export interface UserResult {
         classWinningTime: number;
     };
 }
-
 export interface UserFixture {
     eventId: string;
     date: string;
     name: string;
-}
-export interface UserReservation extends UserFixture {
-    course: string;
-    waitinglist?: number;
 }
