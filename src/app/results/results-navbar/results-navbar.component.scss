@@ -1,0 +1,77 @@
+// Import theming functions
+@use '@angular/material' as mat;
+
+// Include non-theme styles for core.
+@include mat.core();
+
+.results-navbar-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 8px 16px;
+  background: blue;
+
+  > .mat-button {
+    &:last-child {
+      margin-left: auto;
+    }
+  }
+}
+
+.fill-remaining-space {
+  // This fills the remaining space, by using flexbox. 
+  // Every toolbar row uses a flexbox row layout.
+  flex: 1 1 auto;
+}
+
+.displayOptions {
+  font-size: 14px;
+}
+
+.flex-item {
+  margin-right:10px
+}
+
+.align-baseline {
+  align-self: flex-end;
+}
+
+.results-navbar-icon {
+  height: 21px;
+  margin: 0 7px 2px 0;
+  vertical-align: middle;
+}
+
+
+
+///Mterial2 stykes
+
+.docs-navbar {
+  display: none;
+}
+
+.docs-navbar-show-small {
+  display: none;
+}
+
+/**
+  * Rules for when the device is detected to be a small screen.
+  * Moves content two rows instead of one.
+  */
+@media (max-width: 720px) {
+  .docs-navbar-hide-small {
+    display: none;
+  }
+
+  .docs-navbar-show-small {
+    display: block;
+  }
+
+  .docs-navbar {
+    display: flex;
+  }
+
+  .docs-navbar--github-logo {
+    margin: 0;
+  }
+}

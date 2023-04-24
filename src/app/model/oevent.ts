@@ -31,3 +31,52 @@ export type ControlCardType = "SI" | "Emit" | "Other";
 export class ControlCardTypes {
     static types: Array<ControlCardType> = ["SI", "Emit" , "Other"];
 }
+
+export type SplitsFileFormat = "auto" | "IOFv3" |  "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML" ;
+
+export interface EventInfo {
+    name: string;
+    nationality: string;
+    date: ISODateString;
+    club: string;
+    grade: EventGrade;
+    type: EventType;
+    discipline: EventDiscipline;
+    webpage: string;
+    email: string;
+    controlCardType: ControlCardType;
+}
+
+export interface SplitsFileInfo {
+    uploadDate: ISODateString;
+    splitsFilename: string;
+    splitsFileFormat: SplitsFileFormat;
+    valid: boolean;
+    failurereason?: string;
+}
+
+export interface EventSummary {
+    numcompetitors: number;
+    courses: Array<CourseSummary>;
+}
+
+export interface CourseSummary {
+    name: string;
+    length: number;
+    climb: number;
+    numcompetitors: number;
+    classes: Array<string>;
+}
+
+
+export interface OEvent extends EventInfo {
+     key: string;
+     userId: string;
+     splits?: SplitsFileInfo | null;
+     summary?: EventSummary | null;
+     legacyPassword?: string;
+     yearIndex: number;     // Used for filtering
+     gradeIndex: any;  // Used for filtering
+}
+
+

@@ -1,0 +1,76 @@
+<app-sidenav-button> </app-sidenav-button>
+
+<mat-sidenav-container class=fill-client-area>
+  <mat-sidenav #sidenav mode="side" opened="true" fxFlex=300px>
+
+    <div fxLayout="column" class=side-nav-content>
+
+      <h4 fxFlexAlign="center">Events</h4>
+      <button mat-raised-button color=primary  (click)="addEvent()" fxFlexAlign="start" fxFlexOffset="5">
+         Add event
+       </button>
+
+      <div class="scrolling-content fill-client-area">
+
+        <mat-nav-list fxFlex>
+          <mat-divider></mat-divider>
+
+          <div *ngFor="let event of events | async" (click)="eventClicked(event)">
+            <mat-list-item>
+              <h2 matLine> {{ event.date | date }} {{ event.name }} </h2>
+              <p matLine>
+                <span>  {{event.nationality}}  {{event.club}} </span>
+              </p>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+          </div>
+        </mat-nav-list>
+      </div>
+    </div>
+  </mat-sidenav>
+
+  <div fxFlex=450px fxLayout="column" class=.my-content>
+
+  <div *ngIf="selectedEvent || new">
+
+    <mat-card>
+
+      <mat-card-content>
+          <app-event-edit [oevent]="selectedEvent"></app-event-edit>
+      </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="!new">
+
+      <mat-card>
+        <mat-card-title>
+          Upload Splits
+        </mat-card-title>
+
+        <mat-card-content>
+          <div fxLayout=row>
+          <file-button color=primary (fileSelected)="uploadSplits($event)" label="Upload Splits"></file-button>   
+          <span fxFlexAlign=end *ngIf=selectedEvent.summary>  
+             Splits uploaded  {{selectedEvent.summary.courses.length}} courses <BR>
+            <span *ngFor="let course of selectedEvent.summary.courses"> 
+                {{course.name}} &nbsp; &nbsp; 
+            </span>
+          </span>
+          <span *ngIf=!selectedEvent.summary color=red> Splits not yet uploded</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card>
+        <mat-card-title>
+          Delete Event
+        </mat-card-title>
+
+        <mat-card-content>
+          <button mat-raised-button color=primary aria-label="delete" (click)="deleteEvent()">Delete</button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    </div>
+  </div>
+</mat-sidenav-container>

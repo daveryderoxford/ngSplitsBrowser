@@ -1,0 +1,89 @@
+<div>
+  <form [formGroup]="f" (ngSubmit)="submit()" novalidate>
+
+    <div fxLayout="column" fxFlex fxLayoutAlign="space-around" fxLayoutGap=10px>
+
+      <mat-progress-bar *ngIf="showProgressBar" mode="query"> </mat-progress-bar>
+
+      <mat-form-field appearance="legacy" >
+        <input matInput formControlName="name" placeholder="Event Name">
+        <mat-error>Name required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput formControlName="date" placeholder="Date" [matDatepicker]="picker">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <mat-error>Date required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-select formControlName="nationality" placeholder="Nationality">
+          <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
+            {{ nation.fullname }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation" [matAutocomplete]="auto">
+       <mat-hint align="end">Between 2 and 10 characters</mat-hint>
+        <mat-error>Club required</mat-error>
+
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub">
+            <mat-option *ngFor="let club of filteredClubs$ | async" [value]="club.name">
+              {{ club.name }}
+            </mat-option>
+          </mat-autocomplete>
+
+      </mat-form-field>
+
+
+      <mat-form-field>
+
+        <mat-select formControlName="grade" placeholder="Grade">
+          <mat-option *ngFor="let grade of grades; let i = index" [value]="grade">
+            {{ grade }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+
+        <mat-select formControlName="type" placeholder="Type">
+          <mat-option *ngFor="let type of types" [value]="type">
+            {{ type }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+
+        <mat-select formControlName="discipline" placeholder="Discipline">
+          <mat-option *ngFor="let discipline of disciplines" [value]="discipline">
+            {{ discipline }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-select formControlName="controlCardType" placeholder="Punching type">
+          <mat-option *ngFor="let controlCardType of controlCardTypes" [value]="controlCardType">
+            {{ controlCardType }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput formControlName="webpage" placeholder="Web page">
+        <mat-error>Invalid URL</mat-error>
+      </mat-form-field>
+
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <button [disabled]="f.invalid" mat-raised-button color=primary type="submit" aria-label="login">Save</button>
+      </div>
+
+    </div>
+
+  </form>
+</div>

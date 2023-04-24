@@ -44,6 +44,8 @@ export class FixturesMapComponent implements OnInit, AfterViewInit {
    constructor ( private ref: ChangeDetectorRef ) { }
 
    ngOnInit() {
+
+
    }
 
 

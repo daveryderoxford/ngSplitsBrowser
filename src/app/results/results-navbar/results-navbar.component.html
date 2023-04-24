@@ -1,0 +1,19 @@
+<nav mat-primary class="results-navbar-container">
+
+   <mat-icon routerLink="/events" class="results-navbar-icon">arrow_back</mat-icon>
+
+   <app-results-view-button [views]="resultsViews" [selectedView]="rs.resultsView | async" (viewSelected)="viewSelected($event)"></app-results-view-button>
+
+   <ng-container *ngIf='(rs.selectedResults| async) as results'>
+      <app-class-menu-button [selectedClass]='rs.selectedClass | async' [oclasses]='results.classes' (select)='rs.selectClass($event)'></app-class-menu-button>
+   </ng-container>
+
+   <app-compare-with [selected]='compareWith' (select)='onCompareWith($event)'></app-compare-with>
+
+   <span class="fill-remaining-space"></span>
+
+   <app-results-search class="align-baseline, flex-item"></app-results-search>
+
+   <mat-icon class="docs-button results-navbar-icon flex-item">settings</mat-icon>
+
+</nav>

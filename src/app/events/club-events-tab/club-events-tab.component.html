@@ -1,0 +1,43 @@
+<div class="background">
+
+  <div class="class-filter">
+    <mat-form-field>
+      <mat-select placeholder="Nationality" (selectionChange)="clubNationalFilterChange($event)">
+        <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
+          {{ nation.fullname }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <input matInput #clubNameFilter placeholder="Name" (keyup)="clubNameFilterChange($event)">
+    </mat-form-field>
+  </div>
+
+  <div class="data-container mat-elevation-z2">
+
+    <mat-accordion multi="false">
+
+      <mat-expansion-panel (opened)="setSelectedClub(club)" *ngFor="let club of clubs$ | async">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <b> {{club.name}}  <span *ngIf="(clubNationalityFilter$ | async) === ''"> &nbsp;&nbsp;&nbsp; {{club.nationality}} </span></b>
+          </mat-panel-title>
+          <mat-panel-description>
+            {{club.numEvents}} events &nbsp;&nbsp;&nbsp; Last event {{club.lastEvent | date}}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <ng-template matExpansionPanelContent>
+          <app-events-table [events]="clubEvents" [displayedColumns]=" ['date', 'name', 'grade', 'discipline', 'type']"
+            (eventSelected)="eventClicked($event)"></app-events-table>
+        </ng-template>
+
+      </mat-expansion-panel>
+
+      <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+
+    </mat-accordion>
+
+  </div>
+</div>
