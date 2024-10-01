@@ -5,28 +5,32 @@ import { OEvent } from 'app/model';
 import { ResultsView } from '../model';
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyMenuModule } from '@angular/material/legacy-menu';
-import { NgFor } from '@angular/common';
+
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
     selector: 'app-results-view-button',
     template: `
   <mat-button-toggle-group>
-
-    <mat-button-toggle class="toggelebutton" [checked]="selectedView.type === view.type"
-                     (click)="buttonClicked(view)"  *ngFor="let view of primaryViews">
-       {{ view.name }}
-    </mat-button-toggle>
-
+  
+    @for (view of primaryViews; track view) {
+      <mat-button-toggle class="toggelebutton" [checked]="selectedView.type === view.type"
+        (click)="buttonClicked(view)" >
+        {{ view.name }}
+      </mat-button-toggle>
+    }
+  
     <mat-button-toggle class="toggelebutton" [matMenuTriggerFor]="moreMenu">
       More <mat-icon>arrow_drop_down</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>
-
+  
   <mat-menu #moreMenu="matMenu" xPosition="before">
-    <button mat-menu-item (click)="buttonClicked(view)" *ngFor="let view of additionalViews">
-       {{ view.name }}
-    </button>
+    @for (view of additionalViews; track view) {
+      <button mat-menu-item (click)="buttonClicked(view)">
+        {{ view.name }}
+      </button>
+    }
   </mat-menu>
   `,
     styles: [
@@ -42,7 +46,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     }`
     ],
     standalone: true,
-    imports: [MatButtonToggleModule, NgFor, MatLegacyMenuModule, MatIconModule]
+    imports: [MatButtonToggleModule, MatLegacyMenuModule, MatIconModule]
 })
 export class ResultsViewButtonComponent implements OnInit {
 

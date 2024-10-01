@@ -1,6 +1,6 @@
 import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
 import { CourseClass } from 'app/results/model';
-import { NgFor } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 import { MatLegacyMenuModule } from '@angular/material/legacy-menu';
 import { MatLegacyButtonModule } from '@angular/material/legacy-button';
@@ -9,17 +9,19 @@ import { MatLegacyButtonModule } from '@angular/material/legacy-button';
     selector: 'app-class-menu-button',
     template: `
 <button mat-button [matMenuTriggerFor]="classPicker">
-    {{ buttonText }}
-     <mat-icon>arrow_drop_down</mat-icon>
+  {{ buttonText }}
+  <mat-icon>arrow_drop_down</mat-icon>
 </button>
 <mat-menu #classPicker="matMenu">
-  <button mat-menu-item *ngFor="let oclass of oclasses" (click)="select.emit(oclass)">
-    {{oclass.name}}
-  </button>
+  @for (oclass of oclasses; track oclass) {
+    <button mat-menu-item (click)="select.emit(oclass)">
+      {{oclass.name}}
+    </button>
+  }
 </mat-menu>
-  `,
+`,
     standalone: true,
-    imports: [MatLegacyButtonModule, MatLegacyMenuModule, MatIconModule, NgFor]
+    imports: [MatLegacyButtonModule, MatLegacyMenuModule, MatIconModule]
 })
 export class ClassMenuButtonComponent implements OnInit, OnChanges {
 

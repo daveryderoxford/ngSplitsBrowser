@@ -9,7 +9,7 @@ import { filter, map } from 'rxjs/operators';
 import { MatLegacyListModule } from "@angular/material/legacy-list";
 import { RouterLink } from "@angular/router";
 import { MatLegacyButtonModule } from "@angular/material/legacy-button";
-import { NgIf, NgFor, AsyncPipe } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
@@ -17,7 +17,7 @@ import { NgIf, NgFor, AsyncPipe } from "@angular/common";
     templateUrl: "./my-events-tab.component.html",
     styleUrls: ["./my-events-tab.component.scss"],
     standalone: true,
-    imports: [NgIf, MatLegacyButtonModule, RouterLink, NgFor, MatLegacyListModule, AsyncPipe]
+    imports: [MatLegacyButtonModule, RouterLink, MatLegacyListModule, AsyncPipe]
 })
 export class MyEventsTabComponent implements OnInit {
    @Output() eventSelected = new EventEmitter();

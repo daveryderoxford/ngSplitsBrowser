@@ -3,9 +3,11 @@
   <div class="class-filter">
     <mat-form-field>
       <mat-select placeholder="Nationality" (selectionChange)="clubNationalFilterChange($event)">
-        <mat-option *ngFor="let nation of nations" [value]="nation.abrievation">
-          {{ nation.fullname }}
-        </mat-option>
+        @for (nation of nations; track nation) {
+          <mat-option [value]="nation.abrievation">
+            {{ nation.fullname }}
+          </mat-option>
+        }
       </mat-select>
     </mat-form-field>
 
@@ -18,24 +20,28 @@
 
     <mat-accordion multi="false">
 
-      <mat-expansion-panel (opened)="setSelectedClub(club)" *ngFor="let club of clubs$ | async">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <b> {{club.name}}  <span *ngIf="(clubNationalityFilter$ | async) === ''"> &nbsp;&nbsp;&nbsp; {{club.nationality}} </span></b>
-          </mat-panel-title>
-          <mat-panel-description>
-            {{club.numEvents}} events &nbsp;&nbsp;&nbsp; Last event {{club.lastEvent | date}}
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-
-        <ng-template matExpansionPanelContent>
-          <app-events-table [events]="clubEvents" [displayedColumns]=" ['date', 'name', 'grade', 'discipline', 'type']"
+      @for (club of clubs$ | async; track club) {
+        <mat-expansion-panel (opened)="setSelectedClub(club)">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <b> {{club.name}}  @if ((clubNationalityFilter$ | async) === '') {
+                <span> &nbsp;&nbsp;&nbsp; {{club.nationality}} </span>
+              }</b>
+            </mat-panel-title>
+            <mat-panel-description>
+              {{club.numEvents}} events &nbsp;&nbsp;&nbsp; Last event {{club.lastEvent | date}}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <ng-template matExpansionPanelContent>
+            <app-events-table [events]="clubEvents" [displayedColumns]=" ['date', 'name', 'grade', 'discipline', 'type']"
             (eventSelected)="eventClicked($event)"></app-events-table>
-        </ng-template>
+          </ng-template>
+        </mat-expansion-panel>
+      }
 
-      </mat-expansion-panel>
-
-      <mat-progress-bar *ngIf="loading$ | async" mode="indeterminate"></mat-progress-bar>
+      @if (loading$ | async) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
 
     </mat-accordion>
 

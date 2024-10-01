@@ -75,10 +75,10 @@
           "options": {},
           "configurations": {
             "production": {
-              "browserTarget": "splitsbrowser:build:production"
+              "buildTarget": "splitsbrowser:build:production"
             },
             "development": {
-              "browserTarget": "splitsbrowser:build:development"
+              "buildTarget": "splitsbrowser:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -86,7 +86,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "splitsbrowser:build"
+            "buildTarget": "splitsbrowser:build"
           }
         },
         "test": {

@@ -1,29 +1,32 @@
-<div *ngIf="!loggedIn" class="message">
+@if (!loggedIn) {
+  <div class="message">
     You need to be logged in to view your events
     <div class=messagebuttons>
-        <button mat-button routerLink="/auth/login">LOGIN</button>
-        <button mat-button routerLink="/auth/signup">REGISTER</button>
+      <button mat-button routerLink="/auth/login">LOGIN</button>
+      <button mat-button routerLink="/auth/signup">REGISTER</button>
     </div>
-</div>
+  </div>
+}
 
-<ng-container *ngIf="loggedIn && (myResults$ | async) as results; else loading">
-
-    <div *ngIf="results.length === 0" class=message>
-        No results avalaible for user.
-        <br> Add ecard numbers you have previously used to find historical results
+@if (loggedIn && (myResults$ | async); as results) {
+  @if (results.length === 0) {
+    <div class=message>
+      No results avalaible for user.
+      <br> Add ecard numbers you have previously used to find historical results
         <div class=messagebuttons>
-            <button mat-button routerLink="/user">USER SETTINGS</button>
+          <button mat-button routerLink="/user">USER SETTINGS</button>
         </div>
-    </div>
-
-    <div *ngIf="results.length > 0">
-        <mat-list *ngFor="let result of results">
+      </div>
+    }
+    @if (results.length > 0) {
+      <div>
+        @for (result of results; track result) {
+          <mat-list>
             <mat-list-item> {{result.eventInfo.na}</mat-list-item>
-        </mat-list>
-    </div>
+          </mat-list>
+        }
+      </div>
+    }
+  } @else {
+  }
 
-</ng-container>
-
-<ng-template #loading>
-
-</ng-template>

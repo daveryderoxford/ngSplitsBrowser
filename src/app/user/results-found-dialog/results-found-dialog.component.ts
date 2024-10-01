@@ -3,7 +3,7 @@ import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_L
 import { UserResult } from 'app/model';
 import { MatLegacyButtonModule } from '@angular/material/legacy-button';
 import { MatLineModule } from '@angular/material/core';
-import { NgFor, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatLegacyListModule } from '@angular/material/legacy-list';
 
 @Component({
@@ -11,7 +11,7 @@ import { MatLegacyListModule } from '@angular/material/legacy-list';
     templateUrl: './results-found-dialog.component.html',
     styleUrls: ['./results-found-dialog.component.scss'],
     standalone: true,
-    imports: [MatLegacyDialogModule, MatLegacyListModule, NgFor, MatLineModule, MatLegacyButtonModule, DatePipe]
+    imports: [MatLegacyDialogModule, MatLegacyListModule, MatLineModule, MatLegacyButtonModule, DatePipe]
 })
 export class ResultsFoundDialogComponent {
 

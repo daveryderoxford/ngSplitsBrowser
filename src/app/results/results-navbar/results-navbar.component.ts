@@ -6,7 +6,7 @@ import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-o
 import { ResultsSearchComponent } from "../results-search/results-search.component";
 import { CompareWithComponent } from "./compare-with.component";
 import { ClassMenuButtonComponent } from "./class-menu-button.component";
-import { NgIf, AsyncPipe } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import { ResultsViewButtonComponent } from "./results-view-button.component";
 import { RouterLink } from "@angular/router";
 import { MatIconModule } from "@angular/material/icon";
@@ -17,7 +17,7 @@ import { MatIconModule } from "@angular/material/icon";
     templateUrl: "./results-navbar.component.html",
     styleUrls: ["./results-navbar.component.scss"],
     standalone: true,
-    imports: [MatIconModule, RouterLink, ResultsViewButtonComponent, NgIf, ClassMenuButtonComponent, CompareWithComponent, ResultsSearchComponent, AsyncPipe]
+    imports: [MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, CompareWithComponent, ResultsSearchComponent, AsyncPipe]
 })
 export class ResultsNavbarComponent implements OnInit {
 

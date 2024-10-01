@@ -1,15 +1,19 @@
 <div class="docs-search-input-container">
-   <input placeholder="Search" type="text" class="docs-search-input" 
-      (focus)="toggleIsExpanded()" 
-      (blur)="toggleIsExpanded($event.relatedTarget)"
-      [matAutocomplete]="autoCompletePanel" [formControl]="searchControl">
-   <mat-icon class="docs-search-icon">search</mat-icon>
+  <input placeholder="Search" type="text" class="docs-search-input"
+    (focus)="toggleIsExpanded()"
+    (blur)="toggleIsExpanded($event.relatedTarget)"
+    [matAutocomplete]="autoCompletePanel" [formControl]="searchControl">
+  <mat-icon class="docs-search-icon">search</mat-icon>
 </div>
 
 <mat-autocomplete #autoCompletePanel="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onOptionSelected($event)">
-   <mat-optgroup *ngFor="let group of filterPanelContents" [label]="group.name">
-      <mat-option *ngFor="let option of group.options" [value]="option">
-         {{ option.name }}
-      </mat-option>
-   </mat-optgroup>
+  @for (group of filterPanelContents; track group) {
+    <mat-optgroup [label]="group.name">
+      @for (option of group.options; track option) {
+        <mat-option [value]="option">
+          {{ option.name }}
+        </mat-option>
+      }
+    </mat-optgroup>
+  }
 </mat-autocomplete>

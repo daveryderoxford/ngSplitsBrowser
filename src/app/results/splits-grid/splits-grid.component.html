@@ -1,63 +1,67 @@
 <div class="main-container">
 
-   <div class="header-container">
-      <app-results-search> </app-results-search>
+  <div class="header-container">
+    <app-results-search> </app-results-search>
 
-      <mat-form-field>
-         <mat-select placeholder="Class" [formControl]="classSelect">
-            <mat-option *ngFor="let oclass of results?.classes" [value]="oclass">
-               {{oclass.name}}
-            </mat-option>
-         </mat-select>
-      </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="Class" [formControl]="classSelect">
+        @for (oclass of results?.classes; track oclass) {
+          <mat-option [value]="oclass">
+            {{oclass.name}}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
-      <mat-slide-toggle *ngIf="course && course.classes.length > 1" [formControl]="courseToggle">Course</mat-slide-toggle>
+    @if (course && course.classes.length > 1) {
+      <mat-slide-toggle [formControl]="courseToggle">Course</mat-slide-toggle>
+    }
 
-      <mat-slide-toggle [formControl]="colorToggle">Color</mat-slide-toggle>
+    <mat-slide-toggle [formControl]="colorToggle">Color</mat-slide-toggle>
 
-   </div>
+  </div>
 
-   <div class="table-container">
-      <table mat-table [dataSource]="dataSource" matSort>
+  <div class="table-container">
+    <table mat-table [dataSource]="dataSource" matSort>
 
-         <!-- Initial columns -->
-         <ng-container matColumnDef="position" sticky>
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Position</th>
-            <td mat-cell *matCellDef="let competitor">
-               {{competitor.coursePosition}}
-            </td>
-         </ng-container>
+      <!-- Initial columns -->
+      <ng-container matColumnDef="position" sticky>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Position</th>
+        <td mat-cell *matCellDef="let competitor">
+          {{competitor.coursePosition}}
+        </td>
+      </ng-container>
 
-         <ng-container matColumnDef="name" sticky>
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-            <td mat-cell *matCellDef="let competitor">
-               {{competitor.name}}
-               <br> {{competitor.club}}
-            </td>
-         </ng-container>
+      <ng-container matColumnDef="name" sticky>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+        <td mat-cell *matCellDef="let competitor">
+          {{competitor.name}}
+          <br> {{competitor.club}}
+          </td>
+        </ng-container>
 
-         <ng-container matColumnDef="total" sticky>
-            <th mat-header-cell class="totaltimecolumn" *matHeaderCellDef mat-sort-header>Total</th>
-            <td mat-cell *matCellDef="let competitor"> {{ formatTime(competitor.totalTime) }} </td>
-         </ng-container>
+        <ng-container matColumnDef="total" sticky>
+          <th mat-header-cell class="totaltimecolumn" *matHeaderCellDef mat-sort-header>Total</th>
+          <td mat-cell *matCellDef="let competitor"> {{ formatTime(competitor.totalTime) }} </td>
+        </ng-container>
 
-         <!-- Splits times columns -->
-         <ng-container *ngFor="let split of splitsColumns; let i index">
-            <ng-container [matColumnDef]="split">
-               <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} <br> test</th>
-               <td mat-cell [ngStyle]="{'background': cellColor(colorToggle.value, i, competitor)}" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor) }"*matCellDef="let competitor">
-                  <span [ngClass]="{ 'fastest': (competitor.splitRanks[i]===1) }"> {{ formatTime(competitor.splitTimes[i]) }} ({{competitor.splitRanks[i]}}) </span>
-                  <br>
-                  <span [ngClass]="{ 'fastest': (competitor.cumRanks[i]===1) }">{{ formatTime(competitor.cumTimes[i]) }} ({{competitor.cumRanks[i]}})</span>
-                  <br>
-               </td>
-            </ng-container>
-         </ng-container>
+        <!-- Splits times columns -->
+        @for (split of splitsColumns; track split) {
+          <ng-container [matColumnDef]="split">
+            <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} <br> test</th>
+            <td mat-cell [ngStyle]="{'background': cellColor(colorToggle.value, i, competitor)}" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor) }"*matCellDef="let competitor">
+              <span [ngClass]="{ 'fastest': (competitor.splitRanks[i]===1) }"> {{ formatTime(competitor.splitTimes[i]) }} ({{competitor.splitRanks[i]}}) </span>
+              <br>
+                <span [ngClass]="{ 'fastest': (competitor.cumRanks[i]===1) }">{{ formatTime(competitor.cumTimes[i]) }} ({{competitor.cumRanks[i]}})</span>
+                <br>
+                </td>
+              </ng-container>
+            }
 
-         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-         <tr mat-row *matRowDef="let competitor; columns: displayedColumns;" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor)}"
-            (click)="updateSelectedCompetitor(competitor)">
-         </tr>
-      </table>
-   </div>
-</div>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let competitor; columns: displayedColumns;" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor)}"
+              (click)="updateSelectedCompetitor(competitor)">
+            </tr>
+          </table>
+        </div>
+      </div>

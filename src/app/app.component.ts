@@ -10,7 +10,7 @@ import { SidenavService } from './shared/services/sidenav.service';
 import firebase from "firebase/compat/app";
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { tap } from 'rxjs/operators';
-import { NgIf } from '@angular/common';
+
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
 import { MatListModule } from '@angular/material/list';
 
@@ -20,7 +20,7 @@ import { MatListModule } from '@angular/material/list';
     templateUrl: './app.component.html',
     styleUrls: ['app.component.scss'],
     standalone: true,
-   imports: [NgIf, SpinnerComponent, MatSidenavModule, MatListModule, RouterOutlet]
+   imports: [SpinnerComponent, MatSidenavModule, MatListModule, RouterOutlet]
 })
 export class AppComponent implements OnInit {
 

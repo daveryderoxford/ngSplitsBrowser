@@ -11,7 +11,7 @@ import { EventsTableComponent } from "../events-table/events-table.component";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatLegacyInputModule } from "@angular/material/legacy-input";
 import { MatLegacyOptionModule } from "@angular/material/legacy-core";
-import { NgFor, NgIf, AsyncPipe, DatePipe } from "@angular/common";
+import { AsyncPipe, DatePipe } from "@angular/common";
 import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
 
 @UntilDestroy( { checkProperties: true } )
@@ -20,7 +20,7 @@ import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
     templateUrl: "./club-events-tab.component.html",
     styleUrls: ["./club-events-tab.component.scss"],
     standalone: true,
-    imports: [MatLegacyFormFieldModule, MatLegacySelectModule, NgFor, MatLegacyOptionModule, MatLegacyInputModule, MatExpansionModule, NgIf, EventsTableComponent, MatLegacyProgressBarModule, AsyncPipe, DatePipe]
+    imports: [MatLegacyFormFieldModule, MatLegacySelectModule, MatLegacyOptionModule, MatLegacyInputModule, MatExpansionModule, EventsTableComponent, MatLegacyProgressBarModule, AsyncPipe, DatePipe]
 })
 export class ClubEventsTabComponent implements OnInit {
    @Output() eventSelected = new EventEmitter<OEvent>();ng

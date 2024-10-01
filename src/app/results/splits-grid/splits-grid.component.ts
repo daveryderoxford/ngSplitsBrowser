@@ -10,7 +10,7 @@ import { ResultsSelectionService } from "../results-selection.service";
 import { Repairer } from '../model/repairer';
 import { MatLegacySlideToggleModule } from "@angular/material/legacy-slide-toggle";
 import { MatLegacyOptionModule } from "@angular/material/legacy-core";
-import { NgFor, NgIf, NgStyle, NgClass } from "@angular/common";
+import { NgStyle, NgClass } from "@angular/common";
 import { MatLegacySelectModule } from "@angular/material/legacy-select";
 import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
 import { ResultsSearchComponent } from "../results-search/results-search.component";
@@ -21,7 +21,7 @@ import { ResultsSearchComponent } from "../results-search/results-search.compone
     templateUrl: "./splits-grid.component.html",
     styleUrls: ["./splits-grid.component.scss"],
     standalone: true,
-    imports: [ResultsSearchComponent, MatLegacyFormFieldModule, MatLegacySelectModule, ReactiveFormsModule, NgFor, MatLegacyOptionModule, NgIf, MatLegacySlideToggleModule, MatLegacyTableModule, NgStyle, NgClass]
+    imports: [ResultsSearchComponent, MatLegacyFormFieldModule, MatLegacySelectModule, ReactiveFormsModule, MatLegacyOptionModule, MatLegacySlideToggleModule, MatLegacyTableModule, NgStyle, NgClass]
 })
 export class SplitsGridComponent implements OnInit {
    results: Results;

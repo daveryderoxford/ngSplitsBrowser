@@ -8,7 +8,7 @@ import { UntilDestroy } from '@ngneat/until-destroy';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
 import { MatLegacyOptionModule } from '@angular/material/legacy-core';
-import { NgFor } from '@angular/common';
+
 import { MatIconModule } from '@angular/material/icon';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
@@ -24,7 +24,7 @@ interface FilterPanelGroup {
     templateUrl: './results-search.component.html',
     styleUrls: ['./results-search.component.scss'],
     standalone: true,
-    imports: [MatLegacyAutocompleteModule, ReactiveFormsModule, MatIconModule, NgFor, MatLegacyOptionModule]
+    imports: [MatLegacyAutocompleteModule, ReactiveFormsModule, MatIconModule, MatLegacyOptionModule]
 })
 export class ResultsSearchComponent implements OnInit {
 
