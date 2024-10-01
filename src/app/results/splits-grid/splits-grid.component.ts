@@ -3,7 +3,7 @@ import { SelectionModel } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl, UntypedFormControl } from "@angular/forms";
 import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource } from "@angular/material/table";
+import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
 import { ResultsSelectionService } from "../results-selection.service";

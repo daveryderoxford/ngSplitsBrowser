@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/quotes */
 import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
-import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent, MatLegacyAutocompleteTrigger as MatAutocompleteTrigger } from '@angular/material/legacy-autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
 //import { Subscription } from 'rxjs/Subscription';
 import { Competitor, Course, CourseClass, Results } from '../model';

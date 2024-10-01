@@ -1,6 +1,6 @@
 
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { MatSelectChange } from "@angular/material/select";
+import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Club, EventGrades, Nation, Nations, OEvent } from "app/model";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
