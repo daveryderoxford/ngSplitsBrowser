@@ -1,11 +1,16 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { OEvent } from 'app/model';
 import { DataSource } from '@angular/cdk/table';
+import { MatIconModule } from '@angular/material/icon';
+import { NgClass, NgIf, DatePipe } from '@angular/common';
+import { MatLegacyTableModule } from '@angular/material/legacy-table';
 
 @Component({
-  selector: 'app-events-table',
-  templateUrl: './events-table.component.html',
-  styleUrls: ['./events-table.component.scss']
+    selector: 'app-events-table',
+    templateUrl: './events-table.component.html',
+    styleUrls: ['./events-table.component.scss'],
+    standalone: true,
+    imports: [MatLegacyTableModule, NgClass, NgIf, MatIconModule, DatePipe]
 })
 export class EventsTableComponent {
 

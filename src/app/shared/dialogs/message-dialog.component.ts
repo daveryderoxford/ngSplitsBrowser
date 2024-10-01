@@ -1,5 +1,7 @@
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
+import { MatLegacyDialogRef as MatDialogRef, MatLegacyDialogModule } from '@angular/material/legacy-dialog';
 import { Component } from '@angular/core';
+import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
     selector: 'app-message-dialog',
@@ -11,7 +13,9 @@ import { Component } from '@angular/core';
         <button type="button" mat-raised-button
             (click)="dialogRef.close(true)">OK</button>
         </div>
-    `,   
+    `,
+    standalone: true,
+    imports: [MatLegacyDialogModule, MatDividerModule, MatLegacyButtonModule]
 })
 
 export class MessageDialogComponent {

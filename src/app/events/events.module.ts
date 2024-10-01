@@ -10,21 +10,19 @@ import { MyEventsTabComponent } from './my-events-tab/my-events-tab.component';
 import { MyResultsTableComponent } from './my-results-table/my-results-table.component';
 
 @NgModule({
-  declarations: [
-    EventsViewComponent,
-    AllEventsTabComponent,
-    ClubEventsTabComponent,
-    EventsTableComponent,
-    MyEventsTabComponent,
-    MyResultsTableComponent
-  ],
-  imports: [
-    CommonModule,
-    SharedModule,
-    EventsRoutingModule,
-  ],
-  exports: [
-    EventsViewComponent
-  ]
+    imports: [
+        CommonModule,
+        SharedModule,
+        EventsRoutingModule,
+        EventsViewComponent,
+        AllEventsTabComponent,
+        ClubEventsTabComponent,
+        EventsTableComponent,
+        MyEventsTabComponent,
+        MyResultsTableComponent
+    ],
+    exports: [
+        EventsViewComponent
+    ]
 })
 export class EventsModule { }

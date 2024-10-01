@@ -1,7 +1,9 @@
-import { MatLegacyDialogRef as MatDialogRef } from '@angular/material/legacy-dialog';
+import { MatLegacyDialogRef as MatDialogRef, MatLegacyDialogModule } from '@angular/material/legacy-dialog';
 import { Component } from '@angular/core';
+import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatDividerModule } from '@angular/material/divider';
 
-@Component( {
+@Component({
     selector: 'app-confirm-dialog',
     template: `
         <h3 mat-dialog-title>{{ title }}</h3>
@@ -12,7 +14,9 @@ import { Component } from '@angular/core';
             <button type="button" mat-button (click)="dialogRef.close()">Cancel</button>
         </div>
     `,
-} )
+    standalone: true,
+    imports: [MatLegacyDialogModule, MatDividerModule, MatLegacyButtonModule]
+})
 export class ConfirmDialogComponent {
 
     public title: string;

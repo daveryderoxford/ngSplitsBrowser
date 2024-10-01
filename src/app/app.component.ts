@@ -1,22 +1,27 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { MatSidenav } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
-import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router } from "@angular/router";
+import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { BulkImportService } from 'scripts/bulk-import';
 import { SidenavService } from './shared/services/sidenav.service';
 import firebase from "firebase/compat/app";
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { tap } from 'rxjs/operators';
+import { NgIf } from '@angular/common';
+import { SpinnerComponent } from './shared/components/spinner/spinner.component';
+import { MatListModule } from '@angular/material/list';
 
 @UntilDestroy()
-@Component( {
-   selector: 'app-root',
-   templateUrl: './app.component.html',
-   styleUrls: ['app.component.scss']
-} )
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['app.component.scss'],
+    standalone: true,
+   imports: [NgIf, SpinnerComponent, MatSidenavModule, MatListModule, RouterOutlet]
+})
 export class AppComponent implements OnInit {
 
    @ViewChild( MatSidenav, { static: true } ) sidenav: MatSidenav;

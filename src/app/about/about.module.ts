@@ -9,15 +9,13 @@ import { PrivacyPolicyComponent } from './privacy-policy.component';
 
 
 @NgModule({
-  declarations: [
-    AboutComponent,
-    AboutItemComponent,
-    PrivacyPolicyComponent,
-  ],
-  imports: [
-    CommonModule,
-    SharedModule,
-    AboutRoutingModule,
-  ]
+    imports: [
+        CommonModule,
+        SharedModule,
+        AboutRoutingModule,
+        AboutComponent,
+        AboutItemComponent,
+        PrivacyPolicyComponent
+    ]
 })
 export class AboutModule { }

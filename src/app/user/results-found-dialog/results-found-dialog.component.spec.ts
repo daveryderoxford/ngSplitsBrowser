@@ -25,17 +25,16 @@ let overlayContainerElement: HTMLElement;
 
 beforeEach(() => {
   TestBed.configureTestingModule({
-    imports: [DialogsModule, AppMaterialModule],
-    declarations: [ResultsFoundDialogComponent],
+    imports: [DialogsModule, AppMaterialModule, ResultsFoundDialogComponent],
     providers: [
-      {
-        provide: OverlayContainer, useFactory: () => {
-          overlayContainerElement = document.createElement('div');
-          return { getContainerElement: () => overlayContainerElement };
+        {
+            provide: OverlayContainer, useFactory: () => {
+                overlayContainerElement = document.createElement('div');
+                return { getContainerElement: () => overlayContainerElement };
+            }
         }
-      }
     ]
-  });
+});
 
   dialog = TestBed.get(MatDialog);
 });
@@ -46,8 +45,8 @@ describe('ResultsFoundDialogComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultsFoundDialogComponent]
-    })
+    imports: [ResultsFoundDialogComponent]
+})
       .compileComponents();
   }));
 

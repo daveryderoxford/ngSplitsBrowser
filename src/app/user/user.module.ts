@@ -8,19 +8,17 @@ import { SharedModule } from 'app/shared/shared.module';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule( {
-  declarations: [
-    ResultsFoundDialogComponent,
-    UserComponent
-  ],
-  imports: [
-    CommonModule,
-    UserRoutingModule,
-    SharedModule,
-    ReactiveFormsModule
-  ],
-  exports: [
-    ResultsFoundDialogComponent,
-    UserComponent
-  ],
+    imports: [
+        CommonModule,
+        UserRoutingModule,
+        SharedModule,
+        ReactiveFormsModule,
+        ResultsFoundDialogComponent,
+        UserComponent
+    ],
+    exports: [
+        ResultsFoundDialogComponent,
+        UserComponent
+    ]
 } )
 export class UserModule { }

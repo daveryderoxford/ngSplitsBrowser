@@ -9,24 +9,22 @@ import { RecoverComponent } from "./recover/recover.component";
 import { SignupComponent } from "./signup/signup.component";
 
 @NgModule({
-  declarations: [
-    LoginComponent,
-    RecoverComponent,
-    SignupComponent,
-    ChangePasswordComponent,
-  ],
-  imports: [
-    CommonModule,
-    SharedModule,
-    ReactiveFormsModule,
-    AuthRoutingModule,
-  ],
-  exports: [
-    LoginComponent,
-    RecoverComponent,
-    SignupComponent,
-    ChangePasswordComponent,
-  ]
+    imports: [
+        CommonModule,
+        SharedModule,
+        ReactiveFormsModule,
+        AuthRoutingModule,
+        LoginComponent,
+        RecoverComponent,
+        SignupComponent,
+        ChangePasswordComponent
+    ],
+    exports: [
+        LoginComponent,
+        RecoverComponent,
+        SignupComponent,
+        ChangePasswordComponent,
+    ]
 })
 export class AuthModule { }
 

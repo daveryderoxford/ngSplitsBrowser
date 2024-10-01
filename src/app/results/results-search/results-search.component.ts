@@ -1,12 +1,15 @@
 /** Componnet to results for club class or */
 /* eslint-disable @typescript-eslint/quotes */
 import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormControl } from '@angular/forms';
-import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent, MatLegacyAutocompleteTrigger as MatAutocompleteTrigger } from '@angular/material/legacy-autocomplete';
+import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent, MatLegacyAutocompleteTrigger as MatAutocompleteTrigger, MatLegacyAutocompleteModule } from '@angular/material/legacy-autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
 //import { Subscription } from 'rxjs/Subscription';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
+import { MatLegacyOptionModule } from '@angular/material/legacy-core';
+import { NgFor } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 
@@ -17,9 +20,11 @@ interface FilterPanelGroup {
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
-  selector: 'app-results-search',
-  templateUrl: './results-search.component.html',
-  styleUrls: ['./results-search.component.scss'],
+    selector: 'app-results-search',
+    templateUrl: './results-search.component.html',
+    styleUrls: ['./results-search.component.scss'],
+    standalone: true,
+    imports: [MatLegacyAutocompleteModule, ReactiveFormsModule, MatIconModule, NgFor, MatLegacyOptionModule]
 })
 export class ResultsSearchComponent implements OnInit {
 

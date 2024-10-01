@@ -1,17 +1,26 @@
 
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { MatLegacySelectChange as MatSelectChange } from "@angular/material/legacy-select";
+import { MatLegacySelectChange as MatSelectChange, MatLegacySelectModule } from "@angular/material/legacy-select";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Club, EventGrades, Nation, Nations, OEvent } from "app/model";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { map, tap } from 'rxjs/operators';
 import { EventService } from "../event.service";
+import { MatLegacyProgressBarModule } from "@angular/material/legacy-progress-bar";
+import { EventsTableComponent } from "../events-table/events-table.component";
+import { MatExpansionModule } from "@angular/material/expansion";
+import { MatLegacyInputModule } from "@angular/material/legacy-input";
+import { MatLegacyOptionModule } from "@angular/material/legacy-core";
+import { NgFor, NgIf, AsyncPipe, DatePipe } from "@angular/common";
+import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
-   selector: "app-club-events-tab",
-   templateUrl: "./club-events-tab.component.html",
-   styleUrls: ["./club-events-tab.component.scss"]
+    selector: "app-club-events-tab",
+    templateUrl: "./club-events-tab.component.html",
+    styleUrls: ["./club-events-tab.component.scss"],
+    standalone: true,
+    imports: [MatLegacyFormFieldModule, MatLegacySelectModule, NgFor, MatLegacyOptionModule, MatLegacyInputModule, MatExpansionModule, NgIf, EventsTableComponent, MatLegacyProgressBarModule, AsyncPipe, DatePipe]
 })
 export class ClubEventsTabComponent implements OnInit {
    @Output() eventSelected = new EventEmitter<OEvent>();ng

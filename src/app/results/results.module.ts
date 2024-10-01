@@ -13,25 +13,23 @@ import { ResultsViewComponent } from "./results-view/results-view.component";
 import { SplitsGridComponent } from './splits-grid/splits-grid.component';
 
 @NgModule({
-  declarations: [
-    GraphComponent,
-    ResultsViewComponent,
-    ResultsNavbarComponent,
-    ResultsSearchComponent,
-    SplitsGridComponent,
-    ResultsViewButtonComponent,
-    CompareWithComponent,
-    ClassMenuButtonComponent,
-  ],
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    ResultsRoutingModule,
-    SharedModule,
-  ],
-  exports: [
-     GraphComponent,
-     SplitsGridComponent
-  ]
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        ResultsRoutingModule,
+        SharedModule,
+        GraphComponent,
+        ResultsViewComponent,
+        ResultsNavbarComponent,
+        ResultsSearchComponent,
+        SplitsGridComponent,
+        ResultsViewButtonComponent,
+        CompareWithComponent,
+        ClassMenuButtonComponent
+    ],
+    exports: [
+        GraphComponent,
+        SplitsGridComponent
+    ]
 })
 export class ResultsModule { }

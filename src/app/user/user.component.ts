@@ -1,7 +1,7 @@
 
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from "@angular/forms";
 import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
 import { Router } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -17,13 +17,27 @@ import firebase from "firebase/compat/app";
 import isEqual from 'lodash/isequal';
 import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { MatLegacyCheckboxModule } from "@angular/material/legacy-checkbox";
+import { MatIconModule } from "@angular/material/icon";
+import { MatLegacyButtonModule } from "@angular/material/legacy-button";
+import { MatLegacyOptionModule } from "@angular/material/legacy-core";
+import { MatLegacySelectModule } from "@angular/material/legacy-select";
+import { MatLegacyInputModule } from "@angular/material/legacy-input";
+import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
+import { MatLegacyProgressBarModule } from "@angular/material/legacy-progress-bar";
+import { NgIf, NgFor, NgStyle } from "@angular/common";
+import { MatLegacyCardModule } from "@angular/material/legacy-card";
+import { FlexModule } from "@ngbracket/ngx-layout/flex";
+import { ToolbarComponent } from "../shared/components/toolbar.component";
 
 @UntilDestroy()
-@Component( {
-  selector: "app-user",
-  templateUrl: "./user.component.html",
-  styleUrls: ["./user.component.scss"]
-} )
+@Component({
+    selector: "app-user",
+    templateUrl: "./user.component.html",
+    styleUrls: ["./user.component.scss"],
+    standalone: true,
+    imports: [ToolbarComponent, FlexModule, MatLegacyCardModule, ReactiveFormsModule, NgIf, MatLegacyProgressBarModule, MatLegacyFormFieldModule, MatLegacyInputModule, MatLegacySelectModule, NgFor, MatLegacyOptionModule, MatLegacyButtonModule, MatIconModule, NgStyle, MatLegacyCheckboxModule]
+})
 export class UserComponent implements OnInit {
   originalUserData: UserData = null;
   userForm: UntypedFormGroup;

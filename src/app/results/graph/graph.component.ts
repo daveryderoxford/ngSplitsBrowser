@@ -6,6 +6,7 @@ import { Results } from "app/results/model";
 import { DialogsService } from '../../shared';
 import { ResultsSelectionService } from "../results-selection.service";
 import { displayGraph } from "./splitsbrowser/splitsbrowser";
+import { ResultsNavbarComponent } from "../results-navbar/results-navbar.component";
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -15,13 +16,15 @@ interface SplitsBrowserOptions {
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
-  selector: "app-graph",
-  templateUrl: "./graph.component.html",
-  styleUrls: ["./graph.component.scss"],
-  // To avoid angular re-writting style names that will be used by graphs view.
-  // These styles will just get appended to the global styles file
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: "app-graph",
+    templateUrl: "./graph.component.html",
+    styleUrls: ["./graph.component.scss"],
+    // To avoid angular re-writting style names that will be used by graphs view.
+    // These styles will just get appended to the global styles file
+    encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [ResultsNavbarComponent]
 })
 export class GraphComponent implements OnInit {
 

@@ -1,19 +1,27 @@
 
 import { SelectionModel } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { FormControl, UntypedFormControl } from "@angular/forms";
+import { FormControl, UntypedFormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatSort } from "@angular/material/sort";
-import { MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
+import { MatLegacyTableDataSource as MatTableDataSource, MatLegacyTableModule } from "@angular/material/legacy-table";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
 import { ResultsSelectionService } from "../results-selection.service";
 import { Repairer } from '../model/repairer';
+import { MatLegacySlideToggleModule } from "@angular/material/legacy-slide-toggle";
+import { MatLegacyOptionModule } from "@angular/material/legacy-core";
+import { NgFor, NgIf, NgStyle, NgClass } from "@angular/common";
+import { MatLegacySelectModule } from "@angular/material/legacy-select";
+import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
+import { ResultsSearchComponent } from "../results-search/results-search.component";
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
-   selector: "app-splits-grid",
-   templateUrl: "./splits-grid.component.html",
-   styleUrls: ["./splits-grid.component.scss"],
+    selector: "app-splits-grid",
+    templateUrl: "./splits-grid.component.html",
+    styleUrls: ["./splits-grid.component.scss"],
+    standalone: true,
+    imports: [ResultsSearchComponent, MatLegacyFormFieldModule, MatLegacySelectModule, ReactiveFormsModule, NgFor, MatLegacyOptionModule, NgIf, MatLegacySlideToggleModule, MatLegacyTableModule, NgStyle, NgClass]
 })
 export class SplitsGridComponent implements OnInit {
    results: Results;

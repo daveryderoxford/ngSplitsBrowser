@@ -3,10 +3,14 @@
 import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { OEvent } from 'app/model';
 import { ResultsView } from '../model';
+import { MatIconModule } from '@angular/material/icon';
+import { MatLegacyMenuModule } from '@angular/material/legacy-menu';
+import { NgFor } from '@angular/common';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
-  selector: 'app-results-view-button',
-  template: `
+    selector: 'app-results-view-button',
+    template: `
   <mat-button-toggle-group>
 
     <mat-button-toggle class="toggelebutton" [checked]="selectedView.type === view.type"
@@ -25,18 +29,20 @@ import { ResultsView } from '../model';
     </button>
   </mat-menu>
   `,
-  styles: [
-    `mat-button-toggle {
+    styles: [
+        `mat-button-toggle {
       height:38px;
       line-height: 38px;
       padding: 0 5px;
     }`,
-    `
+        `
     ::ng-deep .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
       line-height: 35px !important;
       padding: 0 5px !important;
     }`
-  ]
+    ],
+    standalone: true,
+    imports: [MatButtonToggleModule, NgFor, MatLegacyMenuModule, MatIconModule]
 })
 export class ResultsViewButtonComponent implements OnInit {
 

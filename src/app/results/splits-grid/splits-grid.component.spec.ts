@@ -8,8 +8,8 @@ describe('SplitsGridComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SplitsGridComponent ]
-    })
+    imports: [SplitsGridComponent]
+})
     .compileComponents();
   }));
 
