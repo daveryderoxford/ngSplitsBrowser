@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanDeactivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { DialogsService } from '../dialogs/dialogs.service';
 
@@ -10,7 +10,7 @@ export interface ComponentCanDeactivate {
 @Injectable({
   providedIn: 'root'
 })
-export class PendingChangesGuard implements CanDeactivate<ComponentCanDeactivate> {
+export class PendingChangesGuard  {
 
   constructor(private ds: DialogsService) { }
 

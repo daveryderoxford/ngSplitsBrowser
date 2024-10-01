@@ -1,6 +1,6 @@
 
 import { Injectable } from "@angular/core";
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from "@angular/router";
+import { ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Observable } from "rxjs";
 import { take } from 'rxjs/operators';
 import { Results } from "./model";
@@ -9,7 +9,7 @@ import { ResultsSelectionService } from "./results-selection.service";
 @Injectable({
     providedIn: 'root',
 })
-export class ResultsResolver implements Resolve<Results> {
+export class ResultsResolver  {
 
     constructor(private rs: ResultsSelectionService) { }
 
