@@ -83,6 +83,9 @@ export class Course {
             for (const comp of oclass.competitors) {
                if (comp.splitTimes) {
                   numSplits = Math.max(numSplits, comp.splitTimes.length);
+                  console.log(comp.name + "  " + comp.splitTimes.length);
+               } else {
+                  console.log(comp.name + "  split time null");
                }
             }
          }

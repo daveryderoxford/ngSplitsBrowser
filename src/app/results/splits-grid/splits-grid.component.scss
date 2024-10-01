@@ -23,7 +23,8 @@
 .header-container {
    flex: auto;
    display: flex;
-   min-height: 50px;
+   min-height: 70px;
+    max-height: 70px;
    align-items: center;
 }
 

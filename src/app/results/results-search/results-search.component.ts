@@ -4,7 +4,7 @@ import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
-import { Subscription } from 'rxjs/Subscription';
+//import { Subscription } from 'rxjs/Subscription';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
 
@@ -34,7 +34,7 @@ export class ResultsSearchComponent implements OnInit {
   filterPanelContents: Array<FilterPanelGroup> = [];
 
   searchControl: UntypedFormControl = new UntypedFormControl('');
-  subscription: Subscription;
+  subscription: any;
 
   constructor(private rs: ResultsSelectionService) { }
 

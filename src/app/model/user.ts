@@ -3,7 +3,6 @@
 import { sbTime } from "../results/model";
 import { ControlCardType, OEvent } from "./oevent";
 import { ISODateString } from "./date";
-import { GradeFilter } from "./fixture-filter";
 
 export interface ECard {
     id: string;
@@ -21,7 +20,6 @@ export interface UserInfo {
     autoFind: boolean;
     resultsLastupDated: ISODateString;
     postcode: string;
-    fixtureGradeFilters?: GradeFilter[];
 }
 
 /** All the user data stored for the user */
@@ -54,4 +52,3 @@ export interface UserResult {
         classWinningTime: sbTime;
     };
 }
-

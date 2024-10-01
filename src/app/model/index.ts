@@ -6,7 +6,6 @@ export { OEvent, EventDiscipline, EventDisciplines, EventGrade, EventGrades, Eve
 export { LogEntry, LogSeverity } from "./log-entry";
 export { UserData, UserResult, UserInfo, ECard } from "./user";
 export { CompetitorSearchData } from "./competitor-search-data";
-export { Fixture } from "./fixture";
 export { ISODateString } from "./date";
 
 

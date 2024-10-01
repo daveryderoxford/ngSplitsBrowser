@@ -5,11 +5,9 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './results-view.component.html',
   styleUrls: ['./results-view.component.scss']
 })
-export class ResultsViewComponent implements OnInit {
+export class ResultsViewComponent {
 
   constructor() { }
 
-  ngOnInit() {
-  }
 
 }

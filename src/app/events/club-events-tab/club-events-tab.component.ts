@@ -14,7 +14,7 @@ import { EventService } from "../event.service";
    styleUrls: ["./club-events-tab.component.scss"]
 })
 export class ClubEventsTabComponent implements OnInit {
-   @Output() eventSelected = new EventEmitter();
+   @Output() eventSelected = new EventEmitter<OEvent>();ng
 
    clubNationalityFilter$ = new BehaviorSubject<string>("");
    clubNameFilter$ = new BehaviorSubject<string>("");

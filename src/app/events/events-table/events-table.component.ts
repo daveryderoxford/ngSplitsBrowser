@@ -7,7 +7,7 @@ import { DataSource } from '@angular/cdk/table';
   templateUrl: './events-table.component.html',
   styleUrls: ['./events-table.component.scss']
 })
-export class EventsTableComponent implements OnInit {
+export class EventsTableComponent {
 
    currentRow: number;
 
@@ -17,8 +17,6 @@ export class EventsTableComponent implements OnInit {
   @Output() eventSelected = new EventEmitter<OEvent>();
 
   constructor() { }
-
-  ngOnInit() { }
 
   eventClicked(row) {
     this.eventSelected.emit(row);

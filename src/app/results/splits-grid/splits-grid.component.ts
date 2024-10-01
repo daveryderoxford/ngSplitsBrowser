@@ -1,12 +1,13 @@
 
 import { SelectionModel } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { UntypedFormControl } from "@angular/forms";
+import { FormControl, UntypedFormControl } from "@angular/forms";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
 import { ResultsSelectionService } from "../results-selection.service";
+import { Repairer } from '../model/repairer';
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
@@ -28,9 +29,9 @@ export class SplitsGridComponent implements OnInit {
    displayedColumns: string[] = [];
    splitsColumns: string[] = [];
 
-   classSelect = new UntypedFormControl();
-   courseToggle = new UntypedFormControl();
-   colorToggle = new UntypedFormControl();
+   classSelect = new FormControl<CourseClass>(undefined);
+   courseToggle = new FormControl<boolean>(true);
+   colorToggle = new FormControl<boolean>(true);
 
    @ViewChild(MatSort) sort: MatSort;
 
@@ -56,6 +57,14 @@ export class SplitsGridComponent implements OnInit {
    }
 
    private selectedResultsUpdated(results: Results) {
+
+      // TO temp repairt here - should be moved ot where we read the results
+      if (results.needsRepair()) {
+         Repairer.repairEventData(results);
+      }
+
+      results.determineTimeLosses();
+
       this.results = results;
    }
 
@@ -64,11 +73,15 @@ export class SplitsGridComponent implements OnInit {
 
       // Create a column for each control for the course
       if (course) {
+         console.log("*****course updated" + course.name);
+         console.log("numsplits: "+ course.numSplits);
          this.splitsColumns = Array.from({ length: course.numSplits }, (x, i) =>
             i.toString()
-         );
+         )
 
          this.displayedColumns = [...this.staticColumns, ...this.splitsColumns];
+      } else {
+         console.log("*****course null");
       }
    }
 

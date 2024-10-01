@@ -687,19 +687,11 @@ export class Competitor {
         return this.getIndexesAroundDubiousTimes([0].concat(this.splitTimes));
     }
 
-    public get coursePosition() {
-        if (this._coursePosition = 999) {
-
-        }
-
+    public get coursePosition(): number {
         return this._coursePosition;
     }
 
-    public get classPosition() {
-        if (this._classPosition = 999) {
-
-        }
-
+    public get classPosition(): number {
         return this._classPosition;
     }
 }

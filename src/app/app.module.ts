@@ -12,8 +12,9 @@ import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { firebaseConfig } from "./app.firebase-config";
 import { GlobalErrorHandler } from './errorHandler';
-import { FixturesModule } from './fixtures/fixtures.module';
 import { SharedModule } from "./shared/shared.module";
+import { EventsModule } from './events/events.module';
+import { ResultsModule } from './results/results.module';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import { SharedModule } from "./shared/shared.module";
     AngularFireStorageModule,
     SharedModule,
     HttpClientModule,
-    FixturesModule,
+    EventsModule,
+    ResultsModule,
   ],
   bootstrap: [AppComponent],
   providers: [{ provide: ErrorHandler, useClass: GlobalErrorHandler }]

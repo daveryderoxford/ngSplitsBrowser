@@ -20,8 +20,8 @@ import { MyResultsTableComponent } from './my-results-table/my-results-table.com
   ],
   imports: [
     CommonModule,
-    EventsRoutingModule,
     SharedModule,
+    EventsRoutingModule,
   ],
   exports: [
     EventsViewComponent
