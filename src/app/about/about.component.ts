@@ -6,13 +6,10 @@ import { versions } from 'environments/versions';
   templateUrl: "./about.component.html",
   styleUrls: ["./about.component.scss"]
 })
-export class AboutComponent implements OnInit {
+export class AboutComponent {
 
   constructor() { }
 
   ver = versions;
-
-  ngOnInit() {
-  }
 
 }
