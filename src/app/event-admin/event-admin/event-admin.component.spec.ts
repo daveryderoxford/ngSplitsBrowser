@@ -8,7 +8,7 @@ xdescribe('EventAdminComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [EventAdminComponent]
+    imports: [EventAdminComponent]
 })
     .compileComponents();
   }));

@@ -21,9 +21,7 @@
       "dom"
     ],
     "types": [
-      "d3",
-      "stripe-v3",
-      "stripe-checkout"
+      "d3"
     ],
     "useDefineForClassFields": false
   },

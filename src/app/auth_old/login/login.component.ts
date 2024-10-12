@@ -1,21 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import {
-   Auth,
-   FacebookAuthProvider, GoogleAuthProvider, UserCredential, getRedirectResult,
+   Auth, FacebookAuthProvider, GoogleAuthProvider, UserCredential, getRedirectResult,
    signInWithEmailAndPassword, signInWithPopup, signInWithRedirect
 } from '@angular/fire/auth';
-import { ReactiveFormsModule, UntypedFormBuilder, Validators } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyInputModule } from '@angular/material/legacy-input';
+import { MatLegacyFormFieldModule } from '@angular/material/legacy-form-field';
+import { MatLegacyCardModule } from '@angular/material/legacy-card';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
-import { FormContainerComponent } from '../../shared/components/form-container/form-container.component';
-import { MatCardModule } from '@angular/material/card';
-import { HorizontalRuleComponent } from '../../shared/components/horizontal-rule.component';
+import { ToolbarComponent } from '../../shared/components/toolbar.component';
 
-export type AuthType = "EmailAndPassword" | "Google" | "Facebook";
+export type AuthProvider = "EmailAndPassword" | "Google" | "Facebook";
 
 const facebookAuthProvider = new FacebookAuthProvider();
 const googleAuthProvider = new GoogleAuthProvider();
@@ -23,25 +20,20 @@ const googleAuthProvider = new GoogleAuthProvider();
 const isInStandaloneMode = () =>
    (window.matchMedia('(display-mode: standalone)').matches) ||
    ((window.navigator as any).standalone) ||
-   document.referrer.includes('android-app://')
+   document.referrer.includes('android-app://');
 
 @Component({
-   selector: 'app-login',
-   templateUrl: './login.component.html',
-   styleUrls: ['./login.component.scss'],
-   standalone: true,
-   imports: [FormContainerComponent, HorizontalRuleComponent, MatCardModule, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: true,
+    imports: [ToolbarComponent, FlexModule, MatLegacyCardModule, ReactiveFormsModule, MatLegacyFormFieldModule, MatLegacyInputModule, MatLegacyButtonModule, RouterLink]
 })
 export class LoginComponent implements OnInit {
-
-   loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
-   });
-
-   error = '';
+   loginForm: UntypedFormGroup;
+   error: string;
    loading = false;
-   returnUrl = '';
+   returnUrl: string;
 
    constructor(private route: ActivatedRoute,
       private router: Router,
@@ -53,6 +45,11 @@ export class LoginComponent implements OnInit {
          this.returnUrl = params['returnUrl'];
       });
 
+      this.loginForm = this.formBuilder.group({
+         email: ['', [Validators.required, Validators.email]],
+         password: ['', Validators.required]
+      });
+
       this.error = '';
    }
 
@@ -62,7 +59,9 @@ export class LoginComponent implements OnInit {
       }
    }
 
-   async signInWith(provider: AuthType, credentials?: { email: string, password: string }) {
+   async signInWith(provider: AuthProvider, credentials?: { email: string, password: string; }) {
+
+      let userCredentials: UserCredential;
 
       try {
          this.loading = true;
@@ -71,15 +70,15 @@ export class LoginComponent implements OnInit {
          switch (provider) {
 
             case "EmailAndPassword":
-               await signInWithEmailAndPassword(this.afAuth, credentials!.email, credentials!.password);
+               userCredentials = await signInWithEmailAndPassword(this.afAuth, credentials.email, credentials.password);
                break;
 
             case "Google":
-               await this._thirdPartySignIn(googleAuthProvider);
+               userCredentials = await this._thirdPartySignIn(googleAuthProvider);
                break;
 
             case "Facebook":
-               await this._thirdPartySignIn(facebookAuthProvider);
+               userCredentials = await this._thirdPartySignIn(facebookAuthProvider);
                break;
          }
          this._handleSignInSuccess();
@@ -94,11 +93,11 @@ export class LoginComponent implements OnInit {
     * Sign in with popup avoids re-loading the application on the browser.
     * TODO Review which method is better for mobile devices where popups are not handled as well
    */
-   private async _thirdPartySignIn(provider: GoogleAuthProvider): Promise<UserCredential | null> {
+   private async _thirdPartySignIn(provider): Promise<UserCredential> {
       if (isInStandaloneMode()) {
          await signInWithRedirect(this.afAuth, provider);
          const result = await getRedirectResult(this.afAuth);
-         if (result === null || result.user === null) {
+         if (result === null || provider.credentialFromResult(result) === null) {
             return null;
          }
          return result;

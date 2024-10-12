@@ -1,21 +1,35 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Club, Nations } from 'app/model';
 import { combineLatest, Observable } from 'rxjs';
-import { filter, map, startWith } from 'rxjs/operators';
+import {  map, startWith } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
 import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
 import { EventAdminService } from '../event-admin.service';
+import { AsyncPipe } from '@angular/common';
+import { MatLegacyFormFieldModule } from '@angular/material/legacy-form-field';
+import { MatOptionModule } from '@angular/material/core';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @UntilDestroy()
-@Component( {
-   selector: 'app-event-edit',
-   templateUrl: './event-edit.component.html',
-   styleUrls: [ './event-edit.component.scss' ]
-} )
+@Component({
+    selector: 'app-event-edit',
+    templateUrl: './event-edit.component.html',
+    styleUrls: ['./event-edit.component.scss'],
+    standalone: true,
+    imports: [ReactiveFormsModule, 
+              AsyncPipe, 
+              MatLegacyFormFieldModule, 
+              MatOptionModule, 
+              MatProgressBarModule,
+              MatAutocompleteModule,
+              MatDatepickerModule]
+})
 export class EventEditComponent implements OnInit, OnChanges {
    @Input() oevent: OEvent;
    new = true;

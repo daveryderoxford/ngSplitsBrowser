@@ -1,15 +1,16 @@
 import { Component, Output, EventEmitter, ViewChild, ElementRef, Input } from "@angular/core";
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
-  "selector": "file-button",
-  "template": `
+    // eslint-disable-next-line @angular-eslint/component-selector
+    "selector": "file-button",
+    "template": `
         <span>
         <input [accept]="accept" [multiple]="multiple" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
         <button type="button" mat-raised-button color=primary (click)="selectFile()">
           {{label}}
         </button>
-    </span>`
+    </span>`,
+    standalone: true
 })
 
 export class FileButtonComponent {

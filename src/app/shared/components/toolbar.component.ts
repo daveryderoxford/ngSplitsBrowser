@@ -12,14 +12,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     standalone: true,
     imports: [MatToolbarModule, SidenavButtonComponent]
 })
-export class ToolbarComponent implements OnInit {
+export class ToolbarComponent {
 
    @Input() title;
 
    constructor (  ) { }
-
-   ngOnInit() {
-   }
-
 
 }

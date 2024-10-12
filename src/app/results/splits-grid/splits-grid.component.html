@@ -46,7 +46,7 @@
         </ng-container>
 
         <!-- Splits times columns -->
-        @for (split of splitsColumns; track split) {
+        @for (split of splitsColumns; track split; let i = $index) {
           <ng-container [matColumnDef]="split">
             <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} <br> test</th>
             <td mat-cell [ngStyle]="{'background': cellColor(colorToggle.value, i, competitor)}" [ngClass]="{ 'selected': selectedCompetitors.isSelected(competitor) }"*matCellDef="let competitor">

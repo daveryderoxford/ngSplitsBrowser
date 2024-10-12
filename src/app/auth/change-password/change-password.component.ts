@@ -1,21 +1,21 @@
 import { Component } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Auth, updatePassword } from '@angular/fire/auth';
+import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
-import { MatLegacyButtonModule } from '@angular/material/legacy-button';
-
-import { MatLegacyInputModule } from '@angular/material/legacy-input';
-import { MatLegacyFormFieldModule } from '@angular/material/legacy-form-field';
-import { MatLegacyCardModule } from '@angular/material/legacy-card';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
+import { FormContainerComponent } from '../../shared/components/form-container/form-container.component';
 import { ToolbarComponent } from '../../shared/components/toolbar.component';
 
 @Component({
-    selector: 'app-change-password',
-    templateUrl: './change-password.component.html',
-    styleUrls: ['./change-password.component.scss'],
-    standalone: true,
-    imports: [ToolbarComponent, FlexModule, MatLegacyCardModule, ReactiveFormsModule, MatLegacyFormFieldModule, MatLegacyInputModule, MatLegacyButtonModule]
+  selector: 'app-change-password',
+  templateUrl: './change-password.component.html',
+  styleUrls: ['./change-password.component.scss'],
+  standalone: true,
+  imports: [FormContainerComponent,ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class ChangePasswordComponent {
   form: UntypedFormGroup;
@@ -23,7 +23,7 @@ export class ChangePasswordComponent {
 
   constructor(private router: Router,
     private formBuilder: UntypedFormBuilder,
-    private afAuth: AngularFireAuth) {
+    private afAuth: Auth) {
     this.form = this.formBuilder.group({
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required],
@@ -32,8 +32,8 @@ export class ChangePasswordComponent {
   }
 
   passwordMissMatch(g: UntypedFormGroup): any {
-    const p1 = g.get('password');
-    const p2 = g.get('confirmPassword');
+    const p1 = g.get('password')!;
+    const p2 = g.get('confirmPassword')!;
     let ret: { [error: string]: any } = {};
 
     if ((p1.touched || p2.touched) &&
@@ -47,19 +47,20 @@ export class ChangePasswordComponent {
 
   async changePassword() {
 
-    const user = await this.afAuth.currentUser;
-    const password = this.form.get('password').value;
+    const user = await this.afAuth.currentUser!;
+    const password = this.form.get('password')!.value;
 
     this.error = '';
 
     try {
-      await user.updatePassword(password);
+      await updatePassword(user, password);
       this.router.navigateByUrl('/');
 
-    } catch (error) {
-      console.log('SignupComponent: Error updating password:' + error.code + '  ' + error.message);
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        console.log('SignupComponent: Error updating password:' + e.message);
+      }
       this.error = 'Error updating password';
     }
   }
 }
-

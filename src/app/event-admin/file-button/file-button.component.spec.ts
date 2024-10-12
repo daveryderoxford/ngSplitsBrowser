@@ -8,7 +8,7 @@ describe('FileButtonComponent', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-    declarations: [FileButtonComponent]
+    imports: [FileButtonComponent]
 })
     .compileComponents();
   }));

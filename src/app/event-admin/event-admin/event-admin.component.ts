@@ -4,12 +4,32 @@ import { DialogsService } from "../../shared/dialogs/dialogs.service";
 import { OEvent } from "../../model/oevent";
 import { EventAdminService } from "../event-admin.service";
 import { Observable } from "rxjs";
+import { MatListModule } from '@angular/material/list';
+import { FileButtonComponent } from "../file-button/file-button.component";
+import { EventEditComponent } from "../event-edit/event-edit.component";
+import { NgFor, NgIf, AsyncPipe, DatePipe } from "@angular/common";
+import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
+import { MatCardModule } from '@angular/material/card';
+import { MatSidenavModule } from '@angular/material/sidenav';
 
 
 @Component({
-  selector: "app-event-admin",
-  templateUrl: "./event-admin.component.html",
-  styleUrls: ["./event-admin.component.scss"]
+    selector: "app-event-admin",
+    templateUrl: "./event-admin.component.html",
+    styleUrls: ["./event-admin.component.scss"],
+    standalone: true,
+    imports: [
+        SidenavButtonComponent,
+        NgFor,
+        NgIf,
+        EventEditComponent,
+        FileButtonComponent,
+        AsyncPipe,
+        DatePipe,
+        MatCardModule,
+        MatSidenavModule,
+        MatListModule
+    ],
 })
 export class EventAdminComponent implements OnInit {
 

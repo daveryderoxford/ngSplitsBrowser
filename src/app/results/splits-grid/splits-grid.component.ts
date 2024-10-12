@@ -124,16 +124,14 @@ export class SplitsGridComponent implements OnInit {
    }
 
    /** Select cell color based on time loss */
-   cellColor(enabled: boolean, control: string, competitor: Competitor): string {
+   cellColor(enabled: boolean, control: number, competitor: Competitor): string {
 
       let ret: string;
       const maxLoss = 180;
       const maxGain = 100;
 
-      const c = Number.parseInt(control);
-
       if (enabled && competitor.timeLosses) {
-         let percent = (maxLoss - competitor.timeLosses[c]) * 100 / (maxLoss + maxGain);
+         let percent = (maxLoss - competitor.timeLosses[control]) * 100 / (maxLoss + maxGain);
          percent = Math.min(percent, 100);
          percent = Math.max(percent, 0);
          ret = this.colorScale(percent);
@@ -148,13 +146,12 @@ export class SplitsGridComponent implements OnInit {
    }
 
    /** Format title for split time */
-   splitTitle(indexStr: string): string {
+   splitTitle(index: number): string {
       // eslint-disable-next-line radix
-      const index = Number.parseInt(indexStr);
       if (index === 0) {
          return 'S-1';
       } else if (index === this.course.numSplits) {
-         return (indexStr + '-F');
+         return (index.toString() + '-F');
       } else {
          let ret = (index + 1).toString();
          if ( this.course.hasControls ) {
