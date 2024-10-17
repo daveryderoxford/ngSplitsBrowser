@@ -2,10 +2,8 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { ResultsFoundDialogComponent } from './results-found-dialog.component';
 import { UserResult, OEvent } from 'app/model';
-import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatDialog as MatDialog } from '@angular/material/dialog';
 import { OverlayContainer } from '@angular/cdk/overlay';
-import { AppMaterialModule } from 'app/shared/components/material/app-material.module';
-import { DialogsModule } from 'app/shared/dialogs/dialogs.module';
 
 
 const event1: OEvent = null;
@@ -25,7 +23,7 @@ let overlayContainerElement: HTMLElement;
 
 beforeEach(() => {
   TestBed.configureTestingModule({
-    imports: [DialogsModule, AppMaterialModule, ResultsFoundDialogComponent],
+    imports: [ResultsFoundDialogComponent],
     providers: [
         {
             provide: OverlayContainer, useFactory: () => {

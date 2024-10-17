@@ -2,11 +2,10 @@
  * Event service
  */
 import { Injectable } from "@angular/core";
-import { AngularFirestore, QueryFn } from "@angular/fire/compat/firestore";
-import { BehaviorSubject, merge, Observable } from "rxjs";
-import { take, tap } from 'rxjs/operators';
+import { collection, collectionData, CollectionReference, doc, docData, DocumentReference, Firestore, orderBy, query, where } from '@angular/fire/firestore';
 import { Club, EventInfo, OEvent } from "app/model";
 import { PaganationService } from "app/shared";
+import { BehaviorSubject, merge, Observable } from "rxjs";
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
@@ -17,17 +16,17 @@ export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "di
 export class EventService {
 
   private events$: Observable<OEvent[]> = new Observable(null);
-  private currentSearch: QueryFn;
   private pageSize = 20;
   private cursor: OEvent = undefined;
   private _loading = new BehaviorSubject<boolean>(false);
 
-  constructor(private afs: AngularFirestore,
+  constructor(private firestore: Firestore,
     private ps: PaganationService<OEvent>) { }
 
     /** load event by key */
     getEvent(key: string): Observable<OEvent> {
-      return this.afs.doc<OEvent>("/events/" + key).valueChanges();
+      const d = doc(this.firestore, "/events/" + key) as DocumentReference<OEvent>;
+      return docData(d)
     }
 
   /** Sets search critera to use events list
@@ -55,29 +54,21 @@ export class EventService {
   get done(): Observable<boolean> {
     return this.ps.done;
   }
-  /** Gets all evenst for a club  */
+  /** Gets all events for a club  */
   getEventsForClub(club: Club): Observable<OEvent[]> {
 
-    const query = this.afs.collection<OEvent>("/events",
-      res => res
-            .where("club", "==", club.name)
-            .where("nationality", "==", club.nationality)
-            .orderBy('date', 'desc')
-    );
+    const eventsCollection = collection(this.firestore, "/events") as CollectionReference<any>;
+    const q = query(eventsCollection, 
+         where("club", "==", club.name), 
+         where("nationality", "==", club.nationality),
+         orderBy('date', 'desc'));
 
-    const clubs$ = query.valueChanges().pipe(
-      take(1)
-    );
-
-    return clubs$;
+    return collectionData(q);
   }
 
-  /** Get a list if club namees for all events ordered by name and nationality */
+  /** Get a list of club namees for all events ordered by name and nationality */
   getClubs(): Observable<Club[]> {
-    const obs =  this.afs.doc<Club[]>("clubs").valueChanges().pipe(
-        tap( clubs => console.log("EventService:  Clubs list returned.  Num clubs: " + clubs.length.toString() )),
-        take(1)
-      );
-    return obs;
+    const d = doc(this.firestore, "clubs") as DocumentReference<Club[]>
+    return docData(d);
   }
 }

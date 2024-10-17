@@ -2,8 +2,8 @@ import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angu
 import { CourseClass } from 'app/results/model';
 
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyMenuModule } from '@angular/material/legacy-menu';
-import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     selector: 'app-class-menu-button',
@@ -21,7 +21,7 @@ import { MatLegacyButtonModule } from '@angular/material/legacy-button';
 </mat-menu>
 `,
     standalone: true,
-    imports: [MatLegacyButtonModule, MatLegacyMenuModule, MatIconModule]
+    imports: [MatButtonModule, MatMenuModule, MatIconModule]
 })
 export class ClassMenuButtonComponent implements OnInit, OnChanges {
 

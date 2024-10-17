@@ -1,12 +1,10 @@
 import { Injectable } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { AngularFirestore, AngularFirestoreDocument } from "@angular/fire/compat/firestore";
+import { Auth, authState, User } from '@angular/fire/auth';
+import { doc, docData, DocumentReference, Firestore, setDoc, updateDoc } from '@angular/fire/firestore';
 import { EventService } from "app/events/event.service";
 import { CompetitorSearchData, ECard, OEvent, UserData, UserInfo, UserResult } from "app/model";
 import { Competitor, Course, InvalidData, Results } from "app/results/model";
 import { ResultsSelectionService } from "app/results/results-selection.service";
-import { CompetitorDataService } from "app/shared/services/competitor-data.service";
-import firebase from "firebase/compat/app";
 import { Observable, of } from 'rxjs';
 import { shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 
@@ -21,23 +19,24 @@ export class UserDataService {
   private uid: string;
 
   constructor (
-    private afAuth: AngularFireAuth,
-    private afs: AngularFirestore,
-    private csd: CompetitorDataService,
+    private auth: Auth,
+    private firestore: Firestore,
     private es: EventService,
     private rs: ResultsSelectionService
   ) {
 
-    this.user$ = this.afAuth.authState.pipe(
+    
+    this.user$ = authState(this.auth).pipe(
       startWith( null ),
-      switchMap( ( user: firebase.User ) => {
+      switchMap( ( user ) => {
         console.log()
         if ( !user ) {
           console.log( "UserData: Firebase user null.  Stop monitoring user date  " );
           return of( null );
         } else {
           console.log( `UserData: monitoring uid: ${user.uid}` );
-          return this._doc( user.uid ).valueChanges();
+          const d = doc(this.firestore, user.uid) as DocumentReference<UserData>
+          return docData(d);
         }
       } ),
       shareReplay(1)
@@ -65,34 +64,23 @@ export class UserDataService {
 
   /** Update the user info.  Returning the modified user details */
   async updateDetails( details: Partial<UserInfo> ): Promise<void> {
-    return this._getUserDoc().update( details )
+    return updateDoc(this._getUserDoc(), details);
   }
 
-  private _doc( uid: string ) {
-    return this.afs.doc<UserData>( "users/" + uid );
+  private _doc(uid: string): DocumentReference<UserData> {
+    return doc( this.firestore, "users/" + uid ) as DocumentReference<UserData>;
   }
 
   /** Get the database documents associated with the user
    * The user must be logged in to use this function.
    */
-  private _getUserDoc(): AngularFirestoreDocument<UserData> {
-    const userDoc = this.afs.doc<UserData>( "users/" + this.uid );
+  private _getUserDoc(): DocumentReference<UserData> {
+
+    const userDoc = doc(this.firestore, "users/" + this.uid) as DocumentReference<UserData>;
     return userDoc;
   }
 
-  /** Reserve a map for the user */
-  async addFixtureReminder( eventId: string ): Promise<void> {
-    await this._getUserDoc().update( {
-      reminders: firebase.firestore.FieldValue.arrayUnion( eventId ) as any
-    } );
-  }
-
-  async removeFixtureReminder( eventId: string ): Promise<void> {
-    await this._getUserDoc().update( {
-      reminders: firebase.firestore.FieldValue.arrayRemove( eventId ) as any
-    } );
-  }
-
+  
   /** Add userResult to the user results list, populating detail from the results data.
    * The user defaults to the current user.
   */
@@ -100,7 +88,7 @@ export class UserDataService {
 
     const obs = this.rs.loadResults( userResult.event ).pipe(
       tap( results => this._processResults( user.results, results, userResult ) ),
-      switchMap( () => this._getUserDoc().set( user ) )
+      switchMap( () => setDoc( this._getUserDoc(), user ) )
     );
 
     return obs;
@@ -166,26 +154,7 @@ export class UserDataService {
     if ( index > -1 ) {
       user.results.splice( index, 1 );
     }
-    return this._getUserDoc().set( user );
-  }
-
-  /** Find user results for the current user  */
-  async findUserResults( ecard: ECard ): Promise<UserResult[]> {
-    //
-    const searchResults = await this.csd.searchResultsByECard( ecard.id );
-
-    // Get the event for each search result
-    const userResults: UserResult[] = [];
-    for ( const compSearch of searchResults ) {
-      const oevent = await this.es.getEvent( compSearch.eventKey ).pipe( take( 1 ) ).toPromise();
-      const userResult = this._createUserResult( compSearch, oevent );
-      userResults.push( userResult );
-    }
-
-    // Sort by time
-    //  userResults.sort( (a: UserResult, b) => new Date(a.event.date) - new Date (b.event.date) );
-
-    return userResults;
+    return setDoc( this._getUserDoc(), user );
   }
 
   private _createUserResult( comp: CompetitorSearchData, event: OEvent ): UserResult {

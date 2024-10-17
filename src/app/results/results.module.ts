@@ -1,7 +1,4 @@
-import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from "@angular/forms";
-import { SharedModule } from "app/shared/shared.module";
 import { GraphComponent } from "./graph/graph.component";
 import { ClassMenuButtonComponent } from './results-navbar/class-menu-button.component';
 import { CompareWithComponent } from './results-navbar/compare-with.component';
@@ -14,10 +11,7 @@ import { SplitsGridComponent } from './splits-grid/splits-grid.component';
 
 @NgModule({
     imports: [
-        CommonModule,
-        ReactiveFormsModule,
         ResultsRoutingModule,
-        SharedModule,
         GraphComponent,
         ResultsViewComponent,
         ResultsNavbarComponent,

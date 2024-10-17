@@ -3,16 +3,16 @@ import { SelectionModel } from "@angular/cdk/collections";
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormControl, UntypedFormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatSort } from "@angular/material/sort";
-import { MatLegacyTableDataSource as MatTableDataSource, MatLegacyTableModule } from "@angular/material/legacy-table";
+import { MatTableDataSource as MatTableDataSource, MatTableModule } from "@angular/material/table";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
 import { ResultsSelectionService } from "../results-selection.service";
 import { Repairer } from '../model/repairer';
-import { MatLegacySlideToggleModule } from "@angular/material/legacy-slide-toggle";
-import { MatLegacyOptionModule } from "@angular/material/legacy-core";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatOptionModule } from "@angular/material/core";
 import { NgStyle, NgClass } from "@angular/common";
-import { MatLegacySelectModule } from "@angular/material/legacy-select";
-import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
+import { MatSelectModule } from "@angular/material/select";
+import { MatFormFieldModule } from "@angular/material/form-field";
 import { ResultsSearchComponent } from "../results-search/results-search.component";
 
 @UntilDestroy( { checkProperties: true } )
@@ -21,7 +21,7 @@ import { ResultsSearchComponent } from "../results-search/results-search.compone
     templateUrl: "./splits-grid.component.html",
     styleUrls: ["./splits-grid.component.scss"],
     standalone: true,
-    imports: [ResultsSearchComponent, MatLegacyFormFieldModule, MatLegacySelectModule, ReactiveFormsModule, MatLegacyOptionModule, MatLegacySlideToggleModule, MatLegacyTableModule, NgStyle, NgClass]
+    imports: [ResultsSearchComponent, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, MatSlideToggleModule, MatTableModule, NgStyle, NgClass]
 })
 export class SplitsGridComponent implements OnInit {
    results: Results;

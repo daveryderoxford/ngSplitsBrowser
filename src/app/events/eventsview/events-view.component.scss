@@ -1,17 +1,7 @@
-@import 'styles.scss';
 
 /* Structure */
 .main-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-}
-
-::ng-deep .mat-tab-body-content {
-  overflow: hidden !important;
-}
-
-/* https://github.com/angular/material2/issues/4591 */
-::ng-deep .mat-tab-body-wrapper {
-  flex-grow: 1;
 }

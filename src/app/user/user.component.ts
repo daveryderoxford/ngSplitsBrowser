@@ -2,7 +2,7 @@
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/compat/auth";
 import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from "@angular/forms";
-import { MatLegacyDialog as MatDialog } from "@angular/material/legacy-dialog";
+import { MatDialog as MatDialog } from "@angular/material/dialog";
 import { Router } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { EventService } from "app/events/event.service";
@@ -17,16 +17,16 @@ import firebase from "firebase/compat/app";
 import isEqual from 'lodash/isequal';
 import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MatLegacyCheckboxModule } from "@angular/material/legacy-checkbox";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatIconModule } from "@angular/material/icon";
-import { MatLegacyButtonModule } from "@angular/material/legacy-button";
-import { MatLegacyOptionModule } from "@angular/material/legacy-core";
-import { MatLegacySelectModule } from "@angular/material/legacy-select";
-import { MatLegacyInputModule } from "@angular/material/legacy-input";
-import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
-import { MatLegacyProgressBarModule } from "@angular/material/legacy-progress-bar";
+import { MatButtonModule } from "@angular/material/button";
+import { MatOptionModule } from "@angular/material/core";
+import { MatSelectModule } from "@angular/material/select";
+import { MatInputModule } from "@angular/material/input";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { NgStyle } from "@angular/common";
-import { MatLegacyCardModule } from "@angular/material/legacy-card";
+import { MatCardModule } from "@angular/material/card";
 import { FlexModule } from "@ngbracket/ngx-layout/flex";
 import { ToolbarComponent } from "../shared/components/toolbar.component";
 
@@ -36,7 +36,7 @@ import { ToolbarComponent } from "../shared/components/toolbar.component";
     templateUrl: "./user.component.html",
     styleUrls: ["./user.component.scss"],
     standalone: true,
-    imports: [ToolbarComponent, FlexModule, MatLegacyCardModule, ReactiveFormsModule, MatLegacyProgressBarModule, MatLegacyFormFieldModule, MatLegacyInputModule, MatLegacySelectModule, MatLegacyOptionModule, MatLegacyButtonModule, MatIconModule, NgStyle, MatLegacyCheckboxModule]
+    imports: [ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, NgStyle, MatCheckboxModule]
 })
 export class UserComponent implements OnInit {
   originalUserData: UserData = null;
@@ -196,43 +196,7 @@ export class UserComponent implements OnInit {
       return of( [] );
     }
   }
-
-  /** Finds results based on any unchanged field.
-   *  Matches based on ecard
-   */
-  async findUserResults( updatedUser: UserData ): Promise<UserResult[]> {
-    const originalUser = this.originalUserData;
-    let resultsFound: Array<UserResult> = [];
-
-    // Find results for any ecards that have changed.
-    for ( const ecard of updatedUser.ecards ) {
-      if ( !originalUser || !originalUser.ecards.find( origEcard => isEqual( ecard, origEcard ) ) ) {
-        resultsFound = resultsFound.concat( await this.usd.findUserResults( ecard ) );
-      }
-    }
-
-    /** TO DO do we want to search by name as well?
-    if (
-      !originalUser ||
-      originalUser.firstName !== updatedUser.firstName ||
-      originalUser.lastName !== updatedUser.lastName ||
-      originalUser.club !== updatedUser.club
-    ) {
-      resultsFound = resultsFound.concat(
-        await this.cds.searchResultsByName(
-          updatedUser.firstName,
-          updatedUser.lastName,
-          updatedUser.club
-        )
-      );
-    } */
-
-    // Remove duplicated from found results as may have been found for ecard and name
-    Utils.removeDuplicates( resultsFound );
-
-    return resultsFound;
-  }
-
+  
   canDeactivate(): boolean {
     return !this.userForm.dirty;
   }

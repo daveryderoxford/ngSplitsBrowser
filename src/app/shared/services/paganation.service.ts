@@ -1,8 +1,7 @@
 
 /** Service to paganate Firebase queries */
 import { Injectable } from '@angular/core';
-import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import firebase from "firebase/compat/app";
+import { collection, collectionSnapshots, CollectionReference, Firestore, getDocs, limit, orderBy, Query, query, startAfter, DocumentSnapshot } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 
@@ -31,12 +30,10 @@ export class PaganationService<T> {
   done: Observable<boolean> = this._done.asObservable();
   loading: Observable<boolean> = this._loading.asObservable();
 
-  
   // TODO private _cursor: firebase.firestore.QueryDocumentSnapshot;
-  private _cursor: any;
+  private _cursor: DocumentSnapshot;
 
-
-  constructor(private afs: AngularFirestore) { }
+  constructor(private firestore: Firestore) { }
 
   // Initial query sets options and defines the Observable
   // passing opts will override the defaults
@@ -55,11 +52,12 @@ export class PaganationService<T> {
       ...opts
     };
 
-    const first = this.afs.collection(this.query.path, ref => {
-      return ref
-        .orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc')
-        .limit(this.query.limit);
-    });
+    const c = collection(this.firestore, 'this.query.path') as CollectionReference<T>;
+
+    const first = query( c, 
+        orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
+        limit(this.query.limit)
+      );
 
     this.mapAndUpdate(first);
 
@@ -68,22 +66,22 @@ export class PaganationService<T> {
 
   }
 
-
   /**  Retrieves additional data from firestore */
   more() {
     const cursor = this._cursor;
 
-    const more = this.afs.collection(this.query.path, ref => {
-      return ref
-        .orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc')
-        .limit(this.query.limit)
-        .startAfter(cursor);
-    });
+    const col = collection(this.firestore, this.query.path ) as CollectionReference<T>;
+    const more = query( col, 
+      orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
+      limit(this.query.limit),
+      startAfter(cursor)
+    )
+
     this.mapAndUpdate(more);
   }
 
   // Maps the snapshot to usable format the updates source
-  private mapAndUpdate(col: AngularFirestoreCollection<any>) {
+  private mapAndUpdate(query: Query<T>) {
 
     if (this._done.value || this._loading.value) { return; }
 
@@ -91,12 +89,13 @@ export class PaganationService<T> {
     this._loading.next(true);
 
     // Map snapshot with doc ref (needed for cursor)
-    col.snapshotChanges().pipe(
-     tap( (arr) => {
-         let values = arr.map(snap =>  snap.payload.doc.data() as T );
+
+    collectionSnapshots(query).pipe(
+         tap( (arr) => {
+         let values = arr.map(snap => snap.data() as T );
 
         if (arr.length > 0) {
-          this._cursor = arr[arr.length - 1].payload.doc;
+          this._cursor = arr[arr.length - 1];
         }
 
         // If prepending, reverse the batch order

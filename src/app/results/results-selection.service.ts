@@ -1,10 +1,9 @@
-
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { AngularFirestore } from "@angular/fire/compat/firestore";
-import { AngularFireStorage } from '@angular/fire/compat/storage';
+import { doc, docData, DocumentReference, Firestore } from '@angular/fire/firestore';
+import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 import { OEvent } from "app/model/oevent";
-import { BehaviorSubject, combineLatest, Observable } from "rxjs";
+import { BehaviorSubject, combineLatest, from, Observable } from "rxjs";
 import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
 import { parseEventData } from "./import";
 import { Competitor, Course, CourseClass, InvalidData, Results, ResultsView } from "./model";
@@ -30,8 +29,8 @@ export class ResultsSelectionService {
    private _courseCompetitorsDisplayed$: BehaviorSubject<boolean> = new BehaviorSubject( false );
    private _resultsView$: BehaviorSubject<ResultsView> = new BehaviorSubject( resultsViews[ 0 ] );
 
-   constructor ( private afs: AngularFirestore,
-      private storage: AngularFireStorage,
+   constructor ( private firestore: Firestore,
+      private storage: Storage,
       private http: HttpClient
    ) { }
 
@@ -88,7 +87,8 @@ export class ResultsSelectionService {
    setSelectedEventByKey( key: string ): Observable<Results> {
       if ( !this._event$.value || key !== this._event$.value.key ) {
 
-         const obs = this.afs.doc<OEvent>( "/events/" + key ).valueChanges().pipe(
+         const d = doc(this.firestore, "/events/" + key) as DocumentReference<OEvent>;
+         const obs = docData(d).pipe(
             tap( evt => {
                if ( evt ) {
                   console.log( "ResultsSelectionService: Loading Event for key: " + evt.key );
@@ -228,7 +228,8 @@ export class ResultsSelectionService {
 
       const headers = new HttpHeaders( { 'Accept-Encoding': 'gzip' } );
 
-      const obs = this.storage.ref( path ).getDownloadURL().pipe(
+      const r = ref(this.storage, path );
+      const obs = from( getDownloadURL(r)).pipe(
          switchMap( url => this.http.get( url, { responseType: 'text', headers: headers } ) )
       );
       return obs;

@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/quotes */
 import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent, MatLegacyAutocompleteTrigger as MatAutocompleteTrigger, MatLegacyAutocompleteModule } from '@angular/material/legacy-autocomplete';
+import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
 //import { Subscription } from 'rxjs/Subscription';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
-import { MatLegacyOptionModule } from '@angular/material/legacy-core';
+import { MatOptionModule } from '@angular/material/core';
 
 import { MatIconModule } from '@angular/material/icon';
 
@@ -24,7 +24,7 @@ interface FilterPanelGroup {
     templateUrl: './results-search.component.html',
     styleUrls: ['./results-search.component.scss'],
     standalone: true,
-    imports: [MatLegacyAutocompleteModule, ReactiveFormsModule, MatIconModule, MatLegacyOptionModule]
+    imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
 })
 export class ResultsSearchComponent implements OnInit {
 

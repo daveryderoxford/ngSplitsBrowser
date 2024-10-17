@@ -1,18 +1,18 @@
 
+import { AsyncPipe, DatePipe } from "@angular/common";
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { MatLegacySelectChange as MatSelectChange, MatLegacySelectModule } from "@angular/material/legacy-select";
+import { MatOptionModule } from '@angular/material/core';
+import { MatExpansionModule } from "@angular/material/expansion";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSelectChange, MatSelectModule } from "@angular/material/select";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Club, EventGrades, Nation, Nations, OEvent } from "app/model";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { map, tap } from 'rxjs/operators';
 import { EventService } from "../event.service";
-import { MatLegacyProgressBarModule } from "@angular/material/legacy-progress-bar";
 import { EventsTableComponent } from "../events-table/events-table.component";
-import { MatExpansionModule } from "@angular/material/expansion";
-import { MatLegacyInputModule } from "@angular/material/legacy-input";
-import { MatLegacyOptionModule } from "@angular/material/legacy-core";
-import { AsyncPipe, DatePipe } from "@angular/common";
-import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
@@ -20,7 +20,7 @@ import { MatLegacyFormFieldModule } from "@angular/material/legacy-form-field";
     templateUrl: "./club-events-tab.component.html",
     styleUrls: ["./club-events-tab.component.scss"],
     standalone: true,
-    imports: [MatLegacyFormFieldModule, MatLegacySelectModule, MatLegacyOptionModule, MatLegacyInputModule, MatExpansionModule, EventsTableComponent, MatLegacyProgressBarModule, AsyncPipe, DatePipe]
+    imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, EventsTableComponent, MatProgressBarModule, AsyncPipe, DatePipe]
 })
 export class ClubEventsTabComponent implements OnInit {
    @Output() eventSelected = new EventEmitter<OEvent>();ng

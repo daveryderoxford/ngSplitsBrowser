@@ -4,7 +4,7 @@ import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { OEvent } from 'app/model';
 import { ResultsView } from '../model';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyMenuModule } from '@angular/material/legacy-menu';
+import { MatMenuModule } from '@angular/material/menu';
 
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
@@ -46,7 +46,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     }`
     ],
     standalone: true,
-    imports: [MatButtonToggleModule, MatLegacyMenuModule, MatIconModule]
+    imports: [MatButtonToggleModule, MatMenuModule, MatIconModule]
 })
 export class ResultsViewButtonComponent implements OnInit {
 

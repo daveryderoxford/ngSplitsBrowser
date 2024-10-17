@@ -1,18 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar as MatSnackBar } from '@angular/material/snack-bar';
 import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet } from "@angular/router";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { BulkImportService } from 'scripts/bulk-import';
 import { SidenavService } from './shared/services/sidenav.service';
-import firebase from "firebase/compat/app";
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { tap } from 'rxjs/operators';
 
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
 import { MatListModule } from '@angular/material/list';
+import { Auth, authState, signOut, User } from '@angular/fire/auth';
+import { Firestore } from '@angular/fire/firestore';
 
 @UntilDestroy()
 @Component({
@@ -28,15 +26,15 @@ export class AppComponent implements OnInit {
 
    loading = false;
    authorised = false;
-   user: firebase.User;
+   user: User;
    handset = false;
 
    constructor ( private router: Router,
-      private afs: AngularFirestore,
-      private afAuth: AngularFireAuth,
+      private firestore: Firestore,
+      private auth: Auth,
       private sidebarService: SidenavService,
       private snackbar: MatSnackBar,
-      private bs: BulkImportService,
+    //  private bs: BulkImportService,
       private snackBar: MatSnackBar,
       private breakpointObserver: BreakpointObserver,
    ) {
@@ -46,9 +44,6 @@ export class AppComponent implements OnInit {
          this.reportAnalytics( event );
          this.setLoading( event );
       } );
-
-      this.configureFirebase();
-
    }
 
    ngOnInit() {
@@ -57,9 +52,9 @@ export class AppComponent implements OnInit {
          .pipe( tap( state => console.log( 'AppComponnet: state: ' + state.matches.toString() ) ) )
          .subscribe( state => this.handset = !state.matches );
 
-      this.afAuth.authState
-              .pipe( untilDestroyed( this ) )
-              .subscribe( ( user: firebase.User ) => {
+      authState(this.auth)
+         .pipe(untilDestroyed(this))
+         .subscribe((user) => {
          this.authorised = ( user !== null );
          this.user = user;
       } );
@@ -109,10 +104,6 @@ export class AppComponent implements OnInit {
       }
    }
 
-   private configureFirebase() {
-      this.afs.firestore.settings( {} );
-   }
-
    async closeSidenav( target: Array<any>) {
       await this.sidenav.close();
       if ( target)  {
@@ -130,7 +121,8 @@ export class AppComponent implements OnInit {
       if ( this.router.url.includes( "admin" ) ) {
          await this.router.navigate( ["/"] );
       }
-      await this.afAuth.signOut();
+
+      await signOut(this.auth);
       await this.sidenav.close();
    }
 
@@ -181,7 +173,7 @@ export class AppComponent implements OnInit {
    }
 
    async scriptsClicked() {
-      await this.bs.loadEvents();
+     // await this.bs.loadEvents();
       await this.sidenav.close();
 
    }

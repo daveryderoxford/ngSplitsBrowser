@@ -1,17 +1,17 @@
-import { Component, OnInit, Inject } from '@angular/core';
-import { MatLegacyDialog as MatDialog, MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA, MatLegacyDialogModule } from '@angular/material/legacy-dialog';
-import { UserResult } from 'app/model';
-import { MatLegacyButtonModule } from '@angular/material/legacy-button';
-import { MatLineModule } from '@angular/material/core';
 import { DatePipe } from '@angular/common';
-import { MatLegacyListModule } from '@angular/material/legacy-list';
+import { Component, Inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatLineModule } from '@angular/material/core';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatListModule } from '@angular/material/list';
+import { UserResult } from 'app/model';
 
 @Component({
     selector: 'app-results-found-dialog',
     templateUrl: './results-found-dialog.component.html',
     styleUrls: ['./results-found-dialog.component.scss'],
     standalone: true,
-    imports: [MatLegacyDialogModule, MatLegacyListModule, MatLineModule, MatLegacyButtonModule, DatePipe]
+    imports: [MatDialogModule, MatListModule, MatLineModule, MatButtonModule, DatePipe]
 })
 export class ResultsFoundDialogComponent {
 

@@ -1,5 +1,5 @@
 import { Component, OnInit, Input} from '@angular/core';
-import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @Component({
@@ -13,7 +13,7 @@ import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progres
      `,
     styleUrls: ['./spinner.component.scss'],
     standalone: true,
-    imports: [MatLegacyProgressSpinnerModule]
+    imports: [MatProgressSpinnerModule]
 })
 export class SpinnerComponent {
 

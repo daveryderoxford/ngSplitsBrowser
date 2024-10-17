@@ -10,7 +10,7 @@ import { EventService } from '../../events/event.service';
 import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
 import { EventAdminService } from '../event-admin.service';
 import { AsyncPipe } from '@angular/common';
-import { MatLegacyFormFieldModule } from '@angular/material/legacy-form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOptionModule } from '@angular/material/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -24,7 +24,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
     standalone: true,
     imports: [ReactiveFormsModule, 
               AsyncPipe, 
-              MatLegacyFormFieldModule, 
+              MatFormFieldModule, 
               MatOptionModule, 
               MatProgressBarModule,
               MatAutocompleteModule,

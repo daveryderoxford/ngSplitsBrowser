@@ -6,7 +6,7 @@ import { EventService } from "../event.service";
 import { MyEventsTabComponent } from "../my-events-tab/my-events-tab.component";
 import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab.component";
 import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.component";
-import { MatLegacyTabsModule } from "@angular/material/legacy-tabs";
+import { MatTabsModule } from "@angular/material/tabs";
 import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
 
 @Component({
@@ -14,7 +14,7 @@ import { SidenavButtonComponent } from "../../shared/components/sidenav-button.c
     templateUrl: "./events-view.component.html",
     styleUrls: ["./events-view.component.scss"],
     standalone: true,
-    imports: [SidenavButtonComponent, MatLegacyTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent]
+    imports: [SidenavButtonComponent, MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent]
 })
 export class EventsViewComponent implements OnInit {
 

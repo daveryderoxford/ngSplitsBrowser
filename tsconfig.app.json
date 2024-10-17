@@ -12,5 +12,6 @@
   "exclude": [
     "./src/**/*.node.ts",
     "./src/results/**/*.ts",
+     "./src/scripts/**/*.ts",
   ],
 }

@@ -5,7 +5,7 @@ import { EventService } from 'app/events/event.service';
 import { EventGrades, Nations, OEvent } from 'app/model';
 import { Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { MatLegacyProgressBarModule } from '@angular/material/legacy-progress-bar';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AsyncPipe } from '@angular/common';
 import { EventsTableComponent } from '../events-table/events-table.component';
 
@@ -14,7 +14,7 @@ import { EventsTableComponent } from '../events-table/events-table.component';
     templateUrl: './all-events-tab.component.html',
     styleUrls: ['./all-events-tab.component.scss'],
     standalone: true,
-    imports: [EventsTableComponent, MatLegacyProgressBarModule, AsyncPipe]
+    imports: [EventsTableComponent, MatProgressBarModule, AsyncPipe]
 })
 export class AllEventsTabComponent implements OnInit {
 

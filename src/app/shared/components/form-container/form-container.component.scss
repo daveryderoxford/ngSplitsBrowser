@@ -1,10 +1,9 @@
 @use '@angular/material' as mat;
-@use '@angular/material-experimental' as matx;
 @use 'styles' as s;
 
-$screen-background: mat.get-theme-color(s.$theme, surface-container);
+$screen-background: gray;
 
-$card-background: mat.get-theme-color(s.$theme, surface);
+$card-background: white;
 
 mat-card {
     max-width: 400px !important;

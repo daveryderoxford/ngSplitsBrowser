@@ -1,185 +1,20 @@
 @use '@angular/material' as mat;
 
-// TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
-//  The following line adds:
-//    1. Default typography styles for all components
-//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
-//  If you specify typography styles for the components you use elsewhere, you should delete this line.
-//  If you don't need the default component typographies but still want the hierarchy styles,
-//  you can delete this line and instead use:
-//    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
-@include mat.all-legacy-component-typographies();
-@include mat.legacy-core();
+//@include mat.core();
 
-$my-primary: mat.define-palette(mat.$blue-palette);
-$my-accent: mat.define-palette(mat.$yellow-palette);
+$my-primary: mat.define-palette(mat.$indigo-palette, 500);
+$my-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 
-$my-theme: mat.define-light-theme((color: (primary: $my-primary, accent: $my-accent,)));
+// The "warn" palette is optional and defaults to red if not specified.
+$my-warn: mat.define-palette(mat.$red-palette);
 
-@include mat.all-legacy-component-themes($my-theme);
-
-// Theme toggle buttons
-@mixin mix-app-theme($my-theme) {
-
-  .mat-button-toggle-checked {
-     background-color: mat.get-color-from-palette($my-primary, 50);
-  }
-}
-
-// Include the mixin
-@include mix-app-theme($my-theme);
-
-//  Common colors
-$gray-background-color: rgb(209,209,209);
-$gray-text-color: rgb(100,100,100);
-$text-link-color: rgb(20, 20,18000);
-$error-color: red;
-
-// Text Styles 
-html, body {
- font-family: 'Roboto';
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 20px;
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  overflow: auto;
-}
-
-h1, h2, h3, h4, h5, h6, p {
-  margin: 0;
-  padding: 0;
-}
-
-/**
-* Styles for HTML text elements
-*/
-
-h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
-    font-size: 56px;
-     font-weight: 400;
-     line-height: 1.35;
-     letter-spacing: -0.02em;
-     opacity: 0.54;
-
-  font-size: 0.6em;
-}
-
-h1 {
-    font-size: 56px;
-    font-weight: 400;
-    line-height: 1.35;
-    letter-spacing: -0.02em;
-  margin-top: 24px;
-  margin-bottom: 24px;
-}
-
-h2 {
-    font-size: 45px;
-     font-weight: 400;
-     line-height: 48px;
-
-  margin-top: 24px;
-  margin-bottom: 24px;
-}
-
-h3 {
-    font-size: 34px;
-    font-weight: 400;
-    line-height: 40px;
-
-  margin-top: 24px;
-  margin-bottom: 24px;
-}
-
-h4 {
-    font-size: 24px;
-    font-weight: 400;
-    line-height: 32px;
-    -moz-osx-font-smoothing: grayscale;
-
-  margin-top: 24px;
-  margin-bottom: 16px;
-}
-
-h5 {
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: 0.02em;
-
-  margin-top: 24px;
-  margin-bottom: 16px;
-}
-
-h6 {
-    font-size: 16px;
-   font-weight: 400;
-   line-height: 28px;
-   letter-spacing: 0.04em;
-
-  margin-top: 24px;
-  margin-bottom: 16px;
-}
-
-p {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 24px;
-    letter-spacing: 0;
-
-  margin-bottom: 16px;
-}
-
-a {
-  color: $text-link-color;
-  font-weight: 500;
-}
-
-blockquote {
-    position: relative;
-     font-size: 24px;
-     font-weight: 300;
-     font-style: italic;
-     line-height: 1.35;
-     letter-spacing: 0.08em;
-
-     &:before {
-       position: absolute;
-       left: -0.5em;
-       content: '“';
-     }
-
-     &:after {
-       content: '”';
-       margin-left: -0.05em;
-     }
-}
-
- mark {
-  background-color: #f4ff81;
-}
-
-dt {
-  font-weight: 700;
-}
-
-address {
-    font-size: 12px;
-     font-weight: 400;
-     line-height: 1;
-     letter-spacing: 0;
-
-  font-style: normal;
-}
-
-ul, ol {
-    font-size: 14px;
-     font-weight: 400;
-     line-height: 24px;
-     letter-spacing: 0;
-}
+$my-theme: mat.define-light-theme((color: (primary: $my-primary,
+        accent: $my-accent,
+        warn: $my-warn,
+      ),
+      typography: mat.define-typography-config(),
+      density: 0,
+    ));
 
  .error {
     font-family: 'Roboto';
@@ -200,3 +35,5 @@ ul, ol {
   padding: 18x;
 }
 
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

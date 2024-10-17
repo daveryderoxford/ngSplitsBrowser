@@ -1,18 +1,6 @@
 // Import theming functions
 @use '@angular/material' as mat;
 
-// Include non-theme styles for core.
-// TODO(v15): As of v15 mat.legacy-core no longer includes default typography styles.
-//  The following line adds:
-//    1. Default typography styles for all components
-//    2. Styles for typography hierarchy classes (e.g. .mat-headline-1)
-//  If you specify typography styles for the components you use elsewhere, you should delete this line.
-//  If you don't need the default component typographies but still want the hierarchy styles,
-//  you can delete this line and instead use:
-//    `@include mat.legacy-typography-hierarchy(mat.define-legacy-typography-config());`
-@include mat.all-legacy-component-typographies();
-@include mat.legacy-core();
-
 .results-navbar-container {
   display: flex;
   flex-wrap: wrap;
@@ -49,18 +37,6 @@
   height: 21px;
   margin: 0 7px 2px 0;
   vertical-align: middle;
-}
-
-
-
-///Mterial2 stykes
-
-.docs-navbar {
-  display: none;
-}
-
-.docs-navbar-show-small {
-  display: none;
 }
 
 /**

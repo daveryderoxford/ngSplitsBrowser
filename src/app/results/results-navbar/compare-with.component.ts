@@ -2,8 +2,8 @@ import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angu
 import { ComparisionOption, ALL_COMPARISON_OPTIONS } from 'app/results/graph/splitsbrowser/comparision-options';
 
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyMenuModule } from '@angular/material/legacy-menu';
-import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonModule } from '@angular/material/button';
 
 
 @Component({
@@ -22,7 +22,7 @@ import { MatLegacyButtonModule } from '@angular/material/legacy-button';
   </mat-menu>
   `,
     standalone: true,
-    imports: [MatLegacyButtonModule, MatLegacyMenuModule, MatIconModule]
+    imports: [MatButtonModule, MatMenuModule, MatIconModule]
 })
 export class CompareWithComponent implements OnInit, OnChanges {
 

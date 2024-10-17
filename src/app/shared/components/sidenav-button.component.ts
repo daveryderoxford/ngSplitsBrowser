@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SidenavService } from 'app/shared/services/sidenav.service';
 import { MatIconModule } from '@angular/material/icon';
-import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     selector: 'app-sidenav-button',
@@ -11,7 +11,7 @@ import { MatLegacyButtonModule } from '@angular/material/legacy-button';
   </a>
     `,
     standalone: true,
-    imports: [MatLegacyButtonModule, MatIconModule]
+    imports: [MatButtonModule, MatIconModule]
 })
 export class SidenavButtonComponent implements OnInit {
 
