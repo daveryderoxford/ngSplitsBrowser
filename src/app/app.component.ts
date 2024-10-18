@@ -37,14 +37,7 @@ export class AppComponent implements OnInit {
     //  private bs: BulkImportService,
       private snackBar: MatSnackBar,
       private breakpointObserver: BreakpointObserver,
-   ) {
-
-      // Send google analytics message when navigating to any route succeeds.
-      this.router.events.subscribe( event => {
-         this.reportAnalytics( event );
-         this.setLoading( event );
-      } );
-   }
+   ) { }
 
    ngOnInit() {
 
@@ -94,13 +87,6 @@ export class AppComponent implements OnInit {
          routerEvent instanceof NavigationCancel ||
          routerEvent instanceof NavigationError ) {
          this.loading = false;
-      }
-   }
-
-   private reportAnalytics( event: Event ) {
-      if ( event instanceof NavigationEnd ) {
-         ( <any> window ).ga( 'set', 'page', event.urlAfterRedirects );
-         ( <any> window ).ga( 'send', 'pageview' );
       }
    }
 
