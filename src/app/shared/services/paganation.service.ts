@@ -1,6 +1,6 @@
 
 /** Service to paganate Firebase queries */
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { collection, collectionSnapshots, CollectionReference, Firestore, getDocs, limit, orderBy, Query, query, startAfter, DocumentSnapshot } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
@@ -17,7 +17,7 @@ export interface QueryConfig {
   providedIn: 'root',
 })
 export class PaganationService<T> {
-
+      private firestore = inject(Firestore);
   // Source data
   private _done = new BehaviorSubject<boolean>(false);
   private _loading = new BehaviorSubject<boolean>(false);
@@ -32,9 +32,6 @@ export class PaganationService<T> {
 
   // TODO private _cursor: firebase.firestore.QueryDocumentSnapshot;
   private _cursor: DocumentSnapshot;
-
-  constructor(private firestore: Firestore) { }
-
   // Initial query sets options and defines the Observable
   // passing opts will override the defaults
   init(path: string, field: string, opts?: any) {
@@ -52,7 +49,7 @@ export class PaganationService<T> {
       ...opts
     };
 
-    const c = collection(this.firestore, 'this.query.path') as CollectionReference<T>;
+    const c = collection(this.firestore, this.query.path) as CollectionReference<T>;
 
     const first = query( c, 
         orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),

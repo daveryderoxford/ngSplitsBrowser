@@ -10,9 +10,6 @@ import { ToolbarComponent } from '../shared/components/toolbar.component';
     imports: [ToolbarComponent]
 })
 export class PrivacyPolicyComponent implements OnInit {
-
-  constructor() { }
-
   ngOnInit() {
   }
 

@@ -1,13 +1,9 @@
 
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 
 @Injectable()
 export class SBTestSupport {
-
-
-    constructor(private auth: AngularFireAuth) {
-
-    }
+      private auth = inject(AngularFireAuth);
 }

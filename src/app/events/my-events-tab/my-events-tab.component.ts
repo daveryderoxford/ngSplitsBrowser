@@ -1,6 +1,6 @@
 
 import { AsyncPipe } from "@angular/common";
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { Component, OnInit, output, inject } from "@angular/core";
 import { Auth, authState } from '@angular/fire/auth';
 import { MatButtonModule } from "@angular/material/button";
 import { MatListModule } from "@angular/material/list";
@@ -20,13 +20,14 @@ import { filter, map } from 'rxjs/operators';
     imports: [MatButtonModule, RouterLink, MatListModule, AsyncPipe]
 })
 export class MyEventsTabComponent implements OnInit {
-   @Output() eventSelected = new EventEmitter();
+      private us = inject(UserDataService);
+      private auth = inject(Auth);
+   eventSelected = output<OEvent>();
 
    loggedIn: boolean;
    myResults$: Observable<UserResult[]>;
 
-   constructor(private us: UserDataService,
-      private auth: Auth) {
+   constructor() {
 
          authState(this.auth).subscribe( user => this.loggedIn = (user !== null));
 

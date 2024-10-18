@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Auth, User, authState } from '@angular/fire/auth';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,11 +15,12 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
   styleUrl: './auth-button.component.scss'
 })
 export class AuthButtonComponent {
-
+      private auth = inject(Auth);
+      private router = inject(Router);
   authorised = false;
   user: User | null = null;
 
-  constructor(private auth: Auth, private router: Router) {
+  constructor() {
     authState(this.auth)
       .pipe(untilDestroyed(this))
       .subscribe((u) => {

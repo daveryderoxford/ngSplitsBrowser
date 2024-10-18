@@ -1,5 +1,5 @@
 
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Auth, authState } from '@angular/fire/auth';
 import { CanActivate, Router } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -9,7 +9,8 @@ import { map, take, tap } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class UnauthGuard implements CanActivate {
-  constructor(private afAuth: Auth, private router: Router) { }
+      private afAuth = inject(Auth);
+      private router = inject(Router);
 
   canActivate(): Observable<boolean> {
     return authState(this.afAuth).pipe(

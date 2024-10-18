@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
    Auth,
    FacebookAuthProvider, GoogleAuthProvider, UserCredential, getRedirectResult,
@@ -33,7 +33,10 @@ const isInStandaloneMode = () =>
    imports: [FormContainerComponent, HorizontalRuleComponent, MatCardModule, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class LoginComponent implements OnInit {
-
+      private route = inject(ActivatedRoute);
+      private router = inject(Router);
+      private formBuilder = inject(UntypedFormBuilder);
+      private afAuth = inject(Auth);
    loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -42,11 +45,6 @@ export class LoginComponent implements OnInit {
    error = '';
    loading = false;
    returnUrl = '';
-
-   constructor(private route: ActivatedRoute,
-      private router: Router,
-      private formBuilder: UntypedFormBuilder,
-      private afAuth: Auth) { }
 
    ngOnInit() {
       this.route.queryParams.subscribe(params => {

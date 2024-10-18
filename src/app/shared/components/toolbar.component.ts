@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, input } from '@angular/core';
 import { SidenavButtonComponent } from './sidenav-button.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
@@ -6,7 +6,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     selector: 'app-toolbar',
     template: `
 <mat-toolbar>
-   <app-sidenav-button> </app-sidenav-button> <ng-content> </ng-content>
+   <app-sidenav-button  /> <ng-content  />
 </mat-toolbar>
     `,
     standalone: true,
@@ -14,8 +14,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 })
 export class ToolbarComponent {
 
-   @Input() title;
+   title = input();
 
    constructor (  ) { }
-
 }

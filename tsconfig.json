@@ -23,9 +23,10 @@
     "types": [
       "d3"
     ],
-    "useDefineForClassFields": false
+    "useDefineForClassFields": false,
+    "skipLibCheck": true
   },
   "angularCompilerOptions": {
-    "strictTemplates": true,
+    "strictTemplates": true
   }
 }

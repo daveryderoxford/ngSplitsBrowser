@@ -1,6 +1,6 @@
 
 import { AsyncPipe, DatePipe } from "@angular/common";
-import { Component, EventEmitter, OnInit, Output } from "@angular/core";
+import { Component, OnInit, output, inject } from "@angular/core";
 import { MatOptionModule } from '@angular/material/core';
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -23,7 +23,8 @@ import { EventsTableComponent } from "../events-table/events-table.component";
     imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, EventsTableComponent, MatProgressBarModule, AsyncPipe, DatePipe]
 })
 export class ClubEventsTabComponent implements OnInit {
-   @Output() eventSelected = new EventEmitter<OEvent>();ng
+      private es = inject(EventService);
+   eventSelected = output<OEvent>();
 
    clubNationalityFilter$ = new BehaviorSubject<string>("");
    clubNameFilter$ = new BehaviorSubject<string>("");
@@ -36,7 +37,7 @@ export class ClubEventsTabComponent implements OnInit {
    grades: EventGrades[];
    nations: Nation[];
 
-   constructor(private es: EventService) {
+   constructor() {
       this.loading$ = this.es.loading;
 
       this.grades = EventGrades.grades;

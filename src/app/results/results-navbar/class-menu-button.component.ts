@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, input, output } from '@angular/core';
 import { CourseClass } from 'app/results/model';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -7,13 +7,14 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     selector: 'app-class-menu-button',
-    template: `
+    
+        template: `
 <button mat-button [matMenuTriggerFor]="classPicker">
   {{ buttonText }}
   <mat-icon>arrow_drop_down</mat-icon>
 </button>
 <mat-menu #classPicker="matMenu">
-  @for (oclass of oclasses; track oclass) {
+  @for (oclass of oclasses(); track oclass) {
     <button mat-menu-item (click)="select.emit(oclass)">
       {{oclass.name}}
     </button>
@@ -25,19 +26,17 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class ClassMenuButtonComponent implements OnInit, OnChanges {
 
-   @Input() oclasses: CourseClass[];
-   @Input() selectedClass: CourseClass;
-   @Output() select = new EventEmitter<CourseClass>();
+   oclasses = input<CourseClass[]>();
+   selectedClass = input<CourseClass>();
+   select = output<CourseClass>();
 
    buttonText: string;
-
-   constructor() { }
 
    ngOnInit() { }
 
    ngOnChanges() {
-      if (this.selectedClass) {
-         this.buttonText = this.selectedClass.name;
+      if (this.selectedClass()) {
+         this.buttonText = this.selectedClass()!.name;
       } else {
          this.buttonText = 'Class';
       }

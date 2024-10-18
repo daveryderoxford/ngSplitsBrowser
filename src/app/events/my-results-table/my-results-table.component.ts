@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit, input, output } from '@angular/core';
 import { OEvent, UserResult } from 'app/model';
 import { TimeUtilities, sbTime } from 'app/results/model';
 import { NgClass, DatePipe } from '@angular/common';
@@ -13,20 +13,18 @@ import { MatTableModule } from '@angular/material/table';
 })
 export class MyResultsTableComponent implements OnInit {
 
-  @Input() dataSource: UserResult[];
-  @Input() displayedColumns = ["eventInfo.date",
-                              "eventInfo.name",
-                              "eventInfo.club",
-                              "classPosition",
-                              "classWinningTime",
-                              "totalTime",
-                              "minPerKm",
-                              "behindWinner"
-                              ];
+  dataSource = input<UserResult[]>();
+  displayedColumns = input(["eventInfo.date",
+        "eventInfo.name",
+        "eventInfo.club",
+        "classPosition",
+        "classWinningTime",
+        "totalTime",
+        "minPerKm",
+        "behindWinner"
+    ]);
 
-  @Output() eventSelected = new EventEmitter<OEvent>();
-
-  constructor() { }
+  eventSelected = output<OEvent>();
 
   ngOnInit() {
   }
@@ -46,5 +44,4 @@ export class MyResultsTableComponent implements OnInit {
   eventClicked(event: OEvent) {
     this.eventSelected.emit(event);
   }
-
 }

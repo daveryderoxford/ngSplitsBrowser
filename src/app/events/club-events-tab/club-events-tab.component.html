@@ -34,13 +34,13 @@
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
             <app-events-table [events]="clubEvents" [displayedColumns]=" ['date', 'name', 'grade', 'discipline', 'type']"
-            (eventSelected)="eventClicked($event)"></app-events-table>
+            (eventSelected)="eventClicked($event)" />
           </ng-template>
         </mat-expansion-panel>
       }
 
       @if (loading$ | async) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <mat-progress-bar mode="indeterminate" />
       }
 
     </mat-accordion>

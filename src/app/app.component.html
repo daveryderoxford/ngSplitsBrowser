@@ -1,4 +1,4 @@
-<app-spinner [loading]="loading"> </app-spinner>
+<app-spinner [loading]="loading" />
 
 <mat-sidenav-container class="fullscreen">
 
@@ -17,7 +17,7 @@
       <!-- <button mat-list-item (click)='closeSidenav( "/events")'>Results</button>
       <button mat-list-item (click)='closeSidenav( "/admin/event-admin" )'>Admin</button> -->
 
-      <mat-divider></mat-divider>
+      <mat-divider  />
 
       @if (authorised) {
         <button mat-list-item (click)='closeSidenav(["/user"])'>User settings</button>
@@ -29,7 +29,7 @@
         <button mat-list-item (click)='closeSidenav(["/auth/login"])'>Login</button>
       }
 
-      <mat-divider></mat-divider>
+      <mat-divider  />
       <button mat-list-item (click)='closeSidenav(["/about"])'>About</button>
       <button mat-list-item (click)='contact()'>Contact</button>
 
@@ -46,5 +46,5 @@
   </mat-sidenav>
 
   <mat-sidenav-content class="fullscreen">
-    <router-outlet></router-outlet>
+    <router-outlet  />
   </mat-sidenav-content>

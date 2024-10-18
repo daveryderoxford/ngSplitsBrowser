@@ -2,10 +2,10 @@
 
   <div class="data-container mat-elevation-z2" (scroll)="onTableScroll($event)">
 
-    <app-events-table [events]="dataSource" (eventSelected)="eventClicked($event)"></app-events-table>
+    <app-events-table [events]="dataSource" (eventSelected)="eventClicked($event)" />
 
     @if (loading | async) {
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate" />
     }
 
   </div>

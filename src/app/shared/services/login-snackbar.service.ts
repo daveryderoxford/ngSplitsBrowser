@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 
@@ -6,11 +6,9 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class LoginSnackbarService {
-
+      private snackbar = inject(MatSnackBar);
+      private router = inject(Router);
   target: string;
-
-  constructor(private snackbar: MatSnackBar,
-              private router: Router) { }
 
   open(message: string, target?: string) {
     const snackBarRef = this.snackbar.open( message, "Login", { duration: 3000 });

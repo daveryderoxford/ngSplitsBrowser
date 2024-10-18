@@ -1,5 +1,5 @@
 import { AsyncPipe, DatePipe, NgFor, NgIf } from "@angular/common";
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -31,15 +31,13 @@ import { FileButtonComponent } from "../file-button/file-button.component";
   ],
 })
 export class EventAdminComponent {
-
+      private eventAdmin = inject(EventAdminService);
+      private dialogsService = inject(DialogsService);
   events: Observable<OEvent[]>;
 
   selectedEvent: OEvent = null;
   new = false;
   loading = false;
-
-  constructor(private eventAdmin: EventAdminService,
-    private dialogsService: DialogsService) { }
 
   async uploadSplits(files: File[]) {
     let confirm = true;

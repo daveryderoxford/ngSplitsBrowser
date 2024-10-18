@@ -1,6 +1,6 @@
 
 import { DataSource } from '@angular/cdk/table';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit, output, inject } from '@angular/core';
 import { EventService } from 'app/events/event.service';
 import { EventGrades, Nations, OEvent } from 'app/model';
 import { Observable } from 'rxjs';
@@ -17,8 +17,8 @@ import { EventsTableComponent } from '../events-table/events-table.component';
     imports: [EventsTableComponent, MatProgressBarModule, AsyncPipe]
 })
 export class AllEventsTabComponent implements OnInit {
-
-  @Output() eventSelected = new EventEmitter();
+      private es = inject(EventService);
+  eventSelected = output<OEvent>();
 
   dataSource: EventDataSource | null;
 
@@ -26,8 +26,6 @@ export class AllEventsTabComponent implements OnInit {
   nations = Nations.getNations();
 
   loading: Observable<boolean>;
-
-  constructor(private es: EventService) { }
 
   ngOnInit() {
     this.loading = this.es.loading.pipe(delay(0));

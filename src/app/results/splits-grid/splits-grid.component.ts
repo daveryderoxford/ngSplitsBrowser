@@ -1,6 +1,6 @@
 
 import { SelectionModel } from "@angular/cdk/collections";
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnInit, viewChild, inject } from "@angular/core";
 import { FormControl, UntypedFormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource as MatTableDataSource, MatTableModule } from "@angular/material/table";
@@ -24,6 +24,7 @@ import { ResultsSearchComponent } from "../results-search/results-search.compone
     imports: [ResultsSearchComponent, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, MatSlideToggleModule, MatTableModule, NgStyle, NgClass]
 })
 export class SplitsGridComponent implements OnInit {
+      private rs = inject(ResultsSelectionService);
    results: Results;
    course: Course;
    oclass: CourseClass;
@@ -41,13 +42,11 @@ export class SplitsGridComponent implements OnInit {
    courseToggle = new FormControl<boolean>(true);
    colorToggle = new FormControl<boolean>(true);
 
-   @ViewChild(MatSort) sort: MatSort;
-
-   constructor(private rs: ResultsSelectionService) { }
+   sort = viewChild(MatSort);
 
    ngOnInit() {
 
-      this.dataSource.sort = this.sort;
+      this.dataSource.sort = this.sort();
 
       // Subecribed to updates from results selection
       this.rs.selectedResults.subscribe(results => this.selectedResultsUpdated(results));
@@ -99,7 +98,7 @@ export class SplitsGridComponent implements OnInit {
 
       if (oclass) {
          this.dataSource = new MatTableDataSource(oclass.competitors);
-         this.dataSource.sort = this.sort;
+         this.dataSource.sort = this.sort();
       } else {
          this.dataSource = new MatTableDataSource([]);
       }

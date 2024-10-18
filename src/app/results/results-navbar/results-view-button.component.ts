@@ -1,6 +1,6 @@
 /** Pure component to show button groupto allow results view to be selected */
 
-import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, input, output } from '@angular/core';
 import { OEvent } from 'app/model';
 import { ResultsView } from '../model';
 import { MatIconModule } from '@angular/material/icon';
@@ -10,11 +10,12 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
     selector: 'app-results-view-button',
-    template: `
-  <mat-button-toggle-group>
+    
+        template: `
+  <mat-button-toggle-group [hideSingleSelectionIndicator]=true>
   
     @for (view of primaryViews; track view) {
-      <mat-button-toggle class="toggelebutton" [checked]="selectedView.type === view.type"
+      <mat-button-toggle class="toggelebutton" [checked]="selectedView().type === view.type"
         (click)="buttonClicked(view)" >
         {{ view.name }}
       </mat-button-toggle>
@@ -54,20 +55,17 @@ export class ResultsViewButtonComponent implements OnInit {
       If the primary property is set on the view it will be displayed as a button
       If the primary propery is not set it will be displayed in the 'More' menu
   */
-  @Input() views: ResultsView[] = [];
-  @Input() selectedView: ResultsView;
+  views = input<ResultsView[]>([]);
+  selectedView = input<ResultsView>();
 
-  @Output() viewSelected = new EventEmitter<ResultsView>();
+  viewSelected = output<ResultsView>();
 
   primaryViews: ResultsView[];
   additionalViews: ResultsView[];
 
-  constructor() {
-  }
-
   ngOnInit() {
-    this.primaryViews = this.views.filter(view => view.primary);
-    this.additionalViews = this.views.filter(view => !view.primary);
+    this.primaryViews = this.views().filter(view => view.primary);
+    this.additionalViews = this.views().filter(view => !view.primary);
   }
 
   buttonClicked(view: ResultsView) {

@@ -7,8 +7,4 @@ import { Component, OnInit } from '@angular/core';
     standalone: true
 })
 export class ResultsViewComponent {
-
-  constructor() { }
-
-
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, viewChild } from '@angular/core';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBar as MatSnackBar } from '@angular/material/snack-bar';
 import { Event, NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, RouterOutlet } from "@angular/router";
@@ -22,7 +22,7 @@ import { Firestore } from '@angular/fire/firestore';
 })
 export class AppComponent implements OnInit {
 
-   @ViewChild( MatSidenav, { static: true } ) sidenav: MatSidenav;
+   sidenav = viewChild<MatSidenav>(MatSidenav);
 
    loading = false;
    authorised = false;
@@ -59,7 +59,7 @@ export class AppComponent implements OnInit {
          this.user = user;
       } );
 
-      this.sidebarService.setSidenav( this.sidenav );
+      this.sidebarService.setSidenav( this.sidenav() );
       this.cookieConsent();
    }
 
@@ -105,14 +105,14 @@ export class AppComponent implements OnInit {
    }
 
    async closeSidenav( target: Array<any>) {
-      await this.sidenav.close();
+      await this.sidenav().close();
       if ( target)  {
          await this.router.navigate( target );
       }
    }
 
    async contact() {
-      await this.sidenav.close();
+      await this.sidenav().close();
       window.location.href = "mailto:support@splitsbrowser.org.uk";
    }
 
@@ -123,7 +123,7 @@ export class AppComponent implements OnInit {
       }
 
       await signOut(this.auth);
-      await this.sidenav.close();
+      await this.sidenav().close();
    }
 
 
@@ -174,7 +174,7 @@ export class AppComponent implements OnInit {
 
    async scriptsClicked() {
      // await this.bs.loadEvents();
-      await this.sidenav.close();
+      await this.sidenav().close();
 
    }
 }

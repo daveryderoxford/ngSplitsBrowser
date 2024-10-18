@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnChanges, input, output } from '@angular/core';
 import { ComparisionOption, ALL_COMPARISON_OPTIONS } from 'app/results/graph/splitsbrowser/comparision-options';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -26,19 +26,17 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class CompareWithComponent implements OnInit, OnChanges {
 
-  @Input() selected: ComparisionOption;
-  @Output() select = new EventEmitter<ComparisionOption>();
+  selected = input<ComparisionOption>();
+  select = output<ComparisionOption>();
 
   buttonText: string;
   options = ALL_COMPARISON_OPTIONS;
 
-  constructor() { }
-
   ngOnInit() { }
 
   ngOnChanges() {
-     if (this.selected) {
-        this.buttonText = this.selected.nameKey;
+     if (this.selected()) {
+        this.buttonText = this.selected()!.nameKey;
      } else {
         this.buttonText = 'Compare Against';
      }

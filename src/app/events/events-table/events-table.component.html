@@ -6,7 +6,7 @@
 -->
 
 
-<table mat-table class="table" [dataSource]="events">
+<table mat-table class="table" [dataSource]="events()">
 
   <!-- Date Definition -->
   <ng-container matColumnDef="date">
@@ -75,6 +75,6 @@
   </ng-container>
 
   <!-- Header and Row Declarations -->
-  <tr mat-header-row  *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)=eventClicked(row)></tr>
+  <tr mat-header-row  *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns();" (click)=eventClicked(row)></tr>
 </table>

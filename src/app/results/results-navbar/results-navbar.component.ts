@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, input, inject } from "@angular/core";
 import { OEvent,  } from "app/model";
 import { resultsViews, ResultsView } from "../model/results-view";
 import { ResultsSelectionService } from "../results-selection.service";
@@ -20,13 +20,11 @@ import { MatIconModule } from "@angular/material/icon";
     imports: [MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, CompareWithComponent, ResultsSearchComponent, AsyncPipe]
 })
 export class ResultsNavbarComponent implements OnInit {
-
-  @Input() oevent: OEvent;
+      public rs = inject(ResultsSelectionService);
+  oevent = input<OEvent>();
 
   resultsViews: ResultsView[] = resultsViews;
   compareWith: ComparisionOption;
-
-  constructor(public rs: ResultsSelectionService) {}
 
   ngOnInit() {
   }
@@ -39,5 +37,4 @@ export class ResultsNavbarComponent implements OnInit {
   onCompareWith(option: ComparisionOption) {
     // TODO
   }
-
 }

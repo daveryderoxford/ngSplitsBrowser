@@ -1,6 +1,6 @@
 /** Componnet to results for club class or */
 /* eslint-disable @typescript-eslint/quotes */
-import { Component, HostBinding, OnInit, ViewChild } from '@angular/core';
+import { Component, HostBinding, OnInit, viewChild, inject } from '@angular/core';
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
@@ -27,11 +27,10 @@ interface FilterPanelGroup {
     imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
 })
 export class ResultsSearchComponent implements OnInit {
-
+      private rs = inject(ResultsSelectionService);
   @HostBinding('class.docs-expanded') _isExpanded: boolean;
 
-  @ViewChild(MatAutocompleteTrigger, { static: true })
-  private _autocompleteTrigger: MatAutocompleteTrigger;
+  private _autocompleteTrigger = viewChild(MatAutocompleteTrigger);
 
   results: Results;
 
@@ -40,8 +39,6 @@ export class ResultsSearchComponent implements OnInit {
 
   searchControl: UntypedFormControl = new UntypedFormControl('');
   subscription: any;
-
-  constructor(private rs: ResultsSelectionService) { }
 
   ngOnInit() {
     this.rs.selectedResults.subscribe(results => {
@@ -119,10 +116,10 @@ export class ResultsSearchComponent implements OnInit {
 
   _delayDropdown(isExpanded: boolean) {
     if (isExpanded) {
-      this._autocompleteTrigger.closePanel();
+      this._autocompleteTrigger().closePanel();
     } else {
-      this._autocompleteTrigger.closePanel();
-      setTimeout(() => this._autocompleteTrigger.openPanel(), 210);
+      this._autocompleteTrigger().closePanel();
+      setTimeout(() => this._autocompleteTrigger().openPanel(), 210);
     }
   }
 

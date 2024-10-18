@@ -1,7 +1,7 @@
 /**
  * Event data admininstarion service
  */
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Auth, authState } from '@angular/fire/auth';
 import { collection, deleteDoc, doc, docData, DocumentReference, Firestore, setDoc, updateDoc } from '@angular/fire/firestore';
 import { deleteObject, ref, Storage, uploadString } from '@angular/fire/storage';
@@ -18,12 +18,12 @@ type PartialEvent = Partial<OEvent>;
    providedIn: 'root',
 })
 export class EventAdminService {
-
+      protected auth = inject(Auth);
+      protected firestore = inject(Firestore);
+      protected storage = inject(Storage);
    uid = "";
 
-   constructor(protected auth: Auth,
-      protected firestore: Firestore,
-      protected storage: Storage) {
+   constructor() {
 
       authState(this.auth).subscribe(user => {
          if (user) {

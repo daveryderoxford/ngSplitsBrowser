@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendEmailVerification } from '@angular/fire/auth';
 import { FormGroup, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +17,9 @@ import { FormContainerComponent } from '../../shared/components/form-container/f
     imports: [FormContainerComponent, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class SignupComponent {
-
+      private router = inject(Router);
+      private formBuilder = inject(UntypedFormBuilder);
+      private afAuth = inject(Auth);
     signupForm = this.formBuilder.group({
         email: ['', [Validators.required, Validators.email]],
         password: ['', Validators.required],
@@ -25,10 +27,6 @@ export class SignupComponent {
     }, { validator: this.passwordMissMatch });
 
     error = '';
-
-    constructor(private router: Router,
-        private formBuilder: UntypedFormBuilder,
-        private afAuth: Auth) { }
 
     passwordMissMatch(g: FormGroup): any {
         const p1 = g.get('password')!;

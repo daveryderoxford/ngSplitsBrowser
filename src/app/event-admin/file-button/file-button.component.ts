@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, ViewChild, ElementRef, Input } from "@angular/core";
+import { Component, ElementRef, input, output, viewChild } from "@angular/core";
 
 @Component({
     // eslint-disable-next-line @angular-eslint/component-selector
@@ -14,12 +14,12 @@ import { Component, Output, EventEmitter, ViewChild, ElementRef, Input } from "@
 })
 
 export class FileButtonComponent {
-  @Input() accept: string;
-  @Input() multiple = false;
-  @Input() label = "Select file";
-  @Output() fileSelected = new EventEmitter<File[]>();
+  accept = input<string>();
+  multiple = input(false);
+  label = input("Select file");
+  fileSelected = output<File[]>();
 
-  @ViewChild("inputFile") nativeInputFile: ElementRef;
+  nativeInputFile = viewChild<ElementRef>("inputFile");
 
   private _files: File[];
 
@@ -31,6 +31,6 @@ export class FileButtonComponent {
   }
 
   selectFile() {
-    this.nativeInputFile.nativeElement.click();
+    this.nativeInputFile().nativeElement.click();
   }
 }

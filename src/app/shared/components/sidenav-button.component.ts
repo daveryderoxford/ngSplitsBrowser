@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { SidenavService } from 'app/shared/services/sidenav.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -14,8 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
     imports: [MatButtonModule, MatIconModule]
 })
 export class SidenavButtonComponent implements OnInit {
-
-  constructor( public sidenavService: SidenavService) { }
+      public sidenavService = inject(SidenavService);
 
   ngOnInit() {
   }

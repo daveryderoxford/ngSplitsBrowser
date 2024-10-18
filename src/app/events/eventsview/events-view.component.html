@@ -1,23 +1,23 @@
 <div class="main-container">
 
-  <app-sidenav-button> </app-sidenav-button>
+  <app-sidenav-button  />
 
-  <mat-tab-group backgroundColor="primary">
-    <mat-tab #tabAll label="ALL">
+  <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" backgroundColor="primary">
+    <mat-tab #tabAll label="All">
       <ng-template matTabContent>
-        <app-all-events-tab (eventSelected)="eventClicked($event)"></app-all-events-tab>
+        <app-all-events-tab (eventSelected)="eventClicked($event)" />
       </ng-template>
     </mat-tab>
 
-    <mat-tab #tabClub label="CLUB">
+    <mat-tab #tabClub label="Club">
       <ng-template matTabContent>
-        <app-club-events-tab (eventSelected)="eventClicked($event)"></app-club-events-tab>
+        <app-club-events-tab (eventSelected)="eventClicked($event)" />
       </ng-template>
     </mat-tab>
 
-    <mat-tab #tabMyEvents label="MY RESULTS">
+    <mat-tab #tabMyEvents label="My Results">
       <ng-template matTabContent>
-        <app-my-events-tab (eventSelected)="eventClicked($event)"></app-my-events-tab>
+        <app-my-events-tab (eventSelected)="eventClicked($event)" />
       </ng-template>
     </mat-tab>
 

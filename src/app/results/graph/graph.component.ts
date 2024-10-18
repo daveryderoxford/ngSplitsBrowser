@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from "@angular/core";
+import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation, inject } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { OEvent } from "app/model";
@@ -27,14 +27,11 @@ interface SplitsBrowserOptions {
     imports: [ResultsNavbarComponent]
 })
 export class GraphComponent implements OnInit {
-
+      private route = inject(ActivatedRoute);
+      private rs = inject(ResultsSelectionService);
+      private dialog = inject(DialogsService);
   results: Results;
   oevent: OEvent;
-
-  constructor(private route: ActivatedRoute,
-    private rs: ResultsSelectionService,
-    private dialog: DialogsService) {
-  }
 
   ngOnInit() {
     this.rs.selectedEvent.subscribe( oevent => this.oevent = oevent );

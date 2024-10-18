@@ -1,13 +1,14 @@
-import { Component, OnInit, Input} from '@angular/core';
+import { Component, OnInit, input } from '@angular/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @Component({
     selector: 'app-spinner',
-    template: `
-     @if (loading) {
+    
+        template: `
+     @if (loading()) {
        <div class="loading-spinner">
-         <mat-spinner mode="indeterminate" color="accent" diameter="40" ></mat-spinner>
+         <mat-spinner mode="indeterminate" color="accent" diameter="40"  />
        </div>
      }
      `,
@@ -17,9 +18,5 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 })
 export class SpinnerComponent {
 
-  @Input()
-  loading = false;
-
-  constructor() { }
-
+  loading = input(false);
 }

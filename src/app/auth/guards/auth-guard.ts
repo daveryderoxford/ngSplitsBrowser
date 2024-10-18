@@ -1,5 +1,5 @@
 
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Auth, authState } from '@angular/fire/auth';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -9,8 +9,8 @@ import { map, take, tap } from 'rxjs/operators';
   providedIn: 'root',
 })
 export class AuthGuard  {
-  constructor(private afAuth: Auth,
-              private router: Router) { }
+      private afAuth = inject(Auth);
+      private router = inject(Router);
 
   canActivate( route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     return authState(this.afAuth).pipe(

@@ -1,5 +1,5 @@
 
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Observable } from "rxjs";
 import { take } from 'rxjs/operators';
@@ -10,8 +10,7 @@ import { ResultsSelectionService } from "./results-selection.service";
     providedIn: 'root',
 })
 export class ResultsResolver  {
-
-    constructor(private rs: ResultsSelectionService) { }
+      private rs = inject(ResultsSelectionService);
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Results> {
 

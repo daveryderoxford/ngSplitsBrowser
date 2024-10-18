@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatLineModule } from '@angular/material/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -14,9 +14,6 @@ import { UserResult } from 'app/model';
     imports: [MatDialogModule, MatListModule, MatLineModule, MatButtonModule, DatePipe]
 })
 export class ResultsFoundDialogComponent {
-
-  constructor(
-    public dialogRef: MatDialogRef<ResultsFoundDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: UserResult[]) { }
-
+      public dialogRef = inject<MatDialogRef<ResultsFoundDialogComponent>>(MatDialogRef<ResultsFoundDialogComponent>);
+      public data = inject<UserResult[]>(MAT_DIALOG_DATA);
 }

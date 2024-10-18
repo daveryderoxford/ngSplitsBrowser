@@ -1,7 +1,7 @@
 /**
  * Event service
  */
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { collection, collectionData, CollectionReference, doc, docData, DocumentReference, Firestore, orderBy, query, where } from '@angular/fire/firestore';
 import { Club, EventInfo, OEvent } from "app/model";
 import { PaganationService } from "app/shared";
@@ -14,14 +14,12 @@ export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "di
   providedIn: 'root',
 })
 export class EventService {
-
+      private firestore = inject(Firestore);
+      private ps = inject<PaganationService<OEvent>>(PaganationService<OEvent>);
   private events$: Observable<OEvent[]> = new Observable(null);
   private pageSize = 20;
   private cursor: OEvent = undefined;
   private _loading = new BehaviorSubject<boolean>(false);
-
-  constructor(private firestore: Firestore,
-    private ps: PaganationService<OEvent>) { }
 
     /** load event by key */
     getEvent(key: string): Observable<OEvent> {

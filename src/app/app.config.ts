@@ -7,14 +7,16 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { firebaseConfig } from './app.firebase-config';
 import { routes } from './app-routes';
+import { provideHttpClient } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
    providers: [
-      provideRouter(routes),
-      provideAnimationsAsync(),
       provideFirebaseApp(() => initializeApp(firebaseConfig)),
       provideAuth(() => getAuth()),
       provideFirestore(() => getFirestore()),
-      provideStorage(() => getStorage()),  
+      provideStorage(() => getStorage()), 
+      provideHttpClient(),
+      provideRouter(routes),
+      provideAnimationsAsync(), 
    ],
 };

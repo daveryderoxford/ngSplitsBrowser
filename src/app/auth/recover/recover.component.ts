@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Auth, sendPasswordResetEmail } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,16 +18,13 @@ import { FormContainerComponent } from '../../shared/components/form-container/f
   imports: [FormContainerComponent, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class RecoverComponent implements OnInit {
-
+      private router = inject(Router);
+      private formBuilder = inject(FormBuilder);
+      private afAuth = inject(Auth);
+      private snackBar = inject(MatSnackBar);
   recoverForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
   });
-
-  constructor(private router: Router,
-    private formBuilder: FormBuilder,
-    private afAuth: Auth, 
-    private snackBar: MatSnackBar
-  ) { }
 
   ngOnInit() {
     this.recoverForm = this.formBuilder.group({

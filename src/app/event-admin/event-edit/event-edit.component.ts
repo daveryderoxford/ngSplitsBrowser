@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges, input, output } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -31,9 +31,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
               MatDatepickerModule]
 })
 export class EventEditComponent implements OnInit, OnChanges {
-   @Input() oevent: OEvent;
+   oevent = input<OEvent>();
    new = true;
-   @Output() eventSubmitted = new EventEmitter<EventInfo>();
+   eventSubmitted = output<EventInfo>();
    showProgressBar = false;
 
    f: UntypedFormGroup;
@@ -107,13 +107,13 @@ export class EventEditComponent implements OnInit, OnChanges {
 
    ngOnChanges( changes: SimpleChanges ) {
       // set the form fields when the event is changed.
-      if ( this.oevent === null ) {
+      if ( this.oevent() === null ) {
          this.new = true;
          this.createForm();
          this.f.reset();
       } else {
          this.new = false;
-         this.f.reset( this.oevent );
+         this.f.reset( this.oevent() );
       }
    }
 
@@ -144,7 +144,7 @@ export class EventEditComponent implements OnInit, OnChanges {
             if ( this.new ) {
                await this.eventService.saveNew( this.f.value );
             } else {
-               await this.eventService.updateEventInfo( this.oevent.key, this.f.value );
+               await this.eventService.updateEventInfo( this.oevent().key, this.f.value );
             }
             this.showProgressBar = false;
          } catch ( err ) {

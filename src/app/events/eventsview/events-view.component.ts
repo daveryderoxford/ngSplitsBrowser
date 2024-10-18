@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { OEvent } from "app/model/oevent";
 import { DialogsService } from "app/shared";
@@ -16,12 +16,10 @@ import { SidenavButtonComponent } from "../../shared/components/sidenav-button.c
     standalone: true,
     imports: [SidenavButtonComponent, MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent]
 })
-export class EventsViewComponent implements OnInit {
-
-  constructor(private router: Router,
-    public es: EventService,
-    private ds: DialogsService) {
-  }
+export class EventsViewComponent{
+      private router = inject(Router);
+      public es = inject(EventService);
+      private ds = inject(DialogsService);
 
   eventClicked(event: OEvent) {
       if (!event.splits || event.splits.valid === false) {
@@ -32,11 +30,6 @@ export class EventsViewComponent implements OnInit {
         this.ds.message('Error loading results', 'Error loading results for event');
       });
     }
-  }
-
-  // eslint-disable-next-line
-  ngOnInit() {
-
   }
 
   graphMenuSelected() {

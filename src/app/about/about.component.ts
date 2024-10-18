@@ -14,9 +14,6 @@ import { ToolbarComponent } from "../shared/components/toolbar.component";
     imports: [ToolbarComponent, FlexModule, MatExpansionModule, AboutItemComponent, RouterLink]
 })
 export class AboutComponent {
-
-  constructor() { }
-
   ver = versions;
 
 }

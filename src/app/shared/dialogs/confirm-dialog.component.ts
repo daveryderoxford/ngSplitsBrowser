@@ -8,7 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
     template: `
         <h3 mat-dialog-title>{{ title }}</h3>
         <p mat-dialog-content> {{ message }} </p>
-        <mat-divider></mat-divider>
+        <mat-divider  />
         <div mat-dialog-actions>
             <button type="button" mat-raised-button (click)="dialogRef.close(true)">OK</button>
             <button type="button" mat-button (click)="dialogRef.close()">Cancel</button>
