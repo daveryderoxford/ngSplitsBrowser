@@ -15,5 +15,4 @@ import { ToolbarComponent } from "../shared/components/toolbar.component";
 })
 export class AboutComponent {
   ver = versions;
-
 }

@@ -5,9 +5,9 @@ import { Component, ElementRef, input, output, viewChild } from "@angular/core";
     "selector": "file-button",
     "template": `
         <span>
-        <input [accept]="accept" [multiple]="multiple" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
+        <input [accept]="accept()" [multiple]="multiple()" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
         <button type="button" mat-raised-button color=primary (click)="selectFile()">
-          {{label}}
+          {{label()}}
         </button>
     </span>`,
     standalone: true

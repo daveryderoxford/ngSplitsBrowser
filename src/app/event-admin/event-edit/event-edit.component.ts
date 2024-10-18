@@ -1,20 +1,20 @@
-import { Component, OnChanges, OnInit, SimpleChanges, input, output } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AsyncPipe } from '@angular/common';
+import { Component, input, OnChanges, OnInit, output, SimpleChanges } from '@angular/core';
+import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatOptionModule } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Club, Nations } from 'app/model';
 import { combineLatest, Observable } from 'rxjs';
-import {  map, startWith } from 'rxjs/operators';
+import { map, startWith } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
 import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
 import { EventAdminService } from '../event-admin.service';
-import { AsyncPipe } from '@angular/common';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatOptionModule } from '@angular/material/core';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 
 @UntilDestroy()
 @Component({
@@ -31,7 +31,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
               MatDatepickerModule]
 })
 export class EventEditComponent implements OnInit, OnChanges {
+
    oevent = input<OEvent>();
+   
    new = true;
    eventSubmitted = output<EventInfo>();
    showProgressBar = false;

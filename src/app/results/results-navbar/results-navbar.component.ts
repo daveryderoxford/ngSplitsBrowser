@@ -19,15 +19,12 @@ import { MatIconModule } from "@angular/material/icon";
     standalone: true,
     imports: [MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, CompareWithComponent, ResultsSearchComponent, AsyncPipe]
 })
-export class ResultsNavbarComponent implements OnInit {
+export class ResultsNavbarComponent {
       public rs = inject(ResultsSelectionService);
   oevent = input<OEvent>();
 
   resultsViews: ResultsView[] = resultsViews;
   compareWith: ComparisionOption;
-
-  ngOnInit() {
-  }
 
   viewSelected(view: ResultsView) {
     console.log('Results navbar.  view seleted ' + view.name);

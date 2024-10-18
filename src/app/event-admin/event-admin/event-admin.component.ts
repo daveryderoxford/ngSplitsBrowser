@@ -11,7 +11,6 @@ import { EventAdminService } from "../event-admin.service";
 import { EventEditComponent } from "../event-edit/event-edit.component";
 import { FileButtonComponent } from "../file-button/file-button.component";
 
-
 @Component({
   selector: "app-event-admin",
   templateUrl: "./event-admin.component.html",
@@ -33,6 +32,7 @@ import { FileButtonComponent } from "../file-button/file-button.component";
 export class EventAdminComponent {
       private eventAdmin = inject(EventAdminService);
       private dialogsService = inject(DialogsService);
+      
   events: Observable<OEvent[]>;
 
   selectedEvent: OEvent = null;
