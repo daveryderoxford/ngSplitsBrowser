@@ -6,30 +6,23 @@ import { SplitsGridComponent } from './splits-grid/splits-grid.component';
 
 const routes: Routes = [
    {
-      path: '',
+      path: "graph/:id",
       component: GraphComponent,
-      children: [
-         {
-            path: ":id",
-            component: GraphComponent,
-            resolve: {
-               results: ResultsResolver
-            }
-         },
-         {
-            path: "table/:id",
-            component: SplitsGridComponent,
-            resolve: {
-               results: ResultsResolver
-            }
-         },
-         { path: "table", component: SplitsGridComponent }
-      ]
+      resolve: {
+         results: ResultsResolver
+      }
+   },
+   {
+      path: "table/:id",
+      component: SplitsGridComponent,
+      resolve: {
+         results: ResultsResolver
+      }
    }
 ];
 
-@NgModule( {
-   imports: [RouterModule.forChild( routes )],
+@NgModule({
+   imports: [RouterModule.forChild(routes)],
    exports: [RouterModule]
-} )
+})
 export class ResultsRoutingModule { }

@@ -39,7 +39,7 @@ export class SplitsPopupData {
 
         Lang.setLanguage("en_gb");
 
-        const data = courseClassSet.getFastestSplitsTo(this.maxFastestSplits, controlIndex);
+        const data = courseClassSet.getFastestSplitsForControl(this.maxFastestSplits, controlIndex);
 
         const ret = data.map((comp) => {
             return { time: comp.split, name: comp.name, highlight: false };

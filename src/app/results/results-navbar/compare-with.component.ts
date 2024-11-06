@@ -1,15 +1,14 @@
-import { Component, OnInit, OnChanges, input, output } from '@angular/core';
+import { Component, OnChanges, input, output } from '@angular/core';
 import { ComparisionOption, ALL_COMPARISON_OPTIONS } from 'app/results/graph/splitsbrowser/comparision-options';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 
-
 @Component({
     selector: 'app-compare-with',
     template: `
-  <button mat-button [matMenuTriggerFor]="picker">
+  <button mat-stroked-button [matMenuTriggerFor]="picker">
     {{ buttonText }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>
@@ -24,15 +23,13 @@ import { MatButtonModule } from '@angular/material/button';
     standalone: true,
     imports: [MatButtonModule, MatMenuModule, MatIconModule]
 })
-export class CompareWithComponent implements OnInit, OnChanges {
+export class CompareWithComponent implements OnChanges {
 
   selected = input<ComparisionOption>();
   select = output<ComparisionOption>();
 
   buttonText: string;
   options = ALL_COMPARISON_OPTIONS;
-
-  ngOnInit() { }
 
   ngOnChanges() {
      if (this.selected()) {

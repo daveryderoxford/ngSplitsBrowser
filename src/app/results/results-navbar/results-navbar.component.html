@@ -1,12 +1,14 @@
-<nav mat-primary class="results-navbar-container">
+<nav class="results-navbar-container">
 
   <mat-icon routerLink="/events" class="results-navbar-icon">arrow_back</mat-icon>
 
-  <app-results-view-button [views]="resultsViews" [selectedView]="rs.resultsView | async" (viewSelected)="viewSelected($event)" />
+  <app-results-view-button [views]="resultsViews" [selectedView]="rd.resultsView | async" (viewSelected)="viewSelected($event)" />
 
-  @if ((rs.selectedResults| async); as results) {
-    <app-class-menu-button [selectedClass]='rs.selectedClass | async' [oclasses]='results.classes' (select)='rs.selectClass($event)' />
+  @if ((rd.selectedResults| async); as results) {
+    <app-class-menu-button [selectedClass]='rs.selectedClass()' [oclasses]='results.classes' (select)='rs.selectClass($event)' />
   }
+
+  <ng-content></ng-content>
 
   <app-compare-with [selected]='compareWith' (select)='onCompareWith($event)' />
 
@@ -14,6 +16,8 @@
 
   <app-results-search class="align-baseline, flex-item" />
 
-  <mat-icon class="docs-button results-navbar-icon flex-item">settings</mat-icon>
+  <ng-content select="[settings]"></ng-content>
+
+  <mat-icon class="results-navbar-icon flex-item">settings</mat-icon>
 
 </nav>

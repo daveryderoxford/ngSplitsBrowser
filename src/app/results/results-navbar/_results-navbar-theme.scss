@@ -1,0 +1,11 @@
+@use '@angular/material' as mat;
+
+@mixin theme($theme) {
+  app-navbar {
+    color: mat.get-theme-color($theme, primary);
+
+    .results-navbar-container {
+      background: mat.get-theme-color($theme, primary-container);
+    }
+  }
+}

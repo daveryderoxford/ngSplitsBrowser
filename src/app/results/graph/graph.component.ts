@@ -7,6 +7,7 @@ import { DialogsService } from '../../shared';
 import { ResultsSelectionService } from "../results-selection.service";
 import { displayGraph } from "./splitsbrowser/splitsbrowser";
 import { ResultsNavbarComponent } from "../results-navbar/results-navbar.component";
+import { ResultsDataService } from '../results-data.service ';
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -30,15 +31,16 @@ export class GraphComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
   private rs = inject(ResultsSelectionService);
+  private rd = inject(ResultsDataService);
   private dialog = inject(DialogsService);
 
   results: Results;
   oevent: OEvent;
 
   ngOnInit() {
-    this.rs.selectedEvent.subscribe(oevent => this.oevent = oevent);
+    this.rd.selectedEvent.subscribe(oevent => this.oevent = oevent);
 
-    this.rs.selectedResults.subscribe(results => {
+    this.rd.selectedResults.subscribe(results => {
       if (results) {
         console.log('Graph First comp ' + results.allCompetitors[0].name);
         displayGraph(results, { containerElement: "app-graph", topBar: "nav.results-navbar-container" });

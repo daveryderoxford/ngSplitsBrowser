@@ -5,12 +5,13 @@ import { Observable } from "rxjs";
 import { take } from 'rxjs/operators';
 import { Results } from "./model";
 import { ResultsSelectionService } from "./results-selection.service";
+import { ResultsDataService } from './results-data.service ';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ResultsResolver  {
-      private rs = inject(ResultsSelectionService);
+      private rs = inject(ResultsDataService);
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Results> {
 

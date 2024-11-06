@@ -1,107 +1,77 @@
-
-import { SelectionModel } from "@angular/cdk/collections";
-import { Component, OnInit, viewChild, inject } from "@angular/core";
-import { FormControl, UntypedFormControl, ReactiveFormsModule } from "@angular/forms";
-import { MatSort } from "@angular/material/sort";
-import { MatTableDataSource as MatTableDataSource, MatTableModule } from "@angular/material/table";
-import { UntilDestroy } from '@ngneat/until-destroy';
-import { Competitor, Course, CourseClass, Results, sbTime, TimeUtilities } from "../model";
-import { ResultsSelectionService } from "../results-selection.service";
-import { Repairer } from '../model/repairer';
-import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { NgClass, NgStyle } from "@angular/common";
+import { Component, computed, inject, OnInit, viewChild } from "@angular/core";
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatOptionModule } from "@angular/material/core";
-import { NgStyle, NgClass } from "@angular/common";
-import { MatSelectModule } from "@angular/material/select";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatSelectModule } from "@angular/material/select";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
+import { MatSort, MatSortModule, Sort } from "@angular/material/sort";
+import { MatTableDataSource, MatTableModule } from "@angular/material/table";
+import { Competitor, CourseClass, sbTime, TimeUtilities } from "../model";
+import { ResultsDataService } from '../results-data.service ';
+import { ResultsNavbarComponent } from "../results-navbar/results-navbar.component";
 import { ResultsSearchComponent } from "../results-search/results-search.component";
+import { ResultsSelectionService } from "../results-selection.service";
 
-@UntilDestroy( { checkProperties: true } )
 @Component({
-    selector: "app-splits-grid",
-    templateUrl: "./splits-grid.component.html",
-    styleUrls: ["./splits-grid.component.scss"],
-    standalone: true,
-    imports: [ResultsSearchComponent, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, MatSlideToggleModule, MatTableModule, NgStyle, NgClass]
+   selector: "app-splits-grid",
+   templateUrl: "./splits-grid.component.html",
+   styleUrls: ["./splits-grid.component.scss"],
+   standalone: true,
+   imports: [ResultsSearchComponent, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, MatSlideToggleModule, MatTableModule, MatSortModule, NgStyle, NgClass, ResultsNavbarComponent]
 })
 export class SplitsGridComponent implements OnInit {
-      private rs = inject(ResultsSelectionService);
-   results: Results;
-   course: Course;
-   oclass: CourseClass;
-   dataSource = new MatTableDataSource<Competitor>([]);
+   protected rs = inject(ResultsSelectionService);
+   protected rd = inject(ResultsDataService);
 
-   selectedControl = new SelectionModel<number>(false, null);
-   selectedCompetitors = new SelectionModel<Competitor>(true, null);
+   results = toSignal(this.rd.selectedResults);
+   course = this.rs.selectedCourse;
+   oclass = this.rs.selectedClass;
 
    /** Column definitions columns */
    staticColumns = ["position", "name", "total"];
-   displayedColumns: string[] = [];
-   splitsColumns: string[] = [];
 
    classSelect = new FormControl<CourseClass>(undefined);
    courseToggle = new FormControl<boolean>(true);
    colorToggle = new FormControl<boolean>(true);
+   selectedToggle = new FormControl<boolean>(false);
 
-   sort = viewChild(MatSort);
+   sortHeader = viewChild(MatSort);
+
+   selectedOnly = toSignal(this.selectedToggle.valueChanges, { initialValue: false });
+
+   splitsColumns = computed(() =>
+      this.course() ?
+         Array.from({ length: this.course().numSplits }, (x, i) => i.toString()) : []
+   );
+
+   displayedColumns = computed(() => [...this.staticColumns, ...this.splitsColumns()]);
+
+   tableData = computed<MatTableDataSource<Competitor>>(() => {
+      const r = this.results();
+
+      if (this.oclass()) {
+         const comps = this.selectedOnly() ?
+            this.oclass().competitors.filter((comp) => this.rs.isCompetitorSelected(comp)) :
+            this.oclass().competitors;
+         const ds = new MatTableDataSource(comps);
+         ds.sort = this.sortHeader();
+         return ds;
+      } else {
+         return new MatTableDataSource([]);
+      }
+   });
 
    ngOnInit() {
 
-      this.dataSource.sort = this.sort();
-
-      // Subecribed to updates from results selection
-      this.rs.selectedResults.subscribe(results => this.selectedResultsUpdated(results));
-      this.rs.selectedCourse.subscribe(course => this.selectedCourseUpdated(course));
-      this.rs.selectedClass.subscribe(oclass => this.selectedClassUpdated(oclass));
-
-      // Update results seelction when user changed form controls
-      this.classSelect.valueChanges.subscribe( (courseClass: CourseClass) => {
+      this.classSelect.valueChanges.subscribe((courseClass: CourseClass) => {
          this.rs.selectClass(courseClass);
       });
 
-      this.courseToggle.valueChanges.subscribe( (courseDisplayed: boolean) => {
+      this.courseToggle.valueChanges.subscribe((courseDisplayed: boolean) => {
          this.rs.displayAllCourseCompetitors(courseDisplayed);
       });
-   }
-
-   private selectedResultsUpdated(results: Results) {
-
-      // TO temp repairt here - should be moved ot where we read the results
-      if (results.needsRepair()) {
-         Repairer.repairEventData(results);
-      }
-
-      results.determineTimeLosses();
-
-      this.results = results;
-   }
-
-   private selectedCourseUpdated(course: Course) {
-      this.course = course;
-
-      // Create a column for each control for the course
-      if (course) {
-         console.log("*****course updated" + course.name);
-         console.log("numsplits: "+ course.numSplits);
-         this.splitsColumns = Array.from({ length: course.numSplits }, (x, i) =>
-            i.toString()
-         )
-
-         this.displayedColumns = [...this.staticColumns, ...this.splitsColumns];
-      } else {
-         console.log("*****course null");
-      }
-   }
-
-   selectedClassUpdated(oclass: CourseClass) {
-
-      this.oclass = oclass;
-
-      if (oclass) {
-         this.dataSource = new MatTableDataSource(oclass.competitors);
-         this.dataSource.sort = this.sort();
-      } else {
-         this.dataSource = new MatTableDataSource([]);
-      }
    }
 
    /** Returns color om a red/green color scale for a given percentage along the scale */
@@ -141,7 +111,7 @@ export class SplitsGridComponent implements OnInit {
    }
 
    updateSelectedCompetitor(competitor: Competitor) {
-      this.selectedCompetitors.toggle(competitor);
+      this.rs.toggleSelectedSelectedCompetitor(competitor);
    }
 
    /** Format title for split time */
@@ -149,19 +119,47 @@ export class SplitsGridComponent implements OnInit {
       // eslint-disable-next-line radix
       if (index === 0) {
          return 'S-1';
-      } else if (index === this.course.numSplits) {
+      } else if (index === this.course().numSplits) {
          return (index.toString() + '-F');
       } else {
          let ret = (index + 1).toString();
-         if ( this.course.hasControls ) {
-            ret = ret + ' (' + this.course.controls[index].toString() + ')';
+         if (this.course().hasControls) {
+            ret = ret + ' (' + this.course().controls[index].toString() + ')';
          }
          return ret;
       }
    }
 
-   /** Format splitsbrowser time string */
-   formatTime(time: sbTime) {
-      return TimeUtilities.formatTime(time);
+   sortChanged(sortState: Sort) {
+      if (sortState.direction) {
+         console.log(`Sorted ${sortState.direction} ending`);
+      } else {
+         console.log('Sorting cleared');
+      }
+
+     /* this.sortedData = data.sort((a, b) => {
+         const isAsc = sort.direction === 'asc';
+         switch (sort.active) {
+            case 'name':
+               return compare(a.name, b.name, isAsc);
+            case 'calories':
+               return compare(a.calories, b.calories, isAsc);
+            case 'fat':
+               return compare(a.fat, b.fat, isAsc);
+            case 'carbs':
+               return compare(a.carbs, b.carbs, isAsc);
+            case 'protein':
+               return compare(a.protein, b.protein, isAsc);
+            default:
+               return 0;
+         } 
+      }); */
+   }
+
+   /** Format splitsbrowser time string. 
+    */
+   formatTime(time: sbTime): string {
+      return
+      !time ? '' : TimeUtilities.formatTime(time);
    }
 }

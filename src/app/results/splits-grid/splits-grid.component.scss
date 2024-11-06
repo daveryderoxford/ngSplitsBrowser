@@ -10,51 +10,70 @@
 .flexContainer {
   display: flex;
 }
+
 .flexItem {
   flex: 1;
 }
+
 .flexStart {
   justify-content: flex-start;
 }
+
 .flexEnd {
   justify-content: flex-end;
 }
 
 .header-container {
-   flex: auto;
-   display: flex;
-   min-height: 70px;
-    max-height: 70px;
-   align-items: center;
+  flex: auto;
+  display: flex;
+  min-height: 70px;
+  max-height: 70px;
+  align-items: center;
 }
 
 .table-container {
-    flex-grow: 1;
-    min-width: 300px;
-    overflow: scroll;
+  flex-grow: 1;
+  min-width: 300px;
+  overflow: scroll;
 }
 
 .selected {
-  border-bottom: 2px solid rgb(100, 100, 100) !important;
-  border-top: 2px solid rgb(100, 100, 100) !important;
- }
+   background: rgb(220,226,245);
+}
 
- .fastest {
-   color: red;
- }
+.fastest {
+  color: red;
+  font-weight: bold;
+}
 
- .splitcolumn {
-    width: 100px;
-    min-width: 100px;
-    padding-right: 8px;
- }
+.second {
+  color: blueviolet;
+  font-weight: bold;
+}
 
- .totaltimecolumn {
-   width: 75px;
-   min-width: 75px;
-   padding-right: 8px;
- }
- 
+.third {
+  color: black;
+  font-weight: bold;
+}
+
+.splitcolumn {
+  width: 100px;
+  min-width: 100px;
+  padding-right: 8px;
+}
+
+.totaltimecolumn {
+  width: 75px;
+  min-width: 75px;
+  padding-right: 8px;
+}
+
+.positioncolumn {
+  width: 50px;
+  min-width: 50px;
+  padding-right: 8px;
+}
+
 tr {
   border: 1px solid #e0e0e0;
 }
@@ -62,4 +81,3 @@ tr {
 th.mat-sort-header-sorted {
   color: black;
 }
-      

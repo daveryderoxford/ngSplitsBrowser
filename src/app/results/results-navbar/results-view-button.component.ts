@@ -57,7 +57,6 @@ export class ResultsViewButtonComponent implements OnInit {
   */
   views = input<ResultsView[]>([]);
   selectedView = input<ResultsView>();
-
   viewSelected = output<ResultsView>();
 
   primaryViews: ResultsView[];

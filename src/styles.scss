@@ -24,32 +24,13 @@ $theme: mat.define-theme((color: (theme-type: light,
       ),
       density: (scale: -1)));
 
- .error {
-    font-family: 'Roboto';
-
-    color: red;
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0;
-    line-height: 1;
-    margin-bottom: 20px;
-    margin-top: 0px;
-    padding-top: 0px;
-    padding-bottom: 0px;
-}
-
-.sb-highzorder-dialog .mat-dialog-container {
-  z-index: 10000;
-  padding: 18x;
-}
-
 html,
 body {
   height: 100%;
   @include mat.all-component-themes($theme);
 }
 
-body {
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+.rounded {
+  --mdc-outlined-text-field-container-shape: 28px;
+    font-size: 2em;
 }

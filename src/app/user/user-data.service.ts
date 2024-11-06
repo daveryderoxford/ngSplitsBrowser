@@ -1,59 +1,58 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { Auth, authState, User } from '@angular/fire/auth';
 import { doc, docData, DocumentReference, Firestore, setDoc, updateDoc } from '@angular/fire/firestore';
 import { EventService } from "app/events/event.service";
 import { CompetitorSearchData, ECard, OEvent, UserData, UserInfo, UserResult } from "app/model";
 import { Competitor, Course, InvalidData, Results } from "app/results/model";
+import { ResultsDataService } from 'app/results/results-data.service ';
 import { ResultsSelectionService } from "app/results/results-selection.service";
 import { Observable, of } from 'rxjs';
 import { shareReplay, startWith, switchMap, take, tap } from 'rxjs/operators';
 
-@Injectable( {
+@Injectable({
   providedIn: "root"
-} )
+})
 export class UserDataService {
+
+  private auth = inject(Auth);
+  private firestore = inject(Firestore);
+  private rd = inject(ResultsDataService);
 
   public user$: Observable<UserData | null>;
 
   private currentUser: UserData | null = null;
   private uid: string;
 
-  constructor (
-    private auth: Auth,
-    private firestore: Firestore,
-    private es: EventService,
-    private rs: ResultsSelectionService
-  ) {
+  constructor() {
 
-    
     this.user$ = authState(this.auth).pipe(
-      startWith( null ),
-      switchMap( ( user ) => {
-        console.log()
-        if ( !user ) {
-          console.log( "UserData: Firebase user null.  Stop monitoring user date  " );
-          return of( null );
+      startWith(null),
+      switchMap((user) => {
+        console.log();
+        if (!user) {
+          console.log("UserData: Firebase user null.  Stop monitoring user date  ");
+          return of(null);
         } else {
-          console.log( `UserData: monitoring uid: ${user.uid}` );
-          const d = doc(this.firestore, user.uid) as DocumentReference<UserData>
+          console.log(`UserData: monitoring uid: ${user.uid}`);
+          const d = doc(this.firestore, user.uid) as DocumentReference<UserData>;
           return docData(d);
         }
-      } ),
+      }),
       shareReplay(1)
     );
 
     /* Subscribe to update local cache - remove at some point */
-    this.user$.subscribe( user => {
-      if ( !user ) {
-        console.log( "UserData: Local cache updated to nll " );
+    this.user$.subscribe(user => {
+      if (!user) {
+        console.log("UserData: Local cache updated to nll ");
         this.currentUser = null;
         this.uid = null;
       } else {
-        console.log( "UserData: Local cache updated to new value " );
+        console.log("UserData: Local cache updated to new value ");
         this.currentUser = user;
         this.uid = user.key;
       }
-    } );
+    });
 
   }
 
@@ -63,12 +62,12 @@ export class UserDataService {
   }
 
   /** Update the user info.  Returning the modified user details */
-  async updateDetails( details: Partial<UserInfo> ): Promise<void> {
+  async updateDetails(details: Partial<UserInfo>): Promise<void> {
     return updateDoc(this._getUserDoc(), details);
   }
 
   private _doc(uid: string): DocumentReference<UserData> {
-    return doc( this.firestore, "users/" + uid ) as DocumentReference<UserData>;
+    return doc(this.firestore, "users/" + uid) as DocumentReference<UserData>;
   }
 
   /** Get the database documents associated with the user
@@ -80,28 +79,28 @@ export class UserDataService {
     return userDoc;
   }
 
-  
+
   /** Add userResult to the user results list, populating detail from the results data.
    * The user defaults to the current user.
   */
-  addResult( userResult: UserResult, user = this.currentUserData ): Observable<void> {
+  addResult(userResult: UserResult, user = this.currentUserData): Observable<void> {
 
-    const obs = this.rs.loadResults( userResult.event ).pipe(
-      tap( results => this._processResults( user.results, results, userResult ) ),
-      switchMap( () => setDoc( this._getUserDoc(), user ) )
+    const obs = this.rd.loadResults(userResult.event).pipe(
+      tap(results => this._processResults(user.results, results, userResult)),
+      switchMap(() => setDoc(this._getUserDoc(), user))
     );
 
     return obs;
   }
 
-  private _processResults( userResults: UserResult[], results: Results, userResult: UserResult ) {
+  private _processResults(userResults: UserResult[], results: Results, userResult: UserResult) {
 
     // Find competitor by ecard. Note that a synthtic ecard will be assigned if the event does not have ecard values.
-    const comp = results.findCompetitorByECard( userResult.ecardId );
+    const comp = results.findCompetitorByECard(userResult.ecardId);
 
     // Populate result data for the user
     const course = comp.courseClass.course;
-    const courseWinner = this._getCourseWinner( course );
+    const courseWinner = this._getCourseWinner(course);
 
     userResult.result = {
       course: course.name,
@@ -121,43 +120,43 @@ export class UserDataService {
       classWinningTime: comp.courseClass.competitors[0].totalTime
 
     };
-    userResults.push( userResult );
+    userResults.push(userResult);
 
     // sort results by event date by default
-    userResults.sort( ( a, b ) => {
-      const d1 = new Date( a.event.date );
-      const d2 = new Date( b.event.date );
+    userResults.sort((a, b) => {
+      const d1 = new Date(a.event.date);
+      const d2 = new Date(b.event.date);
       return d1.valueOf() - d2.valueOf();
-    } );
+    });
   }
 
-  private _getCourseWinner( course: Course ): Competitor {
-    if ( course.classes.length === 0 ) {
+  private _getCourseWinner(course: Course): Competitor {
+    if (course.classes.length === 0) {
       return null;
     }
 
     let winner = course.classes[0].competitors[0];
-    course.classes.forEach( eclass => {
-      if ( eclass.competitors[0].totalTime < winner.totalTime ) {
+    course.classes.forEach(eclass => {
+      if (eclass.competitors[0].totalTime < winner.totalTime) {
         winner = eclass.competitors[0];
       }
-    } );
+    });
     return winner;
   }
 
-  async removeResult( user: UserData, result: UserResult ): Promise<void> {
-    if ( user.key !== this.uid ) {
-      throw new InvalidData( "User data key must match signed in user" );
+  async removeResult(user: UserData, result: UserResult): Promise<void> {
+    if (user.key !== this.uid) {
+      throw new InvalidData("User data key must match signed in user");
     }
 
-    const index = user.results.indexOf( result );
-    if ( index > -1 ) {
-      user.results.splice( index, 1 );
+    const index = user.results.indexOf(result);
+    if (index > -1) {
+      user.results.splice(index, 1);
     }
-    return setDoc( this._getUserDoc(), user );
+    return setDoc(this._getUserDoc(), user);
   }
 
-  private _createUserResult( comp: CompetitorSearchData, event: OEvent ): UserResult {
+  private _createUserResult(comp: CompetitorSearchData, event: OEvent): UserResult {
     return {
       ecardId: comp.ecardId,
       event: event,

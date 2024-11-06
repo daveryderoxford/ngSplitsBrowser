@@ -89,7 +89,7 @@ export class CourseClassSet {
 
    /**
    * Returns an array of the cumulative times of the winner of the set of
-   * classes.  If any cumulatve tim is missing then it is linearly interpolated.
+   * classes.  If any cumulatve time is missing then it is linearly interpolated.
    * @sb-return {Array} Array of the winner's cumulative times.
    */
    public getWinnerCumTimes(): Array<sbTime> {
@@ -297,7 +297,7 @@ export class CourseClassSet {
    * @sb-param {Number} controlIdx - Index of the control.
    * @sb-return {Array} Array of the fastest splits to the given control.
    */
-   public getFastestSplitsTo(numSplits: number, controlIdx: number): Array<FatestSplitsData> {
+   public getFastestSplitsForControl(numSplits: number, controlIdx: number): Array<FatestSplitsData> {
       if (typeof numSplits !== "number" || numSplits <= 0) {
          throw new InvalidData("The number of splits must be a positive integer");
       } else if (typeof controlIdx !== "number" || controlIdx <= 0 || controlIdx > this.numControls + 1) {

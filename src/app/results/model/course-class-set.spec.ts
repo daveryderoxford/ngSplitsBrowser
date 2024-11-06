@@ -521,7 +521,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3();
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(2, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 209, name: competitor1.name}]);
     });
 
@@ -531,7 +531,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3();
         const courseClassSet = new CourseClassSet([new CourseClass('Test 1', 3, [competitor1]), new CourseClass('Test 2', 3, [competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(2, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 209, name: competitor1.name}]);
     });
 
@@ -541,7 +541,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3();
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(2, 4);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(2, 4);
         expect(fastestSplits).toEqual([{split: 100, name: competitor1.name}, {split: 106, name: competitor2.name}]);
     });
 
@@ -551,7 +551,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3();
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(4, 3);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(4, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 209, name: competitor1.name}, {split: 212, name: competitor2.name}]);
     });
 
@@ -561,7 +561,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3();
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(2, 3);
         expect(fastestSplits).toEqual([{split: 199, name: competitor3.name}, {split: 212, name: competitor2.name}]);
     });
 
@@ -571,7 +571,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3WithNullSplitForControl2();
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(2, 3);
         expect(fastestSplits).toEqual([{split: 209, name: competitor1.name}, {split: 212, name: competitor2.name}]);
     });
 
@@ -581,7 +581,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3WithNullSplitForControl3();
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(2, 3);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(2, 3);
         expect(fastestSplits).toEqual([{split: 212, name: competitor2.name}]);
     });
 
@@ -591,7 +591,7 @@ describe('Course-class set', () => {
         const competitor3 = getCompetitor3();
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [competitor1, competitor2, competitor3])]);
 
-        const fastestSplits = courseClassSet.getFastestSplitsTo(3, 2);
+        const fastestSplits = courseClassSet.getFastestSplitsForControl(3, 2);
         expect(fastestSplits).toEqual([{split: 197, name: competitor2.name}, {split: 209, name: competitor3.name}]);
     });
 
@@ -606,7 +606,7 @@ describe('Course-class set', () => {
     function assertCannotGetFastestSplits( competitors, numSplits, controlIdx) {
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, competitors)]);
         TestSupport.assertInvalidData( () => {
-            courseClassSet.getFastestSplitsTo(numSplits, controlIdx);
+            courseClassSet.getFastestSplitsForControl(numSplits, controlIdx);
         });
     }
 

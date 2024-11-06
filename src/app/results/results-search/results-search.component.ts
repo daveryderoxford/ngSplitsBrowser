@@ -4,12 +4,12 @@ import { Component, HostBinding, OnInit, viewChild, inject } from '@angular/core
 import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
-//import { Subscription } from 'rxjs/Subscription';
 import { Competitor, Course, CourseClass, Results } from '../model';
 import { ResultsSelectionService } from '../results-selection.service';
 import { MatOptionModule } from '@angular/material/core';
 
 import { MatIconModule } from '@angular/material/icon';
+import { ResultsDataService } from '../results-data.service ';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 
@@ -18,16 +18,18 @@ interface FilterPanelGroup {
   options: Array<SearchSelectedItem>;
 }
 
-@UntilDestroy( { checkProperties: true } )
+@UntilDestroy({ checkProperties: true })
 @Component({
-    selector: 'app-results-search',
-    templateUrl: './results-search.component.html',
-    styleUrls: ['./results-search.component.scss'],
-    standalone: true,
-    imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
+  selector: 'app-results-search',
+  templateUrl: './results-search.component.html',
+  styleUrls: ['./results-search.component.scss'],
+  standalone: true,
+  imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
 })
 export class ResultsSearchComponent implements OnInit {
-      private rs = inject(ResultsSelectionService);
+  private rd = inject(ResultsDataService);
+  private rs = inject(ResultsSelectionService);
+
   @HostBinding('class.docs-expanded') _isExpanded: boolean;
 
   private _autocompleteTrigger = viewChild(MatAutocompleteTrigger);
@@ -41,7 +43,7 @@ export class ResultsSearchComponent implements OnInit {
   subscription: any;
 
   ngOnInit() {
-    this.rs.selectedResults.subscribe(results => {
+    this.rd.selectedResults.subscribe(results => {
       this.results = results;
     });
 

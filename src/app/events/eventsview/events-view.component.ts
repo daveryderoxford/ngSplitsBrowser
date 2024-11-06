@@ -1,13 +1,13 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, inject } from "@angular/core";
+import { MatTabsModule } from "@angular/material/tabs";
 import { Router } from "@angular/router";
 import { OEvent } from "app/model/oevent";
 import { DialogsService } from "app/shared";
+import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
+import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.component";
+import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab.component";
 import { EventService } from "../event.service";
 import { MyEventsTabComponent } from "../my-events-tab/my-events-tab.component";
-import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab.component";
-import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.component";
-import { MatTabsModule } from "@angular/material/tabs";
-import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
 
 @Component({
     selector: "app-results",
@@ -25,8 +25,8 @@ export class EventsViewComponent{
       if (!event.splits || event.splits.valid === false) {
          this.ds.message("Results display failed", "No valid results uploaded for event");
       } else {
-      this.router.navigate(["/graph", event.key]).catch((err) => {
-        console.log('Errror in loading results for ' + event.name + ' ' + err);
+      this.router.navigate(["results", "graph", event.key]).catch((err) => {
+        console.log('Errror in loading results for ' + event.name + ' ' + err.toString());
         this.ds.message('Error loading results', 'Error loading results for event');
       });
     }
