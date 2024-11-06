@@ -23,7 +23,7 @@
   </app-results-navbar>
 
   <div class="table-container">
-    <table mat-table [dataSource]="tableData()" matSort (matSortChange)="sortChanged($event)">
+    <table mat-table [dataSource]="tableData()" matSort (matSortChange)="this.sortState.set($event)">
 
       <!-- Initial columns -->
       <ng-container matColumnDef="position" sticky>

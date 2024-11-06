@@ -232,4 +232,3 @@ export class ResultsDataService {
       return ranks;
    }
 }
-

@@ -69,8 +69,7 @@ export class ResultsSelectionService {
       this._selectedCompetitors.set([]);
    }
 
-   /** Toggle selected cometitor 
-    */
+   /** Toggle selected cometitor */
    toggleSelectedSelectedCompetitor(comp: Competitor) {
       let competitors = this._selectedCompetitors();
 
@@ -106,6 +105,5 @@ export class ResultsSelectionService {
    displayAllCourseCompetitors(showCourse: boolean) {
       this._courseCompetitorsDisplayed.set(showCourse);
    }
-
 }
 

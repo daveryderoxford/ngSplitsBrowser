@@ -1,10 +1,9 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes } from '@angular/router';
 import { GraphComponent } from "./graph/graph.component";
 import { ResultsResolver } from './results.resolver';
 import { SplitsGridComponent } from './splits-grid/splits-grid.component';
 
-const routes: Routes = [
+export const RESULTS_ROUTES: Routes = [
    {
       path: "graph/:id",
       component: GraphComponent,
@@ -20,9 +19,3 @@ const routes: Routes = [
       }
    }
 ];
-
-@NgModule({
-   imports: [RouterModule.forChild(routes)],
-   exports: [RouterModule]
-})
-export class ResultsRoutingModule { }

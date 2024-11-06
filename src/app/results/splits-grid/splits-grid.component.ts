@@ -1,13 +1,13 @@
 import { NgClass, NgStyle } from "@angular/common";
-import { Component, computed, inject, OnInit, viewChild } from "@angular/core";
+import { Component, computed, inject, OnInit, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatOptionModule } from "@angular/material/core";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatSelectModule } from "@angular/material/select";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
-import { MatSort, MatSortModule, Sort } from "@angular/material/sort";
-import { MatTableDataSource, MatTableModule } from "@angular/material/table";
+import { MatSortModule, Sort } from "@angular/material/sort";
+import { MatTableModule } from "@angular/material/table";
 import { Competitor, CourseClass, sbTime, TimeUtilities } from "../model";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsNavbarComponent } from "../results-navbar/results-navbar.component";
@@ -29,6 +29,8 @@ export class SplitsGridComponent implements OnInit {
    course = this.rs.selectedCourse;
    oclass = this.rs.selectedClass;
 
+   sortState = signal<Sort>({ active: '', direction: '' });
+
    /** Column definitions columns */
    staticColumns = ["position", "name", "total"];
 
@@ -36,8 +38,6 @@ export class SplitsGridComponent implements OnInit {
    courseToggle = new FormControl<boolean>(true);
    colorToggle = new FormControl<boolean>(true);
    selectedToggle = new FormControl<boolean>(false);
-
-   sortHeader = viewChild(MatSort);
 
    selectedOnly = toSignal(this.selectedToggle.valueChanges, { initialValue: false });
 
@@ -48,18 +48,17 @@ export class SplitsGridComponent implements OnInit {
 
    displayedColumns = computed(() => [...this.staticColumns, ...this.splitsColumns()]);
 
-   tableData = computed<MatTableDataSource<Competitor>>(() => {
+   tableData = computed<Competitor[]>(() => {
       const r = this.results();
 
       if (this.oclass()) {
          const comps = this.selectedOnly() ?
             this.oclass().competitors.filter((comp) => this.rs.isCompetitorSelected(comp)) :
-            this.oclass().competitors;
-         const ds = new MatTableDataSource(comps);
-         ds.sort = this.sortHeader();
-         return ds;
+            [...this.oclass().competitors];
+         this.applySort(this.sortState(), comps);
+         return comps;
       } else {
-         return new MatTableDataSource([]);
+         return [];
       }
    });
 
@@ -130,36 +129,31 @@ export class SplitsGridComponent implements OnInit {
       }
    }
 
-   sortChanged(sortState: Sort) {
+   applySort(sortState: Sort, competitors: Competitor[]) {
+
       if (sortState.direction) {
-         console.log(`Sorted ${sortState.direction} ending`);
+         console.log(`Sorting ${sortState.active} ${sortState.direction} ending`);
       } else {
          console.log('Sorting cleared');
       }
 
-     /* this.sortedData = data.sort((a, b) => {
-         const isAsc = sort.direction === 'asc';
-         switch (sort.active) {
-            case 'name':
-               return compare(a.name, b.name, isAsc);
-            case 'calories':
-               return compare(a.calories, b.calories, isAsc);
-            case 'fat':
-               return compare(a.fat, b.fat, isAsc);
-            case 'carbs':
-               return compare(a.carbs, b.carbs, isAsc);
-            case 'protein':
-               return compare(a.protein, b.protein, isAsc);
-            default:
-               return 0;
-         } 
-      }); */
+      if (!sortState.direction || sortState.active == 'position)') {
+         competitors.sort((c1, c2) => c1.totalTime - c2.totalTime);
+      } else {
+         const index = parseInt(sortState.active);
+         if (sortState.direction == 'asc') {
+            competitors.sort((c1, c2) => c1.splitTimes[index] - c2.splitTimes[index]);
+         } else {
+            competitors.sort((c1, c2) => c2.splitTimes[index] - c1.splitTimes[index]);
+         }
+      }
    }
 
    /** Format splitsbrowser time string. 
     */
+   /** Format splitsbrowser time string. 
+    */
    formatTime(time: sbTime): string {
-      return
-      !time ? '' : TimeUtilities.formatTime(time);
+      return !time ? '' : TimeUtilities.formatTime(time);
    }
 }
