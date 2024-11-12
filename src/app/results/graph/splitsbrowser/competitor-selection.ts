@@ -1,4 +1,4 @@
-import * as $ from "jquery";
+import $ from 'jquery';
 import { InvalidData } from "../../model/exception";
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
 import { set as d3_set } from "d3-collection";

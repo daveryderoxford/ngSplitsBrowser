@@ -23,7 +23,7 @@
 
 import { } from "jasmine";
 import 'jasmine-expect';
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Competitor, sbTime } from "./model";
 import { isNaNStrict } from "./model/util";
 

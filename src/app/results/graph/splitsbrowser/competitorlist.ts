@@ -1,4 +1,4 @@
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Competitor } from "../../model";
 import { ChartType } from "./chart-types";
 import { CompetitorSelection } from "./competitor-selection";

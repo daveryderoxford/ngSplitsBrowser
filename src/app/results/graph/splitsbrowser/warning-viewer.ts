@@ -1,4 +1,4 @@
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Lang } from "./lang";
 
 const getMessage = Lang.getMessage;

@@ -2,7 +2,7 @@
 
 import { range as d3_range } from "d3-array";
 import { event as d3_event, mouse as d3_mouse, select as d3_select, selectAll as d3_selectAll } from "d3-selection";
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Competitor } from "../../model";
 import { ChartType } from "./chart-types";
 import { CompetitorSelection } from "./competitor-selection";

@@ -8,6 +8,7 @@ import { ResultsSelectionService } from "../results-selection.service";
 import { displayGraph } from "./splitsbrowser/splitsbrowser";
 import { ResultsNavbarComponent } from "../results-navbar/results-navbar.component";
 import { ResultsDataService } from '../results-data.service ';
+import { CompetitorListComponent } from '../competitor-list/competitor-list.component';
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -25,7 +26,7 @@ interface SplitsBrowserOptions {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [ResultsNavbarComponent]
+  imports: [ResultsNavbarComponent, CompetitorListComponent]
 })
 export class GraphComponent implements OnInit {
 

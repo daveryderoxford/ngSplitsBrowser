@@ -1,7 +1,7 @@
 
 /** Service to paganate Firebase queries */
-import { Injectable, inject } from '@angular/core';
-import { collection, collectionSnapshots, CollectionReference, Firestore, getDocs, limit, orderBy, Query, query, startAfter, DocumentSnapshot } from '@angular/fire/firestore';
+import { inject, Injectable } from '@angular/core';
+import { collection, CollectionReference, collectionSnapshots, DocumentSnapshot, Firestore, limit, orderBy, Query, query, startAfter } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 

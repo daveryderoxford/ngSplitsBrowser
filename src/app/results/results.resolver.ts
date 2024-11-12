@@ -1,10 +1,8 @@
-
 import { Injectable, inject } from "@angular/core";
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
 import { Observable } from "rxjs";
 import { take } from 'rxjs/operators';
 import { Results } from "./model";
-import { ResultsSelectionService } from "./results-selection.service";
 import { ResultsDataService } from './results-data.service ';
 
 @Injectable({

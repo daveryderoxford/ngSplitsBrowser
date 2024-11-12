@@ -1,7 +1,7 @@
 // file language-selector.js
 
 import { select as d3_select} from "d3-selection";
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Lang } from "./lang";
 
 

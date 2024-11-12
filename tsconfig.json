@@ -6,13 +6,13 @@
     "outDir": "./dist/out-tsc",
     "baseUrl": "src",
     "sourceMap": true,
+    "esModuleInterop": true,
     "declaration": false,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "target": "ES2022",
     "allowJs": false,
     "checkJs": false,
-    "allowSyntheticDefaultImports": true,
     "typeRoots": [
       "node_modules/@types"
     ],

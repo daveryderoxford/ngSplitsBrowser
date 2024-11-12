@@ -1,6 +1,6 @@
 
 import { map as d3_map } from "d3-collection";
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
 import { Version2Reader } from "./iof-xml-v2-reader";

@@ -1,7 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, viewChild } from '@angular/core';
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from '../results-selection.service';
-import { MatListModule } from '@angular/material/list';
+import { MatListModule, MatSelectionList, MatSelectionListChange } from '@angular/material/list';
+import { Utils } from 'app/shared';
+import { TimeUtilities } from '../model';
 
 @Component({
   selector: 'app-competitor-list',
@@ -13,5 +15,16 @@ import { MatListModule } from '@angular/material/list';
 export class CompetitorListComponent {
   rd = inject(ResultsDataService);
   rs = inject(ResultsSelectionService);
+
+  list = viewChild(MatSelectionList);
+
+
+  selectionChanged(change: MatSelectionListChange) {
+
+  }
+
+  formatTime( t: number): string{
+    return TimeUtilities.formatTime(t);
+  }
 
 }

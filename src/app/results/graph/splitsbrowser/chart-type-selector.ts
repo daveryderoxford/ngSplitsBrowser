@@ -1,6 +1,6 @@
 // file chart-type-selector.js
 
-import * as $ from "jquery";
+import $ from 'jquery';
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
 import { select as d3_select } from "d3-selection";

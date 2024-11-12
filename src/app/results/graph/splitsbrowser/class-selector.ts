@@ -4,7 +4,7 @@
 import { ascending } from "d3-array";
 import { set } from "d3-collection";
 import { select } from "d3-selection";
-import * as $ from "jquery";
+import $ from 'jquery';
 import { InvalidData } from "../../model";
 import { Lang } from "./lang";
 

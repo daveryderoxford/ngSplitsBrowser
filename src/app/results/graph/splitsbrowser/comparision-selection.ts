@@ -1,5 +1,5 @@
 
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Lang } from "./lang";
 import { select as d3_select } from "d3-selection";
 import { range as d3_range } from "d3-array";

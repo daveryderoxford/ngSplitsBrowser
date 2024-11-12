@@ -1,7 +1,8 @@
 // file chart-popup.js
 
 import { select as d3_select, Selection } from "d3-selection";
-import * as $ from "jquery";
+import $ from 'jquery'
+
 import { TimeUtilities } from "../../model";
 
 interface ChartPopupHandlers {

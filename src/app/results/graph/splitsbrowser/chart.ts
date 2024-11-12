@@ -5,13 +5,24 @@ import { map as d3_map } from "d3-collection";
 import { scaleLinear as d3_scaleLinear, ScaleLinear as d3_ScaleLinear } from "d3-scale";
 import { select as d3_select, selectAll as d3_selectAll, Selection, BaseType } from "d3-selection";
 import { line as d3_line } from "d3-shape";
-import * as $ from "jquery";
+import $ from 'jquery';
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
 import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
 import { FastestSplitsPopupData, SplitsPopupData, NextControlData } from "./splits-popup-data";
+
+
+///// New interface 
+
+
+
+
+
+
+
+/////
 
 export interface GraphColData {
    x: number;

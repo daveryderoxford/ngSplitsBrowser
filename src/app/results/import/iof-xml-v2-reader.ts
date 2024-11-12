@@ -1,5 +1,5 @@
 
-import * as $ from "jquery";
+import $ from 'jquery';
 import { isUndefined } from "./util";
 import { InvalidData, TimeUtilities, WrongFileFormat } from "../model";
 import { CourseDeatils, IOFXMLReader } from "./iof-xml-v3-reader";
