@@ -1,5 +1,4 @@
 
-import { map as d3_map } from "d3-collection";
 import { Competitor, Course, CourseClass, Results, TimeUtilities, WrongFileFormat } from "../model";
 import { normaliseLineEndings, parseCourseClimb, parseCourseLength } from "./util";
 
@@ -54,7 +53,7 @@ export function parseTripleColumnEventData(data: string): Results {
 const DELIMITERS = [",", ";"];
 
 class TrippleCVSReader {
-    classes = d3_map();
+    classes = new Map();
     delimiter = null;
     warnings = [];
 
@@ -255,7 +254,7 @@ class TrippleCVSReader {
 
         // Group the classes by the list of controls.  Two classes using the
         // same list of controls can be assumed to be using the same course.
-        const coursesByControlsLists = <any>d3_map();
+        const coursesByControlsLists = new Map();
 
         this.classes.entries().forEach((keyValuePair) => {
             const className = keyValuePair.key;
@@ -280,7 +279,7 @@ class TrippleCVSReader {
         });
 
         const courses = [];
-        coursesByControlsLists.values().forEach((courseObject) => {
+        coursesByControlsLists.forEach((courseObject) => {
             const course = new Course(courseObject.name, courseObject.classes, courseObject.length, courseObject.climb, courseObject.controls);
             courseObject.classes.forEach((courseClass) => { courseClass.setCourse(course); });
             courses.push(course);

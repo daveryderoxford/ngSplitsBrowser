@@ -1,8 +1,7 @@
 // file query-string.js
 
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
-import { map as d3_map, set as d3_set } from "d3-collection";
-import { Competitor, CourseClassSet, Results } from "../../model";
+import { Competitor, CourseClass, CourseClassSet, Results } from "../../model";
 import { ChartType, ChartTypeClass } from "./chart-types";
 
 type ChartCompareTo = "TotalTime" | "SplitTime" | "BehindFastest" | "TimeLoss";
@@ -47,13 +46,13 @@ function readSelectedClasses(queryString: string, eventData: Results): CourseCla
         // No class name specified in the URL.
         return null;
     } else {
-        const classesByName = <any>d3_map();
+        const classesByName = new Map<string, CourseClass>();
         for (let index = 0; index < eventData.classes.length; index += 1) {
             classesByName.set(eventData.classes[index].name, eventData.classes[index]);
         }
 
         let classNames = decodeURIComponent(classNameMatch[1]).split(";");
-        classNames = d3_set(classNames).values();
+        classNames = [...(new Set(classNames))];
         let selectedClasses = classNames.filter(function (className) { return classesByName.has(className); })
             .map(function (className) { return classesByName.get(className); });
 
@@ -223,7 +222,7 @@ function readSelectedCompetitors(queryString: string, courseClassSet: CourseClas
                 return d3_range(0, courseClassSet.allCompetitors.length);
             }
 
-            competitorNames = d3_set(competitorNames).values();
+            competitorNames = [...(new Set(competitorNames))];
             const allCompetitorNames = courseClassSet.allCompetitors.map(function (competitor) { return competitor.name; });
             const selectedCompetitorIndexes = [];
             competitorNames.forEach(function (competitorName) {

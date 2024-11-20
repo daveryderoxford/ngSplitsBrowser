@@ -1,14 +1,6 @@
 // Import theming functions
 @use '@angular/material' as mat;
 
-.toolbar-button {
-  --mat-standard-button-toggle-selected-state-background-color: #{mat.get-theme-color($theme, primary, 90)};
-}
-
-.toolbar-toggle-button {
-  --mat-standard-button-toggle-selected-state-background-color: #{mat.get-theme-color($theme, primary, 80)};
-}
-
 .fill-remaining-space {
   // This fills the remaining space, by using flexbox. 
   // Every toolbar row uses a flexbox row layout.
