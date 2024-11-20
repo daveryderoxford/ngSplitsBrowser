@@ -4,6 +4,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
+  margin: 0;
   overflow: hidden;
 }
 
@@ -69,8 +70,14 @@
 }
 
 .positioncolumn {
-  width: 50px;
-  min-width: 50px;
+  width: 30px;
+  min-width: 0px;
+  padding-right: 8px;
+}
+
+.namecolumn {
+  max-width: 200px;
+    min-width: 100px;
   padding-right: 8px;
 }
 

@@ -1,7 +1,7 @@
 import { Component, OnInit, input, output } from '@angular/core';
 import { OEvent, UserResult } from 'app/model';
 import { TimeUtilities, sbTime } from 'app/results/model';
-import { NgClass, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 
 @Component({
@@ -9,7 +9,7 @@ import { MatTableModule } from '@angular/material/table';
     templateUrl: './my-results-table.component.html',
     styleUrls: ['./my-results-table.component.scss'],
     standalone: true,
-    imports: [MatTableModule, NgClass, DatePipe]
+    imports: [MatTableModule, DatePipe]
 })
 export class MyResultsTableComponent implements OnInit {
 

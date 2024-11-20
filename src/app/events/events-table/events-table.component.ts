@@ -2,7 +2,7 @@ import { Component, OnInit, input, output } from '@angular/core';
 import { OEvent } from 'app/model';
 import { DataSource } from '@angular/cdk/table';
 import { MatIconModule } from '@angular/material/icon';
-import { NgClass, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 
 @Component({
@@ -10,7 +10,7 @@ import { MatTableModule } from '@angular/material/table';
     templateUrl: './events-table.component.html',
     styleUrls: ['./events-table.component.scss'],
     standalone: true,
-    imports: [MatTableModule, NgClass, MatIconModule, DatePipe]
+    imports: [MatTableModule, MatIconModule, DatePipe]
 })
 export class EventsTableComponent {
 

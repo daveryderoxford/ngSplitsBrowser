@@ -12,7 +12,6 @@ export class ResultsSelectionService {
 
    private rd = inject(ResultsDataService);
 
-   // Behavioir subjects for all state
    private _selectedCompetitors = signal<Competitor[]>([]);
    private _selectedControl = signal<string>(null);
    private _selectedCourse = signal<Course>(null);
@@ -31,7 +30,6 @@ export class ResultsSelectionService {
             comp.courseClass.course.name === this.selectedCourse().name :
             comp.courseClass.name === this.selectedClass().name)
    );
-
 
    constructor() {
       this.rd.selectedResults.subscribe(results => {
@@ -106,4 +104,3 @@ export class ResultsSelectionService {
       this._courseCompetitorsDisplayed.set(showCourse);
    }
 }
-

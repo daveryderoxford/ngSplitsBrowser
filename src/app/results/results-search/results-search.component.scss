@@ -30,7 +30,6 @@
     background: rgba(255, 255, 255, 0.4);
     border: none;
     border-radius: 2px;
-    color: white;
     font-size: 18px;
     height: 95%;
     line-height: 95%;
@@ -38,11 +37,6 @@
     position: relative;
     transition: width .2s ease;
     width: 100%;
-     /* Set placeholder text to be white */
-    &::-webkit-input-placeholder { @include color-placeholder(); } /* Chrome/Opera/Safari */
-    &::-moz-placeholder { @include color-placeholder(); } /* Firefox 19+ */
-    &:-moz-placeholder { @include color-placeholder(); } /* Firefox 18- */
-    &:ms-input-placeholder { @include color-placeholder(); } /* IE 10+ */
 
     &:focus {
       outline: none;

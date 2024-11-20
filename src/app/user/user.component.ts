@@ -1,33 +1,32 @@
 
+import { NgStyle } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators, ReactiveFormsModule } from "@angular/forms";
-import { MatDialog as MatDialog } from "@angular/material/dialog";
+import { ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { MatButtonModule } from "@angular/material/button";
+import { MatCardModule } from "@angular/material/card";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatOptionModule } from "@angular/material/core";
+import { MatDialog } from "@angular/material/dialog";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
+import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
+import { FlexModule } from "@ngbracket/ngx-layout/flex";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { EventService } from "app/events/event.service";
 import { ControlCardTypes, UserData } from "app/model";
 import { Nations } from "app/model/nations";
 import { UserResult } from "app/model/user";
 import { ResultsSelectionService } from "app/results/results-selection.service";
-import { DialogsService, Utils } from "app/shared";
+import { DialogsService } from "app/shared";
 import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
 import { UserDataService } from "app/user/user-data.service";
 import firebase from "firebase/compat/app";
-import isEqual from 'lodash/isequal';
 import { forkJoin, Observable, of, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatIconModule } from "@angular/material/icon";
-import { MatButtonModule } from "@angular/material/button";
-import { MatOptionModule } from "@angular/material/core";
-import { MatSelectModule } from "@angular/material/select";
-import { MatInputModule } from "@angular/material/input";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatProgressBarModule } from "@angular/material/progress-bar";
-import { NgStyle } from "@angular/common";
-import { MatCardModule } from "@angular/material/card";
-import { FlexModule } from "@ngbracket/ngx-layout/flex";
 import { ToolbarComponent } from "../shared/components/toolbar.component";
 
 @UntilDestroy()
@@ -58,10 +57,7 @@ export class UserComponent implements OnInit {
     private afAuth: AngularFireAuth,
     private router: Router,
     private usd: UserDataService,
-    private rs: ResultsSelectionService,
-    private es: EventService,
     private dialog: MatDialog,
-    private dialogService: DialogsService
   ) {
     this.userForm = this.formBuilder.group( {
       firstname: [""],

@@ -11,13 +11,14 @@ import { ResultsViewButtonComponent } from "./results-view-button.component";
 import { RouterLink } from "@angular/router";
 import { MatIconModule } from "@angular/material/icon";
 import { ResultsDataService } from '../results-data.service ';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: "app-results-navbar",
   templateUrl: "./results-navbar.component.html",
   styleUrls: ["./results-navbar.component.scss"],
   standalone: true,
-  imports: [MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, CompareWithComponent, ResultsSearchComponent, AsyncPipe]
+  imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, CompareWithComponent, ResultsSearchComponent, AsyncPipe]
 })
 export class ResultsNavbarComponent {
   public rs = inject(ResultsSelectionService);

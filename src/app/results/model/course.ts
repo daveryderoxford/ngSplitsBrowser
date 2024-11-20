@@ -8,7 +8,7 @@ export interface CompetitorSummaryDetails extends FastestTimeInfo {
    className: string;
 }
 
-export interface FastestSplitForClass extends FastestSplitInfo {
+export interface FastestSplitData extends FastestSplitInfo {
    className: string;
 }
 
@@ -205,7 +205,7 @@ export class Course {
    * @sb-return {Array} Array of fastest splits for each course-class using this
    *      course.
    */
-   public getFastestSplitsForLeg(startCode: string, endCode: string): Array<FastestSplitForClass> {
+   public getFastestSplitsForLeg(startCode: string, endCode: string): Array<FastestSplitData> {
 
       const legNumber = this.getLegNumber(startCode, endCode);
       if (legNumber < 0) {
@@ -214,7 +214,7 @@ export class Course {
       }
 
       const controlNum = legNumber;
-      const fastestSplits: Array<FastestSplitForClass> = [];
+      const fastestSplits: Array<FastestSplitData> = [];
       this.classes.forEach((courseClass) => {
          const classFastest = courseClass.getFastestSplitTo(controlNum);
          if (classFastest !== null) {

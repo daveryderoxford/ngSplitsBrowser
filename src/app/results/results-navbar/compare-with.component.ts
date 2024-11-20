@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
     selector: 'app-compare-with',
     template: `
-  <button mat-stroked-button [matMenuTriggerFor]="picker">
+  <button mat-button [matMenuTriggerFor]="picker">
     {{ buttonText }}
     <mat-icon>arrow_drop_down</mat-icon>
   </button>

@@ -1,7 +1,7 @@
 /** Componnet to results for club class or */
 /* eslint-disable @typescript-eslint/quotes */
 import { Component, HostBinding, OnInit, viewChild, inject } from '@angular/core';
-import { UntypedFormControl, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatAutocompleteModule } from '@angular/material/autocomplete';
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { Competitor, Course, CourseClass, Results } from '../model';
@@ -10,6 +10,7 @@ import { MatOptionModule } from '@angular/material/core';
 
 import { MatIconModule } from '@angular/material/icon';
 import { ResultsDataService } from '../results-data.service ';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 
@@ -34,33 +35,29 @@ export class ResultsSearchComponent implements OnInit {
 
   private _autocompleteTrigger = viewChild(MatAutocompleteTrigger);
 
-  results: Results;
+  results = toSignal(this.rd.selectedResults);
 
   // Filter panel contents consisting of groups for courses, classes and competitors
   filterPanelContents: Array<FilterPanelGroup> = [];
 
-  searchControl: UntypedFormControl = new UntypedFormControl('');
+  searchControl: FormControl = new FormControl('');
   subscription: any;
 
   ngOnInit() {
-    this.rd.selectedResults.subscribe(results => {
-      this.results = results;
-    });
-
     // When the search input control changes update the panel contents
     this.searchControl.valueChanges.subscribe((val) => this.updateSearchPanelContents(val));
 
   }
 
   private updateSearchPanelContents(searchstring: string | SearchSelectedItem) {
-    if (!this.results) { return; }
+    if (!this.results()) { return; }
 
     // If a selction has not been made the value of the contol is a string.   If a seelction has been made it is the object selected
     searchstring = (typeof searchstring === 'string') ? searchstring : searchstring.name;
 
-    const courses = this.results.findCourses(searchstring);
-    const classes = this.results.findCourseClasss(searchstring);
-    const competitors = this.results.findCompetitors(searchstring);
+    const courses = this.results()?.findCourses(searchstring);
+    const classes = this.results()?.findCourseClasss(searchstring);
+    const competitors = this.results()?.findCompetitors(searchstring);
 
     this.filterPanelContents = [];
 
@@ -95,6 +92,9 @@ export class ResultsSearchComponent implements OnInit {
       this.rs.selectCourse(selection.course);
     } else if (selection instanceof Course) {
       this.rs.selectCourse(selection);
+      if (selection.length > 0) {
+         this.rs.selectClass(selection.classes[0]);
+      }
     }
   }
 

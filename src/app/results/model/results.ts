@@ -1,7 +1,7 @@
 import { ascending as d3_ascending } from "d3-array";
 import { NextControlsDataArr } from "../graph/splitsbrowser/splits-popup-data";
 import { Competitor } from "./competitor";
-import { CompetitorSummaryDetails, Course } from "./course";
+import { CompetitorSummaryDetails, Course, FastestSplitData } from "./course";
 import { CourseClass } from "./course-class";
 import { sbTime } from "./time";
 
@@ -20,15 +20,15 @@ export class Results {
     * @sb-param {Array} warnings - Array of strings containing warning messages
     *     encountered when reading in the event data.
     */
-    constructor(public classes: Array<CourseClass>,
-        public courses: Array<Course>,
-        warnings?: Array<string>) {
+    constructor(public classes: CourseClass[],
+        public courses: Course[],
+        warnings?: string[]) {
         if (warnings) {
             this.warnings = warnings;
         }
     }
 
-    get allCompetitors(): Array<Competitor> {
+    get allCompetitors(): Competitor[] {
         if (!this.allCompetitorsList) {
 
             this.allCompetitorsList = [];
@@ -80,7 +80,7 @@ export class Results {
     *     null for the finish.
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
-    public getFastestSplitsForLeg(startCode: string, endCode: string): Array<any> {
+    public getFastestSplitsForLeg(startCode: string, endCode: string): FastestSplitData[] {
         let fastestSplits = [];
         this.courses.forEach((course) => {
             if (course.usesLeg(startCode, endCode)) {
@@ -107,8 +107,8 @@ export class Results {
     *     null for the finish.
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
-    public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<CompetitorSummaryDetails> {
-        const competitors: Array<CompetitorSummaryDetails> = [];
+    public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): CompetitorSummaryDetails[] {
+        const competitors: CompetitorSummaryDetails[] = [];
         this.courses.forEach((course) => {
             course.getCompetitorsAtControlInTimeRange(controlCode, intervalStart, intervalEnd).forEach((comp) => {
                 competitors.push(comp);
@@ -144,7 +144,7 @@ export class Results {
     /** Search for a competior in the results.
      *  Matches on firstname, surname or club (case independent)
      */
-    public findCompetitors(searchstring: string): Array<Competitor> {
+    public findCompetitors(searchstring: string): Competitor[] {
         if (!searchstring || searchstring.trim().length === 0) { return []; }
 
         const ss = searchstring.toLocaleLowerCase();
@@ -165,7 +165,7 @@ export class Results {
     }
 
     /** Find competitors by ecard from results  Only a simngle competitir should be found for a given ecard number */
-    findCompetitorByECard(ecards: string | Array<string> ): Competitor {
+    findCompetitorByECard(ecards: string | string[] ): Competitor {
         const foundComp = this.allCompetitors.find((comp) => {
             if (Array.isArray(ecards)) {
                 return ecards.some(card => card === comp.ecardId);
@@ -180,7 +180,7 @@ export class Results {
     /** Search for a course class matching on name.
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
      */
-    findCourseClasss(searchstring: string): Array<CourseClass> {
+    findCourseClasss(searchstring: string): CourseClass[] {
         if (!searchstring || searchstring.trim().length === 0) { return []; }
 
         const onechar = searchstring.length > 1;
@@ -197,7 +197,7 @@ export class Results {
     /** Search for a course matching on name.
      *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
      */
-    findCourses(searchstring: string): Array<Course> {
+    findCourses(searchstring: string): Course[] {
 
         if (!searchstring || searchstring.trim().length === 0) { return []; }
 

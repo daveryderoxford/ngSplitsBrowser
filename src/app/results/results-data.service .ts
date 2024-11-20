@@ -96,7 +96,7 @@ export class ResultsDataService {
                if (evt) {
                   console.log("ResultsSelectionService: Loading Event for key: " + evt.key);
                } else {
-                  console.log("ResultsSelectionService::  Event not found. key:" + evt.key);
+                  console.log("ResultsSelectionService:: Event not found. key:" + evt.key);
                }
             }),
             switchMap(evt => this.setSelectedEvent(evt))
@@ -147,7 +147,7 @@ export class ResultsDataService {
       return obs;
    }
 
-   computeRanks(results: Results) {
+   private computeRanks(results: Results) {
       for (const oclass of results.classes ) {
          this.computeCompetitorRanks(oclass.competitors, oclass.numControls);
       }

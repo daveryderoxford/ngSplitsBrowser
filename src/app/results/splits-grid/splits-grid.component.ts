@@ -1,25 +1,24 @@
-import { NgClass, NgStyle } from "@angular/common";
 import { Component, computed, inject, OnInit, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
-import { MatOptionModule } from "@angular/material/core";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatSelectModule } from "@angular/material/select";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatSortModule, Sort } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
-import { Competitor, CourseClass, sbTime, TimeUtilities } from "../model";
+import { Competitor, CourseClass } from "../model";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsNavbarComponent } from "../results-navbar/results-navbar.component";
-import { ResultsSearchComponent } from "../results-search/results-search.component";
 import { ResultsSelectionService } from "../results-selection.service";
+import { TimeUtilities } from "../model/time";
+import { FormatTimePipe, BracketedPipe } from '../model/results-pipes';
 
 @Component({
    selector: "app-splits-grid",
    templateUrl: "./splits-grid.component.html",
    styleUrls: ["./splits-grid.component.scss"],
    standalone: true,
-   imports: [ResultsSearchComponent, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, MatSlideToggleModule, MatTableModule, MatSortModule, NgStyle, NgClass, ResultsNavbarComponent]
+   imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, ResultsNavbarComponent, FormatTimePipe, BracketedPipe]
 })
 export class SplitsGridComponent implements OnInit {
    protected rs = inject(ResultsSelectionService);
@@ -85,7 +84,6 @@ export class SplitsGridComponent implements OnInit {
          g = 255;
          r = Math.round(510 - 5.10 * percent);
          b = Math.round(510 - 5.10 * percent);
-
       }
       const h = r * 0x10000 + g * 0x100 + b * 0x1;
       return '#' + ('000000' + h.toString(16)).slice(-6);
@@ -129,6 +127,22 @@ export class SplitsGridComponent implements OnInit {
       }
    }
 
+   getTimeOrStatus(competitor: Competitor): string {
+      if (competitor.isNonStarter) {
+         return 'DNS';
+      } else if (competitor.isNonFinisher) {
+         return 'RET';
+      } else if (competitor.isDisqualified) {
+         return 'DSQ';
+      } else if (competitor.isOverMaxTime) {
+         return 'Over time';
+      } else if (competitor.completed()) {
+         return TimeUtilities.formatTime(competitor.totalTime);
+      } else {
+         return 'mp';
+      }
+   }
+
    applySort(sortState: Sort, competitors: Competitor[]) {
 
       if (sortState.direction) {
@@ -138,7 +152,7 @@ export class SplitsGridComponent implements OnInit {
       }
 
       if (!sortState.direction || sortState.active == 'position)') {
-         competitors.sort((c1, c2) => c1.totalTime - c2.totalTime);
+         competitors.sort((c1, c2) => Competitor.compareCompetitors(c1, c2));
       } else {
          const index = parseInt(sortState.active);
          if (sortState.direction == 'asc') {
@@ -147,13 +161,5 @@ export class SplitsGridComponent implements OnInit {
             competitors.sort((c1, c2) => c2.splitTimes[index] - c1.splitTimes[index]);
          }
       }
-   }
-
-   /** Format splitsbrowser time string. 
-    */
-   /** Format splitsbrowser time string. 
-    */
-   formatTime(time: sbTime): string {
-      return !time ? '' : TimeUtilities.formatTime(time);
    }
 }

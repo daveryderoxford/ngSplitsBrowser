@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
     selector: 'app-class-menu-button',
     
         template: `
-<button mat-stroked-button [matMenuTriggerFor]="classPicker">
+<button mat-button [matMenuTriggerFor]="classPicker">
   {{ buttonText }}
   <mat-icon>arrow_drop_down</mat-icon>
 </button>

@@ -39,5 +39,5 @@ export function isNaNStrict(x): boolean {
 *     otherwise.
 */
 export function isNotNullNorNaN(x): boolean {
-    return x !== null && x === x;
+    return x !== null && x !== undefined && x === x;
 }

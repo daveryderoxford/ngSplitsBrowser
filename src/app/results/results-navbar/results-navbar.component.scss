@@ -1,17 +1,12 @@
 // Import theming functions
 @use '@angular/material' as mat;
 
-.results-navbar-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  padding: 8px 16px;
+.toolbar-button {
+  --mat-standard-button-toggle-selected-state-background-color: #{mat.get-theme-color($theme, primary, 90)};
+}
 
-  > .mat-button {
-    &:last-child {
-      margin-left: auto;
-    }
-  }
+.toolbar-toggle-button {
+  --mat-standard-button-toggle-selected-state-background-color: #{mat.get-theme-color($theme, primary, 80)};
 }
 
 .fill-remaining-space {

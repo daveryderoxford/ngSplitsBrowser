@@ -1,5 +1,5 @@
 /** Various utility functions for Splitsbrowser */
-import uniqBy from 'lodash/uniqby';
+import uniqBy from 'lodash/uniqBy';
 
 export class Utils {
 
@@ -11,7 +11,7 @@ export class Utils {
 
          reader.onload = (event: any) => {
             const text = event.target.result;
-            resolve(text);
+            resolve(text); 
          };
 
          reader.onerror = () => {

@@ -22,38 +22,38 @@
 
   <!-- Nationality Definition -->
   <ng-container matColumnDef="nationality">
-    <th mat-header-cell *matHeaderCellDef>Nationality</th>
-    <td mat-cell *matCellDef="let row" ngClass=center> {{row.nationality}} </td>
+    <th mat-header-cell class="center" *matHeaderCellDef>Nationality</th>
+    <td mat-cell *matCellDef="let row" class="center"> {{row.nationality}} </td>
   </ng-container>
 
   <!-- Club Definition -->
   <ng-container matColumnDef="club">
-    <th mat-header-cell *matHeaderCellDef>Club</th>
-    <td mat-cell *matCellDef="let row" ngClass=center> {{row.club}} </td>
+    <th mat-header-cell class="center" *matHeaderCellDef>Club</th>
+    <td mat-cell *matCellDef="let row" class="center"> {{row.club}} </td>
   </ng-container>
 
   <!-- Grade Definition -->
   <ng-container matColumnDef="grade">
-    <th mat-header-cell *matHeaderCellDef>Grade</th>
-    <td mat-cell *matCellDef="let row" ngClass=center> {{row.grade}} </td>
+    <th mat-header-cell class="center" *matHeaderCellDef>Grade</th>
+    <td mat-cell *matCellDef="let row" class="center"> {{row.grade}} </td>
   </ng-container>
 
   <!-- Type Definition -->
   <ng-container matColumnDef="type">
-    <th mat-header-cell *matHeaderCellDef>Type</th>
-    <td mat-cell *matCellDef="let row" ngClass=center> {{row.type}} </td>
+    <th mat-header-cell class="center" *matHeaderCellDef>Type</th>
+    <td mat-cell *matCellDef="let row" class="center"> {{row.type}} </td>
   </ng-container>
 
   <!-- Disapline Definition -->
   <ng-container matColumnDef="discipline">
-    <th mat-header-cell *matHeaderCellDef>Discipline</th>
-    <td mat-cell *matCellDef="let row" ngClass=center> {{row.discipline}} </td>
+    <th mat-header-cell class="center" *matHeaderCellDef>Discipline</th>
+    <td mat-cell *matCellDef="let row" class="center"> {{row.discipline}} </td>
   </ng-container>
 
   <!-- website -->
   <ng-container matColumnDef="website">
-    <th mat-header-cell *matHeaderCellDef>Website</th>
-    <td mat-cell *matCellDef="let row" ngClass=center>
+    <th mat-header-cell class="center" *matHeaderCellDef>Website</th>
+    <td mat-cell *matCellDef="let row" class="center">
       @if ((row.webpage !== '') && (row.webpage !== undefined)) {
         <a href={{row.webpage}}>
           <mat-icon>link</mat-icon>
@@ -65,7 +65,7 @@
   <!-- Actions -->
   <ng-container matColumnDef="actions">
     <th mat-header-cell *matHeaderCellDef>Actions</th>
-    <td mat-cell *matCellDef="let row" ngClass=center>
+    <td mat-cell *matCellDef="let row" class="center">
       @if (row === currentRow) {
         <div>
           <mat-icon>home</mat-icon>

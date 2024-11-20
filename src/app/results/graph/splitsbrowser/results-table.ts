@@ -221,8 +221,8 @@ ResultsTable.prototype.populateTable = function () {
         addCell(getTimeOrStatus(competitor), NON_BREAKING_SPACE_CHAR, "time", false, false, false, false);
 
         d3_range(1, this.courseClass.numControls + 2).forEach(function (controlNum) {
-            const formattedCumTime = TimeUtilities.formatTime(competitor.getOriginalCumulativeTimeTo(controlNum), precision);
-            const formattedSplitTime = TimeUtilities.formatTime(competitor.getOriginalSplitTimeTo(controlNum), precision);
+            const formattedCumTime = TimeUtilities.formatTime(competitor.getOriginalCumulativeTimeTo(controlNum));
+            const formattedSplitTime = TimeUtilities.formatTime(competitor.getOriginalSplitTimeTo(controlNum));
             const isCumTimeFastest = (competitor.getCumulativeRankTo(controlNum) === 1);
             const isSplitTimeFastest = (competitor.getSplitRankTo(controlNum) === 1);
             const isCumDubious = competitor.isCumulativeTimeDubious(controlNum);

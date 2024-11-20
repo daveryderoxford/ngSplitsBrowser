@@ -12,7 +12,7 @@ export class TimeUtilities {
     * @sb-param {?Number} precision - Optional number of decimal places to format using, or the default if not specified.
     * @sb-returns {string} The string formatting of the time.
     */
-    static formatTime(seconds: number, precision?: number): string {
+    static formatTime(seconds: number, hoursOnly: boolean = false, precision?: number): string {
 
         if (seconds === null) {
             return TimeUtilities.NULL_TIME_PLACEHOLDER;
@@ -20,15 +20,23 @@ export class TimeUtilities {
             return "???";
         }
 
+        let hours: number, mins: number, secs: number;
+
         let result = "";
         if (seconds < 0) {
             result = "-";
             seconds = -seconds;
         }
 
-        const hours = Math.floor(seconds / (60 * 60));
-        const mins = Math.floor(seconds / 60) % 60;
-        const secs = seconds % 60;
+        if (hoursOnly) {
+            hours = 0;
+            mins = Math.floor(seconds / 60);
+            secs = seconds % 60;
+        } else {
+            hours = Math.floor(seconds / (60 * 60));
+            mins = Math.floor(seconds / 60) % 60;
+            secs = seconds % 60;
+        }
         if (hours > 0) {
             result += hours.toString() + ":";
         }
@@ -59,7 +67,7 @@ export class TimeUtilities {
     */
     static parseTime(timeStr: string): number | null {
         if (!timeStr) {
-            return(null);
+            return (null);
         }
         timeStr = timeStr.trim();
         if (/^(\d+:)?\d+:\d\d([,.]\d+)?$/.test(timeStr)) {

@@ -15,13 +15,13 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
   <mat-button-toggle-group [hideSingleSelectionIndicator]=true>
   
     @for (view of primaryViews; track view) {
-      <mat-button-toggle class="toggelebutton" [checked]="selectedView().type === view.type"
+      <mat-button-toggle class="toolbar-toggle-button" [checked]="selectedView().type === view.type"
         (click)="buttonClicked(view)" >
         {{ view.name }}
       </mat-button-toggle>
     }
   
-    <mat-button-toggle class="toggelebutton" [matMenuTriggerFor]="moreMenu">
+    <mat-button-toggle [matMenuTriggerFor]="moreMenu">
       More <mat-icon>arrow_drop_down</mat-icon>
     </mat-button-toggle>
   </mat-button-toggle-group>
@@ -34,18 +34,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     }
   </mat-menu>
   `,
-    styles: [
-        `mat-button-toggle {
-      height:38px;
-      line-height: 38px;
-      padding: 0 5px;
-    }`,
-        `
-    ::ng-deep .mat-button-toggle-appearance-standard .mat-button-toggle-label-content {
-      line-height: 35px !important;
-      padding: 0 5px !important;
-    }`
-    ],
+    styles: [],
     standalone: true,
     imports: [MatButtonToggleModule, MatMenuModule, MatIconModule]
 })
