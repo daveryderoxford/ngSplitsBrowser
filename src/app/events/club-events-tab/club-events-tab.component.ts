@@ -8,11 +8,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectChange, MatSelectModule } from "@angular/material/select";
 import { UntilDestroy } from '@ngneat/until-destroy';
-import { Club, EventGrades, Nation, Nations, OEvent } from "app/model";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { map, tap } from 'rxjs/operators';
 import { EventService } from "../event.service";
 import { EventsTableComponent } from "../events-table/events-table.component";
+import { EventGrades, OEvent } from '../model/oevent';
+import { Club } from '../model/club';
+import { Nation, Nations } from '../model/nations';
 
 @UntilDestroy( { checkProperties: true } )
 @Component({

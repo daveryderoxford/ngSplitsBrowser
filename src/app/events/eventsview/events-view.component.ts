@@ -1,7 +1,7 @@
 import { Component, inject } from "@angular/core";
 import { MatTabsModule } from "@angular/material/tabs";
 import { Router } from "@angular/router";
-import { OEvent } from "app/model/oevent";
+import { OEvent } from "app/events/model/oevent";
 import { DialogsService } from "app/shared";
 import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
 import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.component";

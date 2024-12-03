@@ -3,9 +3,10 @@
  */
 import { Injectable, inject } from "@angular/core";
 import { collection, collectionData, CollectionReference, doc, docData, DocumentReference, Firestore, orderBy, query, where } from '@angular/fire/firestore';
-import { Club, EventInfo, OEvent } from "app/model";
 import { PaganationService } from "app/shared";
 import { BehaviorSubject, merge, Observable } from "rxjs";
+import { EventInfo, OEvent } from './model/oevent';
+import { Club } from './model/club';
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";

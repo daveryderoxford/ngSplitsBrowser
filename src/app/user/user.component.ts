@@ -16,18 +16,13 @@ import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
 import { FlexModule } from "@ngbracket/ngx-layout/flex";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { EventService } from "app/events/event.service";
-import { ControlCardTypes, UserData } from "app/model";
-import { Nations } from "app/model/nations";
-import { UserResult } from "app/model/user";
-import { ResultsSelectionService } from "app/results/results-selection.service";
-import { DialogsService } from "app/shared";
-import { ResultsFoundDialogComponent } from "app/user/results-found-dialog/results-found-dialog.component";
+import { Nations } from "app/events/model/nations";
 import { UserDataService } from "app/user/user-data.service";
 import firebase from "firebase/compat/app";
-import { forkJoin, Observable, of, Subscription } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { ToolbarComponent } from "../shared/components/toolbar.component";
+import { UserData } from 'app/user/user';
+import { ControlCardTypes } from 'app/events/model/oevent';
 
 @UntilDestroy()
 @Component({
@@ -148,49 +143,7 @@ export class UserComponent implements OnInit {
     const updatedUserData: UserData = null;
 
    this.busy = true;
- 
-    /*
-    .pipe(
-      tap( userData => updatedUserData = userData ),
-      switchMap( () => this.findUserResults( updatedUserData ) ),
-      map( foundResults => this.removeAlreadyInUserResults( foundResults, updatedUserData.results ) ),
-      switchMap( ( foundResults ) => this.selectResultsToSave( foundResults ) ),
-      switchMap( selectedResults => this.saveCompetitorResults( selectedResults ) )
-    )*/
-  }
 
-  /** Returns found results that are not already in the users results based on ecardId and type  */
-  removeAlreadyInUserResults( foundResults: UserResult[], allResults: UserResult[] ): UserResult[] {
-
-    for ( const userResult of allResults ) {
-      foundResults = foundResults.filter( found => {
-        const duplicate =
-          userResult.event.key === found.event.key &&
-          userResult.ecardId === found.ecardId;
-        return !duplicate;
-      } );
-    }
-    return ( foundResults );
-  }
-
-  /** Saves all competitor results emiting a value when all have been saved. */
-  saveCompetitorResults( userResults: UserResult[] ): Observable<void> {
-    const requests: Observable<void>[] = [];
-    for ( const found of userResults ) {
-      requests.push( this.usd.addResult( found ) );
-    }
-
-    return forkJoin( requests ).pipe( map( () => { } ) );
-  }
-
-  /** Displays dialog with user results found and returns the results the user has selected */
-  selectResultsToSave( foundResults: UserResult[] ): Observable<UserResult[]> {
-    if ( foundResults.length > 0 ) {
-      const dialogRef = this.dialog.open( ResultsFoundDialogComponent, { width: '300px', data: foundResults } );
-      return dialogRef.afterClosed();
-    } else {
-      return of( [] );
-    }
   }
   
   canDeactivate(): boolean {

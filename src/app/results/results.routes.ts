@@ -1,19 +1,26 @@
 import { Routes } from '@angular/router';
-import { GraphComponent } from "./graph/graph.component";
+import { GraphPage } from "./graph/graph-page";
 import { ResultsResolver } from './results.resolver';
-import { SplitsGridComponent } from './splits-grid/splits-grid.component';
+import { ResultsTable } from './resullts-table/results-table';
 
 export const RESULTS_ROUTES: Routes = [
    {
       path: "graph/:id",
-      component: GraphComponent,
+      component: GraphPage,
+      resolve: {
+         results: ResultsResolver
+      }
+   },
+   {
+      path: "race/:id",
+      component: GraphPage,
       resolve: {
          results: ResultsResolver
       }
    },
    {
       path: "table/:id",
-      component: SplitsGridComponent,
+      component: ResultsTable,
       resolve: {
          results: ResultsResolver
       }

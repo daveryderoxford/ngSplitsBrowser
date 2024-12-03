@@ -1,5 +1,4 @@
-<mat-card class="container card-tertiary">
-   <mat-card-content>
+<div class="container background1">
    <div>
       <mat-button-toggle-group class="dense-toggle-button" hideSingleSelectionIndicator
          #pageDidsplayed="matButtonToggleGroup">
@@ -10,27 +9,24 @@
 
    @if (pageDidsplayed.value == 'selected') {
 
-   <span class="mat-title-medium"> {{selectedClass()?.name}} </span>
    <table>
       @for (split of fastestSplitsForLeg(); track split) {
       <tr [class.primary]="split.className.localeCompare(selectedClass()?.name)">
-         <td class="mat-body-medium"> {{split.split}}</td>
-         <td class="mat-body-medium"> {{split.className}}</td>
          <td class="mat-body-medium"> {{split.name}}</td>
+         <td class="mat-body-medium"> {{split.split | formatTime}}</td>
       </tr>
       }
    </table>
    } @else {
-   <span class="mat-title-medium">Fastest leg time for {{startCode()}} to {{endCode()}}</span>
+   <span class="mat-body-medium">leg {{152}} to {{endCode()}}</span>
    <table>
       @for (split of fastestSplitsForLeg(); track split) {
       <tr>
-         <td class="mat-body-medium" [class.primary]="split.className === selectedClass()?.name"> {{split.split | formatTime}}</td>
-         <td class="mat-body-medium"> {{split.className}}</td>
-         <td class="mat-body-medium"> {{split.name}}</td>
+         <td class="mat-body-small" [class.primary]="split.className === selectedClass()?.name"> {{split.split | formatTime}}</td>
+         <td class="mat-body-small"> {{split.className}}</td>
+         <td class="mat-body-small"> {{split.name}}</td>
       </tr>
       }
    </table>
    }
-   </mat-card-content>
-</mat-card>
+</div>

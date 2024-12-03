@@ -3,7 +3,7 @@ import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d
 import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
 import { map as d3_map } from "d3-collection";
 import { scaleLinear as d3_scaleLinear, ScaleLinear as d3_ScaleLinear } from "d3-scale";
-import { select as d3_select, selectAll as d3_selectAll, Selection, BaseType } from "d3-selection";
+import { BaseType, select as d3_select, selectAll as d3_selectAll, Selection } from "d3-selection";
 import { line as d3_line } from "d3-shape";
 import $ from 'jquery';
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
@@ -11,13 +11,10 @@ import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
 import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
-import { FastestSplitsPopupData, SplitsPopupData, NextControlData } from "./splits-popup-data";
+import { FastestSplitsPopupData, NextControlData, SplitsPopupData } from "./splits-popup-data";
 
 
 ///// New interface 
-
-
-
 
 
 
@@ -43,10 +40,10 @@ export interface ChartDisplayData {
 }
 
 export interface StatsVisibilityFlags {
-   TotalTime: boolean;
-   SplitTime: boolean;
-   BehindFastest: boolean;
-   TimeLoss: boolean;
+   totalTime: boolean;
+   splitTime: boolean;
+   behindFastest: boolean;
+   timeLoss: boolean;
 }
 
 
@@ -182,66 +179,65 @@ function maxNonNullNorNaNValue(values: Array<number | null>): number {
 }
 
 export class Chart {
-   parent: HTMLElement;
-   svg: Selection<BaseType, {}, null, undefined>;
-   svgGroup: Selection<BaseType, {}, null, undefined>;
-   textSizeElement: Selection<any, {}, null, undefined>;
+   private parent: HTMLElement;
+   private svg: Selection<BaseType, {}, null, undefined>;
+   private svgGroup: Selection<BaseType, {}, null, undefined>;
+   private textSizeElement: Selection<any, {}, null, undefined>;
 
-   xScale: d3_ScaleLinear<number, number> = null;
-   yScale: d3_ScaleLinear<number, number> = null;
-   overallWidth = -1;
-   overallHeight = -1;
-   contentWidth = -1;
-   contentHeight = -1;
+   private  xScale: d3_ScaleLinear<number, number> = null;
+   private yScale: d3_ScaleLinear<number, number> = null;
+   private overallWidth = -1;
+   private overallHeight = -1;
+   private contentWidth = -1;
+   private contentHeight = -1;
 
-   popup: ChartPopup;
-   popupData: SplitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
-   isPopupOpen = false;
-   popupUpdateFunc: () => void = null;
+   private popup: ChartPopup;
+   private popupData: SplitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
+   private popupUpdateFunc: () => void = null;
 
-   mouseOutTimeout = null; // Mouse timeout function
-   isMouseIn = false;
+   private mouseOutTimeout = null; // Mouse timeout function
+   private isMouseIn = false;
 
    // The position the mouse cursor is currently over, or null for not over
    // the charts.  This index is constrained by the minimum control that a
    // chart type specifies.
-   currentControlIndex: number | null = null;
+   private currentControlIndex: number | null = null;
 
    // The position the mouse cursor is currently over, or null for not over
    // the charts.  Unlike currentControlIndex, this index is not
    // constrained by the minimum control that a chart type specifies.
-   actualControlIndex: number | null = null;
+   private actualControlIndex: number | null = null;
 
-   controlLine = null;  // SVG line running the lenght of the control
+   private controlLine = null;  // SVG line running the lenght of the control
 
-   currentChartTime: number | null = null;
+   private currentChartTime: number | null = null;
 
-   hasData = false;
-   numControls = -1;
-   selectedIndexes: number[] = [];
-   currentCompetitorData: CurrentCompetitorData[] = [];
+   private hasData = false;
+   private numControls = -1;
+   private selectedIndexes: number[] = [];
+   private currentCompetitorData: CurrentCompetitorData[] = [];
 
-   maxStartTimeLabelWidth = 0;
-   maxStatisticTextWidth: number;
+   private maxStartTimeLabelWidth = 0;
+   private maxStatisticTextWidth: number;
 
    // Indexes of the currently-selected competitors, in the order that
    // they appear in the list of labels.
-   selectedIndexesOrderedByLastYValue: number[] = [];
-   referenceCumTimes: sbTime[] = [];
-   referenceCumTimesSorted: sbTime[] = [];
-   referenceCumTimeIndexes: sbTime[] = [];
-   fastestCumTimes: sbTime[] = [];
+   private selectedIndexesOrderedByLastYValue: number[] = [];
+   private referenceCumTimes: sbTime[] = [];
+   private referenceCumTimesSorted: sbTime[] = [];
+   private referenceCumTimeIndexes: sbTime[] = [];
+   private fastestCumTimes: sbTime[] = [];
 
    // Chart data
-   numLines: number;
-   eventData: Results;
-   courseClassSet: CourseClassSet;
-   hasControls: boolean;
-   isRaceGraph: boolean;
-   minViewableControl: number;
-   visibleStatistics: StatsVisibilityFlags;
-   currentLeftMargin: number;
-   xScaleMinutes: d3_ScaleLinear<number, number>;
+   private numLines: number;
+   private eventData: Results;
+   private courseClassSet: CourseClassSet;
+   private hasControls: boolean;
+   private isRaceGraph: boolean;
+   private minViewableControl: number;
+   private visibleStatistics: StatsVisibilityFlags;
+   private currentLeftMargin: number;
+   private xScaleMinutes: d3_ScaleLinear<number, number>;
 
    /**
    * A chart object in a window.
@@ -278,6 +274,70 @@ export class Chart {
       this.popup = new ChartPopup(parent, handlers);
 
       $(document).mouseup(() => { this.popup.hide(); });
+   }
+
+   /**
+   * Draws the chart.
+   * @sb-param {object} data - Object that contains various chart data.  This
+   *     must contain the following properties:
+   *     * chartData {Object} - the data to plot on the chart
+   *     * eventData {Event} - the overall Event object.
+   *     * courseClassSet {Event} - the course-class set.
+   *     * referenceCumTimes {Array} - Array of cumulative split times of the
+   *       'reference'.
+   *     * fastestCumTimes {Array} - Array of cumulative times of the
+   *       imaginary 'fastest' competitor.
+   * @sb-param {Array} selectedIndexes - Array of indexes of selected competitors
+   *                (0 in this array means the first competitor is selected, 1
+   *                means the second is selected, and so on.)
+   * @sb-param {Array} visibleStatistics - Array of boolean flags indicating whether
+   *                                    certain statistics are visible.
+   * @sb-param {Object} chartType - The type of chart being drawn.
+   */
+   drawChart(data: ChartDisplayData, selectedIndexes: Array<number>, visibleStatistics: StatsVisibilityFlags, chartType: ChartType): void {
+
+      const chartData = data.chartData;
+
+      this.numControls = chartData.numControls;
+      this.numLines = chartData.competitorNames.length;
+      this.selectedIndexes = selectedIndexes;
+      this.referenceCumTimes = data.referenceCumTimes;
+      this.fastestCumTimes = data.fastestCumTimes;
+      this.eventData = data.eventData;
+      this.courseClassSet = data.courseClassSet;
+      this.hasControls = data.courseClassSet.getCourse().hasControls();
+      this.isRaceGraph = chartType.isRaceGraph;
+      this.minViewableControl = chartType.minViewableControl;
+      this.visibleStatistics = visibleStatistics;
+      this.hasData = true;
+
+      this.maxStatisticTextWidth = this.determineMaxStatisticTextWidth();
+      this.maxStartTimeLabelWidth = (this.isRaceGraph) ? this.determineMaxStartTimeLabelWidth(chartData) : 0;
+      this.sortReferenceCumTimes();
+      this.adjustContentSize();
+      this.createScales(chartData);
+      this.drawBackgroundRectangles();
+      this.drawAxes(getMessage(chartType.yAxisLabelKey), chartData);
+      this.drawChartLines(chartData);
+      this.drawCompetitorLegendLabels(chartData);
+      this.removeControlLine();
+      if (this.isRaceGraph) {
+         this.drawCompetitorStartTimeLabels(chartData);
+      } else {
+         this.removeCompetitorStartTimeLabels();
+      }
+   }
+
+   /**
+  * Sets the overall size of the chart control, including margin, axes and legend labels.
+  * @sb-param {Number} overallWidth - Overall width
+  * @sb-param {Number} overallHeight - Overall height
+  */
+   setSize(overallWidth: number, overallHeight: number) {
+      this.overallWidth = overallWidth;
+      this.overallHeight = overallHeight;
+      $(this.svg.node()).width(overallWidth).height(overallHeight);
+      this.adjustContentSize();
    }
 
    /**
@@ -611,28 +671,28 @@ export class Chart {
       let labelTexts = selectedCompetitors.map(comp => formatNameAndSuffix(comp.name, getSuffix(comp)));
 
       if (this.currentControlIndex !== null && this.currentControlIndex > 0) {
-         if (this.visibleStatistics.TotalTime) {
+         if (this.visibleStatistics.totalTime) {
             const cumTimes = selectedCompetitors.map(comp => comp.getCumulativeTimeTo(this.currentControlIndex));
             const cumRanks = selectedCompetitors.map(comp => comp.getCumulativeRankTo(this.currentControlIndex));
             labelTexts = d3_zip<number | string>(labelTexts, cumTimes, cumRanks)
                .map(triple => triple[0] + formatTimeAndRank(triple[1] as number, triple[2] as number));
          }
 
-         if (this.visibleStatistics.SplitTime) {
+         if (this.visibleStatistics.splitTime) {
             const splitTimes = selectedCompetitors.map(comp => comp.getSplitTimeTo(this.currentControlIndex));
             const splitRanks = selectedCompetitors.map(comp => comp.getSplitRankTo(this.currentControlIndex));
             labelTexts = d3_zip<string | number>(labelTexts, splitTimes, splitRanks)
                .map(triple => triple[0] + formatTimeAndRank(triple[1] as number, triple[2] as number));
          }
 
-         if (this.visibleStatistics.BehindFastest) {
+         if (this.visibleStatistics.behindFastest) {
             const timesBehind = this.getTimesBehindFastest(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
             labelTexts = d3_zip<string | number>(labelTexts, timesBehind)
                .map(pair => pair[0] + SPACER + formatTime(pair[1] as number));
 
          }
 
-         if (this.visibleStatistics.TimeLoss) {
+         if (this.visibleStatistics.timeLoss) {
             const timeLosses = this.getTimeLosses(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
             labelTexts = d3_zip<string | number>(labelTexts, timeLosses)
                .map(pair => pair[0] + SPACER + formatTime(pair[1] as number));
@@ -792,16 +852,16 @@ export class Chart {
    */
    private determineMaxStatisticTextWidth(): number {
       let maxWidth = 0;
-      if (this.visibleStatistics.TotalTime) {
+      if (this.visibleStatistics.totalTime) {
          maxWidth += this.getMaxCumulativeTimeAndRankTextWidth();
       }
-      if (this.visibleStatistics.SplitTime) {
+      if (this.visibleStatistics.splitTime) {
          maxWidth += this.getMaxSplitTimeAndRankTextWidth();
       }
-      if (this.visibleStatistics.BehindFastest) {
+      if (this.visibleStatistics.behindFastest) {
          maxWidth += this.getMaxTimeBehindFastestWidth();
       }
-      if (this.visibleStatistics.TimeLoss) {
+      if (this.visibleStatistics.timeLoss) {
          maxWidth += this.getMaxTimeLossWidth();
       }
 
@@ -1226,18 +1286,6 @@ export class Chart {
    }
 
    /**
-   * Sets the overall size of the chart control, including margin, axes and legend labels.
-   * @sb-param {Number} overallWidth - Overall width
-   * @sb-param {Number} overallHeight - Overall height
-   */
-   setSize(overallWidth: number, overallHeight: number) {
-      this.overallWidth = overallWidth;
-      this.overallHeight = overallHeight;
-      $(this.svg.node()).width(overallWidth).height(overallHeight);
-      this.adjustContentSize();
-   }
-
-   /**
   * Sorts the reference cumulative times, and creates a list of the sorted
   * reference cumulative times and their indexes into the actual list of
   * reference cumulative times.
@@ -1268,57 +1316,5 @@ export class Chart {
       this.referenceCumTimeIndexes = this.referenceCumTimesSorted.map(cumTime => {
          return cumTimesToControlIndex.get(cumTime.toString());
       });
-   }
-
-   /**
-   * Draws the chart.
-   * @sb-param {object} data - Object that contains various chart data.  This
-   *     must contain the following properties:
-   *     * chartData {Object} - the data to plot on the chart
-   *     * eventData {Event} - the overall Event object.
-   *     * courseClassSet {Event} - the course-class set.
-   *     * referenceCumTimes {Array} - Array of cumulative split times of the
-   *       'reference'.
-   *     * fastestCumTimes {Array} - Array of cumulative times of the
-   *       imaginary 'fastest' competitor.
-   * @sb-param {Array} selectedIndexes - Array of indexes of selected competitors
-   *                (0 in this array means the first competitor is selected, 1
-   *                means the second is selected, and so on.)
-   * @sb-param {Array} visibleStatistics - Array of boolean flags indicating whether
-   *                                    certain statistics are visible.
-   * @sb-param {Object} chartType - The type of chart being drawn.
-   */
-   drawChart(data: ChartDisplayData, selectedIndexes: Array<number>, visibleStatistics: StatsVisibilityFlags, chartType: ChartType): void {
-
-      const chartData = data.chartData;
-
-      this.numControls = chartData.numControls;
-      this.numLines = chartData.competitorNames.length;
-      this.selectedIndexes = selectedIndexes;
-      this.referenceCumTimes = data.referenceCumTimes;
-      this.fastestCumTimes = data.fastestCumTimes;
-      this.eventData = data.eventData;
-      this.courseClassSet = data.courseClassSet;
-      this.hasControls = data.courseClassSet.getCourse().hasControls();
-      this.isRaceGraph = chartType.isRaceGraph;
-      this.minViewableControl = chartType.minViewableControl;
-      this.visibleStatistics = visibleStatistics;
-      this.hasData = true;
-
-      this.maxStatisticTextWidth = this.determineMaxStatisticTextWidth();
-      this.maxStartTimeLabelWidth = (this.isRaceGraph) ? this.determineMaxStartTimeLabelWidth(chartData) : 0;
-      this.sortReferenceCumTimes();
-      this.adjustContentSize();
-      this.createScales(chartData);
-      this.drawBackgroundRectangles();
-      this.drawAxes(getMessage(chartType.yAxisLabelKey), chartData);
-      this.drawChartLines(chartData);
-      this.drawCompetitorLegendLabels(chartData);
-      this.removeControlLine();
-      if (this.isRaceGraph) {
-         this.drawCompetitorStartTimeLabels(chartData);
-      } else {
-         this.removeCompetitorStartTimeLabels();
-      }
    }
 }

@@ -1,4 +1,4 @@
-import { EventGrades } from '.';
+import { EventGrades } from './oevent';
 
 describe('OEvent model object', () => {
 

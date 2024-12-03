@@ -1,10 +1,8 @@
 import { Component, OnInit, input, inject, TemplateRef } from "@angular/core";
-import { OEvent, } from "app/model";
 import { resultsViews, ResultsView } from "../model/results-view";
 import { ResultsSelectionService } from "../results-selection.service";
 import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
-import { ResultsSearchComponent } from "../results-search/results-search.component";
-import { CompareWithComponent } from "./compare-with.component";
+import { ResultsSearch } from "../results-search/results-search.";
 import { ClassMenuButtonComponent } from "./class-menu-button.component";
 import { AsyncPipe } from "@angular/common";
 import { ResultsViewButtonComponent } from "./results-view-button.component";
@@ -12,15 +10,16 @@ import { RouterLink } from "@angular/router";
 import { MatIconModule } from "@angular/material/icon";
 import { ResultsDataService } from '../results-data.service ';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { OEvent } from 'app/events/model/oevent';
 
 @Component({
   selector: "app-results-navbar",
-  templateUrl: "./results-navbar.component.html",
-  styleUrls: ["./results-navbar.component.scss"],
+  templateUrl: "./navbar.html",
+  styleUrls: ["./navbar.scss"],
   standalone: true,
-  imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, CompareWithComponent, ResultsSearchComponent, AsyncPipe]
+  imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, ResultsSearch, AsyncPipe]
 })
-export class ResultsNavbarComponent {
+export class Navbar {
   public rs = inject(ResultsSelectionService);
   public rd = inject(ResultsDataService);
 
@@ -33,9 +32,5 @@ export class ResultsNavbarComponent {
   viewSelected(view: ResultsView) {
     console.log('Results navbar.  view seleted ' + view.name);
     this.rd.setResultsView(view);
-  }
-
-  onCompareWith(option: ComparisionOption) {
-    // TODO
   }
 }

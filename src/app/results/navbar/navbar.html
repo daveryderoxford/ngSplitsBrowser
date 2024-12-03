@@ -1,24 +1,21 @@
 <mat-toolbar>
 
-
   <mat-icon routerLink="/events" class="results-navbar-icon">arrow_back</mat-icon>
 
   <app-results-view-button [views]="resultsViews" [selectedView]="rd.resultsView | async" (viewSelected)="viewSelected($event)" />
 
   @if ((rd.selectedResults| async); as results) {
-    <app-class-menu-button [selectedClass]='rs.selectedClass()' [oclasses]='results.classes' (select)='rs.selectClass($event)' />
+    <app-class-menu-button [selectedClass]='rs.oclass()' [oclasses]='results.classes' (select)='rs.selectClass($event)' />
   }
 
   <ng-content></ng-content>
 
-  <app-compare-with [selected]='compareWith' (select)='onCompareWith($event)' />
-
   <span class="fill-remaining-space"></span>
 
-  <app-results-search class="align-baseline, flex-item" />
+  <app-results-search class="align-baseline, padded" />
 
   <ng-content select="[settings]"></ng-content>
 
-  <mat-icon class="results-navbar-icon flex-item">settings</mat-icon>
+  <mat-icon class="results-navbar-icon padded">settings</mat-icon>
 
 </mat-toolbar>

@@ -1,14 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ResultsSearchComponent } from './results-search.component';
+import { ResultsSearch } from './results-search.';
 
 describe('ResultsSearchComponent', () => {
-  let component: ResultsSearchComponent;
-  let fixture: ComponentFixture<ResultsSearchComponent>;
+  let component: ResultsSearch;
+  let fixture: ComponentFixture<ResultsSearch>;
 
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultsSearchComponent);
+    fixture = TestBed.createComponent(ResultsSearch);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

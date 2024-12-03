@@ -1,7 +1,6 @@
 /** Pure component to show button groupto allow results view to be selected */
 
 import { Component, OnInit, input, output } from '@angular/core';
-import { OEvent } from 'app/model';
 import { ResultsView } from '../model';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';

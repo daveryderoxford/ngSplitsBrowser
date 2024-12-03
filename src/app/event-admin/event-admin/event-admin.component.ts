@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Observable } from "rxjs";
-import { OEvent } from "../../model/oevent";
+import { OEvent } from "../../events/model/oevent";
 import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
 import { DialogsService } from "../../shared/dialogs/dialogs.service";
 import { EventAdminService } from "../event-admin.service";

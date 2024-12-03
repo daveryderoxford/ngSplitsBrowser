@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -8,25 +8,26 @@ import { MatSortModule, Sort } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
 import { Competitor, CourseClass } from "../model";
 import { ResultsDataService } from '../results-data.service ';
-import { ResultsNavbarComponent } from "../results-navbar/results-navbar.component";
+import { Navbar } from "../navbar/navbar";
 import { ResultsSelectionService } from "../results-selection.service";
 import { TimeUtilities } from "../model/time";
 import { FormatTimePipe, BracketedPipe } from '../model/results-pipes';
 
 @Component({
    selector: "app-splits-grid",
-   templateUrl: "./splits-grid.component.html",
-   styleUrls: ["./splits-grid.component.scss"],
+   templateUrl: "./results-table.html",
+   styleUrls: ["./results-table.scss"],
    standalone: true,
-   imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, ResultsNavbarComponent, FormatTimePipe, BracketedPipe]
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe]
 })
-export class SplitsGridComponent implements OnInit {
+export class ResultsTable implements OnInit {
    protected rs = inject(ResultsSelectionService);
    protected rd = inject(ResultsDataService);
 
    results = toSignal(this.rd.selectedResults);
-   course = this.rs.selectedCourse;
-   oclass = this.rs.selectedClass;
+   course = this.rs.course;
+   oclass = this.rs.oclass;
 
    sortState = signal<Sort>({ active: '', direction: '' });
 
@@ -68,7 +69,7 @@ export class SplitsGridComponent implements OnInit {
       });
 
       this.courseToggle.valueChanges.subscribe((courseDisplayed: boolean) => {
-         this.rs.displayAllCourseCompetitors(courseDisplayed);
+         this.rs.setCourseOrClass(courseDisplayed);
       });
    }
 
@@ -108,7 +109,7 @@ export class SplitsGridComponent implements OnInit {
    }
 
    updateSelectedCompetitor(competitor: Competitor) {
-      this.rs.toggleSelectedSelectedCompetitor(competitor);
+      this.rs.toggleCompetitor(competitor);
    }
 
    /** Format title for split time */

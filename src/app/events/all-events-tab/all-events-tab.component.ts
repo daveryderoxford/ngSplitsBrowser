@@ -2,12 +2,13 @@
 import { DataSource } from '@angular/cdk/table';
 import { Component, OnInit, output, inject } from '@angular/core';
 import { EventService } from 'app/events/event.service';
-import { EventGrades, Nations, OEvent } from 'app/model';
 import { Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AsyncPipe } from '@angular/common';
 import { EventsTableComponent } from '../events-table/events-table.component';
+import { EventGrades, OEvent } from '../model/oevent';
+import { Nations } from '../model/nations';
 
 @Component({
     selector: 'app-all-events-tab',

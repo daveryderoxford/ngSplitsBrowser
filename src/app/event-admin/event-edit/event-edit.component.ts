@@ -9,12 +9,13 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { Club, Nations } from 'app/model';
 import { combineLatest, Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
-import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../model/oevent';
+import { ControlCardTypes, EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../events/model/oevent';
 import { EventAdminService } from '../event-admin.service';
+import { Nations } from 'app/events/model/nations';
+import { Club } from 'app/events/model/club';
 
 @UntilDestroy()
 @Component({

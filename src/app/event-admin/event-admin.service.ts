@@ -5,7 +5,7 @@ import { Injectable, inject } from "@angular/core";
 import { Auth, authState } from '@angular/fire/auth';
 import { collection, deleteDoc, doc, docData, DocumentReference, Firestore, setDoc, updateDoc } from '@angular/fire/firestore';
 import { deleteObject, ref, Storage, uploadString } from '@angular/fire/storage';
-import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/model/oevent";
+import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/events/model/oevent";
 import { parseEventData } from "app/results/import";
 import { Results } from "app/results/model/results";
 import { Utils } from "app/shared";

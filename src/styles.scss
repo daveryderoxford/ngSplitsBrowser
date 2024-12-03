@@ -2,18 +2,22 @@
 
 @include mat.core();
 
-$theme: mat.define-theme((color: (theme-type: light,
+$theme: mat.define-theme((
+      color: (theme-type: light,
         primary: mat.$azure-palette,
+        use-system-variables: true,
       ),
-      density: (scale: -1))
+      density: (scale: -1),
+      )
 );
 
 html,
 body {
-  height: 100%;
   width: 100%;
+  height: 100%;
   margin: 0;
   @include mat.all-component-themes($theme);
+  @include mat.system-level-colors($theme);
 
   --mat-toolbar-container-background-color: #{mat.get-theme-color($theme, primary-container)};
  
@@ -35,3 +39,18 @@ body {
   @include mat.button-toggle-density(-5);
 }
 
+.background1 {
+  background: mat.get-theme-color($theme, surface-container-high );
+}
+
+// Workaround to always show scrolll bar on mac
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, .5);
+  box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+}

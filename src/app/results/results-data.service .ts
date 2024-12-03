@@ -3,7 +3,7 @@ import { inject, Injectable } from "@angular/core";
 import { doc, docData, DocumentReference, Firestore } from '@angular/fire/firestore';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 import { Router } from '@angular/router';
-import { OEvent } from "app/model/oevent";
+import { OEvent } from "app/events/model/oevent";
 import { DialogsService } from 'app/shared';
 import { range as d3_range, ascending as d3_ascending } from "d3-array";
 

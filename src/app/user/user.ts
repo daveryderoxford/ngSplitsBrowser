@@ -1,8 +1,7 @@
 
 /** data associated with a user */
 import { sbTime } from "../results/model";
-import { ControlCardType, OEvent } from "./oevent";
-import { ISODateString } from "./date";
+import { ControlCardType, OEvent } from "../events/model/oevent";
 
 export interface ECard {
     id: string;
@@ -18,7 +17,7 @@ export interface UserInfo {
     nationalId: string;
     ecards: ECard[];
     autoFind: boolean;
-    resultsLastupDated: ISODateString;
+    resultsLastupDated: string;
     postcode: string;
 }
 

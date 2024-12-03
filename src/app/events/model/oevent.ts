@@ -1,4 +1,4 @@
-import { ISODateString } from "./date";
+type ISODateString = string;
 
 export type EventGrade = "IOF" | "International" | "National" | "Regional"| "Club" | "Local";
 

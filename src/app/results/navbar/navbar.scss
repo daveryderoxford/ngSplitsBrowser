@@ -1,0 +1,22 @@
+
+.fill-remaining-space {
+  // This fills the remaining space, by using flexbox. 
+  // Every toolbar row uses a flexbox row layout.
+  flex: 1 1 auto;
+}
+
+.padded {
+  margin-right:10px
+}
+
+.align-baseline {
+  align-self: flex-end;
+}
+
+.results-navbar-icon {
+  height: 21px;
+  margin: 0 7px 2px 0;
+  vertical-align: middle;
+}
+
+

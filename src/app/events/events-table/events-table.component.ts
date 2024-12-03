@@ -1,9 +1,9 @@
 import { Component, OnInit, input, output } from '@angular/core';
-import { OEvent } from 'app/model';
 import { DataSource } from '@angular/cdk/table';
 import { MatIconModule } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
+import { OEvent } from '../model/oevent';
 
 @Component({
     selector: 'app-events-table',

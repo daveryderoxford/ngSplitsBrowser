@@ -1,4 +1,4 @@
-import { ISODateString } from "./date";
+type ISODateString = string;
 
 export interface Club {
   key: string;

@@ -22,12 +22,12 @@ interface FilterPanelGroup {
 @UntilDestroy({ checkProperties: true })
 @Component({
   selector: 'app-results-search',
-  templateUrl: './results-search.component.html',
-  styleUrls: ['./results-search.component.scss'],
+  templateUrl: './results-search.html',
+  styleUrls: ['./results-search.scss'],
   standalone: true,
   imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
 })
-export class ResultsSearchComponent implements OnInit {
+export class ResultsSearch implements OnInit {
   private rd = inject(ResultsDataService);
   private rs = inject(ResultsSelectionService);
 
@@ -46,7 +46,6 @@ export class ResultsSearchComponent implements OnInit {
   ngOnInit() {
     // When the search input control changes update the panel contents
     this.searchControl.valueChanges.subscribe((val) => this.updateSearchPanelContents(val));
-
   }
 
   private updateSearchPanelContents(searchstring: string | SearchSelectedItem) {
@@ -115,6 +114,9 @@ export class ResultsSearchComponent implements OnInit {
       this._isExpanded = !this._isExpanded;
     }
   }
+
+  isCompetitor = (option): boolean => (option instanceof Competitor);
+  asCompetitor = (option): Competitor => (option as Competitor);
 
   _delayDropdown(isExpanded: boolean) {
     if (isExpanded) {

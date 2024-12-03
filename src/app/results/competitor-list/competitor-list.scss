@@ -1,0 +1,10 @@
+@use '@angular/material' as mat;
+
+.selected {
+   @include mat.list-overrides((list-item-container-color: var(--sys-primary)));
+}
+
+:host {
+   flex-grow: 1;
+   overflow: scroll;
+}

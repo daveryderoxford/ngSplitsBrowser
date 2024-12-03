@@ -50,10 +50,10 @@ describe( "ResultsSelectionService", () => {
 
       /* Zip waits for for all expected observables to emit then emits array of value obtained. */
       const expectedObservables = zip( service.selectedResults,
-         service.selectedCompetitors,
-         service.selectedControl,
-         service.selectedClass,
-         service.selectedCourse );
+         service.competitors,
+         service.control,
+         service.oclass,
+         service.course );
 
       service.setSelectedEvent( eventA ).subscribe( oevent => {
          console.log( 'Event selected' );
@@ -86,7 +86,7 @@ describe( "ResultsSelectionService", () => {
       spyOn( service, "downloadResultsFile" ).and.returnValue( of( resultsa ) );
 
       let eventcount = 0;
-      service.selectedClass.subscribe( ( oclass ) => {
+      service.oclass.subscribe( ( oclass ) => {
          if ( oclass ) {
             console.log( 'Class selected: ' + oclass.name );
          }
@@ -119,7 +119,7 @@ describe( "ResultsSelectionService", () => {
       spyOn( service, "downloadResultsFile" ).and.returnValue( of( resultsa ) );
 
       let eventcount = 0;
-      service.selectedCourse.subscribe( ( course ) => {
+      service.course.subscribe( ( course ) => {
          if ( course ) {
             console.log( 'Course selected: ' + course.name );
          }
@@ -151,7 +151,7 @@ describe( "ResultsSelectionService", () => {
       spyOn( service, "downloadResultsFile" ).and.returnValue( of( resultsa ) );
 
       let eventcount = 0;
-      service.selectedCompetitors.subscribe( ( comps ) => {
+      service.competitors.subscribe( ( comps ) => {
          if ( comps ) {
             console.log( 'Selected competitors number: ' + comps.length );
          }
@@ -194,7 +194,7 @@ describe( "ResultsSelectionService", () => {
 
       spyOn( service, "downloadResultsFile" ).and.returnValue( of( resultsa ) );
 
-      const compsSelected = zip( service.displayedCompetitors, service.selectedCompetitorsDisplayed );
+      const compsSelected = zip( service.displayedCompetitors, service.displayedCompetitors );
 
       let eventcount = 0;
       compsSelected.subscribe( ( [ displayed, selected ] ) => {

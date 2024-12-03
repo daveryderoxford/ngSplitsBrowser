@@ -33,7 +33,7 @@ export class CourseClassSet {
    * @constructor
    * @sb-param {Array} classes - Array of currently-selected classes.
    */
-   constructor(public classes) {
+   constructor(public classes: CourseClass[]) {
       this.allCompetitors = this.mergeCompetitors(this.classes);
       this.numControls = (classes.length > 0) ? classes[0].numControls : null;
       this.computeRanks();

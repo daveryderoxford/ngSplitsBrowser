@@ -8,25 +8,3 @@
   </div>
 }
 
-@if (loggedIn && (myResults$ | async); as results) {
-  @if (results.length === 0) {
-    <div class=message>
-      No results avalaible for user.
-      <br> Add ecard numbers you have previously used to find historical results
-        <div class=messagebuttons>
-          <button mat-button routerLink="/user">USER SETTINGS</button>
-        </div>
-      </div>
-    }
-    @if (results.length > 0) {
-      <div>
-        @for (result of results; track result) {
-          <mat-list>
-            <mat-list-item> {{result.eventInfo.na}</mat-list-item>
-          </mat-list>
-        }
-      </div>
-    }
-  } @else {
-  }
-
