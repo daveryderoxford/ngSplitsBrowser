@@ -22,9 +22,9 @@
    <table>
       @for (split of fastestSplitsForLeg(); track split) {
       <tr>
-         <td class="mat-body-small" [class.primary]="split.className === selectedClass()?.name"> {{split.split | formatTime}}</td>
-         <td class="mat-body-small"> {{split.className}}</td>
-         <td class="mat-body-small"> {{split.name}}</td>
+         <td class="mat-body-medium" [class.primary]="split.className === selectedClass()?.name"> {{split.split | formatTime}}</td>
+         <td class="mat-body-medium"> {{split.className}}</td>
+         <td class="mat-body-medium"> {{split.name}}</td>
       </tr>
       }
    </table>

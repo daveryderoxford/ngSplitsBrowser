@@ -102,8 +102,8 @@ export class Competitor {
     timeLosses: Array<sbTime> | null = null;
     totalTime: sbTime = 0;
 
-    private _classPosition = 999;
-    private _coursePosition = 999;
+    classPosition = 999;
+    coursePosition = 999;
     /**
     * Create and return a Competitor object where the competitor's times are given
     * as a list of cumulative times.
@@ -687,11 +687,4 @@ export class Competitor {
         return this.getIndexesAroundDubiousTimes([0].concat(this.splitTimes));
     }
 
-    public get coursePosition(): number {
-        return this._coursePosition;
-    }
-
-    public get classPosition(): number {
-        return this._classPosition;
-    }
 }

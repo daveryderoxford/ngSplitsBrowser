@@ -2,7 +2,7 @@
 import { NgStyle } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { FormBuilder, ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -30,11 +30,10 @@ import { ControlCardTypes } from 'app/events/model/oevent';
     templateUrl: "./user.component.html",
     styleUrls: ["./user.component.scss"],
     standalone: true,
-    imports: [ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, NgStyle, MatCheckboxModule]
+    imports: [ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
 export class UserComponent implements OnInit {
   originalUserData: UserData = null;
-  userForm: UntypedFormGroup;
   ecardTypes = ControlCardTypes.types;
 
   error = "";
@@ -47,23 +46,21 @@ export class UserComponent implements OnInit {
 
   cardclass: "mat-card-mobile";
 
+  userForm = this.formBuilder.group({
+        firstname: [""],
+        surname: [""],
+        club: ["", [Validators.minLength(2), Validators.maxLength(10)]],
+        nationality: [""],
+        nationalId: [""],
+      });
+
   constructor (
-    private formBuilder: UntypedFormBuilder,
+    private formBuilder: FormBuilder,
     private afAuth: AngularFireAuth,
     private router: Router,
     private usd: UserDataService,
-    private dialog: MatDialog,
   ) {
-    this.userForm = this.formBuilder.group( {
-      firstname: [""],
-      surname: [""],
-      club: ["", [Validators.minLength( 2 ), Validators.maxLength( 10 )]],
-      nationality: [""],
-      postcode: [""],
-      nationalId: [""],
-      autoFind: [""],
-      ecards: this.formBuilder.array( [] ) as UntypedFormArray
-    } );
+
   }
 
   ngOnInit() {
@@ -91,7 +88,6 @@ export class UserComponent implements OnInit {
     if ( userData ) {
 
       // Clear form by removing ecards and resetting
-      this.userForm.setControl( 'ecards', new UntypedFormArray( [] ) );
       this.userForm.reset();
 
       this.userForm.setValue( {
@@ -99,10 +95,7 @@ export class UserComponent implements OnInit {
         surname: userData.surname,
         club: userData.club,
         nationality: userData.nationality,
-        postcode: userData.postcode,
         nationalId: userData.nationalId,
-        autoFind: userData.autoFind,
-        ecards: [],
       } );
 
       for ( const ecard of userData.ecards ) {

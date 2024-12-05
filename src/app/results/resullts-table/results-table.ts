@@ -7,11 +7,11 @@ import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatSortModule, Sort } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
 import { Competitor, CourseClass } from "../model";
-import { ResultsDataService } from '../results-data.service ';
-import { Navbar } from "../navbar/navbar";
-import { ResultsSelectionService } from "../results-selection.service";
+import { BracketedPipe, FormatTimePipe } from '../model/results-pipes';
 import { TimeUtilities } from "../model/time";
-import { FormatTimePipe, BracketedPipe } from '../model/results-pipes';
+import { Navbar } from "../navbar/navbar";
+import { ResultsDataService } from '../results-data.service ';
+import { ResultsSelectionService } from "../results-selection.service";
 
 @Component({
    selector: "app-splits-grid",

@@ -9,10 +9,12 @@
 
       <div class="sidebar">
 
-         <app-competitor-list/>
+         <app-competitor-list (mouseenter)="showFastestPanel.set(false)" (mouseleave)="showFastestPanel.set(true)"/>
 
-         <app-fastest-panel [results]="results()" [leg]="1" [course]="rs.course()"
-            [selectedClass]="rs.oclass()" />
+         @if ( showFastestPanel() ) {
+            <app-fastest-panel [results]="results()" [leg]="1" [course]="rs.course()"
+               [selectedClass]="rs.oclass()" />
+         }
 
       </div>
 

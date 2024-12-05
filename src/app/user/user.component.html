@@ -1,4 +1,3 @@
-
 <app-toolbar>User details</app-toolbar>
 
 <!-- Put form in middle of page -->
@@ -15,13 +14,13 @@
         [formGroup]="userForm">
 
         @if (showProgressBar) {
-          <mat-progress-bar mode="query" />
+        <mat-progress-bar mode="query" />
         }
 
         <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
 
           <mat-form-field fxFlex="calc(50%-20px)">
-            <input  matInput required formControlName="firstname" placeholder="First Name">
+            <input matInput required formControlName="firstname" placeholder="First Name">
           </mat-form-field>
 
           <mat-form-field fxFlex="calc(50%-20px)">
@@ -33,15 +32,16 @@
         <mat-form-field>
           <mat-select required formControlName="nationality" placeholder="Nationality">
             @for (nation of nations; track nation) {
-              <mat-option [value]="nation.abrievation">
-                {{ nation.fullname }}
-              </mat-option>
+            <mat-option [value]="nation.abrievation">
+              {{ nation.fullname }}
+            </mat-option>
             }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field>
-          <input matInput required formControlName="postcode" placeholder="Postcode" oninput="this.value = this.value.toUpperCase()">
+          <input matInput required formControlName="postcode" placeholder="Postcode"
+            oninput="this.value = this.value.toUpperCase()">
           <mat-hint>For displaying fixture locations (UK)</mat-hint>
         </mat-form-field>
 
@@ -54,47 +54,9 @@
           <input matInput formControlName="nationalId" type="number" placeholder="National ID number">
         </mat-form-field>
 
-        <div fxLayout="row" fxLayoutAlign="start">
-          <b> ECards </b>
-
-          <span fxFlex></span>
-
-          <button mat-button (click)="addEcard()">
-            ADD
-            <mat-icon [ngStyle]="{'color':'green'}">add_circle</mat-icon>
-          </button>
-        </div>
-
-        @for (ecard of userForm.get('ecards')['controls']; track ecard; let i = $index) {
-          <div formArrayName="ecards">
-            <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
-              <div [formGroupName]="i">
-                <mat-form-field fxFlex=100px>
-                  <input matInput formControlName="id" min=0 placeholder="Number">
-                </mat-form-field>
-                <mat-form-field fxFlex=100px>
-                  <mat-select formControlName="type" placeholder="Type">
-                    @for (type of ecardTypes; track type) {
-                      <mat-option [value]="type">
-                        {{ type }}
-                      </mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
-              <span fxFlex></span>
-              <button mat-button (click)="removeEcard(i)">
-                <mat-icon [ngStyle]="{'color':'red'}" >remove_circle</mat-icon>
-              </button>
-            </div>
-          </div>
-        }
-
-        <mat-checkbox formControlName="autoFind"> Automatically add results </mat-checkbox>
-
         <div fxLayout="row" fxLayoutAlign="space-between center">
           <button [disabled]="userForm.invalid || !userForm.dirty" mat-raised-button color=primary type="submit"
-          aria-label="login">Save</button>
+            aria-label="login">Save</button>
         </div>
 
       </form>

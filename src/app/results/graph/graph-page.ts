@@ -42,6 +42,8 @@ export class GraphPage implements AfterViewInit {
   results = toSignal(this.rd.selectedResults);
   oevent = toSignal(this.rd.selectedEvent);
 
+  showFastestPanel = signal(true);
+
   comparisonOptions = signal(ALL_COMPARISON_OPTIONS[0]);
 
   leftLabelFlags = signal<StatsVisibilityFlags>({

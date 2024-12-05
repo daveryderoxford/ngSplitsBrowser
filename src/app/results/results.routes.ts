@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { GraphPage } from "./graph/graph-page";
 import { ResultsResolver } from './results.resolver';
 import { ResultsTable } from './resullts-table/results-table';
+import { StatsPage } from './stats/stats-page/stats-page';
 
 export const RESULTS_ROUTES: Routes = [
    {
@@ -24,5 +25,12 @@ export const RESULTS_ROUTES: Routes = [
       resolve: {
          results: ResultsResolver
       }
-   }
+   },
+   {
+      path: "stats/:id",
+      component: StatsPage,
+      resolve: {
+         results: ResultsResolver
+      }
+   },
 ];

@@ -1,0 +1,15 @@
+
+<app-results-navbar [oevent]="oevent()"/>
+
+<app-competitor-list />
+
+<div>
+   @for (comp of rs.selectedCompetitors(); track comp) {
+      <app-stats-panel [competitor]="comp"></app-stats-panel>
+   } @empty {
+      <span class="no-competitors mat-body-large">
+         No competitors selected
+         Select a competitor to display 
+      </span>
+   }
+</div>
