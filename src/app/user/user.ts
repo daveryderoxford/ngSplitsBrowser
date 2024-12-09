@@ -25,7 +25,6 @@ export interface UserInfo {
 export interface UserData extends UserInfo {
     key: string;  // Matches with the users Firebase reference
     results: UserResult[];
-    reminders: string[];  // array of eventIds
 }
 
 /** Information on the results for a user.

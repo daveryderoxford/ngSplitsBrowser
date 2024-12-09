@@ -1,6 +1,12 @@
 <div class="main-container">
 
-  <app-sidenav-button  />
+  <app-toolbar>
+    Splitsbrowser events
+    <span class="spacer"></span>
+                        <a mat-button routerLink='/auth/recover'>Forgot password?</a>
+
+    <a mat-button routerLink='/admin/add-event'>Upload results</a>
+  </app-toolbar>
 
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" backgroundColor="primary">
     <mat-tab #tabAll label="All">

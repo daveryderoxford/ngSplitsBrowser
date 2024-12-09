@@ -2,6 +2,17 @@
 
 @include mat.core();
 
+@mixin clipped-container {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.clipped-container {
+  @include clipped-container;
+}
+
 $theme: mat.define-theme((
       color: (theme-type: light,
         primary: mat.$azure-palette,
@@ -13,10 +24,7 @@ $theme: mat.define-theme((
 
 html,
 body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
+  @include clipped-container;
   @include mat.all-component-themes($theme);
   @include mat.system-level-colors($theme);
 
@@ -43,4 +51,3 @@ body {
 .background1 {
   background: mat.get-theme-color($theme, surface-container-high );
 }
-

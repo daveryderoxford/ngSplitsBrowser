@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendEmailVerification } from '@angular/fire/auth';
-import { FormGroup, ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -18,8 +18,9 @@ import { FormContainerComponent } from '../../shared/components/form-container/f
 })
 export class SignupComponent {
       private router = inject(Router);
-      private formBuilder = inject(UntypedFormBuilder);
+      private formBuilder = inject(FormBuilder);
       private afAuth = inject(Auth);
+
     signupForm = this.formBuilder.group({
         email: ['', [Validators.required, Validators.email]],
         password: ['', Validators.required],

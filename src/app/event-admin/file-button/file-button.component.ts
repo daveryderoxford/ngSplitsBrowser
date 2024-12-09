@@ -1,22 +1,25 @@
 import { Component, ElementRef, input, output, viewChild } from "@angular/core";
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     // eslint-disable-next-line @angular-eslint/component-selector
-    "selector": "file-button",
-    "template": `
+    selector: "file-button",
+    template: `
         <span>
         <input [accept]="accept()" [multiple]="multiple()" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
-        <button type="button" mat-raised-button color=primary (click)="selectFile()">
+        <button type="button" mat-raised-button [disabled]=disabled() (click)="selectFile()">
           {{label()}}
         </button>
     </span>`,
-    standalone: true
+    standalone: true,
+    imports: [MatButtonModule],
 })
 
 export class FileButtonComponent {
   accept = input<string>();
   multiple = input(false);
   label = input("Select file");
+  disabled = input(false);
   fileSelected = output<File[]>();
 
   nativeInputFile = viewChild<ElementRef>("inputFile");

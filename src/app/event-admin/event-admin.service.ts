@@ -1,101 +1,97 @@
-/**
- * Event data admininstarion service
- */
-import { Injectable, inject } from "@angular/core";
-import { Auth, authState } from '@angular/fire/auth';
-import { collection, deleteDoc, doc, docData, DocumentReference, Firestore, setDoc, updateDoc } from '@angular/fire/firestore';
+import { inject, Injectable, Signal } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { collection, collectionData, CollectionReference, deleteDoc, doc, Firestore, orderBy, query, setDoc, where } from '@angular/fire/firestore';
 import { deleteObject, ref, Storage, uploadString } from '@angular/fire/storage';
-import { CourseSummary, EventGrades, EventInfo, EventSummary, OEvent, SplitsFileFormat } from "app/events/model/oevent";
-import { parseEventData } from "app/results/import";
-import { Results } from "app/results/model/results";
-import { Utils } from "app/shared";
-import { Observable } from "rxjs";
-import { take } from 'rxjs/operators';
+import { AuthService } from 'app/auth/auth.service';
+import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
+import { parseEventData } from 'app/results/import';
+import { Results } from 'app/results/model';
+import { Utils } from 'app/shared';
+import { of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
-type PartialEvent = Partial<OEvent>;
+const EVENTS_COLLECTION = 'events';
 
 @Injectable({
    providedIn: 'root',
 })
 export class EventAdminService {
-      protected auth = inject(Auth);
-      protected firestore = inject(Firestore);
-      protected storage = inject(Storage);
-   uid = "";
+   protected auth = inject(AuthService);
+   protected fs = inject(Firestore);
+   protected storage = inject(Storage);
+
+   public events: Signal<OEvent[]>;
 
    constructor() {
 
-      authState(this.auth).subscribe(user => {
-         if (user) {
-            this.uid = user.uid;
-         } else {
-            this.uid = "";
-         }
+      // Any is used here as Firebase returns Timestamps for Dates.  
+      const eventsCollection = collection(this.fs, EVENTS_COLLECTION) as CollectionReference<any>;
+
+      const events$ = toObservable(this.auth.user).pipe(
+         switchMap((user) => {
+            if (!user) {
+               return of<OEvent[]>([]);
+            } else {
+               const q = this.auth.isAdmin() ?
+                  query(eventsCollection, orderBy('dateSubmitted', 'desc')) :
+                  query(eventsCollection, where('userId', '==', user.uid), orderBy('dateSubmitted', 'desc'));
+               return collectionData(q);
+            }
+         }),
+         map((fsEvent) => this.mapEvent(fsEvent))
+      );
+
+      this.events = toSignal(events$, { initialValue: [] });
+
+   }
+
+   /** Converts event fields as stored in Firestore to their correct types.
+    * - dates from Timestamps (used by Firestore) to Dates 
+    * - decinal numbers that get stored in Firestore as strings back to Numbers 
+   */
+   private mapEvent(fsEvents: any[]): OEvent[] {
+      return fsEvents.map((fsEvent: any) => {
+         return {
+            ...fsEvent,
+            date: fsEvent.dateSubmitted.toDate()
+         };
       });
    }
 
-   /** Get observable for event key */
-   getEvent(key: string): Observable<OEvent> {
-      const eventDoc = doc(this.firestore, '/events/' + key) as DocumentReference<OEvent>;
-      return docData(eventDoc).pipe(take(1));
+   async update(id: string, event: Partial<OEvent>): Promise<void> {
+      const d = doc(this.fs, EVENTS_COLLECTION, id);
+      await setDoc(d, event, { merge: true });
    }
 
-   /** Create new event specifying event info
-    * The let
-   */
-   async saveNew(eventInfo: EventInfo): Promise<string> {
-      const event = <OEvent>eventInfo;
+   async add(event: Partial<OEvent>): Promise<OEvent> {
 
-      const eventsCollectionRef = await collection(this.firestore, 'events');
+      const eventsCollectionRef = await collection(this.fs, EVENTS_COLLECTION);
+      event.key = doc(eventsCollectionRef).id;
 
-      // Ensure date is an ISO date string
-      event.date = new Date(event.date).toISOString();
-      event.userId = this.uid;
-      event.key = doc(eventsCollectionRef).id // Generated new Id. 
+      event.userId = this.auth.user().uid;
 
       this.setIndexProperties(event);
 
-      console.log("EventService:  Adding Event " + JSON.stringify(event));
+      await setDoc(doc(this.fs, EVENTS_COLLECTION, event.key), event);
 
-      await setDoc(doc(this.firestore, "/events/" + event.key), event);
-
-      console.log("EventService:  Event added");
-
-      return Promise.resolve(event.key);
+      return(event as OEvent);
 
    }
 
-   /** Update the event info for an event */
-   async updateEventInfo(key: string, eventInfo: EventInfo): Promise<void> {
-
-      console.log("EventService: Updating key " + key);
-
-      const update: Partial<OEvent> = Object.assign(eventInfo);
-
-      update.date = new Date(update.date).toISOString();
-
-      this.setIndexProperties(update);
-
-      await updateDoc(doc(this.firestore, "/events/" + key), update);
-
-      console.log("EventAdminService:  Event updated " + key);
-   }
-
-   /** Sets index propeties on a partial even object  */
-   public setIndexProperties(partialEvent: PartialEvent) {
-      partialEvent.yearIndex = new Date(partialEvent.date).getFullYear();
-      partialEvent.gradeIndex = EventGrades.indexObject(partialEvent.grade);
-   }
-
-   /** Delete an event.  Deleting all event data  */
    async delete(event: OEvent): Promise<void> {
 
-      // Delete event entry
-      await deleteDoc(doc(this.firestore, "/events/" + event.key));
+      const d = doc(this.fs, EVENTS_COLLECTION, event.key);
+      await deleteDoc(d);
 
       if (event.splits) {
          await deleteObject(ref(this.storage, event.splits.splitsFilename));
       }
+   }
+
+   /** Sets index propeties on a partial even object  */
+   private setIndexProperties(partialEvent: Partial<OEvent>) {
+      partialEvent.yearIndex = new Date(partialEvent.date).getFullYear();
+      partialEvent.gradeIndex = EventGrades.indexObject(partialEvent.grade);
    }
 
    /** Async functiom to upload results for an event to the database from a
@@ -119,7 +115,7 @@ export class EventAdminService {
          event.summary = this.populateSummary(results);
 
          // Save file to users area on Google Clould  Storage
-         const path = "results/" + this.uid + "/" + event.key + "-results";
+         const path = "results/" + this.auth.user().uid + "/" + event.key + "-results";
          await this._uploadToGoogle(text, path);
 
          // Update event object with stored file location
@@ -131,20 +127,28 @@ export class EventAdminService {
          };
 
       } catch (err) {
+         this.logUploadWarnings(event.name, results);
          // If an error has occueed save reason in the database
          event.splits.valid = false;
          event.splits.failurereason = err;
-         await setDoc(doc(this.firestore, "/events/" + event.key), event);
+         await setDoc(doc(this.fs, "/events/" + event.key), event);
          throw err;
       }
 
       // save event details
-      await setDoc(doc(this.firestore, "/events/" + event.key), event);
+      await setDoc(doc(this.fs, "/events/" + event.key), event);
 
       console.log("EventAdminService: Results file uploaded " + file + " to " + event.splits.splitsFilename);
 
       return results;
 
+   }
+
+   private logUploadWarnings(eventname: string, results: Results) {
+      if (results.warnings && results.warnings.length > 0) {
+         const msg = results.warnings.reduce((acc = '', warn) => acc + '\n' + warn);
+         console.log("EventAdminComponnet: Splits uploaded with warnings\n Event key: " + eventname + '\n' + msg);
+      }
    }
 
    /* Parse splits file returning parsed results */
@@ -172,7 +176,7 @@ export class EventAdminService {
    protected async _uploadToGoogle(text: string, path: string): Promise<any> {
       const storageRef = ref(this.storage, path);
       return await uploadString(storageRef, text);
-   }
+   };
 
    /** Populate the event summary based on a Results object */
    public populateSummary(results: Results): EventSummary {

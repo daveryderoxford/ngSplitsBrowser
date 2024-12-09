@@ -1,78 +1,56 @@
-import { inject, Injectable } from "@angular/core";
-import { Auth, authState } from '@angular/fire/auth';
-import { doc, docData, DocumentReference, Firestore, updateDoc } from '@angular/fire/firestore';
-import { UserData, UserInfo } from 'app/user/user';
-import { ResultsDataService } from 'app/results/results-data.service ';
-import { Observable, of } from 'rxjs';
+import { Injectable, Signal } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
+import { Auth, authState } from "@angular/fire/auth";
+import { DocumentReference, Firestore, doc, docData, updateDoc } from "@angular/fire/firestore";
+import { of } from 'rxjs';
 import { shareReplay, startWith, switchMap } from 'rxjs/operators';
+import { UserData } from './user';
 
 @Injectable({
   providedIn: "root"
 })
 export class UserDataService {
 
-  private auth = inject(Auth);
-  private firestore = inject(Firestore);
-  private rd = inject(ResultsDataService);
+  user: Signal<UserData | null | undefined>;
 
-  public user$: Observable<UserData | null>;
+  constructor(
+    private auth: Auth,
+    private fs: Firestore,
+  ) {
 
-  private currentUser: UserData | null = null;
-  private uid: string;
-
-  constructor() {
-
-    this.user$ = authState(this.auth).pipe(
+    const user$ = authState(this.auth).pipe(
       startWith(null),
-      switchMap((user) => {
-        console.log();
-        if (!user) {
+      switchMap((u) => {
+        if (!u) {
           console.log("UserData: Firebase user null.  Stop monitoring user date  ");
           return of(null);
         } else {
-          console.log(`UserData: monitoring uid: ${user.uid}`);
-          const d = doc(this.firestore, user.uid) as DocumentReference<UserData>;
-          return docData(d);
+          console.log(`UserData: monitoring uid: ${u.uid}`);
+          return docData(this._doc(u.uid));
         }
       }),
       shareReplay(1)
     );
 
-    /* Subscribe to update local cache - remove at some point */
-    this.user$.subscribe(user => {
-      if (!user) {
-        console.log("UserData: Local cache updated to nll ");
-        this.currentUser = null;
-        this.uid = null;
-      } else {
-        console.log("UserData: Local cache updated to new value ");
-        this.currentUser = user;
-        this.uid = user.key;
-      }
-    });
-  }
+    this.user = toSignal(user$);
 
-  /** Get current user data  */
-  get currentUserData(): UserData {
-    return this.currentUser;
   }
 
   /** Update the user info.  Returning the modified user details */
-  async updateDetails(details: Partial<UserInfo>): Promise<void> {
-    return updateDoc(this._getUserDoc(), details);
+  async updateDetails(details: Partial<UserData>): Promise<void> {
+    if (this.user()) {
+      console.log('UserDataService: Saving user' + this.user()!.key);
+      const doc = this._doc(this.user()!.key);
+      return updateDoc(doc, details);
+    } else {
+      console.log('UserDataService: Saving user: Unexectly null');
+      throw Error('UserDataService: Saving user: Unexectly null');
+    }
+
   }
 
   private _doc(uid: string): DocumentReference<UserData> {
-    return doc(this.firestore, "users/" + uid) as DocumentReference<UserData>;
-  }
-
-  /** Get the database documents associated with the user
-   * The user must be logged in to use this function.
-   */
-  private _getUserDoc(): DocumentReference<UserData> {
-
-    const userDoc = doc(this.firestore, "users/" + this.uid) as DocumentReference<UserData>;
-    return userDoc;
+    return doc(this.fs, "users/" + uid) as DocumentReference<UserData>;
   }
 
 }

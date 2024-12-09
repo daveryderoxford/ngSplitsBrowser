@@ -1,0 +1,26 @@
+<app-toolbar style="grid-area: toolbar">Upload new event</app-toolbar>
+
+<mat-stepper orientation="vertical" linear=true class="steps">
+   <mat-step label="Step 1 - Complete event details">
+      <app-event-form #eventform (submitted)="saveEventDetails($event)" />
+   </mat-step>
+
+   <mat-step #step2 label="Step 2 - Upload results">
+      <p>
+         Select results file to upload.
+      </p>
+      <file-button (fileSelected)="uploadSplits($event)" [disabled]="loading()" label="Select results file" />
+
+   </mat-step>
+
+   <mat-step #step2 label="Done">
+         <p class="mat-title-medium">
+            Results sucessfilly uploaded.
+         </p>
+         <p>Copy the following URL to link directly to Splitsbropwser for the event</p>
+         <p class="mat-title-medium">   
+             htttps//:splitsbrowser.org.uk/{{oevent()?.key}}
+         </p>
+      <button mat-flat-button (click)="done()">Dome</button>
+   </mat-step>
+</mat-stepper>

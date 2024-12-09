@@ -1,14 +1,14 @@
-import { AsyncPipe, DatePipe, NgFor, NgIf } from "@angular/common";
+import { AsyncPipe, DatePipe } from "@angular/common";
 import { Component, inject } from "@angular/core";
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatListModule } from '@angular/material/list';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { Observable } from "rxjs";
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { FlexModule } from '@ngbracket/ngx-layout';
+import { ToolbarComponent } from 'app/shared/components/toolbar.component';
 import { OEvent } from "../../events/model/oevent";
-import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
 import { DialogsService } from "../../shared/dialogs/dialogs.service";
 import { EventAdminService } from "../event-admin.service";
-import { EventEditComponent } from "../event-edit/event-edit.component";
+import { EventForm } from "../event-edit/event-form";
 import { FileButtonComponent } from "../file-button/file-button.component";
 
 @Component({
@@ -17,26 +17,23 @@ import { FileButtonComponent } from "../file-button/file-button.component";
   styleUrls: ["./event-admin.component.scss"],
   standalone: true,
   imports: [
-    SidenavButtonComponent,
-    NgFor,
-    NgIf,
-    EventEditComponent,
+    ToolbarComponent,
+    EventForm,
     FileButtonComponent,
     AsyncPipe,
     DatePipe,
     MatCardModule,
-    MatSidenavModule,
-    MatListModule
+    MatButtonModule,
+    FlexModule
   ],
+  providers: [provideNativeDateAdapter()],
 })
 export class EventAdminComponent {
-      private eventAdmin = inject(EventAdminService);
-      private dialogsService = inject(DialogsService);
-      
-  events: Observable<OEvent[]>;
+  protected eventAdmin = inject(EventAdminService);
+  protected dialogsService = inject(DialogsService);
 
   selectedEvent: OEvent = null;
-  new = false;
+  new = true;
   loading = false;
 
   async uploadSplits(files: File[]) {
@@ -88,6 +85,4 @@ export class EventAdminComponent {
     this.selectedEvent = event;
     this.new = false;
   }
-
 }
-

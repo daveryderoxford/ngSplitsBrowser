@@ -1,8 +1,8 @@
+@use 'styles.scss' as m;
+
 :host {
-   height: 100%;
-   width: 100%;
+   @include m.clipped-container;
    display: grid;
-   overflow: hidden;
    grid-template-rows: 60px auto;
    grid-template-columns: 250px auto;
    grid-template-areas: 'header  header '
@@ -27,15 +27,7 @@ div {
    background-color: #ebebeb;
    width: 100%;
    min-height: 0;
-   overflow-y: scroll
-   /* display: grid;
-   grid-template-columns: repeat(2, 500px);
-   grid-template-rows: repeat (auto, 500px);
-   align-content: flex-start;
-   justify-content: flex-start;
-   gap: 10px;
-   background-color: #ebebeb;
-   overflow-y: scroll; */
+   overflow-y: scroll;
 }
 
 .no-competitors {

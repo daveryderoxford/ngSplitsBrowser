@@ -4,15 +4,15 @@ import {
    FacebookAuthProvider, GoogleAuthProvider, UserCredential, getRedirectResult,
    signInWithEmailAndPassword, signInWithPopup, signInWithRedirect
 } from '@angular/fire/auth';
-import { ReactiveFormsModule, UntypedFormBuilder, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
+import { ToolbarComponent } from 'app/shared/components/toolbar.component';
 import { FormContainerComponent } from '../../shared/components/form-container/form-container.component';
-import { MatCardModule } from '@angular/material/card';
 import { HorizontalRuleComponent } from '../../shared/components/horizontal-rule.component';
 
 export type AuthType = "EmailAndPassword" | "Google" | "Facebook";
@@ -23,20 +23,21 @@ const googleAuthProvider = new GoogleAuthProvider();
 const isInStandaloneMode = () =>
    (window.matchMedia('(display-mode: standalone)').matches) ||
    ((window.navigator as any).standalone) ||
-   document.referrer.includes('android-app://')
+   document.referrer.includes('android-app://');
 
 @Component({
    selector: 'app-login',
    templateUrl: './login.component.html',
    styleUrls: ['./login.component.scss'],
    standalone: true,
-   imports: [FormContainerComponent, HorizontalRuleComponent, MatCardModule, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+   imports: [FormContainerComponent, HorizontalRuleComponent, MatCardModule, ToolbarComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class LoginComponent implements OnInit {
-      private route = inject(ActivatedRoute);
-      private router = inject(Router);
-      private formBuilder = inject(UntypedFormBuilder);
-      private afAuth = inject(Auth);
+   private route = inject(ActivatedRoute);
+   private router = inject(Router);
+   private formBuilder = inject(NonNullableFormBuilder);
+   private afAuth = inject(Auth);
+
    loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
@@ -56,11 +57,11 @@ export class LoginComponent implements OnInit {
 
    async loginFormSubmit() {
       if (this.loginForm.valid) {
-         await this.signInWith("EmailAndPassword", this.loginForm.value);
+         await this.signInWith("EmailAndPassword", this.loginForm.getRawValue());
       }
    }
 
-   async signInWith(provider: AuthType, credentials?: { email: string, password: string }) {
+   async signInWith(provider: AuthType, credentials?: { email: string, password: string; }) {
 
       try {
          this.loading = true;

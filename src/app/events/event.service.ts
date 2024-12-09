@@ -4,7 +4,7 @@
 import { Injectable, inject } from "@angular/core";
 import { collection, collectionData, CollectionReference, doc, docData, DocumentReference, Firestore, orderBy, query, where } from '@angular/fire/firestore';
 import { PaganationService } from "app/shared";
-import { BehaviorSubject, merge, Observable } from "rxjs";
+import { BehaviorSubject, merge, Observable, of } from "rxjs";
 import { EventInfo, OEvent } from './model/oevent';
 import { Club } from './model/club';
 
@@ -17,16 +17,11 @@ export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "di
 export class EventService {
       private firestore = inject(Firestore);
       private ps = inject<PaganationService<OEvent>>(PaganationService<OEvent>);
+      
   private events$: Observable<OEvent[]> = new Observable(null);
   private pageSize = 20;
   private cursor: OEvent = undefined;
   private _loading = new BehaviorSubject<boolean>(false);
-
-    /** load event by key */
-    getEvent(key: string): Observable<OEvent> {
-      const d = doc(this.firestore, "/events/" + key) as DocumentReference<OEvent>;
-      return docData(d)
-    }
 
   /** Sets search critera to use events list
    * @param orderby order the results by specified paremeter name.
@@ -67,6 +62,13 @@ export class EventService {
 
   /** Get a list of club namees for all events ordered by name and nationality */
   getClubs(): Observable<Club[]> {
+    return of([{
+      key: 'eee',
+      name: 'clubname',
+      nationality: 'GBR',
+      numEvents: 0,
+      lastEvent: 'dummy'
+    }]);
     const d = doc(this.firestore, "clubs") as DocumentReference<Club[]>
     return docData(d);
   }

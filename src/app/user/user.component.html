@@ -1,67 +1,45 @@
 <app-toolbar>User details</app-toolbar>
 
-<!-- Put form in middle of page -->
-<div fxLayout="row" fxLayoutAlign="center space-around">
+<app-form-container>
 
-  <!-- layout elements vertically with  10px gaps-->
-  <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
+  <form (ngSubmit)="save()" novalidate fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=10px
+    [formGroup]="userForm">
 
-    <div class=error>{{error}}</div>
+    @if (showProgressBar) {
+    <mat-progress-bar mode="query" />
+    }
 
-    <mat-card [class]=cardclass>
+    <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
 
-      <form (ngSubmit)="save()" novalidate fxLayout="column" fxLayoutAlign="space-around" fxLayoutGap=10px
-        [formGroup]="userForm">
+      <mat-form-field fxFlex="calc(50%-20px)">
+        <input matInput required formControlName="firstname" placeholder="First Name">
+      </mat-form-field>
 
-        @if (showProgressBar) {
-        <mat-progress-bar mode="query" />
+      <mat-form-field fxFlex="calc(50%-20px)">
+        <input matInput required formControlName="surname" placeholder="Last Names">
+      </mat-form-field>
+
+    </div>
+
+    <mat-form-field>
+      <mat-select required formControlName="nationality" placeholder="Nationality">
+        @for (nation of nations; track nation) {
+        <mat-option [value]="nation.abrievation">
+          {{ nation.fullname }}
+        </mat-option>
         }
+      </mat-select>
+    </mat-form-field>
 
-        <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
+    <mat-form-field>
+      <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
+      <mat-hint align="end">Between 2 and 10 characters</mat-hint>
+    </mat-form-field>
 
-          <mat-form-field fxFlex="calc(50%-20px)">
-            <input matInput required formControlName="firstname" placeholder="First Name">
-          </mat-form-field>
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <button [disabled]="userForm.invalid || !userForm.dirty" mat-raised-button color=primary type="submit"
+        aria-label="login">Save</button>
+    </div>
 
-          <mat-form-field fxFlex="calc(50%-20px)">
-            <input matInput required formControlName="surname" placeholder="Last Names">
-          </mat-form-field>
-
-        </div>
-
-        <mat-form-field>
-          <mat-select required formControlName="nationality" placeholder="Nationality">
-            @for (nation of nations; track nation) {
-            <mat-option [value]="nation.abrievation">
-              {{ nation.fullname }}
-            </mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field>
-          <input matInput required formControlName="postcode" placeholder="Postcode"
-            oninput="this.value = this.value.toUpperCase()">
-          <mat-hint>For displaying fixture locations (UK)</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <input matInput formControlName="club" minlength=2 maxlength=10 placeholder="Club abrievation">
-          <mat-hint align="end">Between 2 and 10 characters</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field>
-          <input matInput formControlName="nationalId" type="number" placeholder="National ID number">
-        </mat-form-field>
-
-        <div fxLayout="row" fxLayoutAlign="space-between center">
-          <button [disabled]="userForm.invalid || !userForm.dirty" mat-raised-button color=primary type="submit"
-            aria-label="login">Save</button>
-        </div>
-
-      </form>
-    </mat-card>
-
-  </div>
-
-</div>
+  </form>
+</app-form-container>

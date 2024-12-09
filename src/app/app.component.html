@@ -1,45 +1,26 @@
-<app-spinner [loading]="loading" />
-
 <mat-sidenav-container class="fullscreen">
 
   <mat-sidenav>
 
     <mat-action-list>
-      <button mat-list-item (click)='closeSidenav(["/fixtures"])'>Fixtures</button>
-
-      @if (handset) {
-        <button mat-list-item (click)='closeSidenav(["/fixtures/mapview"])'>Fixtures
-        Map</button>
-      }
 
       <button mat-list-item (click)='closeSidenav(["/events"])'>Results</button>
 
-      <!-- <button mat-list-item (click)='closeSidenav( "/events")'>Results</button>
-      <button mat-list-item (click)='closeSidenav( "/admin/event-admin" )'>Admin</button> -->
+      <button mat-list-item (click)='closeSidenav(["/admin"])'>Administer results</button>
 
       <mat-divider  />
 
-      @if (authorised) {
+      @if (auth.user()) {
         <button mat-list-item (click)='closeSidenav(["/user"])'>User settings</button>
         <button mat-list-item (click)='closeSidenav(["/auth/change-password"])'>Change password</button>
         <button mat-list-item (click)="logout()">Logout</button>
-      }
-
-      @if (!authorised) {
+      } @else {
         <button mat-list-item (click)='closeSidenav(["/auth/login"])'>Login</button>
       }
 
       <mat-divider  />
       <button mat-list-item (click)='closeSidenav(["/about"])'>About</button>
       <button mat-list-item (click)='contact()'>Contact</button>
-
-      @if (authorised) {
-        <button mat-list-item (click)='closeSidenav(["/entry/mapregistration", { new: true}])'>Map Registration</button>
-      }
-
-      @if (isAdmin()) {
-        <button mat-button (click)="scriptsClicked()">Scripts</button>
-      }
 
     </mat-action-list>
 

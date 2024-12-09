@@ -1,4 +1,4 @@
-import { Component, OnInit, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 import { SidenavButtonComponent } from './sidenav-button.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
 

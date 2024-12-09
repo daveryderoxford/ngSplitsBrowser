@@ -1,13 +1,10 @@
 
-import { NgStyle } from "@angular/common";
-import { Component, OnInit } from "@angular/core";
-import { AngularFireAuth } from "@angular/fire/compat/auth";
-import { FormBuilder, ReactiveFormsModule, UntypedFormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { Component, effect, OnInit } from "@angular/core";
+import { Auth, authState, User } from '@angular/fire/auth';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
-import { MatCardModule } from "@angular/material/card";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatOptionModule } from "@angular/material/core";
-import { MatDialog } from "@angular/material/dialog";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
@@ -16,13 +13,11 @@ import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
 import { FlexModule } from "@ngbracket/ngx-layout/flex";
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { Nations } from "app/events/model/nations";
-import { UserDataService } from "app/user/user-data.service";
-import firebase from "firebase/compat/app";
-import { Subscription } from 'rxjs';
-import { ToolbarComponent } from "../shared/components/toolbar.component";
 import { UserData } from 'app/user/user';
-import { ControlCardTypes } from 'app/events/model/oevent';
+import { UserDataService } from "app/user/user-data.service";
+import { ToolbarComponent } from "../shared/components/toolbar.component";
+import { Nations } from "app/events/model/nations";
+import { FormContainerComponent } from 'app/shared/components/form-container/form-container.component';
 
 @UntilDestroy()
 @Component({
@@ -30,115 +25,61 @@ import { ControlCardTypes } from 'app/events/model/oevent';
     templateUrl: "./user.component.html",
     styleUrls: ["./user.component.scss"],
     standalone: true,
-    imports: [ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
+    imports: [ToolbarComponent, FlexModule, FormContainerComponent, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
 export class UserComponent implements OnInit {
-  originalUserData: UserData = null;
-  ecardTypes = ControlCardTypes.types;
 
-  error = "";
-  subscription: Subscription;
+  userForm = new FormGroup({
+    firstname: new FormControl('', { validators: [Validators.required] }),
+    surname: new FormControl('', { validators: [Validators.required] }),
+    club: new FormControl('', { validators: [Validators.minLength(2), Validators.maxLength(10)] }),
+    nationality: new FormControl('', { validators: [Validators.required] }),
+    nationalId: new FormControl('', { validators: [Validators.required] }),
+  });
 
   showProgressBar = false;
   busy = false;
 
   nations = Nations.getNations();
 
-  cardclass: "mat-card-mobile";
-
-  userForm = this.formBuilder.group({
-        firstname: [""],
-        surname: [""],
-        club: ["", [Validators.minLength(2), Validators.maxLength(10)]],
-        nationality: [""],
-        nationalId: [""],
-      });
-
-  constructor (
-    private formBuilder: FormBuilder,
-    private afAuth: AngularFireAuth,
+  constructor(
+    private afAuth: Auth,
     private router: Router,
     private usd: UserDataService,
   ) {
-
+    effect(() => {
+      const userData = usd.user();
+      if (userData) {
+        this.userForm.reset();
+        this.userForm.patchValue(userData);
+      };
+    });
   }
 
   ngOnInit() {
-    this.afAuth.authState
-         .pipe( untilDestroyed(this))
-         .subscribe( loggedIn => this.loginChanged( loggedIn ) );
-
-    this.usd.user$
-          .pipe( untilDestroyed( this ) )
-          .subscribe( userData => this.userChanged( userData ) );
+    authState(this.afAuth)
+      .pipe(untilDestroyed(this))
+      .subscribe(loggedIn => this.loginChanged(loggedIn as User));
   }
 
-  private _ecardsControl(): UntypedFormArray {
-    return this.userForm.controls['ecards'] as UntypedFormArray;
-  }
-
-  loginChanged( loggedIn: firebase.User ) {
-    if ( !loggedIn ) {
-      this.router.navigate( ["/"] );
+  loginChanged(loggedIn: User) {
+    if (!loggedIn) {
+      this.router.navigate(["/"]);
     }
   }
 
-  private userChanged( userData: UserData ) {
-    this.originalUserData = userData;
-    if ( userData ) {
+  async save() {
 
-      // Clear form by removing ecards and resetting
-      this.userForm.reset();
-
-      this.userForm.setValue( {
-        firstname: userData.firstname,
-        surname: userData.surname,
-        club: userData.club,
-        nationality: userData.nationality,
-        nationalId: userData.nationalId,
-      } );
-
-      for ( const ecard of userData.ecards ) {
-        this._ecardsControl().push( this._createEcard( ecard.id, ecard.type ) );
-      }
+    this.busy = true;
+    try {
+      await this.usd.updateDetails(this.userForm.value as Partial<UserData>);
+      console.log('UserComponnet: User results saved');
+    } finally {
+      this.busy = false;
+      this.router.navigate(["/"]);
     }
   }
 
-  private _createEcard( id: string, type: string ): UntypedFormGroup {
-    return this.formBuilder.group( {
-      id: [id, [Validators.required, Validators.pattern( "[0-9]+")]],
-      type: [type, [Validators.required]]
-    } );
-  }
-
-  addEcard(): void {
-    this._ecardsControl().push( this._createEcard( '', '' ) );
-
-    // Need to explicitly mark the form as diirty as removing an element in code does not mark it as dirty.
-    this.userForm.markAsDirty();
-  }
-
-  removeEcard( i: number ) {
-    // remove address from the list
-    this._ecardsControl().removeAt( i );
-
-    // Need to explicitly mark the form as diirty as removing an element in code does not mark it as dirty.
-    this.userForm.markAsDirty();
-
-  }
-
-  ecardControls() {
-    return this.userForm.get( 'ecards' )['controls'];
-  }
-
- async save() {
-
-    const updatedUserData: UserData = null;
-
-   this.busy = true;
-
-  }
-  
   canDeactivate(): boolean {
     return !this.userForm.dirty;
   }

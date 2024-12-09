@@ -1,0 +1,89 @@
+<form (ngSubmit)="submit()" [formGroup]="form" novalidate fxLayout="column" fxLayoutAlign="space-around"
+  fxLayoutGap=10px>
+
+  <mat-form-field>
+    <mat-label>Event Name</mat-label>
+    <input matInput required formControlName="name">
+    <mat-error>Name required</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Date</mat-label>
+    <input matInput required formControlName="date" [matDatepicker]="picker">
+    <mat-datepicker-toggle matSuffix [for]="picker" />
+    <mat-datepicker #picker />
+    <mat-error>Date required</mat-error>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Nationality</mat-label>
+    <mat-select formControlName="nationality">
+      @for (nation of nations; track nation) {
+      <mat-option [value]="nation.abrievation">
+        {{ nation.fullname }}
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Club abrievation</mat-label>
+    <input matInput required formControlName="club" minlength=2 maxlength=10 [matAutocomplete]="auto">
+    <mat-hint>Between 2 and 10 characters</mat-hint>
+    <mat-error>Club required</mat-error>
+
+    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub">
+      @for (club of filteredClubs$ | async; track club) {
+      <mat-option [value]="club.name">
+        {{ club.name }}
+      </mat-option>
+      }
+    </mat-autocomplete>
+
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Grade</mat-label>
+    <mat-select formControlName="grade">
+      @for (grade of grades; track grade; let i = $index) {
+      <mat-option [value]="grade">
+        {{ grade }}
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Type</mat-label>
+    <mat-select formControlName="type">
+      @for (type of types; track type) {
+      <mat-option [value]="type">
+        {{ type }}
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Discipline</mat-label>
+    <mat-select formControlName="discipline">
+      @for (discipline of disciplines; track discipline) {
+      <mat-option [value]="discipline">
+        {{ discipline }}
+      </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Web page</mat-label>
+
+    <input matInput formControlName="webpage">
+    <mat-error>Invalid URL</mat-error>
+  </mat-form-field>
+
+  <div fxLayout="row" fxLayoutAlign="space-between center">
+    <button [disabled]="form.invalid || !form.dirty" mat-flat-button type="submit" aria-label="submit">Save</button>
+  </div>
+
+</form>

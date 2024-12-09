@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Auth, updatePassword } from '@angular/fire/auth';
-import { ReactiveFormsModule, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,20 +19,17 @@ import { ToolbarComponent } from '../../shared/components/toolbar.component';
 })
 export class ChangePasswordComponent {
       private router = inject(Router);
-      private formBuilder = inject(UntypedFormBuilder);
+      private formBuilder = inject(FormBuilder);
       private afAuth = inject(Auth);
-  form: UntypedFormGroup;
+
   error = '';
 
-  constructor() {
-    this.form = this.formBuilder.group({
-      password: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
-    }, { validator: this.passwordMissMatch });
+  form = this.formBuilder.group({
+        password: ['', Validators.required],
+        confirmPassword: ['', Validators.required],
+      }, { validator: this.passwordMissMatch });
 
-  }
-
-  passwordMissMatch(g: UntypedFormGroup): any {
+  passwordMissMatch(g: FormGroup): any {
     const p1 = g.get('password')!;
     const p2 = g.get('confirmPassword')!;
     let ret: { [error: string]: any } = {};

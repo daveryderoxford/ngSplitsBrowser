@@ -1,11 +1,11 @@
-<div class="main-container">
+<div class="main-container clipped-container ">
 
    <app-results-navbar [oevent]="oevent()">
       <app-compare-with [(selected)]="comparisonOptions"></app-compare-with>
       <app-label-flags-select [flags]="leftLabelFlags()" (flagsChanged)="leftLabelFlags.set($event)"/>
    </app-results-navbar>
 
-   <div class="content">
+   <div class="content clipped-container">
 
       <div class="sidebar">
 

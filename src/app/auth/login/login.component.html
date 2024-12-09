@@ -1,4 +1,5 @@
-<mat-toolbar>Splitsbrowser - Login</mat-toolbar>
+
+<app-toolbar title="Login"/>
 
 <div fxLayout="column" fxLayoutAlign="start center" fxFlexFill>
 
@@ -9,7 +10,6 @@
          <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
 
             <div class=error>{{error}}</div>
-
 
             <div fxLayout="column" fxLayoutAlign="space-around center" fxLayoutGap=10px>
 
@@ -45,7 +45,7 @@
 
          <div class="horizontal_rule"></div>
 
-            OR LOGIN USING
+            <span class="mat-title-medium">OR LOGIN USING</span>
 
             <button mat-flat-button (click)="signInWith('Google')" fxFlexAlign="stretch">GOOGLE</button>
             <button mat-flat-button  (click)="signInWith('Facebook')"
