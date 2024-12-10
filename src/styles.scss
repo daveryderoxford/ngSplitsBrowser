@@ -32,7 +32,7 @@ body {
  
   // Decrease default sizes for toggle buttons
    @include mat.button-toggle-density(-3);
-
+   
 }
 
 .rounded {

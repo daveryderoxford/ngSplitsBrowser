@@ -1,11 +1,10 @@
 <div class="main-container">
 
-  <app-toolbar>
-    Splitsbrowser events
-    <span class="spacer"></span>
-                        <a mat-button routerLink='/auth/recover'>Forgot password?</a>
-
-    <a mat-button routerLink='/admin/add-event'>Upload results</a>
+  <app-toolbar title="Splitsbrowser events">
+    
+    <div end>
+       <a mat-button routerLink='/admin/add-event'>Upload results</a>
+    </div>
   </app-toolbar>
 
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" backgroundColor="primary">

@@ -11,13 +11,14 @@ import { MatIconModule } from "@angular/material/icon";
 import { ResultsDataService } from '../results-data.service ';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { OEvent } from 'app/events/model/oevent';
+import { SearchButton } from '../results-search/search-buttton';
 
 @Component({
   selector: "app-results-navbar",
   templateUrl: "./navbar.html",
   styleUrls: ["./navbar.scss"],
   standalone: true,
-  imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, ResultsSearch, AsyncPipe]
+  imports: [SearchButton, MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, ResultsSearch, AsyncPipe]
 })
 export class Navbar {
   public rs = inject(ResultsSelectionService);
