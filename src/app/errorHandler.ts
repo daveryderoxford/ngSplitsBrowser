@@ -1,19 +1,17 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorHandler, Injectable, Injector, NgZone } from '@angular/core';
+import { ErrorHandler, Injectable, Injector, NgZone, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DialogsService } from './shared';
 
 /** Global error handler */
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
+   private injector = inject(Injector);
+
 
    private zone: NgZone = this.injector.get( NgZone );
    private ds: DialogsService = this.injector.get( DialogsService );
    private snackBar: MatSnackBar = this.injector.get( MatSnackBar );
-
-   // Error handling is important and needs to be loaded first.
-   // Because of this we should manually inject the services with Injector.
-   constructor (private injector: Injector) { }
 
 
    handleError( error: Error | HttpErrorResponse ) {

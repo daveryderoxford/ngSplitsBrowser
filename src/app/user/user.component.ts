@@ -1,5 +1,5 @@
 
-import { Component, effect, OnInit } from "@angular/core";
+import { Component, effect, OnInit, inject } from "@angular/core";
 import { Auth, authState, User } from '@angular/fire/auth';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
@@ -27,6 +27,10 @@ import { FormContainerComponent } from 'app/shared/components/form-container/for
     imports: [ToolbarComponent, FlexModule, FormContainerComponent, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
 export class UserComponent implements OnInit {
+  private afAuth = inject(Auth);
+  private router = inject(Router);
+  private usd = inject(UserDataService);
+
 
   userForm = new FormGroup({
     firstname: new FormControl('', { validators: [Validators.required] }),
@@ -41,11 +45,9 @@ export class UserComponent implements OnInit {
 
   nations = Nations.getNations();
 
-  constructor(
-    private afAuth: Auth,
-    private router: Router,
-    private usd: UserDataService,
-  ) {
+  constructor() {
+    const usd = this.usd;
+
     effect(() => {
       const userData = usd.user();
       if (userData) {

@@ -41,10 +41,9 @@ export class ResultsSelectionService {
 
    constructor() {
       // TODO Change to linked sugnal when they are avaliable
-      effect( () => {
-         const results = this.rd.results();
+      this.rd.results$.subscribe(results => {
          
-    /*     this._competitors.set([]);
+         this._competitors.set([]);
          this._control.set(null);
 
          if (results.classes.length > 0) {
@@ -52,7 +51,7 @@ export class ResultsSelectionService {
          } else {
             this._course.set(null);
             this._oclass.set(null);
-         } */
+         } 
       });
    }
 

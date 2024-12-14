@@ -30,8 +30,10 @@ export class ResultsDataService {
    private _event$: BehaviorSubject<OEvent> = new BehaviorSubject(null);
    private _results$: BehaviorSubject<Results> = new BehaviorSubject(null);
 
-   public event = toSignal(this._event$);
-   public results = toSignal(this._results$);
+   event = toSignal(this._event$);
+   results = toSignal(this._results$);
+
+   results$ = this._results$.asObservable();
 
    constructor() { }
 

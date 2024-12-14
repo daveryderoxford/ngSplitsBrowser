@@ -1,4 +1,4 @@
-import { Injectable, Signal } from "@angular/core";
+import { Injectable, Signal, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { Auth, authState } from "@angular/fire/auth";
 import { DocumentReference, Firestore, doc, docData, updateDoc } from "@angular/fire/firestore";
@@ -10,13 +10,13 @@ import { UserData } from './user';
   providedIn: "root"
 })
 export class UserDataService {
+  private auth = inject(Auth);
+  private fs = inject(Firestore);
+
 
   user: Signal<UserData | null | undefined>;
 
-  constructor(
-    private auth: Auth,
-    private fs: Firestore,
-  ) {
+  constructor() {
 
     const user$ = authState(this.auth).pipe(
       startWith(null),
