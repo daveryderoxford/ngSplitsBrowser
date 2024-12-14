@@ -3,7 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { BehaviorSubject, debounceTime } from 'rxjs';
-import { CompetitorList } from '../competitor-list/competitor-list';
+import { CompetitorList } from '../sidebar/competitor-list/competitor-list';
 import { FastestPanelComponent } from "../fastest-panel/fastest-panel.component";
 import { CourseClassSet } from '../model';
 import { Navbar } from "../navbar/navbar";
@@ -14,6 +14,7 @@ import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
 import { ALL_COMPARISON_OPTIONS } from './splitsbrowser/comparision-options';
+import { Sidebar } from '../sidebar/sidebar';
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -31,16 +32,13 @@ interface SplitsBrowserOptions {
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
-  imports: [Navbar, CompetitorList, FastestPanelComponent, CompareWithSelect, LabelFlagSelect]
+  imports: [Navbar, CompetitorList, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar]
 })
 export class GraphPage implements AfterViewInit {
 
   protected rs = inject(ResultsSelectionService);
   protected rd = inject(ResultsDataService);
   protected activeRoute = inject(ActivatedRoute);
-
-  results = toSignal(this.rd.selectedResults);
-  oevent = toSignal(this.rd.selectedEvent);
 
   showFastestPanel = signal(true);
 
@@ -81,7 +79,7 @@ export class GraphPage implements AfterViewInit {
   chartData = computed<ChartDisplayData>(() => {
 
     const data: ChartDisplayData = {
-      eventData: this.results(),
+      eventData: this.rd.results(),
       courseClassSet: this.courseClassSet(),
       referenceCumTimes: this.referenceCumTimes(),
       fastestCumTimes: this.courseClassSet().getFastestCumTimes(),
@@ -112,7 +110,7 @@ export class GraphPage implements AfterViewInit {
           this.chart = new Chart(element);
         }
 
-        if (this.results()) {
+        if (this.rd.results()) {
           this.chart.setSize(element.clientWidth, element.clientHeight);
           this.redrawChart();
         } else {

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, signal } from "@angular/core";
+import { computed, effect, inject, Injectable, signal } from "@angular/core";
 import { Competitor, Course, CourseClass } from "./model";
 import { ResultsDataService } from './results-data.service ';
 
@@ -35,12 +35,15 @@ export class ResultsSelectionService {
    /** Competitors avaluable for selection */
    displayedCompetitors = computed(() =>
       this.courseOrClass() ?
-         this.course().competitors :
-         this.oclass().competitors
+         this.course()?.competitors :
+         this.oclass()?.competitors
    );
 
    constructor() {
-      this.rd.selectedResults.subscribe(results => {
+      // TODO Change to linked sugnal when they are avaliable
+      effect( () => {
+         const results = this.rd.results();
+         
          this._competitors.set([]);
          this._control.set(null);
 
@@ -49,7 +52,7 @@ export class ResultsSelectionService {
          } else {
             this._course.set(null);
             this._oclass.set(null);
-         }
+         } 
       });
    }
 

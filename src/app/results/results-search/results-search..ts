@@ -35,8 +35,6 @@ export class ResultsSearch implements OnInit {
 
   private _autocompleteTrigger = viewChild(MatAutocompleteTrigger);
 
-  results = toSignal(this.rd.selectedResults);
-
   // Filter panel contents consisting of groups for courses, classes and competitors
   filterPanelContents: Array<FilterPanelGroup> = [];
 
@@ -49,14 +47,16 @@ export class ResultsSearch implements OnInit {
   }
 
   private updateSearchPanelContents(searchstring: string | SearchSelectedItem) {
-    if (!this.results()) { return; }
+    const results = this.rd.results();
+
+    if (!results) { return; }
 
     // If a selction has not been made the value of the contol is a string.   If a seelction has been made it is the object selected
     searchstring = (typeof searchstring === 'string') ? searchstring : searchstring.name;
 
-    const courses = this.results()?.findCourses(searchstring);
-    const classes = this.results()?.findCourseClasss(searchstring);
-    const competitors = this.results()?.findCompetitors(searchstring);
+    const courses = results.findCourses(searchstring);
+    const classes = results.findCourseClasss(searchstring);
+    const competitors = this.rd.results()?.findCompetitors(searchstring);
 
     this.filterPanelContents = [];
 

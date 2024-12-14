@@ -412,9 +412,9 @@ export class CourseClassSet {
       }
 
       const allCompetitors = [];
-      const expectedControlCount = classes[0].numControls;
+      const expectedControlCount = classes[0]?.numControls;
       classes.forEach((courseClass) => {
-         if (courseClass.numControls !== expectedControlCount) {
+         if (courseClass?.numControls !== expectedControlCount) {
             throw new InvalidData("Cannot merge classes with " + expectedControlCount + " and " + courseClass.numControls + " controls");
          }
 

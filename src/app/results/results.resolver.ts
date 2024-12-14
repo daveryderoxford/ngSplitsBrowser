@@ -4,12 +4,13 @@ import { Observable } from "rxjs";
 import { take } from 'rxjs/operators';
 import { Results } from "./model";
 import { ResultsDataService } from './results-data.service ';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ResultsResolver  {
-      private rs = inject(ResultsDataService);
+    private rs = inject(ResultsDataService);
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Results> {
 
@@ -18,7 +19,7 @@ export class ResultsResolver  {
 
         // If Id not specified just return the current results
         if (!id) {
-            return this.rs.selectedResults;
+            return toObservable(this.rs.results);
         } else {
             return this.rs.setSelectedEventByKey(id).pipe(take(1));
         }

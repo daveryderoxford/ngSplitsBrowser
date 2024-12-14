@@ -2,18 +2,15 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { doc, docData, DocumentReference, Firestore } from '@angular/fire/firestore';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
-import { Router } from '@angular/router';
 import { OEvent } from "app/events/model/oevent";
-import { DialogsService } from 'app/shared';
-import { range as d3_range, ascending as d3_ascending } from "d3-array";
-
+import { ascending as d3_ascending, range as d3_range } from "d3-array";
 import { BehaviorSubject, from, Observable } from "rxjs";
-import { distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { parseEventData } from "./import";
-import { Competitor, InvalidData, Results, ResultsView } from "./model";
+import { Competitor, InvalidData, Results } from "./model";
 import { Repairer } from './model/repairer';
-import { resultsViews } from "./model/results-view";
 import { isNotNullNorNaN } from './model/util';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 /** Holds results selection state.
  * Selecting an event will load its results
@@ -25,20 +22,16 @@ import { isNotNullNorNaN } from './model/util';
 })
 export class ResultsDataService {
 
-   private router = inject(Router);
    private firestore = inject(Firestore);
    private storage = inject(Storage);
    private http = inject(HttpClient);
-   private ds = inject(DialogsService);
 
    // Behavioir subjects for all state
    private _event$: BehaviorSubject<OEvent> = new BehaviorSubject(null);
    private _results$: BehaviorSubject<Results> = new BehaviorSubject(null);
-   private _resultsView$: BehaviorSubject<ResultsView> = new BehaviorSubject(resultsViews[0]);
 
-   public selectedEvent = this._event$.asObservable();
-   public selectedResults = this._results$.asObservable();
-   public resultsView = this._resultsView$.asObservable().pipe(distinctUntilChanged());
+   public event = toSignal(this._event$);
+   public results = toSignal(this._results$);
 
    constructor() { }
 
@@ -55,7 +48,7 @@ export class ResultsDataService {
             results.determineTimeLosses();
 
             this.computeRanks(results);
-            
+
             return results;
          }));
       return ret;
@@ -107,15 +100,6 @@ export class ResultsDataService {
       }
    }
 
-   setResultsView(view: ResultsView) {
-      
-      this.router.navigate(["results", view.type, this._event$.value.key]).catch((err) => {
-         console.log('Errror in navigating to page ' + this._event$.value.name + ' ' + err.toString());
-         this.ds.message('Error loading results', 'Errror in navigating to page');
-      });
-      this._resultsView$.next(view);
-   }
-
    /** Parse splits file with logging */
    public parseSplits(text: string): Results {
 
@@ -148,7 +132,7 @@ export class ResultsDataService {
    }
 
    private computeRanks(results: Results) {
-      for (const oclass of results.classes ) {
+      for (const oclass of results.classes) {
          this.computeCompetitorRanks(oclass.competitors, oclass.numControls);
       }
    }
@@ -217,7 +201,7 @@ export class ResultsDataService {
       sortedData.sort(d3_ascending);
 
       // Now construct a map that maps from source value to rank.
-      const rankMap = new Map<string, number>()
+      const rankMap = new Map<string, number>();
       sortedData.forEach((value: number, index: number) => {
          if (!rankMap.has(value.toString())) {
             rankMap.set(value.toString(), index + 1);

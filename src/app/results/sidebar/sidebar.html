@@ -1,0 +1,15 @@
+<mat-tab-group [selectedIndex]>
+   <mat-tab label="Courses">
+   </mat-tab>
+   <mat-tab label="Class">
+      <app-class-list 
+            [classes]="rd.results().classes" 
+            [selectedClass]="rs.oclass()" 
+            [hasCourses]="false"
+            (selected)="selectClass($event)"/>
+   </mat-tab>
+   <mat-tab label="Results">
+      <app-competitor-list></app-competitor-list>
+   </mat-tab>
+
+</mat-tab-group>

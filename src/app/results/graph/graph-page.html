@@ -1,6 +1,6 @@
 <div class="main-container clipped-container ">
 
-   <app-results-navbar [oevent]="oevent()">
+   <app-results-navbar [oevent]="rd.event()">
       <app-compare-with [(selected)]="comparisonOptions"></app-compare-with>
       <app-label-flags-select [flags]="leftLabelFlags()" (flagsChanged)="leftLabelFlags.set($event)"/>
    </app-results-navbar>
@@ -8,11 +8,10 @@
    <div class="content clipped-container">
 
       <div class="sidebar">
-
-         <app-competitor-list (mouseenter)="showFastestPanel.set(false)" (mouseleave)="showFastestPanel.set(true)"/>
+         <app-sidebar (mouseleave)="showFastestPanel.set(true)" (mouseenter)="showFastestPanel.set(false)"/>
 
          @if ( showFastestPanel() ) {
-            <app-fastest-panel [results]="results()" [leg]="1" [course]="rs.course()"
+            <app-fastest-panel [results]="rd.results()" [leg]="1" [course]="rs.course()"
                [selectedClass]="rs.oclass()" />
          }
 

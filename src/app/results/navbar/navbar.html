@@ -2,20 +2,16 @@
 
   <mat-icon routerLink="/events" class="results-navbar-icon">arrow_back</mat-icon>
 
-  <app-results-view-button [views]="resultsViews" [selectedView]="rd.resultsView | async" (viewSelected)="viewSelected($event)" />
+  <app-results-view-button [views]="resultsViews" [selectedView]="pageState.pageDisplayed()" (viewSelected)="viewSelected($event)" />
 
-  @if ((rd.selectedResults| async); as results) {
-    <app-class-menu-button [selectedClass]='rs.oclass()' [oclasses]='results.classes' (select)='rs.selectClass($event)' />
-  }
-
+  <app-class-menu-button [selectedClass]='rs.oclass()' [oclasses]='rd.results().classes' (select)='rs.selectClass($event)' />
+  
   <ng-content></ng-content>
 
   <span class="fill-remaining-space"></span>
 
   <ng-content select="[end]"></ng-content>
-
-  <app-search-button></app-search-button>
-
+  
   <app-results-search class="align-baseline, padded" />
 
   <ng-content select="[settings]"></ng-content>

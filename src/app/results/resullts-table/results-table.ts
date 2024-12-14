@@ -25,7 +25,6 @@ export class ResultsTable implements OnInit {
    protected rs = inject(ResultsSelectionService);
    protected rd = inject(ResultsDataService);
 
-   results = toSignal(this.rd.selectedResults);
    course = this.rs.course;
    oclass = this.rs.oclass;
 
@@ -49,7 +48,7 @@ export class ResultsTable implements OnInit {
    displayedColumns = computed(() => [...this.staticColumns, ...this.splitsColumns()]);
 
    tableData = computed<Competitor[]>(() => {
-      const r = this.results();
+      const r = this.rd.results();
 
       if (this.oclass()) {
          const comps = this.selectedOnly() ?

@@ -32,7 +32,7 @@ body {
  
   // Decrease default sizes for toggle buttons
    @include mat.button-toggle-density(-3);
-   
+
 }
 
 .rounded {
@@ -46,6 +46,10 @@ body {
 
 .dense-toggle-button {
   @include mat.button-toggle-density(-5);
+}
+
+.dense-list {
+    @include mat.list-density(-5);
 }
 
 .background1 {
