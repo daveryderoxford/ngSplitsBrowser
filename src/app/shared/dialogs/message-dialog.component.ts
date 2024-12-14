@@ -14,7 +14,6 @@ import { MatDividerModule } from '@angular/material/divider';
             (click)="dialogRef.close(true)">OK</button>
         </div>
     `,
-    standalone: true,
     imports: [MatDialogModule, MatDividerModule, MatButtonModule]
 })
 

@@ -8,11 +8,10 @@ import { CourseClass } from '../model';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
-  selector: 'app-sidebar',
-  standalone: true,
-  imports: [MatTabsModule, CompetitorList, ClassList],
-  templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss'
+    selector: 'app-sidebar',
+    imports: [MatTabsModule, CompetitorList, ClassList],
+    templateUrl: './sidebar.html',
+    styleUrl: './sidebar.scss'
 })
 export class Sidebar implements OnInit {
 

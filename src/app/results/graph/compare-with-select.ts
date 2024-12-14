@@ -6,8 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
-  selector: 'app-compare-with',
-  template: `
+    selector: 'app-compare-with',
+    template: `
   <button mat-button [matMenuTriggerFor]="picker">
     {{ selected().name }}
     <mat-icon>arrow_drop_down</mat-icon>
@@ -20,8 +20,7 @@ import { MatMenuModule } from '@angular/material/menu';
     }
   </mat-menu>
   `,
-  standalone: true,
-  imports: [MatButtonModule, MatMenuModule, MatIconModule]
+    imports: [MatButtonModule, MatMenuModule, MatIconModule]
 })
 export class CompareWithSelect {
 

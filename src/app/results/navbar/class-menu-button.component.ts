@@ -7,8 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     selector: 'app-class-menu-button',
-    
-        template: `
+    template: `
 <button mat-button [matMenuTriggerFor]="classPicker">
   {{ buttonText }}
   <mat-icon>arrow_drop_down</mat-icon>
@@ -21,7 +20,6 @@ import { MatButtonModule } from '@angular/material/button';
   }
 </mat-menu>
 `,
-    standalone: true,
     imports: [MatButtonModule, MatMenuModule, MatIconModule]
 })
 export class ClassMenuButtonComponent implements OnInit, OnChanges {

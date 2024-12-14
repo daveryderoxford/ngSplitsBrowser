@@ -13,7 +13,6 @@ import { FormContainerComponent } from '../../shared/components/form-container/f
     selector: 'app-signup',
     templateUrl: './signup.component.html',
     styleUrls: ['./signup.component.scss'],
-    standalone: true,
     imports: [FormContainerComponent, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class SignupComponent {

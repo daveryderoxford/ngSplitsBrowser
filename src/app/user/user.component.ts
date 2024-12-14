@@ -24,7 +24,6 @@ import { FormContainerComponent } from 'app/shared/components/form-container/for
     selector: "app-user",
     templateUrl: "./user.component.html",
     styleUrls: ["./user.component.scss"],
-    standalone: true,
     imports: [ToolbarComponent, FlexModule, FormContainerComponent, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
 export class UserComponent implements OnInit {

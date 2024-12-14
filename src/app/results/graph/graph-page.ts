@@ -24,15 +24,14 @@ interface SplitsBrowserOptions {
 
 @UntilDestroy({ checkProperties: true })
 @Component({
-  selector: "app-graph",
-  templateUrl: "./graph-page.html",
-  styleUrls: ["./graph-page.scss"],
-  // To avoid angular re-writting style names that will be used by graphs view.
-  // These styles will just get appended to the global styles file
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  imports: [Navbar, CompetitorList, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar]
+    selector: "app-graph",
+    templateUrl: "./graph-page.html",
+    styleUrls: ["./graph-page.scss"],
+    // To avoid angular re-writting style names that will be used by graphs view.
+    // These styles will just get appended to the global styles file
+    encapsulation: ViewEncapsulation.None,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [Navbar, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar]
 })
 export class GraphPage implements AfterViewInit {
 

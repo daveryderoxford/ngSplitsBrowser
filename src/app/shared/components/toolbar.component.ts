@@ -17,7 +17,6 @@ import { MatToolbarModule } from '@angular/material/toolbar';
         </div>
     </mat-toolbar>
     `,
-    standalone: true,
     imports: [MatToolbarModule, SidenavButtonComponent],
     styles: ` 
       .content { 
@@ -35,7 +34,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     .spacer {
        flex: 1 1 auto;
     }
-    `,
+    `
 })
 export class ToolbarComponent {
 

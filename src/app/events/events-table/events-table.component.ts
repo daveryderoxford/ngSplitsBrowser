@@ -12,7 +12,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
     selector: 'app-events-table',
     templateUrl: './events-table.component.html',
     styleUrls: ['./events-table.component.scss'],
-    standalone: true,
     imports: [MatTableModule, MatIconModule, DatePipe, MatListModule]
 })
 export class EventsTableComponent {

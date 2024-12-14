@@ -10,7 +10,6 @@ import { ToolbarComponent } from "../shared/components/toolbar.component";
     selector: "app-about",
     templateUrl: "./about.component.html",
     styleUrls: ["./about.component.scss"],
-    standalone: true,
     imports: [ToolbarComponent, FlexModule, MatExpansionModule, AboutItemComponent, RouterLink]
 })
 export class AboutComponent {

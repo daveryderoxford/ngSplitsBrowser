@@ -14,7 +14,6 @@ import { Nations } from '../model/nations';
     selector: 'app-all-events-tab',
     templateUrl: './all-events-tab.component.html',
     styleUrls: ['./all-events-tab.component.scss'],
-    standalone: true,
     imports: [EventsTableComponent, MatProgressBarModule, AsyncPipe]
 })
 export class AllEventsTabComponent implements OnInit {

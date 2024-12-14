@@ -12,21 +12,17 @@ import { EventForm } from "../event-edit/event-form";
 import { FileButtonComponent } from "../file-button/file-button.component";
 
 @Component({
-  selector: "app-event-admin",
-  templateUrl: "./event-admin.component.html",
-  styleUrls: ["./event-admin.component.scss"],
-  standalone: true,
-  imports: [
-    ToolbarComponent,
-    EventForm,
-    FileButtonComponent,
-    AsyncPipe,
-    DatePipe,
-    MatCardModule,
-    MatButtonModule,
-    FlexModule
-  ],
-  providers: [provideNativeDateAdapter()],
+    selector: "app-event-admin",
+    templateUrl: "./event-admin.component.html",
+    styleUrls: ["./event-admin.component.scss"],
+    imports: [
+        ToolbarComponent,
+        FileButtonComponent,
+        MatCardModule,
+        MatButtonModule,
+        FlexModule
+    ],
+    providers: [provideNativeDateAdapter()]
 })
 export class EventAdminComponent {
   protected eventAdmin = inject(EventAdminService);

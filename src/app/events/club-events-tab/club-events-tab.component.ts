@@ -21,7 +21,6 @@ import { Nation, Nations } from '../model/nations';
     selector: "app-club-events-tab",
     templateUrl: "./club-events-tab.component.html",
     styleUrls: ["./club-events-tab.component.scss"],
-    standalone: true,
     imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, EventsTableComponent, MatProgressBarModule, AsyncPipe, DatePipe]
 })
 export class ClubEventsTabComponent implements OnInit {

@@ -11,8 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
           {{label()}}
         </button>
     </span>`,
-    standalone: true,
-    imports: [MatButtonModule],
+    imports: [MatButtonModule]
 })
 
 export class FileButtonComponent {

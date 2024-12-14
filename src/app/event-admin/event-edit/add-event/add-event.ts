@@ -12,11 +12,10 @@ import { MatButtonModule } from '@angular/material/button';
 type Steps = 'details' | 'upload';
 
 @Component({
-   selector: 'app-add-event',
-   templateUrl: 'add-event.html',
-   styleUrl: 'add-event.scss',
-   standalone: true,
-   imports: [EventForm, FileButtonComponent, ToolbarComponent, EventForm, MatStepperModule, MatButtonModule],
+    selector: 'app-add-event',
+    templateUrl: 'add-event.html',
+    styleUrl: 'add-event.scss',
+    imports: [EventForm, FileButtonComponent, ToolbarComponent, EventForm, MatStepperModule, MatButtonModule]
 })
 export class AddEvent {
    router = inject(Router);

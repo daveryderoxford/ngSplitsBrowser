@@ -10,7 +10,6 @@ import { MatButtonModule } from '@angular/material/button';
     <mat-icon class= "material-icons md-26"> menu </mat-icon>
   </a>
     `,
-    standalone: true,
     imports: [MatButtonModule, MatIconModule]
 })
 export class SidenavButtonComponent {

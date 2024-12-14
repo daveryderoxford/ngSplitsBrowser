@@ -1,6 +1,6 @@
 <mat-selection-list>
    @for (oclass of classes(); track oclass; ) {
-   <mat-list-option [selected]="selectedClass() === oclass" (click)="selected.emit(oclass)">
+   <mat-list-option [selected]="selectedClass().name === oclass.name" (click)="selected.emit(oclass)">
       <div matListItem>{{oclass.name}} <span> - course {{oclass.course.name}}</span></div>
    </mat-list-option>
    } @empty {

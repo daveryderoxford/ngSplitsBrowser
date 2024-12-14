@@ -21,11 +21,10 @@ interface FilterPanelGroup {
 
 @UntilDestroy({ checkProperties: true })
 @Component({
-  selector: 'app-results-search',
-  templateUrl: './results-search.html',
-  styleUrls: ['./results-search.scss'],
-  standalone: true,
-  imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
+    selector: 'app-results-search',
+    templateUrl: './results-search.html',
+    styleUrls: ['./results-search.scss'],
+    imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
 })
 export class ResultsSearch implements OnInit {
   private rd = inject(ResultsDataService);

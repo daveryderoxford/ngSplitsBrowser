@@ -8,12 +8,11 @@ import { ResultsSelectionService } from 'app/results/results-selection.service';
 import { StatsPanel } from "../stats-panel/stats-panel";
 
 @Component({
-  selector: 'app-stats-page',
-  standalone: true,
-  imports: [Navbar, CompetitorList, StatsPanel],
-  templateUrl: './stats-page.html',
-  styleUrl: './stats-page.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-stats-page',
+    imports: [Navbar, CompetitorList, StatsPanel],
+    templateUrl: './stats-page.html',
+    styleUrl: './stats-page.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatsPage {
   protected rs = inject(ResultsSelectionService);

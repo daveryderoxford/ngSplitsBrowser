@@ -3,12 +3,11 @@ import { MatListModule } from '@angular/material/list';
 import { CourseClass } from 'app/results/model';
 
 @Component({
-  selector: 'app-class-list',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatListModule],
-  templateUrl: './class-list.html',
-  styleUrl: './class-list.scss'
+    selector: 'app-class-list',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MatListModule],
+    templateUrl: './class-list.html',
+    styleUrl: './class-list.scss'
 })
 export class ClassList {
 

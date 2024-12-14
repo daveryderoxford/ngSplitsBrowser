@@ -14,8 +14,7 @@ import { FormContainerComponent } from '../../shared/components/form-container/f
     selector: 'app-recover',
     templateUrl: './recover.component.html',
     styleUrls: ['./recover.component.scss'],
-    standalone: true,
-  imports: [FormContainerComponent, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+    imports: [FormContainerComponent, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class RecoverComponent implements OnInit {
       private router = inject(Router);

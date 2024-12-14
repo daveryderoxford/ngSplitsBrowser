@@ -7,11 +7,10 @@ import { FormatTimePipe } from '../model/results-pipes';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-fastest-panel',
-  standalone: true,
-  imports: [MatButtonToggleModule, MatCardModule, FormatTimePipe],
-  templateUrl: './fastest-panel.component.html',
-  styleUrl: './fastest-panel.component.scss'
+    selector: 'app-fastest-panel',
+    imports: [MatButtonToggleModule, MatCardModule, FormatTimePipe],
+    templateUrl: './fastest-panel.component.html',
+    styleUrl: './fastest-panel.component.scss'
 })
 export class FastestPanelComponent {
 

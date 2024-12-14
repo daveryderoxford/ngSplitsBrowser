@@ -6,12 +6,11 @@ import { ResultsSelectionService } from '../../results-selection.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
-  selector: 'app-competitor-list',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatListModule, FormatTimePipe, MatIconModule],
-  templateUrl: './competitor-list.html',
-  styleUrl: './competitor-list.scss'
+    selector: 'app-competitor-list',
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MatListModule, FormatTimePipe, MatIconModule],
+    templateUrl: './competitor-list.html',
+    styleUrl: './competitor-list.scss'
 })
 export class CompetitorList {
 

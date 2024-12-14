@@ -14,7 +14,6 @@ import { MatDividerModule } from '@angular/material/divider';
             <button type="button" mat-button (click)="dialogRef.close()">Cancel</button>
         </div>
     `,
-    standalone: true,
     imports: [MatDialogModule, MatDividerModule, MatButtonModule]
 })
 export class ConfirmDialogComponent {

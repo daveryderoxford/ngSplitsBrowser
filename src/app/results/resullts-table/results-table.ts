@@ -14,12 +14,11 @@ import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
 
 @Component({
-   selector: "app-splits-grid",
-   templateUrl: "./results-table.html",
-   styleUrls: ["./results-table.scss"],
-   standalone: true,
-   changeDetection: ChangeDetectionStrategy.OnPush,
-   imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe]
+    selector: "app-splits-grid",
+    templateUrl: "./results-table.html",
+    styleUrls: ["./results-table.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe]
 })
 export class ResultsTable implements OnInit {
    protected rs = inject(ResultsSelectionService);

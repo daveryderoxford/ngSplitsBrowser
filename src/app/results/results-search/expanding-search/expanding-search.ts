@@ -6,11 +6,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 
 @Component({
-  selector: 'app-expanding-search',
-  standalone: true,
-  imports: [MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, FormsModule], 
-  templateUrl: './expanding-search.html',
-  styleUrl: './expanding-search.scss'
+    selector: 'app-expanding-search',
+    imports: [MatButtonModule, MatFormFieldModule, MatInputModule, MatIconModule, FormsModule],
+    templateUrl: './expanding-search.html',
+    styleUrl: './expanding-search.scss'
 })
 export class ExpandingSearch {
 

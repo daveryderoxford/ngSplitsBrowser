@@ -14,8 +14,7 @@ import { OEvent } from '../model/oevent';
     selector: "app-my-events-tab",
     templateUrl: "./my-events-tab.component.html",
     styleUrls: ["./my-events-tab.component.scss"],
-    standalone: true,
-    imports: [MatButtonModule, RouterLink, MatListModule, AsyncPipe]
+    imports: [MatButtonModule, RouterLink, MatListModule]
 })
 export class MyEventsTabComponent implements OnInit {
       private us = inject(UserDataService);

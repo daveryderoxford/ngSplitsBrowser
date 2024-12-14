@@ -5,10 +5,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { StatsVisibilityFlags } from './splitsbrowser/chart';
 
 @Component({
-   selector: 'app-label-flags-select',
-   standalone: true,
-   imports: [MatSelectModule, MatFormFieldModule],
-   template: `
+    selector: 'app-label-flags-select',
+    imports: [MatSelectModule, MatFormFieldModule],
+    template: `
    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="rounded dense-form-field">
       <mat-select #select [value]="this.selected()" multiple>
              <mat-select-trigger>
@@ -21,8 +20,8 @@ import { StatsVisibilityFlags } from './splitsbrowser/chart';
       </mat-select>
   </mat-form-field>
   `,
-   styles: ` 
-   `,
+    styles: ` 
+   `
 })
 export class LabelFlagSelect {
 

@@ -26,11 +26,10 @@ const isInStandaloneMode = () =>
    document.referrer.includes('android-app://');
 
 @Component({
-   selector: 'app-login',
-   templateUrl: './login.component.html',
-   styleUrls: ['./login.component.scss'],
-   standalone: true,
-   imports: [FormContainerComponent, HorizontalRuleComponent, MatCardModule, ToolbarComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    imports: [MatCardModule, ToolbarComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class LoginComponent implements OnInit {
    private route = inject(ActivatedRoute);

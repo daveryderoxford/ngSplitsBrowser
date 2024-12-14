@@ -9,11 +9,10 @@ import { SidenavService } from './shared/services/sidenav.service';
 
 @UntilDestroy()
 @Component({
-   selector: 'app-root',
-   templateUrl: './app.component.html',
-   styleUrls: ['app.component.scss'],
-   standalone: true,
-   imports: [MatSidenavModule, MatListModule, RouterOutlet]
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['app.component.scss'],
+    imports: [MatSidenavModule, MatListModule, RouterOutlet]
 })
 export class AppComponent implements OnInit {
    auth = inject(AuthService);

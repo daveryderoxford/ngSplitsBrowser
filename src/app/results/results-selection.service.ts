@@ -44,7 +44,7 @@ export class ResultsSelectionService {
       effect( () => {
          const results = this.rd.results();
          
-         this._competitors.set([]);
+    /*     this._competitors.set([]);
          this._control.set(null);
 
          if (results.classes.length > 0) {
@@ -52,7 +52,7 @@ export class ResultsSelectionService {
          } else {
             this._course.set(null);
             this._oclass.set(null);
-         } 
+         } */
       });
    }
 

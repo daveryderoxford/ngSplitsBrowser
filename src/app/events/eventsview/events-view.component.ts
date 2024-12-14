@@ -11,11 +11,10 @@ import { EventService } from "../event.service";
 import { MyEventsTabComponent } from "../my-events-tab/my-events-tab.component";
 
 @Component({
-  selector: "app-results",
-  templateUrl: "./events-view.component.html",
-  styleUrls: ["./events-view.component.scss"],
-  standalone: true,
-  imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent, ToolbarComponent, MatButtonModule, RouterLink]
+    selector: "app-results",
+    templateUrl: "./events-view.component.html",
+    styleUrls: ["./events-view.component.scss"],
+    imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent, ToolbarComponent, MatButtonModule, RouterLink]
 })
 export class EventsViewComponent {
   private router = inject(Router);

@@ -15,11 +15,10 @@ import { ResultsSearch } from '../results-search/results-search.';
 import { ResultsViewState } from '../results-view-state';
 
 @Component({
-  selector: "app-results-navbar",
-  templateUrl: "./navbar.html",
-  styleUrls: ["./navbar.scss"],
-  standalone: true,
-  imports: [ExpandingSearch, MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, ResultsSearch, AsyncPipe]
+    selector: "app-results-navbar",
+    templateUrl: "./navbar.html",
+    styleUrls: ["./navbar.scss"],
+    imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, ResultsSearch]
 })
 export class Navbar {
   public rs = inject(ResultsSelectionService);

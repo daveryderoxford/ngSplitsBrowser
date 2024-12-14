@@ -3,8 +3,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
     selector: 'app-about-item',
-    
-        template: `
+    template: `
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
@@ -16,7 +15,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
   `,
     styles: [],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [MatExpansionModule]
 })
 export class AboutItemComponent {

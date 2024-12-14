@@ -11,11 +11,10 @@ import { FormContainerComponent } from '../../shared/components/form-container/f
 import { ToolbarComponent } from '../../shared/components/toolbar.component';
 
 @Component({
-  selector: 'app-change-password',
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss'],
-  standalone: true,
-  imports: [FormContainerComponent,ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule]
+    selector: 'app-change-password',
+    templateUrl: './change-password.component.html',
+    styleUrls: ['./change-password.component.scss'],
+    imports: [FormContainerComponent, ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule]
 })
 export class ChangePasswordComponent {
       private router = inject(Router);

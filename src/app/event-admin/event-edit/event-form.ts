@@ -22,25 +22,23 @@ import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '..
 
 @UntilDestroy()
 @Component({
-   selector: 'app-event-form',
-   templateUrl: './event-form.html',
-   styleUrls: ['./event-form.scss'],
-   standalone: true,
-   imports: [
-      FormContainerComponent,
-      FlexModule,
-      ReactiveFormsModule,
-      AsyncPipe,
-      MatFormFieldModule,
-      MatInputModule,
-      MatOptionModule,
-      MatSelectModule,
-      MatProgressBarModule,
-      MatAutocompleteModule,
-      MatDatepickerModule,
-      MatButtonModule
-      ],
-   providers: [provideNativeDateAdapter()],
+    selector: 'app-event-form',
+    templateUrl: './event-form.html',
+    styleUrls: ['./event-form.scss'],
+    imports: [
+        FlexModule,
+        ReactiveFormsModule,
+        AsyncPipe,
+        MatFormFieldModule,
+        MatInputModule,
+        MatOptionModule,
+        MatSelectModule,
+        MatProgressBarModule,
+        MatAutocompleteModule,
+        MatDatepickerModule,
+        MatButtonModule
+    ],
+    providers: [provideNativeDateAdapter()]
 })
 export class EventForm implements OnInit  {
    private formBuilder = inject(FormBuilder);

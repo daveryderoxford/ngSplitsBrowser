@@ -9,8 +9,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 @Component({
     selector: 'app-results-view-button',
-    
-        template: `
+    template: `
   <mat-button-toggle-group [hideSingleSelectionIndicator]=true>
   
     @for (view of primaryViews; track view) {
@@ -34,7 +33,6 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
   </mat-menu>
   `,
     styles: [],
-    standalone: true,
     imports: [MatButtonToggleModule, MatMenuModule, MatIconModule]
 })
 export class ResultsViewButtonComponent implements OnInit {
