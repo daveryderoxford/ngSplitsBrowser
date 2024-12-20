@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { Competitor, Course, CourseClass, Results, TimeUtilities, WrongFileFormat } from "../model";
 import { normaliseLineEndings, parseCourseClimb, parseCourseLength } from "./util";

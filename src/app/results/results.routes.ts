@@ -8,6 +8,7 @@ export const RESULTS_ROUTES: Routes = [
    {
       path: "graph/:id",
       component: GraphPage,
+      title: 'Splitsbrowser - Graph',
       resolve: {
          results: ResultsResolver
       }
@@ -15,6 +16,7 @@ export const RESULTS_ROUTES: Routes = [
    {
       path: "race/:id",
       component: GraphPage,
+      title: 'Splitsbrowser - Race',
       resolve: {
          results: ResultsResolver
       }
@@ -22,6 +24,7 @@ export const RESULTS_ROUTES: Routes = [
    {
       path: "table/:id",
       component: ResultsTable,
+      title: 'Splitsbrowser - Results table',
       resolve: {
          results: ResultsResolver
       }
@@ -29,6 +32,7 @@ export const RESULTS_ROUTES: Routes = [
    {
       path: "stats/:id",
       component: StatsPage,
+      title: 'Splitsbrowser - Stats',
       resolve: {
          results: ResultsResolver
       }

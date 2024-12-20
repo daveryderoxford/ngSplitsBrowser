@@ -18,7 +18,7 @@ export const appConfig: ApplicationConfig = {
       provideHttpClient(),
       provideRouter(APP_ROUTES, 
          withPreloading(PreloadAllModules),
-         withDebugTracing(),
+     //    withDebugTracing(),
       ),
       provideAnimationsAsync(), 
    ],

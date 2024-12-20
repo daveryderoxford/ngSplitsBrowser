@@ -1,12 +1,10 @@
 import { Component, inject } from '@angular/core';
-import { Auth, User, authState } from '@angular/fire/auth';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterLink } from '@angular/router';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { AuthService } from '../auth.service';
 
-@UntilDestroy()
 @Component({
   selector: 'app-auth-button',
   standalone: true,
@@ -15,22 +13,12 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
   styleUrl: './auth-button.component.scss'
 })
 export class AuthButtonComponent {
-      private auth = inject(Auth);
-      private router = inject(Router);
-  authorised = false;
-  user: User | null = null;
 
-  constructor() {
-    authState(this.auth)
-      .pipe(untilDestroyed(this))
-      .subscribe((u) => {
-        this.authorised = (u !== null);
-        this.user = u;
-      });
-  }
+  protected authService = inject(AuthService);
+  private router = inject(Router);
 
   async logout() {
-    await this.auth.signOut();
+    await this.authService.signOut();
     await this.router.navigateByUrl('auth/login');
   }
 }

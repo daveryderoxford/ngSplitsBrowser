@@ -41,7 +41,7 @@ export class Utils {
    }
 
    /** Normalise a Firebase key */
-   static encodeAsKey(string) {
+   static encodeAsKey(string: string) {
       return string.replace(/\%/g, "%25")
          .replace(/\./g, "%2E")
          .replace(/\#/g, "%23")

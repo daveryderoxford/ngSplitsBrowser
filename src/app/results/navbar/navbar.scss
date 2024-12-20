@@ -1,3 +1,11 @@
+@use '@angular/material' as mat;
+
+:host {
+  @include mat.form-field-overrides((
+      filled-caret-color: orange,
+      filled-focus-active-indicator-color: red,
+  ));
+}
 
 .fill-remaining-space {
   // This fills the remaining space, by using flexbox. 

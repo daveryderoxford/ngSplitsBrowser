@@ -1,4 +1,8 @@
+// @ts-nocheck
+
 // file chart-popup.js
+
+
 
 import { select as d3_select, Selection } from "d3-selection";
 import $ from 'jquery'

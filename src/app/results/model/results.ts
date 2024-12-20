@@ -7,7 +7,7 @@ import { sbTime } from "./time";
 
 export class Results {
 
-    private allCompetitorsList: Array<Competitor>;
+    private allCompetitorsList: Array<Competitor> | undefined = undefined;
 
     warnings: Array<string> = [];
 
@@ -81,7 +81,7 @@ export class Results {
     * @sb-return {Array} Array of objects containing fastest splits for that leg.
     */
     public getFastestSplitsForLeg(startCode: string, endCode: string): FastestSplitData[] {
-        let fastestSplits = [];
+        let fastestSplits: FastestSplitData[] = [];
         this.courses.forEach((course) => {
             if (course.usesLeg(startCode, endCode)) {
                 fastestSplits = fastestSplits.concat(course.getFastestSplitsForLeg(startCode, endCode));

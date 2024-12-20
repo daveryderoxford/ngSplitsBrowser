@@ -7,14 +7,14 @@ import { OEvent } from './model/oevent';
 @Injectable({
    providedIn: 'root',
 })
-export class ResultsViewState {
+export class ResultsPageState {
    private router = inject(Router);
    private ds = inject(DialogsService);
 
    private _pageDisplayed = signal<ResultsView>(resultsViews[0]);
    pageDisplayed = this._pageDisplayed.asReadonly();
 
-   setResultsView(view: ResultsView, event: OEvent) {
+   setPage(view: ResultsView, event: OEvent) {
 
       this.router.navigate(["results", view.type, event.key]).catch((err) => {
          console.log('Errror in navigating to page ' + event.name + ' ' + err.toString());

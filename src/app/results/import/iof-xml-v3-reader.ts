@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import $ from 'jquery';
 import { isUndefined } from "./util";
 import { InvalidData, sbTime, WrongFileFormat } from "../model";

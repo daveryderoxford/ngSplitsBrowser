@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { range as d3_range } from "d3-array";
 import { map as d3_map, Map as d3_Map, set as d3_set, Set as d3_Set } from "d3-collection";
@@ -561,7 +562,7 @@ class OEReader {
     * @sb-return {SplitsBrowser.Model.Course} - The created Course object.
     */
     private createCourseFromLinkedClassesAndCourses(initCourseName: string,
-        manyToManyMaps,
+        manyToManyMaps: any,
         doneCourseNames: d3_Set,
         classesMap: d3_Map<any>): Course {
 
@@ -642,7 +643,7 @@ class OEReader {
         });
 
         // List of all Course objects created so far.
-        const courses = [];
+        const courses: Course[] = [];
         manyToManyMaps.coursesToClasses.keys().forEach((courseName) => {
             if (!doneCourseNames.has(courseName)) {
                 const course = this.createCourseFromLinkedClassesAndCourses(courseName, manyToManyMaps, doneCourseNames, classesMap);

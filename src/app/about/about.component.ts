@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component } from "@angular/core";
 import { versions } from 'environments/versions';
 import { RouterLink } from "@angular/router";
 import { AboutItemComponent } from "./about-item.component";

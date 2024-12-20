@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
    snackbar = inject(MatSnackBar);
    router = inject(Router);
 
-   sidenav = viewChild(MatSidenav);
+   sidenav = viewChild.required(MatSidenav);
 
    ngOnInit() {
       this.sidebarService.setSidenav(this.sidenav());

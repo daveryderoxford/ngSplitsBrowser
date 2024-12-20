@@ -1,9 +1,7 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewEncapsulation, computed, effect, inject, signal, viewChild } from "@angular/core";
-import { toSignal } from '@angular/core/rxjs-interop';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewEncapsulation, computed, effect, inject, signal, viewChild } from "@angular/core";
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
-import { UntilDestroy } from '@ngneat/until-destroy';
 import { BehaviorSubject, debounceTime } from 'rxjs';
-import { CompetitorList } from '../sidebar/competitor-list/competitor-list';
 import { FastestPanelComponent } from "../fastest-panel/fastest-panel.component";
 import { CourseClassSet } from '../model';
 import { Navbar } from "../navbar/navbar";
@@ -22,24 +20,27 @@ interface SplitsBrowserOptions {
   topBar?: string;
 }
 
-@UntilDestroy({ checkProperties: true })
 @Component({
-    selector: "app-graph",
-    templateUrl: "./graph-page.html",
-    styleUrls: ["./graph-page.scss"],
-    // To avoid angular re-writting style names that will be used by graphs view.
-    // These styles will just get appended to the global styles file
-    encapsulation: ViewEncapsulation.None,
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [Navbar, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar]
+  selector: "app-graph",
+  templateUrl: "./graph-page.html",
+  styleUrls: ["./graph-page.scss"],
+  // To avoid angular re-writting style names that will be used by graphs view.
+  // These styles will just get appended to the global styles file
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Navbar, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar]
 })
 export class GraphPage implements AfterViewInit {
+  destroyRef = inject(DestroyRef);
+
 
   protected rs = inject(ResultsSelectionService);
   protected rd = inject(ResultsDataService);
   protected activeRoute = inject(ActivatedRoute);
 
   showFastestPanel = signal(true);
+  legIndex = signal(0);
+  raceTiime = signal(0);
 
   comparisonOptions = signal(ALL_COMPARISON_OPTIONS[0]);
 
@@ -66,25 +67,24 @@ export class GraphPage implements AfterViewInit {
 
   /** index of competitors in displayed competitor list */
   selectedIndices = computed(() =>
-    this.rs.competitors().map(comp => this.courseClassSet().allCompetitors.indexOf(comp)
-  ));
+    this.rs.selectedCompetitors().map(comp => this.courseClassSet().allCompetitors.indexOf(comp))
+  );
 
   referenceCumTimes = computed(() => {
     const opt = this.comparisonOptions();
+    // TODO need to actually use opt here
     return this.courseClassSet().getFastestCumTimesPlusPercentage(5);
   });
 
-
   chartData = computed<ChartDisplayData>(() => {
 
-    const data: ChartDisplayData = {
+    return {
       eventData: this.rd.results(),
       courseClassSet: this.courseClassSet(),
       referenceCumTimes: this.referenceCumTimes(),
       fastestCumTimes: this.courseClassSet().getFastestCumTimes(),
       chartData: this.courseClassSet().getChartData(this.referenceCumTimes(), this.selectedIndices(), this.chartType())
     };
-    return data;
   });
 
   size$ = new BehaviorSubject({ width: 0, height: 0 });
@@ -107,6 +107,10 @@ export class GraphPage implements AfterViewInit {
 
         if (!this.chart) {
           this.chart = new Chart(element);
+          this.chart.registerEventHandlers(
+            (leg) => this.legIndex.set(leg),
+            (time) => this.raceTiime.set(time)
+          );
         }
 
         if (this.rd.results()) {
@@ -123,12 +127,11 @@ export class GraphPage implements AfterViewInit {
 
     this.observer.observe(this.chartElement().nativeElement);
 
-    this.size$.pipe(debounceTime(100)).subscribe(rect => {
+    this.size$.pipe(debounceTime(100), takeUntilDestroyed(this.destroyRef)).subscribe(rect => {
       const element = this.chartElement().nativeElement;
       this.chart.setSize(element.clientWidth, element.clientHeight);
       this.redrawChart();
     });
-
   }
 
   redrawChart() {
@@ -142,6 +145,6 @@ export class GraphPage implements AfterViewInit {
 
   ngOnDestroy() {
     this.observer.unobserve(this.chartElement()?.nativeElement);
+    this.size$.unsubscribe();
   }
 }
-

@@ -11,7 +11,7 @@
          <app-sidebar (mouseleave)="showFastestPanel.set(true)" (mouseenter)="showFastestPanel.set(false)"/>
 
          @if ( showFastestPanel() ) {
-            <app-fastest-panel [results]="rd.results()" [leg]="1" [course]="rs.course()"
+            <app-fastest-panel [results]="rd.results()" [leg]="legIndex()" [course]="rs.course()"
                [selectedClass]="rs.oclass()" />
          }
 

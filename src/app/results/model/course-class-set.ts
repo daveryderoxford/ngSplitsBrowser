@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
    ascending as d3_ascending, max as d3_max, min as d3_min, range as d3_range,
    transpose as d3_transpose, zip as d3_zip

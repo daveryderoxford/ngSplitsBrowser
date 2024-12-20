@@ -31,7 +31,7 @@ export class PaganationService<T> {
   loading: Observable<boolean> = this._loading.asObservable();
 
   // TODO private _cursor: firebase.firestore.QueryDocumentSnapshot;
-  private _cursor: DocumentSnapshot;
+  private _cursor: DocumentSnapshot | null = null;
   // Initial query sets options and defines the Observable
   // passing opts will override the defaults
   init(path: string, field: string, opts?: any) {

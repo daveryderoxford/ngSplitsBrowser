@@ -30,7 +30,7 @@ export function parseEventData(data: string): Results | null {
         try {
             return parser(data);
         } catch (e) {
-            if (e.name !== "WrongFileFormat") {
+            if (e instanceof Error && e.name !== "WrongFileFormat") {
                 throw e;
             }
         }

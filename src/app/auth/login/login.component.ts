@@ -12,8 +12,6 @@ import { MatInputModule } from '@angular/material/input';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
 import { ToolbarComponent } from 'app/shared/components/toolbar.component';
-import { FormContainerComponent } from '../../shared/components/form-container/form-container.component';
-import { HorizontalRuleComponent } from '../../shared/components/horizontal-rule.component';
 
 export type AuthType = "EmailAndPassword" | "Google" | "Facebook";
 

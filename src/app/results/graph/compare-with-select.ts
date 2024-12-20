@@ -1,4 +1,4 @@
-import { Component, OnChanges, model } from '@angular/core';
+import { Component, model } from '@angular/core';
 import { ALL_COMPARISON_OPTIONS, ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
 
 import { MatButtonModule } from '@angular/material/button';

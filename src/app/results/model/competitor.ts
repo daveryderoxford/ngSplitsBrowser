@@ -90,7 +90,7 @@ export class Competitor {
     courseClass: CourseClass | null = null;
     yearOfBirth: number | null = null;
     gender: Genre | null = null; // "M" or "F" for male or female.
-    birthDate: string;
+    birthDate: string = '';
     ecardId: string | null = null;
     route: string | null = null;
     nationalID: string | null = null;
@@ -227,7 +227,7 @@ export class Competitor {
         if (this.ecardId) {
             return this.ecardId;
         } else {
-            return this.courseClass.name + '-' + this.order.toString();
+            return this.courseClass!.name + '-' + this.order.toString();
         }
     }
 

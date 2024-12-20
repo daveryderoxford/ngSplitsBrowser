@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Component, computed, input, output } from '@angular/core';
 
 import { MatFormFieldModule } from '@angular/material/form-field';

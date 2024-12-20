@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { map as d3_map } from "d3-collection";
 import $ from 'jquery';

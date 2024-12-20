@@ -118,10 +118,13 @@ export class Course {
    *     constants for the start or finish.
    */
    public getControlCode(controlNum: number): string | null {
+      if (!this.controls) {
+         throw new InvalidData("Controls not defined for course");
+      }
       if (controlNum === 0) {
          // The start.
          return Course.START;
-      } else if (1 <= controlNum && controlNum <= this.controls.length) {
+      } else if (1 <= controlNum && controlNum <= this.controls?.length) {
          return this.controls[controlNum - 1];
       } else if (controlNum === this.controls.length + 1) {
          // The finish.
@@ -165,7 +168,7 @@ export class Course {
    *     negative number if the leg is not part of this course.
    */
    public getLegNumber(startCode: string, endCode: string): number {
-      if (this.controls === null) {
+      if (!this.controls) {
          // No controls, so no, it doesn't contain the leg specified.
          return -1;
       }
@@ -243,7 +246,7 @@ export class Course {
    *     within the given time interval.
    */
    public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<CompetitorSummaryDetails> {
-      if (this.controls === null) {
+      if (!this.controls) {
          // No controls means don't return any competitors.
          return [];
       } else if (controlCode === Course.START) {
@@ -291,7 +294,7 @@ export class Course {
    *     course doesn't, or doesn't have any controls at all.
    */
    public hasControl(controlCode: string): boolean {
-      return this.controls !== null && this.controls.indexOf(controlCode) > -1;
+      return this.controls !== null && this.controls!.indexOf(controlCode) > -1;
    }
 
    /**
@@ -304,7 +307,7 @@ export class Course {
    * @sb-return {Array} The code of the next control
    */
    public getNextControls(controlCode: string): string[] {
-      if (this.controls === null) {
+      if (!this.controls) {
          throw new InvalidData("Course has no controls");
       } else if (controlCode === Course.FINISH) {
          throw new InvalidData("Cannot fetch next control after the finish");
@@ -334,23 +337,25 @@ export class Course {
       }
    }
 
+   private courseCompetitors: Competitor[] | undefined = undefined;
+
    /** Returns an ordered list of results for the course */
    public get competitors(): Competitor[] {
-      if (!this.competitors) {
+      if (!this.courseCompetitors) {
+         this.courseCompetitors = [];
          for (const courseClass of this.classes) {
             this.competitors.concat(courseClass.competitors);
          }
          this.competitors.sort( (a: Competitor, b: Competitor) => {
-            if (a.completed && b.completed) {
+            if (a.completed() && b.completed()) {
             return a.totalTime - b.totalTime;
-            } else if (a.completed) {
+            } else if (a.completed()) {
                return 1;
             } else {
                return -1;
             }
          });
       }
-      return this.competitors;
+      return this.competitors!;
    }
-
 }

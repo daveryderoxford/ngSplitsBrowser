@@ -20,6 +20,6 @@ export class ConfirmDialogComponent {
     dialogRef = inject<MatDialogRef<ConfirmDialogComponent>>(MatDialogRef);
 
 
-    public title: string;
-    public message: string;
+    public title: string = '';
+    public message: string = '';
 }

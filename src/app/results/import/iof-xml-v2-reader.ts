@@ -1,10 +1,9 @@
+// @ts-nocheck
 
 import $ from 'jquery';
 import { isUndefined } from "./util";
 import { InvalidData, TimeUtilities, WrongFileFormat } from "../model";
 import { CourseDeatils, IOFXMLReader } from "./iof-xml-v3-reader";
-
-
 
 // Object that contains various functions for parsing bits of data from
 // IOF v2.0.3 XML event data.

@@ -45,8 +45,8 @@ export class ResultsViewButtonComponent implements OnInit {
   selectedView = input<ResultsView>();
   viewSelected = output<ResultsView>();
 
-  primaryViews: ResultsView[];
-  additionalViews: ResultsView[];
+  primaryViews: ResultsView[] = [];
+  additionalViews: ResultsView[] = [];
 
   ngOnInit() {
     this.primaryViews = this.views().filter(view => view.primary);

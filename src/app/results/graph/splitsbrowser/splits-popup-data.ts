@@ -1,6 +1,7 @@
 import { Course, CourseClassSet, Results, TimeUtilities } from "../../model";
 import { Lang } from "./lang";
 
+
 export interface FastestSplitsPopupData {
     title: string;
     data: Array<{ time: number, name: string, highlight: boolean }>;
@@ -63,7 +64,7 @@ export class SplitsPopupData {
     * @sb-return {Object} Object that contains the title for the popup and the
     *     array of data to show within it.
     */
-    public getFastestSplitsForLegPopupData(courseClassSet, eventData, controlIndex): FastestSplitsPopupData {
+    public getFastestSplitsForLegPopupData(courseClassSet: CourseClassSet, eventData: Results, controlIndex: number): FastestSplitsPopupData {
 
         const course = courseClassSet.getCourse();
         const startCode = course.getControlCode(controlIndex - 1);

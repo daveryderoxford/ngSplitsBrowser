@@ -1,4 +1,5 @@
-// file chart.js
+// @ts-nocheck
+
 import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
 import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
 import { map as d3_map } from "d3-collection";
@@ -12,7 +13,6 @@ import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
 import { FastestSplitsPopupData, NextControlData, SplitsPopupData } from "./splits-popup-data";
-
 
 ///// New interface 
 
@@ -57,7 +57,6 @@ interface CurrentCompetitorData {
 }
 
 type tickFormatterFunction = ( value: number ) => string | null;
-
 
 // Local shorthand functions.
 const formatTime = TimeUtilities.formatTime;
@@ -218,7 +217,7 @@ export class Chart {
    private currentCompetitorData: CurrentCompetitorData[] = [];
 
    private maxStartTimeLabelWidth = 0;
-   private maxStatisticTextWidth: number;
+   public maxStatisticTextWidth: number;
 
    // Indexes of the currently-selected competitors, in the order that
    // they appear in the list of labels.
@@ -238,6 +237,10 @@ export class Chart {
    private visibleStatistics: StatsVisibilityFlags;
    private currentLeftMargin: number;
    private xScaleMinutes: d3_ScaleLinear<number, number>;
+
+   // Event handlers
+   selectedLegUpdated: (number) => void;
+   raceTimeUpdated: (sbTime) => void;
 
    /**
    * A chart object in a window.
@@ -276,6 +279,14 @@ export class Chart {
       $(document).mouseup(() => { this.popup.hide(); });
    }
 
+   registerEventHandlers(
+      selectedLegUpdated: (number: number) => void,
+      raceTimeUpdated: (sbTime: number) => void 
+   ) {
+      this.selectedLegUpdated = selectedLegUpdated;
+      this.raceTimeUpdated = raceTimeUpdated;
+   }
+
    /**
    * Draws the chart.
    * @sb-param {object} data - Object that contains various chart data.  This
@@ -294,7 +305,11 @@ export class Chart {
    *                                    certain statistics are visible.
    * @sb-param {Object} chartType - The type of chart being drawn.
    */
-   drawChart(data: ChartDisplayData, selectedIndexes: Array<number>, visibleStatistics: StatsVisibilityFlags, chartType: ChartType): void {
+   drawChart(data: ChartDisplayData, 
+             selectedIndexes: Array<number>, 
+             visibleStatistics: StatsVisibilityFlags, 
+             chartType: ChartType,
+         ) {
 
       const chartData = data.chartData;
 
@@ -387,6 +402,7 @@ export class Chart {
    private setCurrentChartTime(event: JQueryEventObject) {
       const yOffset = event.pageY - $(this.svg.node()).offset().top - MARGIN.top;
       this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
+      
    }
 
    /**
@@ -599,6 +615,8 @@ export class Chart {
             this.removeControlLine();
             this.actualControlIndex = controlIndex;
             this.drawControlLine(Math.max(this.minViewableControl, controlIndex));
+
+            this.selectedLegUpdated(controlIndex);
          }
 
          if (this.popup.isShown() && this.currentControlIndex !== null) {
@@ -614,6 +632,8 @@ export class Chart {
          // In the SVG element but outside the chart area.
          this.removeControlLine();
          this.popup.hide();
+
+         this.selectedLegUpdated(0);
       }
    }
 
@@ -717,7 +737,7 @@ export class Chart {
    * @sb-returns {function} Tick-formatting function.
    */
    private getTickFormatter() {
-      return (value, idx) => {
+      return (value: any, idx: number) => {
          return (idx === 0) ? getMessage("StartNameShort") :
             ((idx === this.numControls + 1) ? getMessage("FinishNameShort") : idx.toString());
       };

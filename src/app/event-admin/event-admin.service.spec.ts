@@ -1,14 +1,17 @@
 /* eslint-disable max-len */
 
 /* eslint-disable @typescript-eslint/quotes */
-import { HttpClient } from "@angular/common/http";
+import { provideHttpClient } from "@angular/common/http";
 import { inject, TestBed } from "@angular/core/testing";
-import { AngularFireModule } from "@angular/fire/compat";
-import { AngularFirestoreModule } from "@angular/fire/compat/firestore";
-import { AngularFireStorageModule } from "@angular/fire/compat/storage";
+
 import 'jasmine-expect';
 import { EventAdminService } from "./event-admin.service";
 import { EventInfo } from 'app/events/model/oevent';
+import { provideFirebaseApp } from '@angular/fire/app/app.module';
+import { initializeApp } from '@angular/fire/app';
+import { firebaseConfig } from 'app/app.firebase-config';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 const testEventInfo1: EventInfo = {
   name: "test name 1",
@@ -59,13 +62,13 @@ describe("EventAdminService", () => {
   beforeEach(() => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      imports: [
-        AngularFireModule.initializeApp(testFirebaseConfig),
-        AngularFirestoreModule,
-        AngularFireStorageModule,
-        HttpClient,
+      providers: [
+        provideFirebaseApp(() => initializeApp(firebaseConfig)),
+        provideAuth(() => getAuth()),
+        provideFirestore(() => getFirestore()),
+        provideHttpClient(),
+        EventAdminService
       ],
-      providers: [EventAdminService],
     });
 
     eventAdmin = TestBed.get(EventAdminService);
@@ -75,11 +78,11 @@ describe("EventAdminService", () => {
     expect(eventAdmin).toBeTruthy();
   });
 
-  it("should save new event data", inject([EventAdminService], async (done) => {
-    const key = await eventAdmin.add(testEventInfo1);
-    expect(key).toBeDefined();
+  it("should save new event data", inject([EventAdminService], async (done: any) => {
+    const event = await eventAdmin.add(testEventInfo1);
+    expect(event).toBeDefined();
 
-    const eventresult = await eventAdmin.getEvent(key).toPromise();
+    const eventresult = await eventAdmin.getEvent(event.key);
 
     expect(eventresult.key).toBeDefined();
     expect(eventresult.splits).toBeNull();
@@ -87,18 +90,18 @@ describe("EventAdminService", () => {
 
     await eventAdmin.delete(eventresult);
 
-    const eventresult1 = await eventAdmin.getEvent(key).toPromise();
+    const eventresult1 = await eventAdmin.getEvent(event.key);
 
     done();
 
   }));
 
-  it("should update event info properties", inject([EventAdminService], async (done) => {
-    const key = await eventAdmin.saveNew(testEventInfo1);
+  it("should update event info properties", inject([EventAdminService], async (done: any) => {
+    const event = await eventAdmin.add(testEventInfo1);
 
-    await eventAdmin.update(key, testEventInfo2);
+    await eventAdmin.update(event.key, testEventInfo2);
 
-    const eventresult = await eventAdmin.getEvent(key).toPromise();
+    const eventresult = await eventAdmin.getEvent(event.key);
     expect(eventresult).toEqual(jasmine.objectContaining(testEventInfo2));
 
     done();
@@ -106,13 +109,13 @@ describe("EventAdminService", () => {
   }));
 
   it("should save a results and update summary etc", async (done) => {
-    const key = await eventAdmin.add(testEventInfo1);
-    const eventresult = await eventAdmin.getEvent(key).toPromise();
+    const event = await eventAdmin.add(testEventInfo1);
+    const eventresult = await eventAdmin.getEvent(event.key);
 
     const file = new File(resultsfile, 'test');
     await eventAdmin.uploadResults(eventresult, file);
 
-    const eventresult1 = await eventAdmin.getEvent(key).toPromise();
+    const eventresult1 = await eventAdmin.getEvent(event.key);
     expect(eventresult1.splits).toBeObject();
     expect(eventresult1.summary.courses).toBeArrayOfSize(2);
     expect(eventresult1.summary.numcompetitors).toEqual(6);
@@ -126,8 +129,8 @@ describe("EventAdminService", () => {
   });
 
   it("should update a results file that has already been downloaded once", async (done) => {
-    const key = await eventAdmin.add(testEventInfo1);
-    const eventresult = await eventAdmin.getEvent(key).toPromise();
+    const event = await eventAdmin.add(testEventInfo1);
+    const eventresult = await eventAdmin.getEvent(event.key);
 
     const file = new File(resultsfile, 'test');
     await eventAdmin.uploadResults(eventresult, file);
@@ -137,8 +140,8 @@ describe("EventAdminService", () => {
   });
 
   it("should delate the datbase entry and file when the event is deleted", async (done) => {
-    const key = await eventAdmin.add(testEventInfo1);
-    const eventresult = await eventAdmin.getEvent(key).toPromise();
+    const event = await eventAdmin.add(testEventInfo1);
+    const eventresult = await eventAdmin.getEvent(event.key);
 
     const file = new File(resultsfile, 'test');
     await eventAdmin.uploadResults(eventresult, file);

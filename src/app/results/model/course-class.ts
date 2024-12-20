@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { range as d3_range } from "d3-array";
 import { Competitor } from "./competitor";
 import { Course } from "./course";

@@ -21,9 +21,9 @@ export class FastestPanelComponent {
   course = input.required<Course>();
   selectedClass = input.required<CourseClass>();
 
-  startCode = computed(() => this.course()?.getControlCode(this.leg() - 1));
+  startCode = computed(() => this.leg() === 0? '' : this.course()?.getControlCode(this.leg() - 1));
 
-  endCode = computed(() => this.course()?.getControlCode(this.leg()));
+  endCode = computed(() => this.leg() === 0 ? '' : this.course()?.getControlCode(this.leg()));
 
   fastestSplitsForLeg = computed(() => 
     this.results().getFastestSplitsForLeg(this.startCode(), this.endCode()));

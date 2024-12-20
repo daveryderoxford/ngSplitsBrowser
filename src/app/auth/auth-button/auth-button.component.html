@@ -1,5 +1,5 @@
 
-  @if (authorised) {
+  @if (authService.loggedIn()) {
     <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Auth details">
       <mat-icon>person</mat-icon>
     </button>

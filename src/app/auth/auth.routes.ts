@@ -6,10 +6,10 @@ import { RecoverComponent } from './recover/recover.component';
 import { SignupComponent } from './signup/signup.component';
 
 export const AUTH_ROUTES: Routes = [
-  { path: "login", component: LoginComponent, title: 'IBRSC Expenses Login' },
-  { path: "signup", component: SignupComponent, title: 'IBRSC Expenses Signup' },
-  { path: "recover", component: RecoverComponent, title: 'IBRSC Expenses Recover password' },
-  { path: "change-password", component: ChangePasswordComponent, canActivate: [AuthGuard], title: 'IBRSC Expenses Change password'},
+  { path: "login", component: LoginComponent, title: 'Splitsbrowser Login' },
+  { path: "signup", component: SignupComponent, title: 'SplitsbrowserSignup' },
+  { path: "recover", component: RecoverComponent, title: 'Splitsbrowser Recover password' },
+  { path: "change-password", component: ChangePasswordComponent, canActivate: [AuthGuard], title: 'Splitsbrowser Change password'},
 ];
 
 

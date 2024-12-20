@@ -114,8 +114,8 @@ export class ResultsSearch implements OnInit {
     }
   }
 
-  isCompetitor = (option): boolean => (option instanceof Competitor);
-  asCompetitor = (option): Competitor => (option as Competitor);
+  isCompetitor = (option: SearchSelectedItem): boolean => (option instanceof Competitor);
+  asCompetitor = (option: SearchSelectedItem): Competitor => (option as Competitor);
 
   _delayDropdown(isExpanded: boolean) {
     if (isExpanded) {

@@ -27,7 +27,7 @@ export class FileButtonComponent {
 
   get fileCount(): number { return this._files && this._files.length || 0; }
 
-  onNativeInputFileSelect($event) {
+  onNativeInputFileSelect($event: any) {
     this._files = $event.srcElement.files;
     this.fileSelected.emit(this._files);
   }

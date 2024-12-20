@@ -28,7 +28,7 @@ export function isNotNull(x: any): boolean {
 * @sb-param {Any} x - Any input value.
 * @sb-return True if x is NaN, false if x is any other value.
 */
-export function isNaNStrict(x): boolean {
+export function isNaNStrict(x: any): boolean {
     return x !== x;
 }
 
@@ -38,6 +38,6 @@ export function isNaNStrict(x): boolean {
 * @sb-return {boolean} false if the value given is null or NaN, true
 *     otherwise.
 */
-export function isNotNullNorNaN(x): boolean {
+export function isNotNullNorNaN(x: any): boolean {
     return x !== null && x !== undefined && x === x;
 }

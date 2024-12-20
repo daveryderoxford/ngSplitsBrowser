@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Auth, updatePassword } from '@angular/fire/auth';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,10 +28,10 @@ export class ChangePasswordComponent {
         confirmPassword: ['', Validators.required],
       }, { validator: this.passwordMissMatch });
 
-  passwordMissMatch(g: FormGroup): any {
+  passwordMissMatch(g: FormGroup): ValidationErrors | null {
     const p1 = g.get('password')!;
     const p2 = g.get('confirmPassword')!;
-    let ret: { [error: string]: any } = {};
+    let ret: ValidationErrors = {};
 
     if ((p1.touched || p2.touched) &&
       (p1.value !== p2.value) &&

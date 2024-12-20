@@ -14,37 +14,45 @@
   @include clipped-container;
 }
 
-$theme: mat.define-theme((
-      color: (theme-type: light,
+html {
+  @include mat.theme((
+      color: (
         primary: mat.$azure-palette,
-        use-system-variables: true,
-    system-variables-prefix: sys,
+        tertiary: mat.$yellow-palette,
+        theme-type: light,
       ),
-      density: (scale: -1),
-      )
-);
+      typography: Roboto,
+      density: -1,
+      use-system-variable: true,
+      system-variables-prefix: sys,
+    ));
 
-html,
+  @include mat.toolbar-overrides((
+      container-background-color: var(--mat-sys-primary-container),
+      container-text-color: var(--mat-sys-primary),
+    ));
+
+  @include mat.button-toggle-density(-3);
+
+  & {
+     @include clipped-container;
+  }
+
+}
+
 body {
-  --mat-toolbar-container-background-color: #{mat.get-theme-color($theme, primary-container)};
-
   @include clipped-container;
-  @include mat.all-component-themes($theme);
-  @include mat.system-level-colors($theme);
-
- 
-  // Decrease default sizes for toggle buttons
-   @include mat.button-toggle-density(-3);
-
+  background: var(--mat-sys-secondary);
+  color: var(--mat-sys-on-surface);
 }
 
 .rounded {
   --mdc-outlined-text-field-container-shape: 28px;
-    font-size: 2em;
+  font-size: 2em;
 }
 
 .dense-form-field {
-    @include mat.form-field-density(-5); 
+  @include mat.form-field-density(-5);
 }
 
 .dense-toggle-button {
@@ -52,9 +60,5 @@ body {
 }
 
 .dense-list {
-    @include mat.list-density(-5);
-}
-
-.background1 {
-  background: mat.get-theme-color($theme, surface-container-high );
+  @include mat.list-density(-5);
 }

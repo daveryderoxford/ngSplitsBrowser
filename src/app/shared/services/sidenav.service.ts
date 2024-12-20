@@ -6,7 +6,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 } )
 export class SidenavService {
 
-   private sidenav: MatSidenav;
+   private sidenav: MatSidenav | null = null;
 
    constructor () { }
 
@@ -15,14 +15,14 @@ export class SidenavService {
    }
 
    public open() {
-      return this.sidenav.open();
+      return this.sidenav!.open();
    }
 
    public close() {
-      return this.sidenav.close();
+      return this.sidenav!.close();
    }
 
    public toggle(): void {
-      this.sidenav.toggle();
+      this.sidenav!.toggle();
    }
 }

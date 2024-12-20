@@ -1,18 +1,16 @@
-import { Component, OnInit, input, inject, TemplateRef } from "@angular/core";
-import { resultsViews, ResultsView } from "../model/results-view";
-import { ResultsSelectionService } from "../results-selection.service";
-import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
-import { ClassMenuButtonComponent } from "./class-menu-button.component";
-import { AsyncPipe } from "@angular/common";
-import { ResultsViewButtonComponent } from "./results-view-button.component";
-import { RouterLink } from "@angular/router";
+import { Component, inject, input, TemplateRef } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
-import { ResultsDataService } from '../results-data.service ';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterLink } from "@angular/router";
 import { OEvent } from 'app/events/model/oevent';
-import { ExpandingSearch } from '../results-search/expanding-search/expanding-search';
+import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
+import { ResultsView, resultsViews } from "../model/results-view";
+import { ResultsDataService } from '../results-data.service ';
+import { ResultsPageState } from '../results-page-state';
 import { ResultsSearch } from '../results-search/results-search.';
-import { ResultsViewState } from '../results-view-state';
+import { ResultsSelectionService } from "../results-selection.service";
+import { ClassMenuButtonComponent } from "./class-menu-button.component";
+import { ResultsViewButtonComponent } from "./results-view-button.component";
 
 @Component({
     selector: "app-results-navbar",
@@ -23,7 +21,7 @@ import { ResultsViewState } from '../results-view-state';
 export class Navbar {
   public rs = inject(ResultsSelectionService);
   public rd = inject(ResultsDataService);
-  public pageState = inject(ResultsViewState);
+  public pageState = inject(ResultsPageState);
 
   oevent = input<OEvent>();
   settings = input<TemplateRef<any>>;
@@ -33,6 +31,6 @@ export class Navbar {
 
   viewSelected(view: ResultsView) {
     console.log('Results navbar.  view seleted ' + view.name);
-    this.pageState.setResultsView(view, this.rd.event());
+    this.pageState.setPage(view, this.rd.event());
   }
 }

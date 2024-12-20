@@ -26,7 +26,7 @@ export class EventsTableComponent {
 
   eventSelected = output<OEvent>();
 
-  eventClicked(row) {
+  eventClicked(row: OEvent) {
     this.eventSelected.emit(row);
   }
 }

@@ -1,4 +1,6 @@
 
+// @ts-nocheck
+
 import { map as d3_map } from "d3-collection";
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { isNotNull } from "../model/util";

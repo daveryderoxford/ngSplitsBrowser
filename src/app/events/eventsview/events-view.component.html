@@ -8,7 +8,7 @@
   </app-toolbar>
 
   <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start" backgroundColor="primary">
-    <mat-tab #tabAll label="All">
+    <mat-tab label="All">
       <ng-template matTabContent>
         <app-all-events-tab (eventSelected)="eventClicked($event)" />
       </ng-template>

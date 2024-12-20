@@ -85,7 +85,7 @@ export class ResultsDataService {
    setSelectedEventByKey(key: string): Observable<Results> {
       if (!this._event$.value || key !== this._event$.value.key) {
 
-         const d = doc(this.firestore, "/events/" + key) as DocumentReference<OEvent>;
+         const d = doc(this.firestore, "events", key) as DocumentReference<OEvent>;
          const obs = docData(d).pipe(
             tap(evt => {
                if (evt) {
@@ -108,7 +108,7 @@ export class ResultsDataService {
       let results: Results;
       try {
          results = parseEventData(text);
-      } catch (e) {
+      } catch (e: any) {
          if (e.name === "InvalidData") {
             console.log("EventService: Error parsing results" + e.message);
          } else {
@@ -124,11 +124,9 @@ export class ResultsDataService {
    public downloadResultsFile(event: OEvent): Observable<string> {
       const path = event.splits.splitsFilename;
 
-      const headers = new HttpHeaders({ 'Accept-Encoding': 'gzip' });
-
       const r = ref(this.storage, path);
       const obs = from(getDownloadURL(r)).pipe(
-         switchMap(url => this.http.get(url, { responseType: 'text', headers: headers }))
+         switchMap(url => this.http.get(url, { responseType: 'text'}))
       );
       return obs;
    }
@@ -148,8 +146,8 @@ export class ResultsDataService {
          return;
       }
 
-      const splitRanksByCompetitor = [];
-      const cumRanksByCompetitor = [];
+      const splitRanksByCompetitor: number[][] = [];
+      const cumRanksByCompetitor: number[][] = [];
 
       competitors.forEach(() => {
          splitRanksByCompetitor.push([]);

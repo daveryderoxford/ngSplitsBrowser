@@ -1,6 +1,6 @@
 import { inject, Injectable, Signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { collection, collectionData, CollectionReference, deleteDoc, doc, Firestore, orderBy, query, setDoc, where } from '@angular/fire/firestore';
+import { collection, collectionData, CollectionReference, deleteDoc, doc, Firestore, getDoc, orderBy, query, setDoc, where } from '@angular/fire/firestore';
 import { deleteObject, ref, Storage, uploadString } from '@angular/fire/storage';
 import { AuthService } from 'app/auth/auth.service';
 import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
@@ -9,6 +9,7 @@ import { Results } from 'app/results/model';
 import { Utils } from 'app/shared';
 import { of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { SplitsbrowserException } from 'app/results/model/exception';
 
 const EVENTS_COLLECTION = 'events';
 
@@ -20,30 +21,25 @@ export class EventAdminService {
    protected fs = inject(Firestore);
    protected storage = inject(Storage);
 
-   public events: Signal<OEvent[]>;
+   private eventsCollection = collection(this.fs, EVENTS_COLLECTION) as CollectionReference<any>;
 
-   constructor() {
+   private events$ = toObservable(this.auth.user).pipe(
+      switchMap((user) => {
+         if (!user) {
+            return of<OEvent[]>([]);
+         } else {
+            const q = this.auth.isAdmin() ?
+               query(this.eventsCollection, orderBy('dateSubmitted', 'desc')) :
+               query(this.eventsCollection, where('userId', '==', user.uid), orderBy('dateSubmitted', 'desc'));
+            return collectionData(q);
+         }
+      }),
+      map((fsEvent) => this.mapEvent(fsEvent))
+   );
 
-      // Any is used here as Firebase returns Timestamps for Dates.  
-      const eventsCollection = collection(this.fs, EVENTS_COLLECTION) as CollectionReference<any>;
+   events = toSignal(this.events$, { initialValue: [] });
 
-      const events$ = toObservable(this.auth.user).pipe(
-         switchMap((user) => {
-            if (!user) {
-               return of<OEvent[]>([]);
-            } else {
-               const q = this.auth.isAdmin() ?
-                  query(eventsCollection, orderBy('dateSubmitted', 'desc')) :
-                  query(eventsCollection, where('userId', '==', user.uid), orderBy('dateSubmitted', 'desc'));
-               return collectionData(q);
-            }
-         }),
-         map((fsEvent) => this.mapEvent(fsEvent))
-      );
-
-      this.events = toSignal(events$, { initialValue: [] });
-
-   }
+   constructor() { }
 
    /** Converts event fields as stored in Firestore to their correct types.
     * - dates from Timestamps (used by Firestore) to Dates 
@@ -74,7 +70,7 @@ export class EventAdminService {
 
       await setDoc(doc(this.fs, EVENTS_COLLECTION, event.key), event);
 
-      return(event as OEvent);
+      return (event as OEvent);
 
    }
 
@@ -92,6 +88,12 @@ export class EventAdminService {
    private setIndexProperties(partialEvent: Partial<OEvent>) {
       partialEvent.yearIndex = new Date(partialEvent.date).getFullYear();
       partialEvent.gradeIndex = EventGrades.indexObject(partialEvent.grade);
+   }
+
+   async getEvent(key: string): Promise<OEvent> {
+      const d = doc(this.fs, EVENTS_COLLECTION, key);
+      // TODO need to add conversion
+      return (await getDoc(d)).data() as OEvent;
    }
 
    /** Async functiom to upload results for an event to the database from a
@@ -130,7 +132,7 @@ export class EventAdminService {
          this.logUploadWarnings(event.name, results);
          // If an error has occueed save reason in the database
          event.splits.valid = false;
-         event.splits.failurereason = err;
+         event.splits.failurereason = err.toString();
          await setDoc(doc(this.fs, "/events/" + event.key), event);
          throw err;
       }
@@ -157,8 +159,8 @@ export class EventAdminService {
       let results: Results;
       try {
          results = parseEventData(text);
-      } catch (e) {
-         if (e.name === "InvalidData") {
+      } catch (e: unknown) {
+         if (e instanceof SplitsbrowserException && e.name === "InvalidData") {
             console.log("EventAdminService: Error parsing results" + e.message);
          } else {
             console.log("EventAdminService: Error parsing results" + e);
