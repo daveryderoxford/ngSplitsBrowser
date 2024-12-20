@@ -12,6 +12,7 @@
 
 .sidebar {
     min-width: 250px;
+    width: 250px;
     max-width: 250px;
     margin: 0;
     height: 100%;
@@ -23,6 +24,8 @@
 .chart {
     margin: 15px;
     width: 100%;
+    flex-grow: 1;
+    min-width: 0;
 }
 
 /*

@@ -15,6 +15,8 @@
 }
 
 html {
+  @include clipped-container;
+
   @include mat.theme((
       color: (
         primary: mat.$azure-palette,
@@ -31,13 +33,6 @@ html {
       container-background-color: var(--mat-sys-primary-container),
       container-text-color: var(--mat-sys-primary),
     ));
-
-  @include mat.button-toggle-density(-3);
-
-  & {
-     @include clipped-container;
-  }
-
 }
 
 body {
@@ -46,17 +41,8 @@ body {
   color: var(--mat-sys-on-surface);
 }
 
-.rounded {
-  --mdc-outlined-text-field-container-shape: 28px;
-  font-size: 2em;
-}
-
 .dense-form-field {
   @include mat.form-field-density(-5);
-}
-
-.dense-toggle-button {
-  @include mat.button-toggle-density(-5);
 }
 
 .dense-list {

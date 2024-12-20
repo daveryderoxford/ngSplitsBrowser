@@ -9,14 +9,13 @@ import { ResultsDataService } from '../results-data.service ';
 import { ResultsPageState } from '../results-page-state';
 import { ResultsSearch } from '../results-search/results-search.';
 import { ResultsSelectionService } from "../results-selection.service";
-import { ClassMenuButtonComponent } from "./class-menu-button.component";
 import { ResultsViewButtonComponent } from "./results-view-button.component";
 
 @Component({
     selector: "app-results-navbar",
     templateUrl: "./navbar.html",
     styleUrls: ["./navbar.scss"],
-    imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ClassMenuButtonComponent, ResultsSearch]
+    imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ResultsSearch]
 })
 export class Navbar {
   public rs = inject(ResultsSelectionService);

@@ -1,13 +1,15 @@
 <app-results-navbar>
 
+  <app-class-menu-button [selectedClass]='rs.oclass()' [oclasses]='rd.results().classes'
+      (select)='rs.selectClass($event)' />
+
   @if (course() && course().classes.length > 1) {
-  <mat-slide-toggle labelPosition="before" hideIcon="true" class=[formControl]="courseToggle">Course</mat-slide-toggle>
+    <mat-checkbox labelPosition="after" [formControl]="courseToggle">Course</mat-checkbox>
   }
 
-  <mat-slide-toggle labelPosition="before" hideIcon="true" class="dense-toggle-slide"
-    [formControl]="colorToggle">Color</mat-slide-toggle>
+  <mat-checkbox labelPosition="after" [formControl]="colorToggle">Color</mat-checkbox>
 
-  <mat-slide-toggle labelPosition="before" hideIcon="true" [formControl]="selectedToggle">Selected only</mat-slide-toggle>
+  <mat-checkbox labelPosition="after" [formControl]="selectedToggle">Selected only</mat-checkbox>
 
 </app-results-navbar>
 

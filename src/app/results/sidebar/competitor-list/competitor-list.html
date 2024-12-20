@@ -2,8 +2,8 @@
    @for (comp of rs.displayedCompetitors(); track comp; let index= $index ) {
    <mat-list-item [class.selected] = "rs.isCompetitorSelected(comp)" (click)="rs.toggleCompetitor(comp)">
       <mat-icon matListItemIcon>folder</mat-icon>
-      <p matListItemTitle>{{(index+1).toString()}}. {{comp.name}} {{comp.club}}</p>
-      <p matListItemLine>{{comp.courseClass.name}} {{comp.totalTime | formatTime}}</p>
+      <p matListItemTitle>{{(index+1).toString()}}. {{comp.name}}</p>
+      <p matListItemLine>{{comp.club}} {{comp.courseClass.name}} {{comp.totalTime | formatTime}}</p>
    </mat-list-item>
    } @empty {
      No competitors

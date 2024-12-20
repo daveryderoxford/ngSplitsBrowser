@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
+import { Component, computed, inject, linkedSignal, OnInit, signal, viewChild } from '@angular/core';
 import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { CompetitorList } from './competitor-list/competitor-list';
 import { ClassList } from './class-list/class-list';
@@ -13,24 +13,21 @@ import { toSignal } from '@angular/core/rxjs-interop';
     templateUrl: './sidebar.html',
     styleUrl: './sidebar.scss'
 })
-export class Sidebar implements OnInit {
+export class Sidebar {
 
   rs = inject(ResultsSelectionService);
   rd = inject(ResultsDataService);
 
   tabs = viewChild(MatTabGroup);
 
-  ngOnInit() {
-    if (this.rs.oclass()) {
-      this.tabs().selectedIndex = 2;
-    }
-  }
+  tablabel = computed( () => this.rs.courseOrClass ? 'Course' : 'Class');
+
+ // tabIndex = linkedSignal(() => this.rs.oclass() ? 1 : 0 );
+ tabIndex = signal(0);
 
   selectClass(oclass: CourseClass) {
     this.rs.selectClass(oclass);
-    this.tabs().selectedIndex = 2;
+    this.tabIndex.set(1);
   }
-
-  // hasCourses = input.required<boolean>();
 
 }

@@ -12,13 +12,15 @@ import { TimeUtilities } from "../model/time";
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
+import { ClassMenuButtonComponent } from "../navbar/class-menu-button.component";
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
     selector: "app-splits-grid",
     templateUrl: "./results-table.html",
     styleUrls: ["./results-table.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe]
+    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe, ClassMenuButtonComponent, MatCheckboxModule]
 })
 export class ResultsTable implements OnInit {
    protected rs = inject(ResultsSelectionService);
@@ -32,7 +34,6 @@ export class ResultsTable implements OnInit {
    /** Column definitions columns */
    staticColumns = ["position", "name", "total"];
 
-   classSelect = new FormControl<CourseClass>(undefined);
    courseToggle = new FormControl<boolean>(true);
    colorToggle = new FormControl<boolean>(true);
    selectedToggle = new FormControl<boolean>(false);
@@ -61,10 +62,6 @@ export class ResultsTable implements OnInit {
    });
 
    ngOnInit() {
-
-      this.classSelect.valueChanges.subscribe((courseClass: CourseClass) => {
-         this.rs.selectClass(courseClass);
-      });
 
       this.courseToggle.valueChanges.subscribe((courseDisplayed: boolean) => {
          this.rs.setCourseOrClass(courseDisplayed);

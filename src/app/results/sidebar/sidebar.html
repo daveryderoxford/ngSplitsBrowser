@@ -1,6 +1,4 @@
-<mat-tab-group class="clipped-container" [selectedIndex]>
-   <mat-tab label="Courses">
-   </mat-tab>
+<mat-tab-group class="clipped-container" [selectedIndex]="tabIndex()">
    <mat-tab label="Class">
       <app-class-list 
             [classes]="rd.results().classes" 

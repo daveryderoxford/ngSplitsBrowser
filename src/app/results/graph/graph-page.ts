@@ -88,11 +88,9 @@ export class GraphPage implements AfterViewInit {
   });
 
   size$ = new BehaviorSubject({ width: 0, height: 0 });
-  observer = new ResizeObserver(entries => {
-    const element = this.chartElement().nativeElement;
-    this.chart.setSize(element.clientWidth, element.clientHeight);
-    this.redrawChart();
-  });
+  observer = new ResizeObserver(entries => 
+    this.size$.next(entries[0].contentRect)
+  );
 
   chart: Chart;
   chartElement = viewChild.required<ElementRef>('chart');
@@ -118,7 +116,7 @@ export class GraphPage implements AfterViewInit {
           this.redrawChart();
         } else {
           console.log('graph componennt null results');
-        }
+        } 
       }
     });
   }
@@ -127,7 +125,7 @@ export class GraphPage implements AfterViewInit {
 
     this.observer.observe(this.chartElement().nativeElement);
 
-    this.size$.pipe(debounceTime(100), takeUntilDestroyed(this.destroyRef)).subscribe(rect => {
+    this.size$.pipe(debounceTime(100)).subscribe(rect => {
       const element = this.chartElement().nativeElement;
       this.chart.setSize(element.clientWidth, element.clientHeight);
       this.redrawChart();
