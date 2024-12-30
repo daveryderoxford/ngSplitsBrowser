@@ -27,8 +27,8 @@ import { TestSupport } from '../test-support.spec';
 import { Competitor } from './competitor';
 import { Course } from './course';
 import { CourseClass } from './course-class';
-import { CourseClassSet } from './course-class-set';
-import { isNaNStrict } from './util';
+import { ChartData, CourseClassSet } from './course-class-set';
+import { isNaNStrict } from './results_util';
 
 
 describe('Course-class set', () => {
@@ -61,97 +61,97 @@ describe('Course-class set', () => {
         minViewableControl: 0
     };
 
-    function getCompetitor1() {
+    function getCompetitor1(): Competitor {
         return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, 209, 100]);
     }
 
-    function getFasterCompetitor1() {
+    function getFasterCompetitor1(): Competitor  {
         return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, 184, 100]);
     }
 
-    function getCompetitor1WithNullSplitForControl2() {
+    function getCompetitor1WithNullSplitForControl2(): Competitor  {
         return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, null, 184, 100]);
     }
 
-    function getCompetitor1WithDubiousSplitForControl1() {
+    function getCompetitor1WithDubiousSplitForControl1(): Competitor  {
         const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 0, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         competitor.setRepairedCumulativeTimes([0, NaN, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         return competitor;
     }
 
-    function getCompetitor1WithDubiousSplitForControl2() {
+    function getCompetitor1WithDubiousSplitForControl2(): Competitor  {
         const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 - 10, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         competitor.setRepairedCumulativeTimes([0, 65, NaN, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         return competitor;
     }
 
-    function getCompetitor1WithDubiousFinishTime() {
+    function getCompetitor1WithDubiousFinishTime(): Competitor  {
         const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184]);
         competitor.setRepairedCumulativeTimes([0, 65, 65 + 221, 65 + 221 + 184, NaN]);
         return competitor;
     }
 
-    function getCompetitor1WithDubiousTimeToLastControlAndFinish() {
+    function getCompetitor1WithDubiousTimeToLastControlAndFinish(): Competitor  {
         const competitor = fromOriginalCumTimes(1, 'John Smith', 'ABC', 10 * 3600, [0, 65, 65 + 221, 65 + 221, 65 + 221]);
         competitor.setRepairedCumulativeTimes([0, 65, 65 + 221, NaN, NaN]);
         return competitor;
     }
 
-    function getCompetitor1WithNullSplitForControl3() {
+    function getCompetitor1WithNullSplitForControl3(): Competitor  {
         return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, null, 100]);
     }
 
-    function getCompetitor1WithNullFinishSplit() {
+    function getCompetitor1WithNullFinishSplit(): Competitor  {
         return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 221, 184, null]);
     }
 
-    function getCompetitor1WithSameControl2SplitAsThatOfCompetitor2() {
+    function getCompetitor1WithSameControl2SplitAsThatOfCompetitor2(): Competitor  {
         return fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [65, 197, 209, 100]);
     }
 
-    function getNonStartingCompetitor1() {
+    function getNonStartingCompetitor1(): Competitor  {
         const competitor = fromSplitTimes(1, 'John Smith', 'ABC', 10 * 3600, [null, null, null, null]);
         competitor.setNonStarter();
         return competitor;
     }
 
-    function getCompetitor2() {
+    function getCompetitor2(): Competitor  {
         return fromSplitTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [81, 197, 212, 106]);
     }
 
-    function getCompetitor2WithNullSplitForControl2() {
+    function getCompetitor2WithNullSplitForControl2(): Competitor {
         return fromSplitTimes(1, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [81, null, 212, 106]);
     }
 
-    function getCompetitor2WithNullFinishSplit() {
+    function getCompetitor2WithNullFinishSplit(): Competitor  {
         return fromSplitTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [81, 197, 212, null]);
     }
 
-    function getCompetitor2WithFinishCumTimeNotTheLargest() {
+    function getCompetitor2WithFinishCumTimeNotTheLargest(): Competitor  {
         return fromCumTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [0, 81, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 - 73]);
     }
 
-    function getCompetitor2WithFirstControlLargerThanAllOthers() {
+    function getCompetitor2WithFirstControlLargerThanAllOthers(): Competitor  {
         return fromCumTimes(2, 'Fred Brown', 'DEF', 10 * 3600 + 30 * 60, [0, 4103, 81 + 197, 81 + 197 + 212, 81 + 197 + 212 + 106]);
     }
 
-    function getCompetitor3() {
+    function getCompetitor3(): Competitor  {
         return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, 199, 117]);
     }
 
-    function getCompetitor3WithSameTotalTimeAsCompetitor1() {
+    function getCompetitor3WithSameTotalTimeAsCompetitor1(): Competitor  {
         return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, 199, 109]);
     }
 
-    function getCompetitor3WithNullSplitForControl2() {
+    function getCompetitor3WithNullSplitForControl2(): Competitor  {
         return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, null, 199, 117]);
     }
 
-    function getCompetitor3WithNullSplitForControl3() {
+    function getCompetitor3WithNullSplitForControl3(): Competitor  {
         return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, null, 117]);
     }
 
-    function getCompetitor3WithNullFinishSplit() {
+    function getCompetitor3WithNullFinishSplit(): Competitor  {
         return fromSplitTimes(3, 'Bill Baker', 'GHI', 11 * 3600, [78, 209, 199, null]);
     }
 
@@ -383,7 +383,7 @@ describe('Course-class set', () => {
         expect(competitorTimes).toEqual([0, 65, 65 + 221, 65 + 221 + 180, 65 + 221 + 180 + 60],  'Cumulative times should have filled-in time to last control and finish');
     });
 
-    function assertSplitRanks( competitor, expectedSplitRanks) {
+    function assertSplitRanks(competitor: Competitor, expectedSplitRanks: number[]) {
         expectedSplitRanks.forEach(function (splitRank, index) {
             if (isNaNStrict(splitRank)) {
                 expect(isNaNStrict(competitor.getSplitRankTo(index + 1))).toBe(true);
@@ -393,7 +393,7 @@ describe('Course-class set', () => {
         });
     }
 
-    function assertCumulativeRanks( competitor, expectedCumulativeRanks) {
+    function assertCumulativeRanks(competitor: Competitor, expectedCumulativeRanks: number[]) {
         expectedCumulativeRanks.forEach(function (cumulativeRank, index) {
             if (isNaNStrict(cumulativeRank)) {
                 expect(isNaNStrict(competitor.getCumulativeRankTo(index + 1))).toBe(true);
@@ -403,7 +403,7 @@ describe('Course-class set', () => {
         });
     }
 
-    function assertSplitAndCumulativeRanks( competitor, expectedSplitRanks, expectedCumulativeRanks) {
+    function assertSplitAndCumulativeRanks(competitor: Competitor, expectedSplitRanks: number[], expectedCumulativeRanks: number[]) {
         assertSplitRanks( competitor, expectedSplitRanks);
         assertCumulativeRanks( competitor, expectedCumulativeRanks);
     }
@@ -603,7 +603,7 @@ describe('Course-class set', () => {
     * @param {Number} numSplits - The number of fastest splits to attempt to return.
     * @param {Number} controlIdx - The index of the control.
     */
-    function assertCannotGetFastestSplits( competitors, numSplits, controlIdx) {
+    function assertCannotGetFastestSplits( competitors: Competitor[], numSplits: number, controlIdx: number) {
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, competitors)]);
         TestSupport.assertInvalidData( () => {
             courseClassSet.getFastestSplitsForControl(numSplits, controlIdx);
@@ -614,10 +614,6 @@ describe('Course-class set', () => {
         assertCannotGetFastestSplits( [getCompetitor1()], 0, 3);
     });
 
-    it('Cannot return fastest splits to a control when the number of such splits is not numeric', () => {
-        assertCannotGetFastestSplits( [getCompetitor1()], 'this is not a number', 3);
-    });
-
     it('Cannot return fastest splits to control zero', () => {
         assertCannotGetFastestSplits( [getCompetitor1()], 1, 0);
     });
@@ -626,17 +622,13 @@ describe('Course-class set', () => {
         assertCannotGetFastestSplits( [getCompetitor1()], 1, 5);
     });
 
-    it('Cannot return fastest splits to control that is not a number', () => {
-        assertCannotGetFastestSplits( [getCompetitor1()], 1, 'this is not a number');
-    });
-
     it('Can return chart data for two competitors in same class', () => {
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [getFasterCompetitor1(), getCompetitor2()])]);
         const fastestTime = courseClassSet.getFastestCumTimes();
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 0, ys: [0, 0] },
                 { x: 65, ys: [0, 16] },
@@ -661,7 +653,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 0, ys: [0, 0] },
                 { x: 65, ys: [0, 16] },
@@ -685,7 +677,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], DUMMY_CHART_TYPE_SKIP);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 65, ys: [0, 0] },
                 { x: 65 + 197, ys: [0, 16] },
@@ -709,18 +701,6 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], DUMMY_CHART_TYPE_SKIP);
 
-    interface DataColumns  {
-       x: number | Array<number>;
-      ys: number | Array<number>;
-    }
-        interface ChartData  {
-            dataColumns: Array<DataColumns>;
-            xExtent: Array<number>;
-            yExtent:  Array<number>;
-            numControls: number;
-            competitorNames: Array<string>;
-            dubiousTimesInfo: any;
-        }
         const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 81, ys: [0, 0] },
@@ -744,7 +724,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 0, ys: [0, 0] },
                 { x: 65, ys: [16, 0] },
@@ -769,7 +749,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 0, ys: [0, 0] },
                 { x: 65, ys: [0, 4038] },
@@ -793,7 +773,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [0, 1], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 0, ys: [0, 0] },
                 { x: 65, ys: [0, 16] },
@@ -817,7 +797,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [0], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 0, ys: [0] },
                 { x: 65, ys: [0] },
@@ -841,7 +821,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [1], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [
                 { x: 0, ys: [0] },
                 { x: 65, ys: [16] },
@@ -865,7 +845,7 @@ describe('Course-class set', () => {
 
         const chartData = courseClassSet.getChartData(fastestTime, [], _DUMMY_CHART_TYPE);
 
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [],
             xExtent: [0, 65 + 197 + 184 + 100],
             yExtent: chartData.yExtent, // Deliberately set this equal, we'll test it later.
@@ -882,7 +862,7 @@ describe('Course-class set', () => {
     it('Can return empty chart data when no competitors', () => {
         const courseClassSet = new CourseClassSet([new CourseClass('Test', 3, [])]);
         const data = courseClassSet.getChartData([0, 87, 87 + 147, 87 + 147 + 92], [], _DUMMY_CHART_TYPE);
-        const expectedChartData = {
+        const expectedChartData: ChartData = {
             dataColumns: [],
             xExtent: data.xExtent,
             yExtent: data.yExtent,

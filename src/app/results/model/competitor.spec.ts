@@ -23,38 +23,38 @@
 import { sbTime } from "./time";
 import {} from "jasmine";
 import { Competitor } from "./competitor";
-import { isNaNStrict } from "./util";
+import { isNaNStrict } from "./results_util";
 import 'jasmine-expect';
 
 const fromCumTimes = Competitor.fromCumTimes;
 const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 const compareCompetitors = Competitor.compareCompetitors;
 
-function signum(n) {
+function signum(n: number) {
     return (n < 0) ? -1 : ((n > 0) ? 1 : 0);
 }
 
 describe("Competitor", () => {
 
-    function assertSplitTimes(competitor: Competitor, expectedSplitTimes: Array<sbTime>) {
+    function assertSplitTimes(competitor: Competitor, expectedSplitTimes: sbTime[]) {
         expectedSplitTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getSplitTimeTo(controlIdx + 1)).toEqual(splitTime);
         });
     }
 
-    function assertOriginalSplitTimes(competitor, expectedSplitTimes) {
+    function assertOriginalSplitTimes(competitor: Competitor, expectedSplitTimes: sbTime[]) {
         expectedSplitTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getOriginalSplitTimeTo(controlIdx + 1)).toEqual(splitTime);
         });
     }
 
-    function assertCumulativeTimes(competitor, expectedCumulativeTimes) {
+    function assertCumulativeTimes(competitor:  Competitor, expectedCumulativeTimes: sbTime[]) {
         expectedCumulativeTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getCumulativeTimeTo(controlIdx)).toEqual(splitTime);
         });
     }
 
-    function assertOriginalCumulativeTimes(competitor, expectedCumulativeTimes) {
+    function assertOriginalCumulativeTimes(competitor: Competitor, expectedCumulativeTimes: sbTime[]) {
         expectedCumulativeTimes.forEach((splitTime, controlIdx) => {
             expect(competitor.getOriginalCumulativeTimeTo(controlIdx)).toEqual(splitTime);
         });

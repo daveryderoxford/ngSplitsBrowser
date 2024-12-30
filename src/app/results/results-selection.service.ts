@@ -79,7 +79,7 @@ export class ResultsSelectionService {
 
    /** Toggle selected cometitor */
    toggleCompetitor(comp: Competitor) {
-      let competitors = this._competitors();
+      const competitors = this._competitors();
 
       if (competitors.includes(comp)) {
          this.deselectCompetitors(comp);
@@ -95,7 +95,7 @@ export class ResultsSelectionService {
    }
 
    selectCourse(course: Course) {
-      console.log('Course selected' + course.name);
+      console.log(`Course selected${course.name}`);
       // If course has changed then reset the selected control
       if (course !== this._course()) {
          this.selectControl(null);
@@ -104,7 +104,7 @@ export class ResultsSelectionService {
    }
 
    selectClass(courseclass: CourseClass) {
-      console.log('Class selected' + courseclass.name);
+      console.log(`Class selected${courseclass.name}`);
       this.selectCourse(courseclass.course);
       this._oclass.set(courseclass);
    }

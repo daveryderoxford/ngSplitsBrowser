@@ -8,6 +8,12 @@ export interface FastestSplitsPopupData {
     placeholder: string;
 }
 
+export interface FastestSplitsPopupDataForLeg  {
+    title: string;
+    data: Array<{ time: number, name: string, className: string, highlight: boolean }>;
+    placeholder: string;
+}
+
 const getMessage = Lang.getMessage;
 const getMessageWithFormatting = Lang.getMessageWithFormatting;
 
@@ -64,7 +70,7 @@ export class SplitsPopupData {
     * @sb-return {Object} Object that contains the title for the popup and the
     *     array of data to show within it.
     */
-    public getFastestSplitsForLegPopupData(courseClassSet: CourseClassSet, eventData: Results, controlIndex: number): FastestSplitsPopupData {
+    public getFastestSplitsForLegPopupData(courseClassSet: CourseClassSet, eventData: Results, controlIndex: number): FastestSplitsPopupDataForLeg {
 
         const course = courseClassSet.getCourse();
         const startCode = course.getControlCode(controlIndex - 1);

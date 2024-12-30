@@ -154,7 +154,7 @@ export class Results {
             const firstname = comp.firstname.toLowerCase();
             const club = comp.club.toLowerCase();
 
-            return  surname.startsWith(ss) ||  firstname.startsWith(ss) ||  club.startsWith(ss);
+            return surname.startsWith(ss) || firstname.startsWith(ss) || club.startsWith(ss);
         });
 
         // Sort into name order
@@ -165,7 +165,7 @@ export class Results {
     }
 
     /** Find competitors by ecard from results  Only a simngle competitir should be found for a given ecard number */
-    findCompetitorByECard(ecards: string | string[] ): Competitor {
+    findCompetitorByECard(ecards: string | string[]): Competitor {
         const foundComp = this.allCompetitors.find((comp) => {
             if (Array.isArray(ecards)) {
                 return ecards.some(card => card === comp.ecardId);
@@ -194,9 +194,7 @@ export class Results {
         return (found);
     }
 
-    /** Search for a course matching on name.
-     *  Requires exact match if search string is 2 characters or less or match on start if >2 characters
-     */
+    /** Search for a course matching on name.  */
     findCourses(searchstring: string): Course[] {
 
         if (!searchstring || searchstring.trim().length === 0) { return []; }
@@ -205,9 +203,15 @@ export class Results {
 
         const found = this.courses.filter((course) => {
             const name = course.name.toLowerCase();
-            return  name.startsWith(ss);
-        });
+            return name.startsWith(ss);
+        }).sort((a, b) => this.sortByDistance(a, b));
+
         return (found);
     }
-}
 
+    private sortByDistance(a: Course, b: Course): number {
+        const lena = a.length ? a.length : 0;
+        const lenb = b.length ? b.length : 0;
+        return lenb - lena;
+    }
+}

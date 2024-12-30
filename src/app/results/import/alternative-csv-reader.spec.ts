@@ -25,7 +25,6 @@ import { TimeUtilities } from "../model";
 import { TestSupport } from "../test-support.spec";
 import { parseTripleColumnEventData } from "./alternative-cvs-reader";
 
-
 const formatTime = TimeUtilities.formatTime;
 
 const TRIPLE_COLUMN_HEADER = "RaceNumber,CardNumbers,MembershipNumbers,Name,AgeClass,Club,Country,CourseClass,StartTime,FinishTime,RaceTime,NonCompetitive,Position,Status,Handicap," +

@@ -2,7 +2,7 @@ import { ascending as d3_ascending } from "d3-array";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
-import { isNaNStrict, isNotNull } from "./util";
+import { isNaNStrict, isNotNull } from "./results_util";
 
 export type Genre = "M" | "F";
 
@@ -193,7 +193,7 @@ export class Competitor {
         }
     }
 
-    protected constructor(public order: number,
+    constructor(public order: number,
         name: string | FirstnameSurname,
         public club: string,
         public startTime: number,

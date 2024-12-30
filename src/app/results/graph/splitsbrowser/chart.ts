@@ -8,7 +8,7 @@ import { BaseType, select as d3_select, selectAll as d3_selectAll, Selection } f
 import { line as d3_line } from "d3-shape";
 import $ from 'jquery';
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
-import { isNaNStrict, isNotNullNorNaN } from "../../model/util";
+import { isNaNStrict, isNotNullNorNaN } from "../../model/results_util";
 import { ChartPopup } from "./chart-popup";
 import { ChartType } from "./chart-types";
 import { Lang } from "./lang";

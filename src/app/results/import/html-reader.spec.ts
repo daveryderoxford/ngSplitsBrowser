@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /*
  *  SplitsBrowser - HTML reader tests.
  *

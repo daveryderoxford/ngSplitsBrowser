@@ -11,7 +11,7 @@ import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
-import { isNaNStrict, isNotNull, isNotNullNorNaN } from "./util";
+import { isNaNStrict, isNotNull, isNotNullNorNaN } from "./results_util";
 
 export interface FatestSplitsData {
    name: string;  // full name of competitor

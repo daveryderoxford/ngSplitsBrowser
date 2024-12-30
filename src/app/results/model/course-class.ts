@@ -5,7 +5,7 @@ import { Competitor } from "./competitor";
 import { Course } from "./course";
 import { InvalidData } from "./exception";
 import { sbTime } from "./time";
-import { isNotNullNorNaN } from "./util";
+import { isNotNullNorNaN } from "./results_util";
 
 export interface FastestSplitInfo {
     name: string;

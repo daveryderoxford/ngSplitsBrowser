@@ -12,7 +12,6 @@
 
 .sidebar {
     min-width: 250px;
-    width: 250px;
     max-width: 250px;
     margin: 0;
     height: 100%;
@@ -49,82 +48,11 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+ /* Graph styles */
+
 div#sbContainer,
 div.sbErrors {
     font: 14px;
-}
-
-.topRowStart {
-    float: left;
-}
-
-.topRowEnd {
-    float: right;
-}
-
-div.topRowStartSpacer {
-    padding: 0px 18px 0px 18px;
-    min-height: 1px;
-    float: left;
-}
-
-div.otherClassSelector {
-    min-width: 100px;
-    border: 1px solid #aaaaaa;
-    padding: 2px;
-    background-color: #eeeeee;
-    vertical-align: middle;
-}
-
-div.otherClassSelector.disabled {
-    border: 1px solid #999999;
-    background-color: #f9f9f9;
-    color: #999999;
-}
-
-span.otherClassCombining {
-    padding: 0px 10px;
-}
-
-span.otherClassCombining.disabled {
-    color: #999999;
-}
-
-div.otherClassList {
-    min-width: 100px;
-    padding: 2px;
-    background-color: white;
-    border: 1px solid #aaaaaa;
-}
-
-div.otherClassItem {
-    padding: 2px;
-}
-
-div.otherClassItem.selected {
-    background-color: #286880;
-    color: white;
-}
-
-span.comparisonSelectorLabel.disabled {
-    color: #999999;
-}
-
-a#directLinkAnchor {
-    margin: 4px;
-}
-
-label.statisticsSelectorLabel.disabled,
-label.originalDataSelectorLabel.disabled {
-    color: #999999;
-}
-
-div.competitor span.nonfinisher {
-    font-style: italic;
-}
-
-span.competitorClassLabel {
-    padding-right: 10px;
 }
 
 svg text {
@@ -183,6 +111,8 @@ text.competitorLabel.selected {
     font-weight: bold;
 }
 
+/* Chart popup styles */
+
 div.chartPopup {
     border: 1px solid black;
     pointer-events: none;
@@ -202,112 +132,6 @@ div.chartPopupTableContainer {
 
 div.chartPopup tr.highlighted {
     color: #0000ff;
-}
-
-#competitorList {
-    overflow-y: scroll;
-    height: 100%;
-    min-width: 100px;
-}
-
-#competitorListContainer {
-    float: left;
-}
-
-div.competitorListPlaceholder {
-    color: #AAAAAA;
-}
-
-#chart {
-    float: left;
-}
-
-div.competitor {
-    font: 14px sans-serif;
-    padding: 2px;
-}
-
-div.competitor.selected,
-div.competitor.dragSelected {
-    background-color: #286880;
-    color: white;
-}
-
-div.competitor.selected.dragDeselected {
-    background-color: transparent;
-    color: black;
-}
-
-#statisticSelector label,
-#originalDataSelectorContainer label {
-    vertical-align: middle;
-    margin-left: 3px;
-    margin-right: 10px;
-}
-
-#statisticSelector input,
-#originalDataSelectorContainer input {
-    vertical-align: middle;
-}
-
-#resultsTableContainer {
-    padding-top: 10px;
-}
-
-.resultsTable {
-    border-spacing: 6px;
-}
-
-span.resultsTableHeader {
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.resultsTable tbody td {
-    white-space: nowrap;
-}
-
-.resultsTable tbody td.time {
-    text-align: right;
-}
-
-.resultsTable tbody td.time span.dubious {
-    font-style: italic;
-    color: #CCCCCC;
-}
-
-.resultsTable tbody td.time span.fastest {
-    color: red;
-}
-
-div.warningPanel {
-    position: absolute;
-    background-color: #EEEE66;
-    border: 5px solid #CCCC44;
-    padding: 10px;
-    color: black;
-    font-weight: bold;
-    max-width: 250px;
-    text-align: center;
-}
-
-div#warningTriangleContainer {
-    float: left;
-}
-
-div.warningList {
-    background-color: #eeeeee;
-    border: 2px solid #cccccc;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-div.warning {
-    padding: 5px;
-}
-
-div.warning:hover {
-    background-color: white;
 }
 
 /*

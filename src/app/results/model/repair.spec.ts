@@ -33,7 +33,7 @@ describe("Data Repair", () => {
 
     const fromOriginalCumTimes = Competitor.fromOriginalCumTimes;
 
-    function wrapInEvent(competitors) {
+    function wrapInEvent(competitors: Competitor[]) {
         const courseClass = new CourseClass("Test class", competitors[0].originalCumTimes.length - 2, competitors);
         const course = new Course("Test course", [courseClass], null, null, null);
         const eventData = new Results([courseClass], [course]);
@@ -47,13 +47,13 @@ describe("Data Repair", () => {
     * @return {boolean} True if the course-class has dubious data, false
     *     otherwise.
     */
-    function wrapInEventAndRepair(competitors) {
+    function wrapInEventAndRepair(competitors: Competitor[]) {
         const eventData = wrapInEvent(competitors);
         Repairer.repairEventData(eventData);
         return eventData.classes[0].hasDubiousData;
     }
 
-    function wrapInEventAndTransfer(competitors) {
+    function wrapInEventAndTransfer(competitors: Competitor[]) {
         Repairer.transferCompetitorData(wrapInEvent(competitors));
     }
 

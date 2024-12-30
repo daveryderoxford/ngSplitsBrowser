@@ -1,11 +1,18 @@
-// @ts-nocheck
+
 
 import { map as d3_map } from "d3-collection";
 import $ from 'jquery';
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
 import { Version2Reader } from "./iof-xml-v2-reader";
-import { Version3Reader } from "./iof-xml-v3-reader";
+import { CourseDeatils, Version3Reader } from "./iof-xml-v3-reader";
+
+type XMLReader = Version2Reader | Version3Reader;
+
+const ALL_READERS = [
+    new Version2Reader(),
+    new Version3Reader()
+];
 
 /**
 * Parses IOF XML data in either the 2.0.3 format or the 3.0 format and
@@ -31,7 +38,7 @@ export function parseIOFXMLEventData(data: string): Results {
 
     // Array of all 'temporary' courses, intermediate objects that contain
     // course data but not yet in a suitable form to return.
-    const tempCourses = [];
+    const tempCourses: Array<CourseDeatils> = [];
 
     // d3 map that maps course IDs plus comma-separated lists of controls
     // to the temporary course with that ID and controls.
@@ -118,7 +125,7 @@ function parseXml(xmlString: string): XMLDocument {
 *     PersonName or Name element.
 * @sb-return {Name object} Name read from the element.
 */
-function readCompetitorName(nameElement): FirstnameSurname {
+function readCompetitorName(nameElement: JQuery<HTMLElement>): FirstnameSurname {
 
     const forename = $("> Given", nameElement).text();
     const surname = $("> Family", nameElement).text();
@@ -129,10 +136,6 @@ function readCompetitorName(nameElement): FirstnameSurname {
     });
 }
 
-const ALL_READERS = [
-    new Version2Reader(),
-    new Version3Reader()
-];
 
 /**
 * Check that the XML document passed is in a suitable format for parsing.
@@ -143,7 +146,7 @@ const ALL_READERS = [
 * @sb-param {Object} reader - XML reader used to assist with format-specific
 *     XML reading.
 */
-function validateData(xml, reader) {
+function validateData(xml: XMLDocument, reader: XMLReader) {
     const rootElement = $("> *", xml);
     const rootElementNodeName = rootElement.prop("tagName");
 
@@ -167,7 +170,7 @@ function validateData(xml, reader) {
 * @sb-return {Object?} Object containing the competitor data, or null if no
 *     competitor could be read.
 */
-function parseCompetitor(element, number: number, reader, warnings: Array<string>) {
+function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader, warnings: Array<string>) {
     const jqElement = $(element);
 
     const nameElement = reader.getCompetitorNameElement(jqElement);
@@ -181,7 +184,7 @@ function parseCompetitor(element, number: number, reader, warnings: Array<string
     const club = reader.readClubName(jqElement);
 
     const dateOfBirth = reader.readDateOfBirth(jqElement);
-    const regexResult = yearRegexp.exec(dateOfBirth);
+    const regexResult = yearRegexp.exec(dateOfBirth?.toString());
     const yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
 
     const gender = $("> Person", jqElement).attr("sex");
@@ -245,11 +248,11 @@ function parseCompetitor(element, number: number, reader, warnings: Array<string
 * @sb-param {Object} reader - XML reader used to assist with format-specific
 *     XML reading.
 * @sb-param {Array} warnings - Array to accumulate any warning messages within.
-* @sb-return {Object} Object containing parsed data.
+* @sb-return {Object} Object containing parsed data.    
 */
-function parseClassData(element, reader, warnings) {
+function parseClassData(element: HTMLElement, reader: XMLReader, warnings: string[]) {
     const jqElement = $(element);
-    const cls = { name: null, competitors: [], controls: [], course: null };
+    const cls = { name: '', competitors: Array<Competitor>(), controls: Array<string>(), course: <CourseDeatils>null };
 
     cls.course = reader.readCourseFromClass(jqElement, warnings);
 

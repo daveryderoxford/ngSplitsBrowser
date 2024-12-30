@@ -6,7 +6,6 @@ import { AuthService } from 'app/auth/auth.service';
 import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
 import { parseEventData } from 'app/results/import';
 import { Results } from 'app/results/model';
-import { Utils } from 'app/shared';
 import { of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { SplitsbrowserException } from 'app/results/model/exception';
@@ -110,7 +109,7 @@ export class EventAdminService {
       let results: Results = null;
 
       try {
-         const text = await Utils.loadTextFile(file);
+         const text = await this.loadTextFile(file);
 
          results = this.parseSplits(text);
 
@@ -212,4 +211,25 @@ export class EventAdminService {
       };
       return (summary);
    }
+
+   /** Async function to load a file from disk returning text string containing file contents */
+   async loadTextFile(file: File): Promise<string> {
+
+      return new Promise<string>((resolve, reject) => {
+         const reader = new FileReader();
+
+         reader.onload = (event: any) => {
+            const text = event.target.result;
+            resolve(text);
+         };
+
+         reader.onerror = () => {
+            reject(reader.error);
+         };
+
+         reader.readAsText(file);
+
+      });
+   }
+
 }

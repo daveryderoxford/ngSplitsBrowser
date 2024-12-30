@@ -1,6 +1,6 @@
 
 import { Competitor, Course, CourseClass, InvalidData, Results, TimeUtilities, WrongFileFormat } from "../model";
-import { isNotNull, isTrue } from "../model/util";
+import { isNotNull, isTrue } from "../model/results_util";
 import { normaliseLineEndings } from "./util";
 
 const parseTime = TimeUtilities.parseTime;

@@ -1,6 +1,8 @@
 /* eslint-disable max-len */
 
-import { UserData, OEvent, SplitsFileInfo, EventSummary } from "app/model";
+import { Club } from 'app/events/model/club';
+import { EventSummary, OEvent, SplitsFileInfo } from 'app/events/model/oevent';
+import { UserData } from 'app/user/user';
 
 /** User data */
 export const user1 = { uid: "user1", email: "user1@example.com" };
@@ -20,7 +22,8 @@ export const userdata1: UserData = {
    nationalId: 'GBR12345',
    ecards: [{ id: '11111', type: 'SI' }, { id: '55555', type: "Emit" }],
    autoFind: true,
-   resultsLastupDated: new Date('2018-10-21').toISOString()
+   resultsLastupDated: new Date('2018-10-21').toISOString(),
+   postcode: 'TW18 2AB'
 };
 export const userdata2: UserData = {
    /** All the user data stored for the user */
@@ -33,7 +36,9 @@ export const userdata2: UserData = {
    nationalId: 'NOR12345',
    ecards: [{ id: '22222', type: 'SI' }, { id: '66666', type: "Emit" }],
    autoFind: false,
-   resultsLastupDated: new Date('2018-10-21').toISOString()
+   resultsLastupDated: new Date('2018-10-21').toISOString(),
+      postcode: 'TW18 2AB'
+
 };
 export const userdata3: UserData = {
    /** All the user data stored for the user */
@@ -46,7 +51,8 @@ export const userdata3: UserData = {
    nationalId: 'GBR12345',
    ecards: [{ id: '33333', type: 'SI' }],
    autoFind: true,
-   resultsLastupDated: new Date('2018-10-21').toISOString()
+   resultsLastupDated: new Date('2018-10-21').toISOString(),
+      postcode: 'TW18 2AB'
 };
 export const test_userdata = [userdata1, userdata2, userdata3];
 
@@ -126,7 +132,7 @@ export const eventSummaryA: EventSummary = {
 };
 eventA.summary = eventSummaryA;
 
-export const resultsa =
+export const resultsa: string =
 `Stno;SI card;Database Id;Name;YB;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;
  ;11; ;Runner A1; ; ; ;10:00:00; ;12:14; ; ; ;ABC; ; ;Class A; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 1;4.1;35;4;1;10:00:00;10:12:14;212;01:48;229;06:14;208;08:43;222;08:43;
  ;12; ;Runner A2; ; ; ;10:30:00; ;14:12; ; ; ;DEF; ; ;Class A; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 1;4.1;35;4;2;10:30:00;10:44:12;212;03:37;229;07:56;208;10:32;222;08:43;
@@ -137,11 +143,11 @@ export const resultsa =
  ;23; ;Runner D1; ; ; ;11:30:00; ;13:32; ; ; ;GHI; ; ;Class D; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ; ;Course 2;2.3;22;3;3;11:00:00;11:30:32;212;03:01;999;07:05;998;09:59;
  `;
 
- export const test_results = [
+ export const test_results: any = [
 
  ];
 
- export const test_clubs = [
+ export const test_clubs: Club[] = [
     { key: 'GBR-TVOC', name: 'TVOC', nationality: 'GBR', numEvents: 1, lastEvent: '2018-10-21' },
     { key: 'GBR-SN', name: 'SN', nationality: 'GBR', numEvents: 1, lastEvent: '2018-10-21' },
     { key: 'NOR-SN', name: 'SN', nationality: 'NOR', numEvents: 1, lastEvent: '2017-01-10' }

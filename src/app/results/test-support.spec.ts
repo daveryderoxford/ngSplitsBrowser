@@ -25,7 +25,7 @@ import { } from "jasmine";
 import 'jasmine-expect';
 import $ from 'jquery';
 import { Competitor, sbTime } from "./model";
-import { isNaNStrict } from "./model/util";
+import { isNaNStrict } from "./model/results_util";
 
 export class TestSupport {
     /**
@@ -40,11 +40,11 @@ export class TestSupport {
     *     failure message if no exception is thrown.  A default message is used
     *     instead if this is not specified.
     */
-    static assertException(exceptionName: string, func, failureMessage?: string) {
+    static assertException(exceptionName: string, func: any, failureMessage?: string) {
         try {
             func();
             expect(false).toBeTrue(failureMessage || "An exception with name '" + exceptionName + "' should have been thrown, but no exception was thrown");
-        } catch (e) {
+        } catch (e: any) {
             expect(e.name).toEqual(exceptionName, "Exception with name '" + exceptionName + "' should have been thrown, message was " + e.message);
         }
     }
@@ -59,7 +59,7 @@ export class TestSupport {
     *     failure message if no exception is thrown.  A default message is used
     *     instead if this is not specified.
     */
-    static assertInvalidData(func, failureMessage?: string) {
+    static assertInvalidData(func: any, failureMessage?: string) {
         TestSupport.assertException("InvalidData", func, failureMessage);
     }
 
@@ -70,16 +70,16 @@ export class TestSupport {
     * @param {Array} actualArray - The 'actual' array of numbers.
     * @param {Array} expectedArray - The 'expected' array of numbers.
     */
-    static assertStrictEqualArrays(actualArray, expectedArray) {
+    static assertStrictEqualArrays(actualArray: number[], expectedArray: number[]) {
         expect($.isArray(actualArray)).toBeTrue("actualArray is not an array");
         expect($.isArray(expectedArray)).toBeTrue("expectedArray is not an array");
         expect(actualArray.length).toEqual(expectedArray.length,
             "Lengths should be the same: expected " + expectedArray.length + ", actual " + actualArray.length);
 
         for (let index = 0; index < expectedArray.length; index += 1) {
-            if ( isNaNStrict(expectedArray[index]) ) {
+            if (isNaNStrict(expectedArray[index])) {
                 expect(isNaNStrict(actualArray[index]))
-                    .toBeTrue( "Expected array has NaN at index " + index + " so actual array should do too.  Actual value " + actualArray[index]);
+                    .toBeTrue("Expected array has NaN at index " + index + " so actual array should do too.  Actual value " + actualArray[index]);
             } else {
                 expect(actualArray[index])
                     .toEqual(expectedArray[index], "Array values at index " + index + " should be strict-equal");
@@ -94,8 +94,27 @@ export class TestSupport {
     * @return {?Number} null if at least one of a or b is null,
     *      otherwise a + b.
     */
-    private static addIfNotNull(a, b) {
+    private static addIfNotNull(a?: number, b?: number): number | null {
         return (a === null || b === null) ? null : (a + b);
+    }
+
+    /**
+        * Convert an array of split times into an array of cumulative times.
+        * If any null splits are given, all cumulative splits from that time
+        * onwards are null also.
+        *
+        * The returned array of cumulative split times includes a zero value for
+        * cumulative time at the start.
+        * @param {Array} splitTimes - Array of split times.
+        * @return {Array} Corresponding array of cumulative split times.
+        */
+    static cumTimesFromSplitTimes(splitTimes: sbTime[]): sbTime[] {
+
+        const cumTimes = [0];
+        for (let i = 0; i < splitTimes.length; i++) {
+            cumTimes.push(TestSupport.addIfNotNull(cumTimes[i], splitTimes[i]));
+        }
+        return cumTimes;
     }
 
     /**
@@ -113,16 +132,17 @@ export class TestSupport {
     * @return {Competitor} Created competitor.
     */
     static fromSplitTimes(order: number,
-                          name: string,
-                          club: string,
-                          startTime: sbTime,
-                          splitTimes: Array<sbTime>) {
-        const cumTimes = [0];
-        for (let i = 0; i < splitTimes.length; i += 1) {
-            cumTimes.push(TestSupport.addIfNotNull(cumTimes[i], splitTimes[i]));
-        }
+        name: string,
+        club: string,
+        startTime: sbTime,
+        splitTimes: sbTime[]): Competitor {
 
-        return ( Competitor.fromCumTimes(order, name, club, startTime, cumTimes) );
+        const cumTimes = TestSupport.cumTimesFromSplitTimes(splitTimes);
 
+        const competitor = new Competitor(order, name, club, startTime, splitTimes, cumTimes);
+        competitor.splitTimes = splitTimes;
+        competitor.cumTimes = cumTimes;
+
+        return competitor;
     }
 }

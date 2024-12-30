@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import $ from 'jquery';
 import { isUndefined } from "./util";
 import { InvalidData, TimeUtilities, WrongFileFormat } from "../model";
@@ -9,11 +7,11 @@ import { CourseDeatils, IOFXMLReader } from "./iof-xml-v3-reader";
 // IOF v2.0.3 XML event data.
 export class Version2Reader implements IOFXMLReader {
 
-    private StatusNonCompetitive = "NotCompeting";
-    private StatusNonStarter = "DidNotStart";
-    private StatusNonFinisher = "DidNotFinish";
-    private StatusDisqualified = "Disqualified";
-    private StatusOverMaxTime = "OverTime";
+    StatusNonCompetitive = "NotCompeting";
+    StatusNonStarter = "DidNotStart";
+    StatusNonFinisher = "DidNotFinish";
+    StatusDisqualified = "Disqualified";
+    StatusOverMaxTime = "OverTime";
 
     /**
     * Returns whether the given event data is likely to be results data of the
@@ -36,7 +34,7 @@ export class Version2Reader implements IOFXMLReader {
     * the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
     * @sb-param {jQuery.selection} rootElement - The root element.
     */
-    checkVersion(rootElement) {
+    checkVersion(rootElement: JQuery<HTMLElement>) {
         const iofVersionElement = $("> IOFVersion", rootElement);
         if (iofVersionElement.length === 0) {
             throw new WrongFileFormat("Could not find IOFVersion element");
@@ -61,7 +59,7 @@ export class Version2Reader implements IOFXMLReader {
     *     containing the course details.
     * @sb-return {String} Class name.
     */
-    readClassName(classResultElement): string {
+    readClassName(classResultElement: JQuery<HTMLElement>): string {
         return $("> ClassShortName", classResultElement).text();
     }
 
@@ -72,7 +70,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-param {Array} warnings - Array that accumulates warning messages.
     * @sb-return {Object} Course details: id, name, length, climb and numberOfControls
     */
-    readCourseFromClass(classResultElement, warnings: Array<string>): CourseDeatils {
+    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: Array<string>): CourseDeatils {
         // Although the IOF v2 format appears to support courses, they
         // haven't been specified in any of the files I've seen.
         // So instead grab course details from the class and the first
@@ -125,7 +123,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {jQuery.selection} jQuery selection containing any child
     *     'PersonName' element.
     */
-    getCompetitorNameElement(element) {
+    getCompetitorNameElement(element: JQuery<HTMLElement>) {
         return $("> Person > PersonName", element);
     }
 
@@ -135,7 +133,7 @@ export class Version2Reader implements IOFXMLReader {
     *     PersonResult element.
     * @sb-return {String} Competitor's club name.
     */
-    readClubName(element) {
+    readClubName(element: JQuery<HTMLElement>) {
         return $("> Club > ShortName", element).text();
     }
 
@@ -145,7 +143,7 @@ export class Version2Reader implements IOFXMLReader {
     *     PersonResult element.
     * @sb-return {String} The competitors date of birth, as a string.
     */
-    readDateOfBirth(element) {
+    readDateOfBirth(element: JQuery<HTMLElement>): number {
         // eslint-disable-next-line radix
         return Number.parseInt($("> Person > BirthDate > Date", element).text());
     }
@@ -157,7 +155,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {?Number} Competitor's start time in seconds since midnight, or
     *     null if not found.
     */
-    readStartTime(resultElement) {
+    readStartTime(resultElement: JQuery<HTMLElement>) {
         const startTimeStr = $("> StartTime > Clock", resultElement).text();
         const startTime = (startTimeStr === "") ? null : TimeUtilities.parseTime(startTimeStr);
         return startTime;
@@ -170,7 +168,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {?Number} - The competitor's total time in seconds, or
     *     null if a valid time was not found.
     */
-    readTotalTime(resultElement) {
+    readTotalTime(resultElement: JQuery<HTMLElement>) {
         const totalTimeStr = $("> Time", resultElement).text();
         const totalTime = (totalTimeStr === "") ? null : TimeUtilities.parseTime(totalTimeStr);
         return totalTime;
@@ -182,7 +180,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {string | null} Base64-encoded binary route data
     */
     /* TODO needs looking at we just ruteun null correntky */
-    readRoute(resultElement): string | null {
+    readRoute(resultElement: JQuery<HTMLElement>): string | null {
         return null;
     }
 
@@ -192,7 +190,7 @@ export class Version2Reader implements IOFXMLReader {
     *     Result element.
     * @sb-return {String} Status of the competitor.
     */
-    getStatus(resultElement) {
+    getStatus(resultElement: JQuery<HTMLElement>): string {
         const statusElement = $("> CompetitorStatus", resultElement);
         return (statusElement.length === 1) ? statusElement.attr("value") : "";
     }
@@ -202,7 +200,7 @@ export class Version2Reader implements IOFXMLReader {
     * support additional controls.
     * @sb-return {boolean} false.
     */
-    isAdditional() {
+    isAdditional(): boolean {
         return false;
     }
 
@@ -212,7 +210,7 @@ export class Version2Reader implements IOFXMLReader {
     *     a SplitTime element.
     * @sb-return {Object} Object containing code and time.
     */
-    readSplitTime(splitTimeElement) {
+    readSplitTime(splitTimeElement: JQuery<HTMLElement>): {code: string, time: number | null } {
         // IOF v2 allows ControlCode or Control elements.
         let code = $("> ControlCode", splitTimeElement).text();
         if (code === "") {
@@ -233,7 +231,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
     * @sb-return {string} ECard
     */
-   readECard(resultElement): string {
+    readECard(resultElement: JQuery<HTMLElement>): string {
        const card = $("> CCard > CCardId", resultElement).text();
        return card;
    }

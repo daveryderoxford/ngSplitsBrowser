@@ -136,14 +136,14 @@ describe("Course", () => {
 
     it("Course created with empty list of controls contains leg from start to finish", () => {
         const courseClass = new CourseClass("Test class", 0, []);
-        const controls = [];
+        const controls: string[] = [];
         const course = new Course("Test course", [courseClass], 4.1, 115, controls);
         expect(course.usesLeg(Course.START, Course.FINISH)).toBe(true, "Course should use leg from start to finish");
     });
 
     it("Course created with empty list of controls does not contain legs with controls other than the start and finish", () => {
         const courseClass = new CourseClass("Test class", 0, []);
-        const controls = [];
+        const controls: string[] = [];
         const course = new Course("Test course", [courseClass], 4.1, 115, controls);
         expect(!course.usesLeg(Course.START, "212")).toBe(true, "Course should use leg from start to some control");
         expect(!course.usesLeg("212", Course.FINISH)).toBe(true, "Course should use leg from some control to the finish");

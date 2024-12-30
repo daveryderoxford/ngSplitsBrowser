@@ -24,7 +24,7 @@ import { } from "jasmine";
 import { Course, CourseClass, CourseClassSet, Results, TimeUtilities } from "../../model";
 import { TestSupport } from "../../test-support.spec";
 import { Lang } from "./lang";
-import { NextControlsDataStr, SplitsPopupData } from "./splits-popup-data";
+import { FastestSplitsPopupData, FastestSplitsPopupDataForLeg, NextControlsDataStr, SplitsPopupData } from "./splits-popup-data";
 import { range } from "d3-array";
 
 
@@ -87,7 +87,7 @@ describe("Splits popup data", () => {
         const eventData = new Results(courseClassSet1.classes.concat(courseClassSet2.classes), [course1, course2], []);
         const actualData = splitsPopupData.getFastestSplitsForLegPopupData(courseClassSet1, eventData, 2);
 
-        const expectedData = {
+        const expectedData: any = {
             title: getMessageWithFormatting("FastestLegTimePopupHeader", { "$$START$$": "235", "$$END$$": "189" }),
             data: [{
                 className: "Test class",
@@ -116,7 +116,7 @@ describe("Splits popup data", () => {
         const eventData = new Results(courseClassSet.classes, [course], []);
         const actualData = splitsPopupData.getFastestSplitsForLegPopupData(courseClassSet, eventData, 1);
 
-        const expectedData = {
+        const expectedData: FastestSplitsPopupDataForLeg = {
             title: getMessageWithFormatting("FastestLegTimePopupHeader", { "$$START$$": getMessage("StartName"), "$$END$$": "235" }),
             data: [{
                 className: "Test class",
@@ -139,7 +139,7 @@ describe("Splits popup data", () => {
         const eventData = new Results(courseClassSet.classes, [course], []);
         const actualData = splitsPopupData.getFastestSplitsForLegPopupData(courseClassSet, eventData, 4);
 
-        const expectedData = {
+        const expectedData: FastestSplitsPopupDataForLeg = {
             title: getMessageWithFormatting("FastestLegTimePopupHeader", { "$$START$$": "212", "$$END$$": getMessage("FinishName") }),
             data: [{
                 className: "Test class",

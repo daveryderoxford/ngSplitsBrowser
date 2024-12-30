@@ -1,4 +1,4 @@
-import { isNaNStrict } from "../model/util";
+import { isNaNStrict } from "../model/results_util";
 
 // Minimum length of a course that is considered to be given in metres as
 // opposed to kilometres.

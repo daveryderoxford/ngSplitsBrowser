@@ -3,7 +3,7 @@ import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { Results } from "./results";
 import { sbTime } from "./time";
-import { isNotNullNorNaN } from "./util";
+import { isNotNullNorNaN } from "./results_util";
 
 interface FirstNonAssendingIndices {
     first: number;

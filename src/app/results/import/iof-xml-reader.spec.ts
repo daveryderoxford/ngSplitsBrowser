@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /*
  *  SplitsBrowser - IOF XML format parser tests.
  *

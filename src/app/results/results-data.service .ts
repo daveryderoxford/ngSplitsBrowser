@@ -9,7 +9,7 @@ import { map, switchMap, tap } from 'rxjs/operators';
 import { parseEventData } from "./import";
 import { Competitor, InvalidData, Results } from "./model";
 import { Repairer } from './model/repairer';
-import { isNotNullNorNaN } from './model/util';
+import { isNotNullNorNaN } from './model/results_util';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 /** Holds results selection state.

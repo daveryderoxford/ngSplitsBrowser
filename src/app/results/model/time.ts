@@ -1,4 +1,4 @@
-import { isNaNStrict } from "./util";
+import { isNaNStrict } from "./results_util";
 
 export type sbTime = number;
 

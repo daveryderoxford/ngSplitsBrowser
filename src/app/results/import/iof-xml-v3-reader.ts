@@ -1,11 +1,8 @@
-// @ts-nocheck
 
 import $ from 'jquery';
 import { isUndefined } from "./util";
-import { InvalidData, sbTime, WrongFileFormat } from "../model";
-import { isNaNStrict } from "../model/util";
-
-
+import { CourseClass, InvalidData, sbTime, WrongFileFormat } from "../model";
+import { isNaNStrict } from "../model/results_util";
 
 export interface CourseDeatils {
     id: string;
@@ -13,24 +10,26 @@ export interface CourseDeatils {
     length: number;
     climb: number;
     numberOfControls: number;
+    classes? : Array<CourseClass>;
+    controls? : Array<string>;
 }
 
 /** interface implemented by IOF XML reader classes */
 export interface IOFXMLReader {
     isOfThisVersion(data: string): boolean;
-    checkVersion(rootElement);
-    readClassName(classResultElement): string;
-    readCourseFromClass(classResultElement, warnings: Array<string>): CourseDeatils;
-    getCompetitorNameElement(element);
-    readClubName(element): string;
-    readDateOfBirth(element): number | null;
-    readStartTime(resultElement): sbTime | null;
-    readTotalTime(resultElement): sbTime | null;
-    readECard(resultElement): string;
-    readRoute(resultElement): string | null;
-    getStatus(resultElement): string;
-    isAdditional(splitTimeElement): boolean;
-    readSplitTime(splitTimeElement);
+    checkVersion(rootElement: JQuery<HTMLElement>): void;
+    readClassName(classResultElement: JQuery<HTMLElement>): string;
+    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: Array<string>): CourseDeatils;
+    getCompetitorNameElement(element: JQuery<HTMLElement>): void;
+    readClubName(element: JQuery<HTMLElement>): string;
+    readDateOfBirth(element: JQuery<HTMLElement>): number | null;
+    readStartTime(resultElement: JQuery<HTMLElement>): sbTime | null;
+    readTotalTime(resultElement: JQuery<HTMLElement>): sbTime | null;
+    readECard(resultElement: JQuery<HTMLElement>): string;
+    readRoute(resultElement: JQuery<HTMLElement>): string | null;
+    getStatus(resultElement: JQuery<HTMLElement>): string;
+    isAdditional(splitTimeElement: JQuery<HTMLElement>): boolean;
+    readSplitTime(splitTimeElement: JQuery<HTMLElement>): void;
 }
 
 
@@ -38,11 +37,11 @@ export interface IOFXMLReader {
 // IOF v3.0 XML event data.
 export class Version3Reader implements IOFXMLReader {
 
-    private StatusNonCompetitive = "NotCompeting";
-    private StatusNonStarter = "DidNotStart";
-    private StatusNonFinisher = "DidNotFinish";
-    private StatusDisqualified = "Disqualified";
-    private StatusOverMaxTime = "OverTime";
+    StatusNonCompetitive = "NotCompeting";
+    StatusNonStarter = "DidNotStart";
+    StatusNonFinisher = "DidNotFinish";
+    StatusDisqualified = "Disqualified";
+    StatusOverMaxTime = "OverTime";
 
     // Regexp that matches the year in an ISO-8601 date.
     // Both XML formats use ISO-8601 (YYYY-MM-DD) dates, so parsing is
@@ -76,7 +75,7 @@ export class Version3Reader implements IOFXMLReader {
     * the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
     * @sb-param {jQuery.selection} rootElement - The root element.
     */
-    checkVersion(rootElement) {
+    checkVersion(rootElement: JQuery<HTMLElement>): void {
         const iofVersion = rootElement.attr("iofVersion");
         if (isUndefined(iofVersion)) {
             throw new WrongFileFormat("Could not find IOF version number");
@@ -96,7 +95,7 @@ export class Version3Reader implements IOFXMLReader {
     *     containing the course details.
     * @sb-return {String} Class name.
     */
-    readClassName(classResultElement): string {
+    readClassName(classResultElement: JQuery<HTMLElement>) {
         return $("> Class > Name", classResultElement).text();
     }
 
@@ -107,7 +106,7 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {Object} Course details: id, name, length, climb and number of
     *     controls.
     */
-    readCourseFromClass(classResultElement, warnings: Array<string>): CourseDeatils {
+    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: Array<string>): CourseDeatils {
         const courseElement = $("> Course", classResultElement);
         const id = $("> Id", courseElement).text() || null;
         const name = $("> Name", courseElement).text();
@@ -149,7 +148,7 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {jQuery.selection} jQuery selection containing any child 'Name'
     *     element.
     */
-    getCompetitorNameElement(element) {
+    getCompetitorNameElement(element: JQuery<HTMLElement>) {
         return $("> Person > Name", element);
     }
 
@@ -159,7 +158,7 @@ export class Version3Reader implements IOFXMLReader {
     *     PersonResult element.
     * @sb-return {String} Competitor's club name.
     */
-    readClubName(element): string {
+    readClubName(element: JQuery<HTMLElement>): string {
         return $("> Organisation > ShortName", element).text();
     }
 
@@ -169,7 +168,7 @@ export class Version3Reader implements IOFXMLReader {
     *     PersonResult element.
     * @sb-return {String} The competitor's date of birth
     */
-    readDateOfBirth(element): number | null {
+    readDateOfBirth(element: JQuery<HTMLElement>): number | null {
         const birthDate = $("> Person > BirthDate", element).text();
         const regexResult = this.yearRegexp.exec(birthDate);
         return (regexResult === null) ? null : parseInt(regexResult[0], 10);
@@ -182,7 +181,7 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {?Number} Competitor's start time, in seconds since midnight,
     *     or null if not known.
     */
-    readStartTime(resultElement): sbTime | null {
+    readStartTime(resultElement: JQuery<HTMLElement>): sbTime | null {
         const startTimeStr = $("> StartTime", resultElement).text();
         const result = this.ISO_8601_RE.exec(startTimeStr);
         if (result === null) {
@@ -215,7 +214,7 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {?Number} Competitor's total time, in seconds, or null if a time
     *     was not found or was invalid.
     */
-    readTotalTime(resultElement): sbTime | null {
+    readTotalTime(resultElement: JQuery<HTMLElement>): sbTime | null {
         const totalTimeStr = $("> Time", resultElement).text();
         return this.readTime(totalTimeStr);
     }
@@ -225,7 +224,7 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
     * @sb-return {string} ECard
     */
-    readECard(resultElement): string {
+    readECard(resultElement: JQuery<HTMLElement>): string {
         return $("> ControlCard", resultElement).text();
     }
 
@@ -234,7 +233,7 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
     * @sb-return {string | null} Base64-encoded binary route data
     */
-    readRoute(resultElement): string | null {
+    readRoute(resultElement: JQuery<HTMLElement>): string | null {
         return $("> Route", resultElement).text();
     }
 
@@ -244,7 +243,7 @@ export class Version3Reader implements IOFXMLReader {
     *     Result element.
     * @sb-return {String} Status of the competitor.
     */
-    getStatus(resultElement): string {
+    getStatus(resultElement: JQuery<HTMLElement>): string {
         return $("> Status", resultElement).text();
     }
 
@@ -255,7 +254,7 @@ export class Version3Reader implements IOFXMLReader {
     *     a SplitTime element.
     * @sb-return {boolean} True if the control is additional, false if not.
     */
-    isAdditional(splitTimeElement): boolean {
+    isAdditional(splitTimeElement: JQuery<HTMLElement>): boolean {
         return (splitTimeElement.attr("status") === "Additional");
     }
 
@@ -265,7 +264,7 @@ export class Version3Reader implements IOFXMLReader {
     *     a SplitTime element.
     * @sb-return {Object} Object containing code and time.
     */
-    readSplitTime(splitTimeElement) {
+    readSplitTime(splitTimeElement: JQuery<HTMLElement>) {
         const code = $("> ControlCode", splitTimeElement).text();
         if (code === "") {
             throw new InvalidData("Control code missing for control");

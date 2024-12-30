@@ -1,20 +1,26 @@
-// @ts-nocheck
 
 import { Competitor, Course, CourseClass, Results, TimeUtilities, WrongFileFormat } from "../model";
 import { normaliseLineEndings, parseCourseClimb, parseCourseLength } from "./util";
 
 interface ColumnFormat {
-    controlsOffset;
-    step;
-    name;
-    club;
-    courseName;
-    startTime;
-    length;
-    climb;
-    placing;
-    finishTime;
-    allowMultipleCompetitorNames;
+    controlsOffset: number;
+    step: number;
+    name: number;
+    club: number;
+    courseName: number;
+    startTime: number;
+    length?: number;
+    climb?: number;
+    placing?: number;
+    finishTime?: number;
+    allowMultipleCompetitorNames: boolean;
+}
+
+interface CourseDetails {
+    length?: number;
+    climb?: number;
+    controls?: string[];
+    competitors: Competitor[];
 }
 
 /* eslint-disable max-len */
@@ -54,9 +60,9 @@ export function parseTripleColumnEventData(data: string): Results {
 const DELIMITERS = [",", ";"];
 
 class TrippleCVSReader {
-    classes = new Map();
-    delimiter = null;
-    warnings = [];
+    classes = new Map<string, CourseDetails>();
+    delimiter: string = null;
+    warnings: string[] = [];
 
     controlsTerminationOffset: number;
 
@@ -65,7 +71,7 @@ class TrippleCVSReader {
     * @constructor
     * @sb-param {Object} format - Object that describes the data format to read.
     */
-    constructor( private format: ColumnFormat ) {
+    constructor(private format: ColumnFormat ) {
         this.format = format;
 
         // Return the offset within the control data that should be used when
@@ -82,7 +88,7 @@ class TrippleCVSReader {
     * @sb-return {?String} The delimiter separating the data, or null if no
     *    suitable delimiter was found.
     */
-    private determineDelimiter = function (firstDataLine: string): string | null {
+    private determineDelimiter(firstDataLine: string): string | null {
         for (let index = 0; index < DELIMITERS.length; index += 1) {
             const delimiter = DELIMITERS[index];
             const lineParts = firstDataLine.split(delimiter);
@@ -93,14 +99,14 @@ class TrippleCVSReader {
         }
 
         return null;
-    };
+    }
 
     /**
     * Trim trailing empty-string entries from the given array.
     * The given array is mutated.
     * @sb-param {Array} array - The array of string values.
     */
-    private trimTrailingEmptyCells(array: Array<string>) {
+    private trimTrailingEmptyCells(array: string[]): void {
         let index = array.length - 1;
         while (index >= 0 && array[index] === "") {
             index -= 1;
@@ -115,7 +121,7 @@ class TrippleCVSReader {
     * such situations and merge them together.
     * @sb-param {Array} row - The row of data read from the file.
     */
-    private adjustLinePartsForMultipleCompetitors = function (row: Array<string>): void {
+    private adjustLinePartsForMultipleCompetitors(row: Array<string>) {
         if (this.format.allowMultipleCompetitorNames) {
             while (row.length > this.format.name + 1 && row[this.format.name + 1].match(/^\s\S/)) {
                 row[this.format.name] += "," + row[this.format.name + 1];
@@ -130,14 +136,14 @@ class TrippleCVSReader {
     * @sb-param {String} firstLine - The first line of data from the file (not
     *     the header line).
     */
-    private checkControlCodesAlphaNumeric = function (firstLine: string): void {
+    private checkControlCodesAlphaNumeric(firstLine: string) {
 
         // All control codes except perhaps the finish are alphanumeric.
         const controlCodeRegexp = /^[A-Za-z0-9]+$/;
 
         const lineParts = firstLine.split(this.delimiter);
         this.trimTrailingEmptyCells(lineParts);
-        this.adjustLinePartsForMultipleCompetitors(lineParts, this.format);
+        this.adjustLinePartsForMultipleCompetitors(lineParts);
 
         for (let index = this.format.controlsOffset; index + this.controlsTerminationOffset < lineParts.length; index += this.format.step) {
             if (!controlCodeRegexp.test(lineParts[index])) {
@@ -153,7 +159,7 @@ class TrippleCVSReader {
     * @sb-param {String} courseName - The name of the course.
     * @sb-param {Array} row - Array of string parts making up the row of data read.
     */
-    private addCompetitorToCourse = function (competitor, courseName, row: Array<string>): void {
+    private addCompetitorToCourse(competitor: Competitor, courseName: string, row: string[]) {
         if (this.classes.has(courseName)) {
             const cls = this.classes.get(courseName);
             const cumTimes = competitor.getAllOriginalCumulativeTimes();
@@ -186,7 +192,7 @@ class TrippleCVSReader {
     * Read a row of data from a line of the file.
     * @sb-param {String} line - The line of data read from the file.
     */
-    private readDataRow = function (line: string): void {
+    private readDataRow(line: string) {
         const row = line.split(this.delimiter);
         this.trimTrailingEmptyCells(row);
         this.adjustLinePartsForMultipleCompetitors(row);
@@ -250,16 +256,16 @@ class TrippleCVSReader {
     * grouping classes by the list of controls
     * @sb-return {Object} Object that contains the courses and classes.
     */
-    private createClassesAndCourses = function () {
-        const courseClasses = [];
+    private createClassesAndCourses() {
+        const courseClasses: CourseClass[] = [];
 
         // Group the classes by the list of controls.  Two classes using the
         // same list of controls can be assumed to be using the same course.
-        const coursesByControlsLists = new Map();
+        const coursesByControlsLists = new Map<string, any>();
 
-        this.classes.entries().forEach((keyValuePair) => {
-            const className = keyValuePair.key;
-            const cls = keyValuePair.value;
+        for (const keyValuePair of this.classes.entries()) {
+            const className = keyValuePair[0];
+            const cls = keyValuePair[1];
             const courseClass = new CourseClass(className, cls.controls.length, cls.competitors);
             courseClasses.push(courseClass);
 
@@ -273,18 +279,19 @@ class TrippleCVSReader {
                         classes: [courseClass],
                         length: cls.length,
                         climb: cls.climb,
-                        controls:
-                        cls.controls
+                        controls: cls.controls
                     });
             }
-        });
+        }
 
-        const courses = [];
-        coursesByControlsLists.forEach((courseObject) => {
+        const courses: Course[] = [];
+        for (const courseObject of coursesByControlsLists.values()) {
             const course = new Course(courseObject.name, courseObject.classes, courseObject.length, courseObject.climb, courseObject.controls);
-            courseObject.classes.forEach((courseClass) => { courseClass.setCourse(course); });
+            for (const courseClass of courseObject.classes) { 
+                courseClass.setCourse(course); 
+            }
             courses.push(course);
-        });
+        }
 
         return { classes: courseClasses, courses: courses };
     };
@@ -294,7 +301,7 @@ class TrippleCVSReader {
     * @sb-param {String} eventData - String containing the entire event data.
     * @sb-return {SplitsBrowser.Model.Event} All event data read in.
     */
-    public parseEventData = function (eventData: string) {
+    public parseEventData(eventData: string) {
         this.warnings = [];
         eventData = normaliseLineEndings(eventData);
 

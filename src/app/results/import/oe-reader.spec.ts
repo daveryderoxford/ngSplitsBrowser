@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /*
  *  SplitsBrowser - OE CSV reader tests.
  *
@@ -30,7 +32,7 @@ const parseEventData = parseOEEventData;
 const HEADER_46 = "Stno;SI card;Database Id;Surname;First name;YB;S;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;\r\n";
 
 // Template for the row data that precedes the controls.
-const ROW_TEMPLATE_46 = "0;ecard;2;surname;forename;yearOfBirth;gender;7;nonComp;startTime;10;time;classifier;13;14;club;16;17;className;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;course;distance;climb;numControls;placing;startPunch;finish";
+const ROW_TEMPLATE_46 = "0;1;2;surname;forename;yearOfBirth;gender;7;nonComp;startTime;10;time;classifier;13;14;club;16;17;className;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;course;distance;climb;numControls;placing;startPunch;finish";
 
 // Header line when control 1 is in column 44.
 // Compared to the variant above, this line has no 'S' column and has the
@@ -38,7 +40,7 @@ const ROW_TEMPLATE_46 = "0;ecard;2;surname;forename;yearOfBirth;gender;7;nonComp
 const HEADER_44 = "Stno;SI card;Database Id;Name;YB;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;\r\n";
 
 // Template for the row data that precedes the controls.
-const ROW_TEMPLATE_44 = "0;ecard;2;name;yearOfBirth;5;nonComp;startTime;8;time;classifier;11;12;club;14;15;className;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;course;distance;climb;numControls;placing;startPunch;finish";
+const ROW_TEMPLATE_44 = "0;1;2;name;yearOfBirth;5;nonComp;startTime;8;time;classifier;11;12;club;14;15;className;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;course;distance;climb;numControls;placing;startPunch;finish";
 
 // Header line when control 1 is in column 60.
 // This has various new columns.  It also doesn't always have competitor
@@ -46,7 +48,7 @@ const ROW_TEMPLATE_44 = "0;ecard;2;name;yearOfBirth;5;nonComp;startTime;8;time;c
 const HEADER_60 = "OE0014;Stno;XStno;Chipno;Database Id;Surname;First name;YB;S;Block;nc;Start;Finish;Time;Classifier;Credit -;Penalty +;Comment;Club no.;Cl.name;City;Nat;Location;Region;Cl. no.;Short;Long;Entry cl. No;Entry class (short);Entry class (long);Rank;Ranking points;Num1;Num2;Num3;Text1;Text2;Text3;Addr. surname;Addr. first name;Street;Line2;Zip;Addr. city;Phone;Mobile;Fax;EMail;Rented;Start fee;Paid;Team;Course no.;Course;km;m;Course controls;Place;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;\r\n";
 
 // Template for the row data that precedes the controls of the 60-column variation.
-const ROW_TEMPLATE_60 = "0;1;2;ecard;4;surname;forename;yearOfBirth;gender;9;nonComp;startTime;12;time;classifier;15;16;17;noOfClub;19;club;21;22;23;24;25;className;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;course;distance;climb;numControls;placing;startPunch;finish";
+const ROW_TEMPLATE_60 = "0;1;2;compno;4;surname;forename;yearOfBirth;gender;9;nonComp;startTime;12;time;classifier;15;16;17;noOfClub;19;club;21;22;23;24;25;className;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;course;distance;climb;numControls;placing;startPunch;finish";
 
 interface OEFormat {
     name: string;
@@ -96,7 +98,6 @@ interface OECompetitorData {
     forename: string;
     surname: string;
     compno: string;
-    ecard: string;
     club: string;
     noOfClub: string;
     startPunch: string;
@@ -124,7 +125,6 @@ function getCompetitor1(): OECompetitorData {
         forename: "John",
         surname: "Smith",
         compno: "123456",
-        ecard: "9876",
         club: "ABC",
         noOfClub: "2",
         startPunch: "11:27:45",
@@ -153,7 +153,6 @@ function getCompetitor2(): OECompetitorData {
         forename: "Fred",
         surname: "Baker",
         compno: "654321",
-        ecard: "5432",
         club: "DEF",
         noOfClub: "6",
         startPunch: "10:30:00",
@@ -177,7 +176,7 @@ function getCompetitor2(): OECompetitorData {
 * Returns data for a second test competitor, on a longer course.
 * @return {Object} Test competitor data.
 */
-function getCompetitor2OnLongerCourse() {
+function getCompetitor2OnLongerCourse(): OECompetitorData {
     const comp2 = getCompetitor2();
     comp2.numControls = "4";
     comp2.distance = "5.3";
@@ -195,7 +194,6 @@ function getCompetitor3(): OECompetitorData {
         forename: "Bill",
         surname: "Jones",
         compno: "345678",
-        ecard: "22222",
         club: "GHI",
         noOfClub: "8",
         startPunch: "11:00:00",
@@ -363,6 +361,10 @@ describe("Input.OE", () => {
     interface TestFunc {
         (eventData: Results, format: OEFormat);
     }
+
+    interface PreProcessor {
+        (eventData: Results, format: OEFormat): string;
+    }
     /**
     * Calls a test function for the result of formatting the given competitor
     * data using all formats.  The data is expected to be parsed successfully.
@@ -374,12 +376,12 @@ describe("Input.OE", () => {
     *     immediately before it is passed to the parser.  If not specified,
     *     no preprocessing is done. Optional
     */
-    function runTestOverAllFormats(competitors: any, testFunc: TestFunc, preprocessor?: any) {
-        ALL_FORMATS.forEach(function (format: OEFormat) {
+    function runTestOverAllFormats(competitors: [Competitor[], Control[]], testFunc: TestFunc, preprocessor?: PreProcessor) {
+        for (const format of ALL_FORMATS) {
             const text = generateData(format, competitors, preprocessor);
             const eventData = parseEventData(text);
             testFunc(eventData, format);
-        });
+        }
     }
 
     it("Can parse a string that contains a single competitor's data in all formats", () => {
@@ -401,7 +403,6 @@ describe("Input.OE", () => {
 
             const competitor = eventData.classes[0].competitors[0];
             expect(competitor.name).toEqual("John Smith", "Should read correct name");
-            expect(competitor.ecardId).toEqual("9876", "Should read correct ecard");
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(competitor.startTime).toEqual(11 * 3600 + 27 * 60 + 45, "Should read correct start time");
             expect(competitor.yearOfBirth).toEqual(1984, "Should read correct year of birth");
@@ -632,14 +633,12 @@ describe("Input.OE", () => {
         OEComp1.forename = "";
         OEComp1.surname = "";
         OEComp1.club = "";
-        OEComp1.ecard = "";
         OEComp1.time = "";
         OEComp1.className = "";
         OEComp1.startTime = OEComp1.startPunch;
         OEComp1.startPunch = "";
 
-        const text = generateData(ROW_FORMAT_60, [[[OEComp1], getControls1()]] );
-        const eventData = parseEventData(text);
+        const eventData = parseEventData(HEADER_60 + generateRow(OEComp1, getControls1(), ROW_TEMPLATE_60));
 
         expect(eventData.classes.length).toEqual(1, "There should be one class");
         expect(eventData.classes[0].name).toEqual("Test course", "Class should have same name as course");

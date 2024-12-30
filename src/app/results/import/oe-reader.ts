@@ -1,10 +1,9 @@
-// @ts-nocheck
 
 import { range as d3_range } from "d3-array";
 import { map as d3_map, Map as d3_Map, set as d3_set, Set as d3_Set } from "d3-collection";
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
-import { isNaNStrict } from "../model/util";
+import { isNaNStrict } from "../model/results_util";
 import { normaliseLineEndings, parseCourseClimb, parseCourseLength } from "./util";
 
 export function parseOEEventData(data: string): Results {
@@ -14,30 +13,41 @@ export function parseOEEventData(data: string): Results {
 
 const parseTime = TimeUtilities.parseTime;
 
+interface CourseDetails {
+    length: number;
+    climb: number;
+    controls: string[];
+}
+
+interface ClassDetails {
+    numControls: number;
+    competitors: Competitor[];
+}
+
 // Indexes of the various columns relative to the column for control-1.
 const COLUMN_INDEXES: any = new Object();
 
-[44, 46, 60].forEach((columnOffset) => {
-    COLUMN_INDEXES[columnOffset] = {
-        course: columnOffset - 7,
-        distance: columnOffset - 6,
-        climb: columnOffset - 5,
-        controlCount: columnOffset - 4,
-        placing: columnOffset - 3,
-        startPunch: columnOffset - 2,
-        finish: columnOffset - 1,
-        control1: columnOffset
+for (const offset of [44, 46, 60]) {
+    COLUMN_INDEXES[offset] = {
+        course: offset - 7,
+        distance: offset - 6,
+        climb: offset - 5,
+        controlCount: offset - 4,
+        placing: offset - 3,
+        startPunch: offset - 2,
+        finish: offset - 1,
+        control1: offset
     };
-});
+}
 
-[44, 46].forEach((columnOffset) => {
-    COLUMN_INDEXES[columnOffset].nonCompetitive = columnOffset - 38;
-    COLUMN_INDEXES[columnOffset].startTime = columnOffset - 37;
-    COLUMN_INDEXES[columnOffset].time = columnOffset - 35;
-    COLUMN_INDEXES[columnOffset].classifier = columnOffset - 34;
-    COLUMN_INDEXES[columnOffset].club = columnOffset - 31;
-    COLUMN_INDEXES[columnOffset].className = columnOffset - 28;
-});
+for (const offset of [44, 46]) {
+    COLUMN_INDEXES[offset].nonCompetitive = offset - 38;
+    COLUMN_INDEXES[offset].startTime = offset - 37;
+    COLUMN_INDEXES[offset].time = offset - 35;
+    COLUMN_INDEXES[offset].classifier = offset - 34;
+    COLUMN_INDEXES[offset].club = offset - 31;
+    COLUMN_INDEXES[offset].className = offset - 28;
+}
 
 COLUMN_INDEXES[44].ecard = 1;
 COLUMN_INDEXES[44].combinedName = 3;
@@ -67,18 +77,17 @@ COLUMN_INDEXES[60].clubFallback = 18;
 // Minimum control offset.
 const MIN_CONTROLS_OFFSET = 37;
 
-
 class OEReader {
 
-    private classes = d3_map<any>();  // Map that associates classes to all of the competitors running on that class.
-    private courseDetails = d3_map<any>();  // Map that associates course names to length and climb values.
-    private columnIndexes = null; // The indexes of the columns that we read data from.
-    private classCoursePairs = [];   // Set of all pairs of classes and course
+    private classes = d3_map<ClassDetails>();  // Map that associates classes to all of the competitors running on that class.
+    private courseDetails = d3_map<CourseDetails>();  // Map that associates course names to length and climb values.
+    private columnIndexes: any = null; // The indexes of the columns that we read data from.
+    private classCoursePairs: string[][] = [];   // Set of all pairs of classes and course
     // (While it is common that one course may have multiple classes, it
     // seems also that one class can be made up of multiple courses, e.g.
     // M21E at BOC 2013.)
-    private warnings = [] as Array<string>;   // Warnings about competitors that cannot be read in.
-    private lines = [] as Array<string>;
+    private warnings = [] as string[];   // Warnings about competitors that cannot be read in.
+    private lines = [] as string[];
 
     /**
     * Constructs an OE-format data reader.
@@ -87,8 +96,7 @@ class OEReader {
     * @constructor
     * @sb-param {String} data - The OE data to read in.
     */
-    constructor(private data: string) {
-    }
+    constructor(private data: string) { }
 
     /**
     * Parses the read-in data and returns it.
@@ -109,7 +117,7 @@ class OEReader {
 
         this.lines.forEach((line, lineIndex) => {
             this.readLine(line, lineIndex + 1, delimiter);
-        }, this);
+        });
 
         const classes = this.createClasses();
         if (classes.length === 0 && this.warnings.length > 0) {
@@ -176,25 +184,25 @@ class OEReader {
         const firstLine = this.lines[1].split(delimiter);
 
         const controlCodeRegexp = /^[A-Za-z0-9]+$/;
-        for (const columnOffset in COLUMN_INDEXES) {
-            if (COLUMN_INDEXES.hasOwnProperty(columnOffset)) {
+        for (const formatName in COLUMN_INDEXES) {
+            if (COLUMN_INDEXES.hasOwnProperty(formatName)) {
                 // Convert columnOffset to a number.  It will presently be a
                 // string because it is an object property.
-                const columnOffsetNum = parseInt(columnOffset, 10);
+                const columnOffsetNum = parseInt(formatName, 10);
 
                 // We want there to be a control code at columnOffset, with
                 // both preceding columns either blank or containing a valid
                 // time.
                 if (columnOffsetNum < firstLine.length &&
-                    controlCodeRegexp.test(firstLine[columnOffset]) &&
+                    controlCodeRegexp.test(firstLine[columnOffsetNum]) &&
                     (firstLine[columnOffsetNum - 2].trim() === "" || parseTime(firstLine[columnOffsetNum - 2]) !== null) &&
                     (firstLine[columnOffsetNum - 1].trim() === "" || parseTime(firstLine[columnOffsetNum - 1]) !== null)) {
 
                     // Now check the control count exists.  If not, we've
                     // probably got a triple-column CSV file instead.
-                    const controlCountColumnIndex = COLUMN_INDEXES[columnOffset].controlCount;
+                    const controlCountColumnIndex = COLUMN_INDEXES[formatName].controlCount;
                     if (firstLine[controlCountColumnIndex].trim() !== "") {
-                        this.columnIndexes = COLUMN_INDEXES[columnOffsetNum];
+                        this.columnIndexes = COLUMN_INDEXES[formatName];
                         return;
                     }
                 }
@@ -209,7 +217,7 @@ class OEReader {
     * @sb-param {Array} row - Array of row data.
     * @sb-return {String} Class name.
     */
-    private getClassName(row: Array<string>): string {
+    private getClassName(row: string[]): string {
         let className = row[this.columnIndexes.className];
         if (className === "" && this.columnIndexes.hasOwnProperty("classNameFallback")) {
             // 'Nameless' variation: no class names.
@@ -224,7 +232,7 @@ class OEReader {
     * @sb-param {Array} row - Array of row data.
     * @sb-return {?Number} Parsed start time, or null for none.
     */
-    private getStartTime(row: Array<string>): sbTime | null {
+    private getStartTime(row: string[]): sbTime | null {
         let startTimeStr = row[this.columnIndexes.startPunch];
         if (startTimeStr === "") {
             startTimeStr = row[this.columnIndexes.startTime];
@@ -239,7 +247,7 @@ class OEReader {
     * @sb-param {Number} lineNumber - The line number of the line.
     * @sb-return {Number?} The number of controls, or null if the count could not be read.
     */
-    private getNumControls(row: Array<string>, lineNumber: number): number | null {
+    private getNumControls(row: string[], lineNumber: number): number | null {
         const className = this.getClassName(row);
         let fullname: string;
         if (className.trim() === "") {
@@ -269,7 +277,7 @@ class OEReader {
     * @sb-param {Number} numControls - The number of controls to read.
     * @sb-return {Array} Array of cumulative times.
     */
-    private readCumulativeTimes(row: Array<string>, lineNumber: number, numControls: number): Array<sbTime> {
+    private readCumulativeTimes(row: string[], lineNumber: number, numControls: number): Array<sbTime> {
 
         const cumTimes = [0];
 
@@ -302,7 +310,7 @@ class OEReader {
     * @sb-param {Array} row - Array of row data items.
     * @sb-param {Number} numControls - The number of controls to read.
     */
-    private createClassIfNecessary(row: Array<string>, numControls: number): void {
+    private createClassIfNecessary(row: string[], numControls: number): void {
         const className = this.getClassName(row);
         if (!this.classes.has(className)) {
             this.classes.set(className, { numControls: numControls, competitors: [] });
@@ -315,7 +323,7 @@ class OEReader {
     * @sb-param {Array} row - Array of row data items.
     * @sb-param {Number} numControls - The number of controls to read.
     */
-    private createCourseIfNecessary(row: Array<string>, numControls: number) {
+    private createCourseIfNecessary(row: string[], numControls: number) {
         const courseName = row[this.columnIndexes.course];
         if (!this.courseDetails.has(courseName)) {
             const controlNums = d3_range(0, numControls).map((controlIdx) => {
@@ -334,7 +342,7 @@ class OEReader {
     * we haven't seen so far, and adds one if not.
     * @sb-param {Array} row - Array of row data items.
     */
-    private createClassCoursePairIfNecessary(row: Array<string>) {
+    private createClassCoursePairIfNecessary(row: string[]) {
         const className = this.getClassName(row);
         const courseName = row[this.columnIndexes.course];
 
@@ -348,7 +356,7 @@ class OEReader {
     * @sb-param {Array} row - Array of row data items.
     * @sb-return {String | FirstnameSurname} The name of the competitor.
     */
-    private getName(row: Array<string>): FirstnameSurname {
+    private getName(row: string[]): FirstnameSurname {
         // Default name to no name
         let name: FirstnameSurname = { firstname: "", surname: "" };
 
@@ -361,23 +369,23 @@ class OEReader {
 
         if (name.firstname === "" && name.surname === "" && this.columnIndexes.hasOwnProperty("combinedName")) {
             // 'Nameless' or 44-column variation.   Singl;e column for firstname as surname
-           //  Treat first name as Firstname traeted as first word in name and surname the rest
-           const combined = row[this.columnIndexes.combinedName];
-           const index = combined.lastIndexOf(" ");
-           if (index === -1) {
-               name.firstname = "";
-               name.surname = combined;
-           } else {
-               name.firstname = combined.slice(0, index).trim();
-               name.surname = combined.slice(index).trim();
-           }
+            //  Treat first name as Firstname traeted as first word in name and surname the rest
+            const combined = row[this.columnIndexes.combinedName];
+            const index = combined.lastIndexOf(" ");
+            if (index === -1) {
+                name.firstname = "";
+                name.surname = combined;
+            } else {
+                name.firstname = combined.slice(0, index).trim();
+                name.surname = combined.slice(index).trim();
+            }
 
         }
 
         return name;
     }
 
-    private getEcard(row: Array<string>): string | null {
+    private getEcard(row: string[]): string | null {
         return row[this.columnIndexes.ecard];
     }
 
@@ -391,7 +399,7 @@ class OEReader {
     * @sb-param {Array} row - Row of items read from a line of the input data.
     * @sb-param {Array} cumTimes - Array of cumulative times for the competitor.
     */
-    private addCompetitor(row: Array<string>, cumTimes: Array<number>) {
+    private addCompetitor(row: string[], cumTimes: Array<number>) {
 
         const className = this.getClassName(row);
         const placing = row[this.columnIndexes.placing];
@@ -501,10 +509,10 @@ class OEReader {
     */
     private getMapsBetweenClassesAndCourses() {
 
-        const classesToCourses = d3_map<any>();
-        const coursesToClasses = d3_map<any>();
+        const classesToCourses = d3_map<string[]>();
+        const coursesToClasses = d3_map<string[]>();
 
-        this.classCoursePairs.forEach((pair) => {
+        for (const pair of this.classCoursePairs) {
             const className = pair[0];
             const courseName = pair[1];
 
@@ -519,7 +527,7 @@ class OEReader {
             } else {
                 coursesToClasses.set(courseName, [className]);
             }
-        });
+        }
 
         return { classesToCourses: classesToCourses, coursesToClasses: coursesToClasses };
     }
@@ -528,13 +536,13 @@ class OEReader {
     * Creates and return a list of CourseClass objects from all of the data read.
     * @sb-return {Array} Array of CourseClass objects.
     */
-    private createClasses(): Array<CourseClass> {
+    private createClasses(): CourseClass[] {
         const classNames = this.classes.keys();
         classNames.sort();
         return classNames.map((className) => {
             const courseClass = this.classes.get(className);
             return new CourseClass(className, courseClass.numControls, courseClass.competitors);
-        }, this);
+        });
     }
 
     /**
@@ -564,7 +572,7 @@ class OEReader {
     private createCourseFromLinkedClassesAndCourses(initCourseName: string,
         manyToManyMaps: any,
         doneCourseNames: d3_Set,
-        classesMap: d3_Map<any>): Course {
+        classesMap: d3_Map<CourseClass>): Course {
 
         const courseNamesToDo = [initCourseName];
         const classNamesToDo = [];
@@ -603,9 +611,9 @@ class OEReader {
         }
 
         // Mark all of the courses that we handled here as done.
-        relatedCourseNames.forEach((courseName1) => {
+        for (const courseName1 of relatedCourseNames) {
             doneCourseNames.add(courseName1);
-        });
+        }
 
         const classesForThisCourse = relatedClassNames.map((className1) => {
             return classesMap.get(className1);
@@ -613,9 +621,9 @@ class OEReader {
         const details = this.courseDetails.get(initCourseName);
         const course = new Course(initCourseName, classesForThisCourse, details.length, details.climb, details.controls);
 
-        classesForThisCourse.forEach((courseClass) => {
+        for (const courseClass of classesForThisCourse) {
             courseClass.setCourse(course);
-        });
+        }
 
         return course;
     }
@@ -637,19 +645,19 @@ class OEReader {
         // one we've already dealt with, we can ignore it.
         const doneCourseNames = d3_set();
 
-        const classesMap = d3_map();
-        classes.forEach((courseClass) => {
+        const classesMap = d3_map<CourseClass>();
+        for (const courseClass of classes) {
             classesMap.set(courseClass.name, courseClass);
-        });
+        }
 
         // List of all Course objects created so far.
         const courses: Course[] = [];
-        manyToManyMaps.coursesToClasses.keys().forEach((courseName) => {
+        for (const courseName of manyToManyMaps.coursesToClasses.keys()) {
             if (!doneCourseNames.has(courseName)) {
                 const course = this.createCourseFromLinkedClassesAndCourses(courseName, manyToManyMaps, doneCourseNames, classesMap);
                 courses.push(course);
             }
-        }, this);
+        };
 
         return courses;
     }

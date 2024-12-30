@@ -8,7 +8,6 @@ import { DialogsService } from './shared';
 export class GlobalErrorHandler implements ErrorHandler {
    private injector = inject(Injector);
 
-
    private zone: NgZone = this.injector.get( NgZone );
    private ds: DialogsService = this.injector.get( DialogsService );
    private snackBar: MatSnackBar = this.injector.get( MatSnackBar );

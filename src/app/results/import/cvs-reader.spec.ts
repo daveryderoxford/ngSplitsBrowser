@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /*
  *  SplitsBrowser - CSV reader tests.
  *

@@ -1,26 +1,25 @@
 import { TestBed, inject } from '@angular/core/testing';
-
-import { UserDataService } from './user-data.service';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
-import { CompetitorDataService } from 'app/shared/services/competitor-data.service';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { testFirebaseConfig } from 'app/app.firebase-config';
 import { EventService } from 'app/events/event.service';
 import { ResultsSelectionService } from 'app/results/results-selection.service';
+import { UserDataService } from './user-data.service';
 
 xdescribe('UserDataService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        provideFirebaseApp(() => initializeApp(testFirebaseConfig)),
+        provideAuth(() => getAuth()),
+        provideFirestore(() => getFirestore()),
         UserDataService,
-        AngularFireAuth,
-        AngularFirestore,
-        CompetitorDataService,
         EventService,
         ResultsSelectionService,
       ]
     });
   });
-
 
   it('should be created', inject([UserDataService], (service: UserDataService) => {
     expect(service).toBeTruthy();

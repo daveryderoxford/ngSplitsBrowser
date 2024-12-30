@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { sbTime, TimeUtilities } from './time';
-import { isNotNullNorNaN } from './util';
+import { isNotNullNorNaN } from './results_util';
 
 @Pipe({
    name: 'formatTime',
