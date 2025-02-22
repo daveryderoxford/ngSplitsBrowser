@@ -7,7 +7,7 @@ import { CourseClassSet } from '../model';
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
-import { CompareWithSelect } from './compare-with-select';
+import { CompareWithSelect } from './splitsbrowser/compare-with-select';
 import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
@@ -32,7 +32,6 @@ interface SplitsBrowserOptions {
 })
 export class GraphPage implements AfterViewInit {
   destroyRef = inject(DestroyRef);
-
 
   protected rs = inject(ResultsSelectionService);
   protected rd = inject(ResultsDataService);

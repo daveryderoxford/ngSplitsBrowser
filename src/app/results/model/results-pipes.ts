@@ -18,7 +18,7 @@ export class FormatTimePipe implements PipeTransform {
 })
 export class BracketedPipe implements PipeTransform {
    transform(pos: number): string {
-      return isNotNullNorNaN(pos) ? "(" + pos.toString() + ")" : "";
+      return isNotNullNorNaN(pos) ? `(${pos.toString()})` : "";
    }
 }
 

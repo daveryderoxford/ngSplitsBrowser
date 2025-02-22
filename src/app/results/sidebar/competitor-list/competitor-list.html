@@ -1,11 +1,18 @@
-<mat-list class="dense-list">
+<ol>
    @for (comp of rs.displayedCompetitors(); track comp; let index= $index ) {
-   <mat-list-item [class.selected] = "rs.isCompetitorSelected(comp)" (click)="rs.toggleCompetitor(comp)">
-      <mat-icon matListItemIcon>folder</mat-icon>
-      <p matListItemTitle>{{(index+1).toString()}}. {{comp.name}}</p>
-      <p matListItemLine>{{comp.club}} {{comp.courseClass.name}} {{comp.totalTime | formatTime}}</p>
-   </mat-list-item>
+   <li (click)="toggleSelected(comp)">
+      @if (rs.isCompetitorSelected(comp)) {
+         <app-colored-circle class="circle" [text]="(index+1).toString()" [color]="circleColor(comp)" />
+      } @else {
+          <span class="position">{{(index+1).toString()}}</span>
+      }
+      <span class="name">{{comp.name}}</span>
+      <span class="club">{{comp.club}}</span>
+      <span class="oclass">{{comp.courseClass.name}}</span>
+      <span class="time">{{comp.totalTime | formatTime}}</span>
+      <span class="behind">{{timeBehind(comp) | formatTime}}</span>
+   </li>
    } @empty {
-     No competitors
+   No competitors
    }
-</mat-list>
+</ol>

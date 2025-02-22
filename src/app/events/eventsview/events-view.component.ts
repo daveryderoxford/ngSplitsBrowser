@@ -26,7 +26,7 @@ export class EventsViewComponent {
       this.ds.message("Results display failed", "No valid splits avaliable for event");
     } else {
       this.router.navigate(["results", "graph", event.key]).catch((err) => {
-        console.log('Errror in loading results for ' + event.name + ' ' + err.toString());
+        console.log('Errror in loading results for ' + event.name + ' \n' + err.toString());
         this.ds.message('Error loading results', 'Error loading results for event');
       });
     }

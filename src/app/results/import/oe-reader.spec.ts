@@ -58,11 +58,11 @@ interface OEFormat {
     hasGender: boolean;
 }
 
-const ROW_FORMAT_46 =  { name: "46-column", header: HEADER_46, template: ROW_TEMPLATE_46, combineName: false, hasGender: true };
+const ROW_FORMAT_46 = { name: "46-column", header: HEADER_46, template: ROW_TEMPLATE_46, combineName: false, hasGender: true };
 const ROW_FORMAT_44 = { name: "44-column", header: HEADER_44, template: ROW_TEMPLATE_44, combineName: true, hasGender: false };
 const ROW_FORMAT_60 = { name: "60-column", header: HEADER_60, template: ROW_TEMPLATE_60, combineName: false, hasGender: true };
 
-const ALL_FORMATS: OEFormat[] = [ ROW_FORMAT_46 , ROW_FORMAT_44, ROW_FORMAT_60];
+const ALL_FORMATS: OEFormat[] = [ROW_FORMAT_46, ROW_FORMAT_44, ROW_FORMAT_60];
 
 
 /**

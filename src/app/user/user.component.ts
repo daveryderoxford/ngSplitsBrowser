@@ -1,6 +1,5 @@
 
 import { Component, effect, OnInit, inject } from "@angular/core";
-import { Auth, authState, User } from '@angular/fire/auth';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -12,22 +11,23 @@ import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
 import { FlexModule } from "@ngbracket/ngx-layout/flex";
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { UserData } from 'app/user/user';
 import { UserDataService } from "app/user/user-data.service";
 import { ToolbarComponent } from "../shared/components/toolbar.component";
 import { Nations } from "app/events/model/nations";
 import { FormContainerComponent } from 'app/shared/components/form-container/form-container.component';
+import { AuthService } from 'app/auth/auth.service';
 
 @UntilDestroy()
 @Component({
-    selector: "app-user",
-    templateUrl: "./user.component.html",
-    styleUrls: ["./user.component.scss"],
-    imports: [ToolbarComponent, FlexModule, FormContainerComponent, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
+  selector: "app-user",
+  templateUrl: "./user.component.html",
+  styleUrls: ["./user.component.scss"],
+  imports: [ToolbarComponent, FlexModule, FormContainerComponent, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
-export class UserComponent implements OnInit {
-  private afAuth = inject(Auth);
+export class UserComponent {
+  private afAuth = inject(AuthService);
   private router = inject(Router);
   private usd = inject(UserDataService);
 
@@ -46,27 +46,21 @@ export class UserComponent implements OnInit {
   nations = Nations.getNations();
 
   constructor() {
-    const usd = this.usd;
 
     effect(() => {
-      const userData = usd.user();
+      const userData = this.usd.user();
       if (userData) {
         this.userForm.reset();
         this.userForm.patchValue(userData);
       };
     });
-  }
 
-  ngOnInit() {
-    authState(this.afAuth)
-      .pipe(untilDestroyed(this))
-      .subscribe(loggedIn => this.loginChanged(loggedIn as User));
-  }
-
-  loginChanged(loggedIn: User) {
-    if (!loggedIn) {
-      this.router.navigate(["/"]);
-    }
+    // Navigate away if we aare logged out
+    effect(() => {
+      if (!this.afAuth.loggedIn()) {
+        this.router.navigate(["/"]);
+      }
+    });
   }
 
   async save() {

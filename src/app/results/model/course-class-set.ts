@@ -6,7 +6,7 @@ import {
 } from "d3-array";
 import { map as d3_map, Map as d3_Map } from "d3-collection";
 import { Course } from ".";
-import { ChartType } from "../graph/splitsbrowser/chart-types";
+import { ChartType } from "../graph-page/splitsbrowser/chart-types";
 import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";

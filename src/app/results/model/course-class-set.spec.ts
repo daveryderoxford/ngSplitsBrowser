@@ -22,7 +22,7 @@
 /* eslint-disable max-len */
 import { } from 'jasmine';
 import 'jasmine-expect';
-import { ChartType } from '../graph/splitsbrowser/chart-types';
+import { ChartType } from '../graph-page/splitsbrowser/chart-types';
 import { TestSupport } from '../test-support.spec';
 import { Competitor } from './competitor';
 import { Course } from './course';

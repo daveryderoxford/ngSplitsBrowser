@@ -2,6 +2,13 @@ import { computed, effect, inject, Injectable, signal } from "@angular/core";
 import { Competitor, Course, CourseClass } from "./model";
 import { ResultsDataService } from './results-data.service ';
 
+const colours = [
+   "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
+   "#FFCC00", "#884400", "#9900FF", "#CCCC00", "#888800", "#CC6699",
+   "#00DD00", "#3399FF", "#BB00BB", "#00DDDD", "#FF00FF", "#0088BB",
+   "#888888", "#FF99FF", "#55BB33"
+];
+
 /** 
  * Selected competitorss, control and courses
  * */
@@ -30,7 +37,10 @@ export class ResultsSelectionService {
          this.courseOrClass() ?
             comp.courseClass.course.name === this.course().name :
             comp.courseClass.name === this.oclass().name)
-   );
+         .map( (comp, index) => {
+             comp.color = colours[index % colours.length] 
+             return comp
+         }));
 
    /** Competitors avaluable for selection */
    displayedCompetitors = computed(() =>

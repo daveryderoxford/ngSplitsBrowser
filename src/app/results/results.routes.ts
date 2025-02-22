@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { GraphPage } from "./graph/graph-page";
+import { GraphPage } from "./graph-page/graph-page";
 import { ResultsResolver } from './results.resolver';
 import { ResultsTable } from './resullts-table/results-table';
 import { StatsPage } from './stats/stats-page/stats-page';

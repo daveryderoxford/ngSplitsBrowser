@@ -14,3 +14,5 @@ export const APP_ROUTES: Routes = [
    { path: "user", loadChildren: () => import( './user/user.routes' ).then( r => r.USER_ROUTES ) },
    { path: "about", title: 'About Splitsbrowser', loadComponent: () => import( './about/about.component' ).then( c => c.AboutComponent ) },
 ];
+
+

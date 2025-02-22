@@ -14,13 +14,6 @@ import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
 import { FastestSplitsPopupData, NextControlData, SplitsPopupData } from "./splits-popup-data";
 
-///// New interface 
-
-
-
-
-/////
-
 export interface GraphColData {
    x: number;
    ys: number[];
@@ -31,7 +24,7 @@ export interface ChartDisplayData {
       numControls?: number;
       competitorNames?: string[];
       datacolumns?: GraphColData[];
-      dubiousTimesInfo?: Array<Array<{start: number, end: number}>>;
+      dubiousTimesInfo?: Array<Array<{ start: number, end: number; }>>;
    };
    eventData: Results;
    courseClassSet: CourseClassSet;
@@ -56,7 +49,7 @@ interface CurrentCompetitorData {
    index: number;
 }
 
-type tickFormatterFunction = ( value: number ) => string | null;
+type tickFormatterFunction = (value: number) => string | null;
 
 // Local shorthand functions.
 const formatTime = TimeUtilities.formatTime;
@@ -176,14 +169,24 @@ function maxNonNullNorNaNValue(values: Array<number | null>): number {
    const nonNullNorNaNValues: Array<number> = values.filter(isNotNullNorNaN);
    return (nonNullNorNaNValues.length > 0) ? d3_max(nonNullNorNaNValues) : 0;
 }
-
+/* 
+@Component({
+  selector: "app-chart",
+  templateUrl: "..html",
+  styleUrls: ["./chart.scss"],
+  // To avoid angular re-writting style names that will be used by graphs view.
+  // These styles will just get appended to the global styles file
+  encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: []
+}) */
 export class Chart {
    private parent: HTMLElement;
    private svg: Selection<BaseType, {}, null, undefined>;
    private svgGroup: Selection<BaseType, {}, null, undefined>;
    private textSizeElement: Selection<any, {}, null, undefined>;
 
-   private  xScale: d3_ScaleLinear<number, number> = null;
+   private xScale: d3_ScaleLinear<number, number> = null;
    private yScale: d3_ScaleLinear<number, number> = null;
    private overallWidth = -1;
    private overallHeight = -1;
@@ -281,7 +284,7 @@ export class Chart {
 
    registerEventHandlers(
       selectedLegUpdated: (number: number) => void,
-      raceTimeUpdated: (sbTime: number) => void 
+      raceTimeUpdated: (sbTime: number) => void
    ) {
       this.selectedLegUpdated = selectedLegUpdated;
       this.raceTimeUpdated = raceTimeUpdated;
@@ -305,11 +308,11 @@ export class Chart {
    *                                    certain statistics are visible.
    * @sb-param {Object} chartType - The type of chart being drawn.
    */
-   drawChart(data: ChartDisplayData, 
-             selectedIndexes: Array<number>, 
-             visibleStatistics: StatsVisibilityFlags, 
-             chartType: ChartType,
-         ) {
+   drawChart(data: ChartDisplayData,
+      selectedIndexes: Array<number>,
+      visibleStatistics: StatsVisibilityFlags,
+      chartType: ChartType,
+   ) {
 
       const chartData = data.chartData;
 
@@ -370,7 +373,7 @@ export class Chart {
    * @sb-param {jQuery.event} event - jQuery mouse-down or mouse-move event.
    * @sb-return {Object} Location of the popup.
    */
-   private getPopupLocation(event: JQueryEventObject): {x: number, y: number} {
+   private getPopupLocation(event: JQueryEventObject): { x: number, y: number; } {
       return {
          x: event.pageX + CHART_POPUP_X_OFFSET,
          y: Math.max(event.pageY - this.popup.height() / 2, 0)
@@ -402,7 +405,7 @@ export class Chart {
    private setCurrentChartTime(event: JQueryEventObject) {
       const yOffset = event.pageY - $(this.svg.node()).offset().top - MARGIN.top;
       this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
-      
+
    }
 
    /**
@@ -969,14 +972,14 @@ export class Chart {
    *     d3 formatter.
    */
 
-   private determineYAxisTickFormatter( chartData ): tickFormatterFunction {
+   private determineYAxisTickFormatter(chartData): tickFormatterFunction {
       if (this.isRaceGraph) {
          // Assume column 0 of the data is the start times.
          // However, beware that there might not be any data.
          const startTimes = (chartData.dataColumns.length === 0) ? [] : chartData.dataColumns[0].ys;
          if (startTimes.length === 0) {
             // No start times - draw all tick marks.
-            return ( time => formatTime(time * 60) );
+            return (time => formatTime(time * 60));
          } else {
             // Some start times are to be drawn - only draw tick marks if
             // they are far enough away from competitors.
@@ -1063,7 +1066,7 @@ export class Chart {
                .y(0)
                .defined((d, i) => i === 0);
          } else {
-            return d3_line<any>()
+            return d3_line()
                .x(d => this.xScale(d.x))
                .y(d => this.yScale(d.ys[selCompIdx]))
                .defined(d => isNotNullNorNaN(d.ys[selCompIdx]));

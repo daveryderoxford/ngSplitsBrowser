@@ -1,13 +1,56 @@
 @use '@angular/material' as mat;
 
-.selected {
-   @include mat.list-overrides((list-item-container-color: var(--sys-primary)));
-}
-
 :host {
    flex-grow: 1;
    overflow: scroll;
    min-height: 20px;
    max-height: 100%;
    height: 100%;
+}
+
+ol {
+   margin: 5px;
+   padding: 5px;
+}
+
+li {
+   display: grid;
+   grid-template-columns: 30px 1fr 1fr 50px;
+   grid-template-rows: auto;
+   grid-template-areas:
+      "left name name time"
+      "left club oclass behind";
+   padding: 5px;
+}
+
+.circle {
+   grid-area: left;
+}
+
+.name {
+   grid-area: name;
+}
+
+.time {
+   grid-area: time;
+}
+
+.position {
+   grid-area: left;
+   text-align: center;
+}
+
+.club {
+   font: var(--mat-sys-body-small);
+   grid-area: club;
+}
+
+.oclass {
+   font: var(--mat-sys-body-small);
+   grid-area: oclass;
+}
+
+.behind {
+   font: var(--mat-sys-body-small);
+   grid-area: behind;
 }

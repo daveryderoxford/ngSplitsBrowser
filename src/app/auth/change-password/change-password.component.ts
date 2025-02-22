@@ -14,7 +14,7 @@ import { ToolbarComponent } from '../../shared/components/toolbar.component';
     selector: 'app-change-password',
     templateUrl: './change-password.component.html',
     styleUrls: ['./change-password.component.scss'],
-    imports: [FormContainerComponent, ToolbarComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule]
+  imports: [FormContainerComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, ToolbarComponent]
 })
 export class ChangePasswordComponent {
       private router = inject(Router);

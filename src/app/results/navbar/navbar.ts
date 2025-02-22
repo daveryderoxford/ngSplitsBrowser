@@ -3,7 +3,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from "@angular/router";
 import { OEvent } from 'app/events/model/oevent';
-import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
+import { ComparisionOption } from 'app/results/graph-page/splitsbrowser/comparision-options';
 import { ResultsView, resultsViews } from "../model/results-view";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsPageState } from '../results-page-state';

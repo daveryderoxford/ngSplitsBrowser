@@ -28,7 +28,7 @@ export const ALL_COMPARISON_OPTIONS: ComparisionOption[] = [
 // All 'Fastest time + N %' values (not including zero).
 const FASTEST_PLUS_PERCENTAGES = [5, 25, 50, 100];
 
-FASTEST_PLUS_PERCENTAGES.forEach(function (percent) {
+for (const percent of FASTEST_PLUS_PERCENTAGES) {
     ALL_COMPARISON_OPTIONS.push({
         nameKey: "CompareWithFastestTimePlusPercentage",
         name: "Fastest time plus" + percent.toString() + "%",
@@ -36,7 +36,7 @@ FASTEST_PLUS_PERCENTAGES.forEach(function (percent) {
         requiresWinner: false,
         percentage: percent.toString()
     });
-});
+}
 ALL_COMPARISON_OPTIONS.push({
     nameKey: "CompareWithAnyRunner",
     name: "Specific runner",
@@ -44,5 +44,3 @@ ALL_COMPARISON_OPTIONS.push({
     requiresWinner: true,
     percentage: ""
 });
-
-

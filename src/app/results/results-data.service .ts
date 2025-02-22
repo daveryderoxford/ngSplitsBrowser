@@ -1,5 +1,6 @@
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
+import { toSignal } from '@angular/core/rxjs-interop';
 import { doc, docData, DocumentReference, Firestore } from '@angular/fire/firestore';
 import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
 import { OEvent } from "app/events/model/oevent";
@@ -10,13 +11,7 @@ import { parseEventData } from "./import";
 import { Competitor, InvalidData, Results } from "./model";
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
-import { toSignal } from '@angular/core/rxjs-interop';
 
-/** Holds results selection state.
- * Selecting an event will load its results
- * This include seelcted event, results, courses, classes and controls.
- * This state should be used by all results views to maintain them in sync
- * */
 @Injectable({
    providedIn: 'root',
 })

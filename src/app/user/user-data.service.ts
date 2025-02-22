@@ -13,28 +13,21 @@ export class UserDataService {
   private auth = inject(Auth);
   private fs = inject(Firestore);
 
+  private user$ = authState(this.auth).pipe(
+    startWith(null),
+    switchMap((u) => {
+      if (!u) {
+        console.log("UserData: Firebase user null.  Stop monitoring user date  ");
+        return of(null);
+      } else {
+        console.log(`UserData: monitoring uid: ${u.uid}`);
+        return docData(this._doc(u.uid));
+      }
+    }),
+    shareReplay(1)
+  );
 
-  user: Signal<UserData | null | undefined>;
-
-  constructor() {
-
-    const user$ = authState(this.auth).pipe(
-      startWith(null),
-      switchMap((u) => {
-        if (!u) {
-          console.log("UserData: Firebase user null.  Stop monitoring user date  ");
-          return of(null);
-        } else {
-          console.log(`UserData: monitoring uid: ${u.uid}`);
-          return docData(this._doc(u.uid));
-        }
-      }),
-      shareReplay(1)
-    );
-
-    this.user = toSignal(user$);
-
-  }
+  user = toSignal(this.user$);
 
   /** Update the user info.  Returning the modified user details */
   async updateDetails(details: Partial<UserData>): Promise<void> {

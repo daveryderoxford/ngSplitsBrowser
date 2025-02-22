@@ -37,6 +37,7 @@ html {
 
 body {
   @include clipped-container;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
   background: var(--mat-sys-secondary);
   color: var(--mat-sys-on-surface);
 }

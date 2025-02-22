@@ -8,11 +8,11 @@ import { map, take, tap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthGuard  {
-      private afAuth = inject(Auth);
-      private router = inject(Router);
+export class AuthGuard {
+  private afAuth = inject(Auth);
+  private router = inject(Router);
 
-  canActivate( route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
     return authState(this.afAuth).pipe(
       take(1),
       map(user => !!user),
@@ -22,7 +22,7 @@ export class AuthGuard  {
           const redirectQueryParame = {
             queryParams: { returnUrl: state.url }
           };
-          this.router.navigate( [ '/auth/login' ], redirectQueryParame );
+          this.router.navigate(['/auth/login'], redirectQueryParame);
 
         }
       })

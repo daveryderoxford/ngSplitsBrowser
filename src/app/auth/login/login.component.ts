@@ -90,7 +90,7 @@ export class LoginComponent implements OnInit {
     * Sign in with popup avoids re-loading the application on the browser.
     * TODO Review which method is better for mobile devices where popups are not handled as well
    */
-   private async _thirdPartySignIn(provider: GoogleAuthProvider): Promise<UserCredential | null> {
+   private async _thirdPartySignIn(provider: GoogleAuthProvider | FacebookAuthProvider): Promise<UserCredential | null> {
       if (isInStandaloneMode()) {
          await signInWithRedirect(this.afAuth, provider);
          const result = await getRedirectResult(this.afAuth);

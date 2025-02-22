@@ -1,5 +1,5 @@
 import { ascending as d3_ascending } from "d3-array";
-import { NextControlsDataArr } from "../graph/splitsbrowser/splits-popup-data";
+import { NextControlsDataArr } from "../graph-page/splitsbrowser/splits-popup-data";
 import { Competitor } from "./competitor";
 import { CompetitorSummaryDetails, Course, FastestSplitData } from "./course";
 import { CourseClass } from "./course-class";

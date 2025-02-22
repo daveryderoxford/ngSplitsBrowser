@@ -14,7 +14,6 @@ import { FlexModule } from '@ngbracket/ngx-layout';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Club } from 'app/events/model/club';
 import { Nations } from 'app/events/model/nations';
-import { FormContainerComponent } from 'app/shared/components/form-container/form-container.component';
 import { combineLatest, Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
@@ -22,25 +21,25 @@ import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '..
 
 @UntilDestroy()
 @Component({
-    selector: 'app-event-form',
-    templateUrl: './event-form.html',
-    styleUrls: ['./event-form.scss'],
-    imports: [
-        FlexModule,
-        ReactiveFormsModule,
-        AsyncPipe,
-        MatFormFieldModule,
-        MatInputModule,
-        MatOptionModule,
-        MatSelectModule,
-        MatProgressBarModule,
-        MatAutocompleteModule,
-        MatDatepickerModule,
-        MatButtonModule
-    ],
-    providers: [provideNativeDateAdapter()]
+   selector: 'app-event-form',
+   templateUrl: './event-form.html',
+   styleUrls: ['./event-form.scss'],
+   imports: [
+      FlexModule,
+      ReactiveFormsModule,
+      AsyncPipe,
+      MatFormFieldModule,
+      MatInputModule,
+      MatOptionModule,
+      MatSelectModule,
+      MatProgressBarModule,
+      MatAutocompleteModule,
+      MatDatepickerModule,
+      MatButtonModule
+   ],
+   providers: [provideNativeDateAdapter()]
 })
-export class EventForm implements OnInit  {
+export class EventForm implements OnInit {
    private formBuilder = inject(FormBuilder);
    private es = inject(EventService);
    public snackBar = inject(MatSnackBar);

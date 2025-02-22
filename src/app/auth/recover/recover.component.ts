@@ -5,16 +5,16 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
 import { FormContainerComponent } from '../../shared/components/form-container/form-container.component';
+import { ToolbarComponent } from 'app/shared/components/toolbar.component';
 
 @Component({
     selector: 'app-recover',
     templateUrl: './recover.component.html',
     styleUrls: ['./recover.component.scss'],
-    imports: [FormContainerComponent, MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+    imports: [FormContainerComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, ToolbarComponent]
 })
 export class RecoverComponent implements OnInit {
       private router = inject(Router);

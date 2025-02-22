@@ -101,6 +101,7 @@ export class Competitor {
     cumRanks: Array<sbTime> | null = null;
     timeLosses: Array<sbTime> | null = null;
     totalTime: sbTime = 0;
+    color?: string;
 
     classPosition = 999;
     coursePosition = 999;
