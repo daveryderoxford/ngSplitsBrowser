@@ -3,11 +3,11 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { collection, collectionData, CollectionReference, deleteDoc, doc, Firestore, getDoc, orderBy, query, setDoc, where } from '@angular/fire/firestore';
 import { deleteObject, ref, Storage, uploadString } from '@angular/fire/storage';
 import { AuthService } from 'app/auth/auth.service';
-import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
+import { CourseSummary, eventConverter, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
 import { parseEventData } from 'app/results/import';
 import { Results } from 'app/results/model';
 import { of } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 import { SplitsbrowserException } from 'app/results/model/exception';
 
 const EVENTS_COLLECTION = 'events';
@@ -20,7 +20,7 @@ export class EventAdminService {
    protected fs = inject(Firestore);
    protected storage = inject(Storage);
 
-   private eventsCollection = collection(this.fs, EVENTS_COLLECTION) as CollectionReference<any>;
+   private eventsCollection = collection(this.fs, EVENTS_COLLECTION).withConverter(eventConverter);
 
    private events$ = toObservable(this.auth.user).pipe(
       switchMap((user) => {
@@ -28,30 +28,15 @@ export class EventAdminService {
             return of<OEvent[]>([]);
          } else {
             const q = this.auth.isAdmin() ?
-               query(this.eventsCollection, orderBy('dateSubmitted', 'desc')) :
-               query(this.eventsCollection, where('userId', '==', user.uid), orderBy('dateSubmitted', 'desc'));
+               query(this.eventsCollection, orderBy('date', 'desc')) :
+               query(this.eventsCollection, where('userId', '==', user.uid), orderBy('date', 'desc'));
             return collectionData(q);
          }
       }),
-      map((fsEvent) => this.mapEvent(fsEvent))
+      tap((events) => console.log("EventAdminService: Events loaded", events)),
    );
 
    events = toSignal(this.events$, { initialValue: [] });
-
-   constructor() { }
-
-   /** Converts event fields as stored in Firestore to their correct types.
-    * - dates from Timestamps (used by Firestore) to Dates 
-    * - decinal numbers that get stored in Firestore as strings back to Numbers 
-   */
-   private mapEvent(fsEvents: any[]): OEvent[] {
-      return fsEvents.map((fsEvent: any) => {
-         return {
-            ...fsEvent,
-            date: fsEvent.dateSubmitted.toDate()
-         };
-      });
-   }
 
    async update(id: string, event: Partial<OEvent>): Promise<void> {
       const d = doc(this.fs, EVENTS_COLLECTION, id);
@@ -124,7 +109,7 @@ export class EventAdminService {
             splitsFilename: path,
             splitsFileFormat: fileFormat,
             valid: true,
-            uploadDate: new Date().toISOString()
+            uploadDate: new Date(),
          };
 
       } catch (err) {

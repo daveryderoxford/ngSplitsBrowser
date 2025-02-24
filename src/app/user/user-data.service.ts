@@ -1,4 +1,4 @@
-import { Injectable, Signal, inject } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { Auth, authState } from "@angular/fire/auth";
 import { DocumentReference, Firestore, doc, docData, updateDoc } from "@angular/fire/firestore";

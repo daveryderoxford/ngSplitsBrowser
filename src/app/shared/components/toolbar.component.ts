@@ -6,31 +6,20 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     selector: 'app-toolbar',
     template: `
     <mat-toolbar>
-        <app-sidenav-button  /> 
-        {{title()}}
-        <div class=content>
-            <ng-content />
-        </div>
-        <div class=spacer></div>
-        <div class="end-content">
-            <ng-content select="[end]" />
-        </div>
+      <app-sidenav-button/> 
+      <span class="title" >{{title()}}</span>
+      <ng-content/>
+      <div class=spacer></div>
+      <ng-content select="[end]" />
     </mat-toolbar>
     `,
     imports: [MatToolbarModule, SidenavButtonComponent],
     styles: ` 
-      .content { 
-        display: flex; 
-        align-items: center; 
-        gap: 6px; 
-        margin-left: 10px;
+    .title {
+       margin-right: 7px;
+       margin-left: 7px;
     }
-      .end-content { 
-        display: flex; 
-        align-items: center;
-        gap: 6px; 
-        margin-right: 10px; 
-    }
+
     .spacer {
        flex: 1 1 auto;
     }
@@ -40,5 +29,4 @@ export class ToolbarComponent {
 
     title = input.required<string>();
 
-    constructor() { }
 }

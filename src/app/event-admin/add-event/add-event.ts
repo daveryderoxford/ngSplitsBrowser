@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
 import { DialogsService } from 'app/shared';
 import { ToolbarComponent } from 'app/shared/components/toolbar.component';
-import { EventAdminService } from '../../event-admin.service';
-import { FileButtonComponent } from '../../file-button/file-button.component';
-import { EventForm } from '../event-form';
+import { EventAdminService } from '../event-admin.service';
+import { FileButtonComponent } from '../file-button/file-button.component';
+import { EventDetailsForm } from '../event-details-form/event-form';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -15,7 +15,7 @@ type Steps = 'details' | 'upload';
     selector: 'app-add-event',
     templateUrl: 'add-event.html',
     styleUrl: 'add-event.scss',
-    imports: [EventForm, FileButtonComponent, ToolbarComponent, EventForm, MatStepperModule, MatButtonModule]
+    imports: [EventDetailsForm, FileButtonComponent, ToolbarComponent, EventDetailsForm, MatStepperModule, MatButtonModule]
 })
 export class AddEvent {
    router = inject(Router);
@@ -24,8 +24,9 @@ export class AddEvent {
 
    oevent = signal<OEvent | null>(null);
 
-   eventForm = viewChild(EventForm);
+   eventForm = viewChild(EventDetailsForm);
    stepper = viewChild(MatStepper);
+   stepsCompleted = signal(0);
 
    loading = signal(false);
 
@@ -33,6 +34,7 @@ export class AddEvent {
       try {
         const evt = await this.eventService.add(details);
         this.oevent.set(evt);
+         this.stepsCompleted.set(1);
          this.stepper().next()
       } catch (e: any) {
          console.log('Error encountered saving event details' + e.toSting());
@@ -55,12 +57,13 @@ export class AddEvent {
          console.log("EventAdminComponnet: Error uploading splits" + err);
          this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);
       } finally {
+         this.stepsCompleted.set(2);
          this.loading.set(false);
       }
    }
 
    done() {
-      this.router.navigate(['events']);
+      this.router.navigate(['admin']);
    }
 
    canDeactivate(): boolean {

@@ -1,9 +1,10 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, computed, effect, inject, input, OnInit, output } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DateFnsAdapter, MAT_DATE_FNS_FORMATS, provideDateFnsAdapter } from '@angular/material-date-fns-adapter';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
-import { MatOptionModule, provideNativeDateAdapter } from '@angular/material/core';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatOptionModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -14,10 +15,12 @@ import { FlexModule } from '@ngbracket/ngx-layout';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 import { Club } from 'app/events/model/club';
 import { Nations } from 'app/events/model/nations';
+import { startOfDay } from 'date-fns';
+import { enGB } from 'date-fns/locale';
 import { combineLatest, Observable } from 'rxjs';
 import { map, startWith } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
-import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '../../events/model/oevent';
+import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/model/oevent';
 
 @UntilDestroy()
 @Component({
@@ -37,17 +40,19 @@ import { EventDisciplines, EventGrades, EventInfo, EventTypes, OEvent } from '..
       MatDatepickerModule,
       MatButtonModule
    ],
-   providers: [provideNativeDateAdapter()]
+   providers: [
+      { provide: MAT_DATE_LOCALE, useValue: enGB },
+      { provide: DateAdapter, useClass: DateFnsAdapter, deps: [MAT_DATE_LOCALE] },
+      { provide: MAT_DATE_FORMATS, useValue: MAT_DATE_FNS_FORMATS },
+      provideDateFnsAdapter(),
+   ],
 })
-export class EventForm implements OnInit {
-   private formBuilder = inject(FormBuilder);
+export class EventDetailsForm implements OnInit {
    private es = inject(EventService);
    public snackBar = inject(MatSnackBar);
 
    oevent = input<OEvent | null>();
    submitted = output<Partial<OEvent>>();
-
-   eventSubmitted = output<EventInfo>();
 
    new = computed(() => this.oevent() === null);
 
@@ -59,15 +64,19 @@ export class EventForm implements OnInit {
    clubs: Club[] = [];
    filteredClubs$: Observable<Club[]>;
 
-   form = this.formBuilder.group({
-      name: ["", Validators.required],
-      date: ["", Validators.required],
-      nationality: ["", Validators.required],
-      club: ["", Validators.required],
-      grade: ["", Validators.required],
-      type: ["", Validators.required],
-      discipline: ["", Validators.required],
-      webpage: ["", Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i)]
+   today = startOfDay(new Date());
+
+   filteredClubs = computed;
+
+   form = new FormGroup({
+      name: new FormControl('', Validators.required),
+      date: new FormControl<Date>(this.today, Validators.required),
+      nationality: new FormControl('', Validators.required),
+      club: new FormControl('', Validators.required),
+      grade: new FormControl('', Validators.required),
+      type: new FormControl('', Validators.required),
+      discipline: new FormControl('', Validators.required),
+      webpage: new FormControl('', Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i))
    });
 
    constructor() {

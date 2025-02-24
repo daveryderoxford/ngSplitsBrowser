@@ -14,7 +14,7 @@ import { EventAdminService } from './event-admin.service';
 
 const testEventInfo1: EventInfo = {
   name: "test name 1",
-  date: "01/02/2003",
+  date: new Date(2003,2,2), 
   nationality: "SWE",
   club: "TVOC",
   grade: "Regional",
@@ -27,7 +27,7 @@ const testEventInfo1: EventInfo = {
 
 const testEventInfo2: EventInfo = {
   name: "test name 2",
-  date: "09/08/2007",
+  date: new Date(2007, 8,9),
   nationality: "NOR",
   club: "TVOC",
   grade: "Local",

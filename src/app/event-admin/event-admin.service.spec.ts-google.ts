@@ -15,24 +15,21 @@ describe('EventAdminService', () => {
     let mockFirestore: jasmine.SpyObj<Firestore>;
     let mockStorage: jasmine.SpyObj<Storage>;
 
-
     const testEvent: OEvent = {
         name: 'Test Event',
         date: new Date(),
         key: 'testKey',
         userId: 'testUser',
         grade: 'Local',
-        location: { place: "Twickenham" },
         summary: null,
         splits: {
             splitsFilename: 'results/testUser/testKey-results',
             splitsFileFormat: 'IOFv3',
             valid: true,
-            uploadDate: new Date().toISOString()
+            uploadDate: new Date()
         },
         yearIndex: 2024,
         gradeIndex: { brown: true }
-
 
     };
 
@@ -73,7 +70,7 @@ describe('EventAdminService', () => {
         const firestoreTimestamp = { toDate: () => new Date(2024, 5, 10) }; // Mock Firestore timestamp
         const fsEvents = [{ dateSubmitted: firestoreTimestamp, name: 'Event 1' }];
         const events = service.mapEvent(fsEvents as any[]);
-        expect(events[0].date).toEqual(new Date(2024, 5, 10).toISOString());
+        expect(events[0].date).toEqual(new Date(2024, 5, 10));
     });
 
 
@@ -106,15 +103,11 @@ describe('EventAdminService', () => {
         expect(event).toEqual(testEvent);
     });
 
-
-
-
     it('should add event', async () => {
 
         mockFirestore.collection.and.returnValue({ doc: () => ({ id: 'newKey' }) } as any);
         mockFirestore.setDoc.and.returnValue(Promise.resolve());
         mockAuthService.user.and.returnValue({ uid: 'newUser' } as UserData);
-
 
         const newEvent = await service.add({ name: 'New Event' } as Partial<OEvent>);
 

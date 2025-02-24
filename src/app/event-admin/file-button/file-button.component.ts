@@ -1,5 +1,6 @@
 import { Component, ElementRef, input, output, viewChild } from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
     // eslint-disable-next-line @angular-eslint/component-selector
@@ -7,17 +8,17 @@ import { MatButtonModule } from '@angular/material/button';
     template: `
         <span>
         <input [accept]="accept()" [multiple]="multiple()" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
-        <button type="button" mat-raised-button [disabled]=disabled() (click)="selectFile()">
-          {{label()}}
+        <button type="button" mat-icon-button [disabled]=disabled() (click)="selectFile()">
+          <mat-icon>upload</mat-icon>
         </button>
     </span>`,
-    imports: [MatButtonModule]
+    imports: [MatButtonModule, MatIconModule]
 })
 
 export class FileButtonComponent {
   accept = input<string>();
   multiple = input(false);
-  label = input("Select file");
+  label = input("");
   disabled = input(false);
   fileSelected = output<File[]>();
 

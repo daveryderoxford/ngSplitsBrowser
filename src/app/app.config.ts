@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
       provideRouter(APP_ROUTES, 
          withPreloading(PreloadAllModules),
          withComponentInputBinding(),
-        withDebugTracing(),
+      //  withDebugTracing(),
       ),
       provideAnimationsAsync(), 
    ],
