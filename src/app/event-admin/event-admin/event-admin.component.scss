@@ -1,10 +1,3 @@
-:host {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  overflow: hidden;
-}
+@use "mixins" as mix;
 
-.scrolling-content {
-  overflow-y: visible;
-}
+@include mix.centered-column-page("app-event-list", 400px);

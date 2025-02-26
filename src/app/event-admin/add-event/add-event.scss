@@ -1,18 +1,8 @@
-:host {
-   width: 100%;
-   height: 100%;
-   overflow: hidden;
-   display: grid;
-   align-items: start;
-   gap: 10px;
-   grid-template-columns: auto min(100%, 450px) auto;
-   grid-template-rows: 60px auto;
-   grid-template-areas: "toolbar toolbar toolbar"
-                         ".      steps      .";
-}
+@use "mixins" as mix;
+
+@include mix.centered-column-page("mat-stepper", 600px);
 
 .steps {
-  grid-area: steps;
   height: 100%;
   overflow-y: auto;
 }

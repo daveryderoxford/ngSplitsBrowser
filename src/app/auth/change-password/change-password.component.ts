@@ -7,26 +7,25 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Router } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
-import { FormContainerComponent } from '../../shared/components/form-container/form-container.component';
 import { ToolbarComponent } from '../../shared/components/toolbar.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-    selector: 'app-change-password',
-    templateUrl: './change-password.component.html',
-    styleUrls: ['./change-password.component.scss'],
-  imports: [FormContainerComponent, FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, ToolbarComponent]
+  selector: 'app-change-password',
+  templateUrl: './change-password.component.html',
+  styleUrls: ['./change-password.component.scss'],
+  imports: [FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, ToolbarComponent]
 })
 export class ChangePasswordComponent {
-      private router = inject(Router);
-      private formBuilder = inject(FormBuilder);
-      private afAuth = inject(Auth);
-
-  error = '';
+  private router = inject(Router);
+  private formBuilder = inject(FormBuilder);
+  private afAuth = inject(Auth);
+  private snackBar = inject(MatSnackBar);
 
   form = this.formBuilder.group({
-        password: ['', Validators.required],
-        confirmPassword: ['', Validators.required],
-      }, { validator: this.passwordMissMatch });
+    password: ['', Validators.required],
+    confirmPassword: ['', Validators.required],
+  }, { validator: this.passwordMissMatch });
 
   passwordMissMatch(g: FormGroup): ValidationErrors | null {
     const p1 = g.get('password')!;
@@ -47,8 +46,6 @@ export class ChangePasswordComponent {
     const user = await this.afAuth.currentUser!;
     const password = this.form.get('password')!.value;
 
-    this.error = '';
-
     try {
       await updatePassword(user, password);
       this.router.navigateByUrl('/');
@@ -57,7 +54,7 @@ export class ChangePasswordComponent {
       if (e instanceof Error) {
         console.log('SignupComponent: Error updating password:' + e.message);
       }
-      this.error = 'Error updating password';
+      this.snackBar.open('Error updating password', 'Close', { duration: 3000 });
     }
   }
 }

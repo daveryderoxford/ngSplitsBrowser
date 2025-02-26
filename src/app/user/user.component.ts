@@ -16,7 +16,6 @@ import { UserData } from 'app/user/user';
 import { UserDataService } from "app/user/user-data.service";
 import { ToolbarComponent } from "../shared/components/toolbar.component";
 import { Nations } from "app/events/model/nations";
-import { FormContainerComponent } from 'app/shared/components/form-container/form-container.component';
 import { AuthService } from 'app/auth/auth.service';
 
 @UntilDestroy()
@@ -24,7 +23,7 @@ import { AuthService } from 'app/auth/auth.service';
   selector: "app-user",
   templateUrl: "./user.component.html",
   styleUrls: ["./user.component.scss"],
-  imports: [ToolbarComponent, FlexModule, FormContainerComponent, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
+  imports: [ToolbarComponent, FlexModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
 export class UserComponent {
   private afAuth = inject(AuthService);

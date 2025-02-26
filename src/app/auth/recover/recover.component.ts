@@ -7,39 +7,33 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
-import { FormContainerComponent } from '../../shared/components/form-container/form-container.component';
 import { ToolbarComponent } from 'app/shared/components/toolbar.component';
 
 @Component({
-    selector: 'app-recover',
-    templateUrl: './recover.component.html',
-    styleUrls: ['./recover.component.scss'],
-    imports: [FormContainerComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, ToolbarComponent]
+  selector: 'app-recover',
+  templateUrl: './recover.component.html',
+  styleUrls: ['./recover.component.scss'],
+  imports: [FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, ToolbarComponent]
 })
-export class RecoverComponent implements OnInit {
-      private router = inject(Router);
-      private formBuilder = inject(FormBuilder);
-      private afAuth = inject(Auth);
-      private snackBar = inject(MatSnackBar);
+export class RecoverComponent {
+  private router = inject(Router);
+  private formBuilder = inject(FormBuilder);
+  private afAuth = inject(Auth);
+  private snackBar = inject(MatSnackBar);
+
   recoverForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
   });
-
-  ngOnInit() {
-    this.recoverForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-    });
-  }
 
   async recover() {
     const emailAddress = this.recoverForm.get('email')!.value!;
 
     try {
-      await sendPasswordResetEmail(this.afAuth, emailAddress );
-      this.router.navigate( ["/auth/login"]);
+      await sendPasswordResetEmail(this.afAuth, emailAddress);
+      this.router.navigate(["/auth/login"]);
     } catch (err) {
       console.log('RecoverComponent: Error requesting password reset for email');
-      this.snackBar.open( 'Error requesting password reset for email', 'Close' , {duration: 3000});
+      this.snackBar.open('Error requesting password reset for email', 'Close', { duration: 3000 });
     }
   }
 }

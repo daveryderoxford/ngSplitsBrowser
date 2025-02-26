@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, input } from '@angular/core';
 import {
    Auth,
    FacebookAuthProvider, GoogleAuthProvider, UserCredential, getRedirectResult,
@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
 import { ToolbarComponent } from 'app/shared/components/toolbar.component';
@@ -24,33 +25,25 @@ const isInStandaloneMode = () =>
    document.referrer.includes('android-app://');
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.scss'],
-    imports: [MatCardModule, ToolbarComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+   selector: 'app-login',
+   templateUrl: './login.component.html',
+   styleUrls: ['./login.component.scss'],
+   imports: [MatCardModule, ToolbarComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
-export class LoginComponent implements OnInit {
-   private route = inject(ActivatedRoute);
+export class LoginComponent {
    private router = inject(Router);
    private formBuilder = inject(NonNullableFormBuilder);
    private afAuth = inject(Auth);
+   private snackBar = inject(MatSnackBar);
 
    loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
    });
 
-   error = '';
    loading = false;
-   returnUrl = '';
 
-   ngOnInit() {
-      this.route.queryParams.subscribe(params => {
-         this.returnUrl = params['returnUrl'];
-      });
-
-      this.error = '';
-   }
+   returnUrl = input(''); //Route parameter
 
    async loginFormSubmit() {
       if (this.loginForm.valid) {
@@ -62,7 +55,6 @@ export class LoginComponent implements OnInit {
 
       try {
          this.loading = true;
-         this.error = '';
 
          switch (provider) {
 
@@ -105,12 +97,11 @@ export class LoginComponent implements OnInit {
 
    private _handleSigninError(err: any) {
       console.log('LoginComponent: Error loging in.  Error code:' + + err.code + '  ' + err.message);
-      this.error = 'Login attempt failed';
+      this.snackBar.open('Error updating password', 'Close', { duration: 3000 });
    }
 
    private _handleSignInSuccess() {
       console.log('LoginComponent: Successful login');
-      this.error = '';
-      this.router.navigateByUrl(this.returnUrl);
+      this.router.navigateByUrl(this.returnUrl());
    }
 }

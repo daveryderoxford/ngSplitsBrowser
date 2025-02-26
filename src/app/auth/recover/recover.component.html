@@ -1,24 +1,18 @@
 <app-toolbar title="Recover Your Password"></app-toolbar>
 
-<app-form-container>
+<form [formGroup]="recoverForm" (ngSubmit)="recover()">
 
-   <form [formGroup]="recoverForm" (ngSubmit)="recover()">
+   <mat-form-field>
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" type="email">
+      <mat-error>Invalid email</mat-error>
+   </mat-form-field>
 
-      <div fxLayout="column" fxFlex fxLayoutAlign="space-around">
-
-         <mat-form-field>
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email">
-            <mat-error>Invalid email</mat-error>
-         </mat-form-field>
-
-         <BR>
-         <div fxLayout="row" fxLayoutAlign="space-between center">
-            <button [disabled]="recoverForm.invalid" mat-flat-button type="submit"
-               aria-label="login">Recover</button>
-            <a mat-button routerLink="/auth/login">Remembered your password?</a>
-
-         </div>
-      </div>
-   </form>
-</app-form-container>
+   <div fxLayout="row" fxLayoutAlign="space-between center">
+      <button [disabled]="recoverForm.invalid" mat-flat-button type="submit" aria-label="Recover password">
+         Recover
+      </button>
+      <a mat-button routerLink="/auth/login">Remembered password?</a>
+   </div>
+   
+</form>
