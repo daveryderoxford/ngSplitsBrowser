@@ -1,27 +1,34 @@
 /**
  * Event service
  */
-import { Injectable, inject } from "@angular/core";
-import { collection, collectionData, CollectionReference, doc, docData, DocumentReference, Firestore, orderBy, query, where } from '@angular/fire/firestore';
+import { inject, Injectable, signal } from "@angular/core";
+import { collection, collectionData, doc, docData, DocumentReference, Firestore, orderBy, query, where } from '@angular/fire/firestore';
 import { PaganationService } from "app/shared";
-import { BehaviorSubject, merge, Observable, of } from "rxjs";
-import { EventInfo, OEvent } from './model/oevent';
+import { BehaviorSubject, merge, Observable } from "rxjs";
 import { Club } from './model/club';
+import { eventConverter, EventInfo, OEvent } from './model/oevent';
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
+
+const EVENTS_COLLECTION = 'events';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventService {
-      private firestore = inject(Firestore);
-      private ps = inject<PaganationService<OEvent>>(PaganationService<OEvent>);
-      
+  private firestore = inject(Firestore);
+  private ps = inject(PaganationService);
+
+  private eventsCollection = collection(this.firestore, EVENTS_COLLECTION).withConverter(eventConverter);
+
   private events$: Observable<OEvent[]> = new Observable(null);
   private pageSize = 20;
   private cursor: OEvent = undefined;
   private _loading = new BehaviorSubject<boolean>(false);
+
+  private _filter = signal("");
+  private _page = signal(1);
 
   /** Sets search critera to use events list
    * @param orderby order the results by specified paremeter name.
@@ -48,28 +55,21 @@ export class EventService {
   get done(): Observable<boolean> {
     return this.ps.done;
   }
+
   /** Gets all events for a club  */
   getEventsForClub(club: Club): Observable<OEvent[]> {
 
-    const eventsCollection = collection(this.firestore, "/events") as CollectionReference<any>;
-    const q = query(eventsCollection, 
-         where("club", "==", club.name), 
-         where("nationality", "==", club.nationality),
-         orderBy('date', 'desc'));
+    const q = query(this.eventsCollection,
+      where("club", "==", club.name),
+      where("nationality", "==", club.nationality),
+      orderBy('date', 'desc'));
 
     return collectionData(q);
   }
 
   /** Get a list of club namees for all events ordered by name and nationality */
   getClubs(): Observable<Club[]> {
-    return of([{
-      key: 'eee',
-      name: 'clubname',
-      nationality: 'GBR',
-      numEvents: 0,
-      lastEvent: 'dummy'
-    }]);
-    const d = doc(this.firestore, "clubs") as DocumentReference<Club[]>
+    const d = doc(this.firestore, "clubs") as DocumentReference<Club[]>;
     return docData(d);
   }
 }

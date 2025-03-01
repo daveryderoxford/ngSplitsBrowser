@@ -11,13 +11,14 @@ import { EventGrades, OEvent } from '../model/oevent';
 import { Nations } from '../model/nations';
 
 @Component({
-    selector: 'app-all-events-tab',
-    templateUrl: './all-events-tab.component.html',
-    styleUrls: ['./all-events-tab.component.scss'],
-    imports: [EventsTableComponent, MatProgressBarModule, AsyncPipe]
+  selector: 'app-all-events-tab',
+  templateUrl: './all-events-tab.component.html',
+  styleUrls: ['./all-events-tab.component.scss'],
+  imports: [EventsTableComponent, MatProgressBarModule, AsyncPipe]
 })
 export class AllEventsTabComponent implements OnInit {
-      private es = inject(EventService);
+  private es = inject(EventService);
+  
   eventSelected = output<OEvent>();
 
   dataSource: EventDataSource | null;
@@ -34,7 +35,7 @@ export class AllEventsTabComponent implements OnInit {
 
   eventClicked(event: OEvent) {
     this.eventSelected.emit(event);
- }
+  }
 
   // EVENT TABLE
   onTableScroll(e: any) {

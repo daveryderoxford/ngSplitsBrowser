@@ -1,14 +1,14 @@
-import { inject, Injectable, Signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { collection, collectionData, CollectionReference, deleteDoc, doc, Firestore, getDoc, orderBy, query, setDoc, where } from '@angular/fire/firestore';
+import { collection, collectionData, deleteDoc, doc, Firestore, getDoc, orderBy, query, setDoc, where } from '@angular/fire/firestore';
 import { deleteObject, ref, Storage, uploadString } from '@angular/fire/storage';
 import { AuthService } from 'app/auth/auth.service';
 import { CourseSummary, eventConverter, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
 import { parseEventData } from 'app/results/import';
 import { Results } from 'app/results/model';
-import { of } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
 import { SplitsbrowserException } from 'app/results/model/exception';
+import { of } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 
 const EVENTS_COLLECTION = 'events';
 

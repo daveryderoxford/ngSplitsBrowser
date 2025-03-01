@@ -17,7 +17,8 @@ export interface QueryConfig {
   providedIn: 'root',
 })
 export class PaganationService<T> {
-      private firestore = inject(Firestore);
+  private firestore = inject(Firestore);
+  
   // Source data
   private _done = new BehaviorSubject<boolean>(false);
   private _loading = new BehaviorSubject<boolean>(false);
@@ -51,10 +52,10 @@ export class PaganationService<T> {
 
     const c = collection(this.firestore, this.query.path) as CollectionReference<T>;
 
-    const first = query( c, 
-        orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
-        limit(this.query.limit)
-      );
+    const first = query(c,
+      orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
+      limit(this.query.limit)
+    );
 
     this.mapAndUpdate(first);
 
@@ -67,12 +68,12 @@ export class PaganationService<T> {
   more() {
     const cursor = this._cursor;
 
-    const col = collection(this.firestore, this.query.path ) as CollectionReference<T>;
-    const more = query( col, 
+    const col = collection(this.firestore, this.query.path) as CollectionReference<T>;
+    const more = query(col,
       orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
       limit(this.query.limit),
       startAfter(cursor)
-    )
+    );
 
     this.mapAndUpdate(more);
   }
@@ -88,8 +89,8 @@ export class PaganationService<T> {
     // Map snapshot with doc ref (needed for cursor)
 
     collectionSnapshots(query).pipe(
-         tap( (arr) => {
-         let values = arr.map(snap => snap.data() as T );
+      tap((arr) => {
+        let values = arr.map(snap => snap.data() as T);
 
         if (arr.length > 0) {
           this._cursor = arr[arr.length - 1];
@@ -99,7 +100,7 @@ export class PaganationService<T> {
         values = this.query.prepend ? values.reverse() : values;
 
         // try concating the values
-        const allValues = this.query.prepend ?  values.concat(this._data.value) : this._data.value.concat(values);
+        const allValues = this.query.prepend ? values.concat(this._data.value) : this._data.value.concat(values);
 
         console.log('values: ' + values.length);
         console.log('allValues: ' + allValues.length);
@@ -113,7 +114,7 @@ export class PaganationService<T> {
           this._done.next(true);
         }
       }),
-      take(1) )
+      take(1))
       .subscribe();
   }
 }
