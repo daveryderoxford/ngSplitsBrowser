@@ -6,16 +6,16 @@ import { ComparisionOption } from 'app/results/graph-page/splitsbrowser/comparis
 import { ResultsView, resultsViews } from "../model/results-view";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsPageState } from '../results-page-state';
-import { ResultsSearch } from '../results-search/results-search.';
 import { ResultsSelectionService } from "../results-selection.service";
 import { ResultsViewButtonComponent } from "./results-view-button.component";
 import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
+import { SearchIconButtonComponent } from "../results-search/results-search-button";
 
 @Component({
     selector: "app-results-navbar",
     templateUrl: "./navbar.html",
     styleUrls: ["./navbar.scss"],
-    imports: [MatToolbarModule, MatIconModule, ResultsViewButtonComponent, ResultsSearch, SidenavButtonComponent]
+    imports: [MatToolbarModule, MatIconModule, ResultsViewButtonComponent, SidenavButtonComponent, SearchIconButtonComponent]
 })
 export class Navbar {
   public rs = inject(ResultsSelectionService);

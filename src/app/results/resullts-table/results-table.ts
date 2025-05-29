@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatFormFieldModule } from "@angular/material/form-field";
@@ -34,11 +34,11 @@ export class ResultsTable implements OnInit {
    /** Column definitions columns */
    staticColumns = ["position", "name", "total"];
 
-   courseToggle = new FormControl<boolean>(true);
-   colorToggle = new FormControl<boolean>(true);
-   selectedToggle = new FormControl<boolean>(false);
+   courseCheckbox = new FormControl<boolean>(true);
+   colorCheckbox = new FormControl<boolean>(true);
+   selectedCheckbox = new FormControl<boolean>(false);
 
-   selectedOnly = toSignal(this.selectedToggle.valueChanges, { initialValue: false });
+   selectedOnly = toSignal(this.selectedCheckbox.valueChanges, { initialValue: false });
 
    splitsColumns = computed(() =>
       this.course() ?
@@ -63,7 +63,7 @@ export class ResultsTable implements OnInit {
 
    ngOnInit() {
 
-      this.courseToggle.valueChanges.subscribe((courseDisplayed: boolean) => {
+      this.courseCheckbox.valueChanges.subscribe((courseDisplayed: boolean) => {
          this.rs.setCourseOrClass(courseDisplayed);
       });
    }

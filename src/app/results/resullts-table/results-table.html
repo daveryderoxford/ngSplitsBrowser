@@ -4,12 +4,12 @@
       (select)='rs.selectClass($event)' />
 
   @if (course() && course().classes.length > 1) {
-    <mat-checkbox labelPosition="after" [formControl]="courseToggle">Course</mat-checkbox>
+    <mat-checkbox labelPosition="after" [formControl]="courseCheckbox">Course</mat-checkbox>
   }
 
-  <mat-checkbox labelPosition="after" [formControl]="colorToggle">Color</mat-checkbox>
+  <mat-checkbox labelPosition="after" [formControl]="colorCheckbox">Color</mat-checkbox>
 
-  <mat-checkbox labelPosition="after" [formControl]="selectedToggle">Selected only</mat-checkbox>
+  <mat-checkbox labelPosition="after" [formControl]="selectedCheckbox">Selected only</mat-checkbox>
 
 </app-results-navbar>
 
@@ -41,7 +41,7 @@
     @for (split of splitsColumns(); track split; let i = $index) {
     <ng-container [matColumnDef]="split">
       <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} <br> test</th>
-      <td mat-cell [style.background]="cellColor(colorToggle.value, i, competitor)" *matCellDef="let competitor">
+      <td mat-cell [style.background]="cellColor(colorCheckbox.value, i, competitor)" *matCellDef="let competitor">
         <span [class.fastest]="competitor.splitRanks[i]===1" [class.second]="competitor.splitRanks[i]===2"
           [class.third]="competitor.splitRanks[i]===3">
           {{ competitor.splitTimes[i] | formatTime:true }}

@@ -32,7 +32,19 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     }
   </mat-menu>
   `,
-    styles: [],
+    styles: `
+    @use '@angular/material' as mat;
+
+    // Customize the entire app. Change :root to your selector if you want to scope the styles.
+    :host {
+      @include mat.button-toggle-overrides((
+        shape: 5px,
+        selected-state-background-color: var(--mat-sys-primary),
+        selected-state-text-color: var(--mat-sys-on-primary)
+
+      ));
+    }
+  `,
     imports: [MatButtonToggleModule, MatMenuModule, MatIconModule]
 })
 export class ResultsViewButtonComponent implements OnInit {

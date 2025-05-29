@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Search</h2>
+<mat-dialog-content>
+
+   <mat-form-field class="search-field" appearance="outline">
+      <mat-label>Competitors, Classes, or Courses</mat-label>
+      <input matInput type="search" aria-label="Search for Competitors, Classes, or Courses"
+         [formControl]="searchControl">
+   </mat-form-field>
+
+   <mat-list class="scroll">
+      @for (group of searchResults(); track group.name) {
+         <h3 matSubheader>{{group.name}}</h3>
+         @for (option of group.options; track option.name; let i = $index) {
+         <mat-list-item (click)="optionSelected(option)">
+            <span>{{ option.name }}</span>
+            @if (isCompetitor(option)) {
+            <span class="option-detail">  {{ asCompetitor(option).club }}</span>
+            }
+         </mat-list-item>
+         }
+      <mat-divider />
+      } @empty {
+         <mat-list-item>No results found</mat-list-item>
+      }
+
+   </mat-list>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+   <button mat-button (click)="dialogRef.close()" type="button">Dismiss</button>
+</mat-dialog-actions>
