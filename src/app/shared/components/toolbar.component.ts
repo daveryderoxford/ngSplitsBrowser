@@ -5,7 +5,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 @Component({
     selector: 'app-toolbar',
     template: `
-    <mat-toolbar>
+    <mat-toolbar class="gap10">
       <app-sidenav-button/> 
       <span class="title" >{{title()}}</span>
       <ng-content/>
@@ -18,6 +18,10 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     .title {
        margin-right: 7px;
        margin-left: 7px;
+    }
+
+    .gap10 {
+        gap: 10px;
     }
 
     .spacer {

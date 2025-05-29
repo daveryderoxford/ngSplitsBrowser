@@ -1,6 +1,6 @@
-<mat-toolbar>
+<mat-toolbar class="gap10">
 
-  <mat-icon routerLink="/events" class="results-navbar-icon">arrow_back</mat-icon>
+  <app-sidenav-button />
 
   <app-results-view-button [views]="resultsViews" [selectedView]="pageState.pageDisplayed()" (viewSelected)="viewSelected($event)" />
   
@@ -10,10 +10,10 @@
 
   <ng-content select="[end]"></ng-content>
   
-  <app-results-search class="align-baseline, padded" />
+  <app-results-search/>
 
   <ng-content select="[settings]"></ng-content>
 
-  <mat-icon class="results-navbar-icon padded">settings</mat-icon>
+  <mat-icon class="results-navbar-icon">settings</mat-icon>
 
 </mat-toolbar>

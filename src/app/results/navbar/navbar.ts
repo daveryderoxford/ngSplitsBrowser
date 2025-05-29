@@ -1,7 +1,6 @@
 import { Component, inject, input, TemplateRef } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { RouterLink } from "@angular/router";
 import { OEvent } from 'app/events/model/oevent';
 import { ComparisionOption } from 'app/results/graph-page/splitsbrowser/comparision-options';
 import { ResultsView, resultsViews } from "../model/results-view";
@@ -10,12 +9,13 @@ import { ResultsPageState } from '../results-page-state';
 import { ResultsSearch } from '../results-search/results-search.';
 import { ResultsSelectionService } from "../results-selection.service";
 import { ResultsViewButtonComponent } from "./results-view-button.component";
+import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
 
 @Component({
     selector: "app-results-navbar",
     templateUrl: "./navbar.html",
     styleUrls: ["./navbar.scss"],
-    imports: [MatToolbarModule, MatIconModule, RouterLink, ResultsViewButtonComponent, ResultsSearch]
+    imports: [MatToolbarModule, MatIconModule, ResultsViewButtonComponent, ResultsSearch, SidenavButtonComponent]
 })
 export class Navbar {
   public rs = inject(ResultsSelectionService);

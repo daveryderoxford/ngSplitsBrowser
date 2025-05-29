@@ -337,16 +337,16 @@ export class Course {
       }
    }
 
-   private courseCompetitors: Competitor[] | undefined = undefined;
+   private _competitors: Competitor[] | undefined = undefined;
 
    /** Returns an ordered list of results for the course */
    public get competitors(): Competitor[] {
-      if (!this.courseCompetitors) {
-         this.courseCompetitors = [];
+      if (!this._competitors) {
+         this._competitors = [];
          for (const courseClass of this.classes) {
-            this.competitors.concat(courseClass.competitors);
+            this._competitors = this._competitors.concat(courseClass.competitors);
          }
-         this.competitors.sort( (a: Competitor, b: Competitor) => {
+         this._competitors.sort( (a: Competitor, b: Competitor) => {
             if (a.completed() && b.completed()) {
             return a.totalTime - b.totalTime;
             } else if (a.completed()) {
@@ -356,6 +356,6 @@ export class Course {
             }
          });
       }
-      return this.competitors!;
+      return this._competitors!;
    }
 }

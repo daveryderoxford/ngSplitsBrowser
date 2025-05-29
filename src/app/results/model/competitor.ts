@@ -502,7 +502,7 @@ export class Competitor {
         return adjustedTimes;
     }
 
-        /**
+    /**
     * Returns the sum of two numbers, or null if either is null.
     * @sb-param {?Number} a - One number, or null, to add.
     * @sb-param {?Number} b - The other number, or null, to add.

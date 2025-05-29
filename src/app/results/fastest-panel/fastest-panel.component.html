@@ -10,7 +10,7 @@
    @if (pageDidsplayed.value == 'selected') {
 
    <table>
-      @for (split of fastestSplitsForLeg(); track split) {
+      @for (split of fastestSplitsForLeg(); track split.name) {
       <tr [class.primary]="split.className.localeCompare(selectedClass()?.name)">
          <td class="mat-body-medium"> {{split.name}}</td>
          <td class="mat-body-medium"> {{split.split | formatTime}}</td>
@@ -20,7 +20,7 @@
    } @else {
    <span class="mat-body-medium">leg {{152}} to {{endCode()}}</span>
    <table>
-      @for (split of fastestSplitsForLeg(); track split) {
+      @for (split of fastestSplitsForLeg(); track split.name) {
       <tr>
          <td class="mat-body-medium" [class.primary]="split.className === selectedClass()?.name"> {{split.split | formatTime}}</td>
          <td class="mat-body-medium"> {{split.className}}</td>

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { Component, computed, input, output } from '@angular/core';
+import { Component, computed, model } from '@angular/core';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -10,10 +10,11 @@ import { StatsVisibilityFlags } from './splitsbrowser/chart';
     selector: 'app-label-flags-select',
     imports: [MatSelectModule, MatFormFieldModule],
     template: `
-   <mat-form-field appearance="outline" subscriptSizing="dynamic" class="rounded dense-form-field">
+   <mat-form-field appearance="outline" subscriptSizing="dynamic" class="dense-form-field">
+      <mat-label>Display</mat-label>
       <mat-select #select [value]="this.selected()" multiple>
              <mat-select-trigger>
-               {{makeSelectText(select.value)}}
+               <span class=small-text>{{makeSelectText(select.value)}}</span>
     </mat-select-trigger>
 
          @for (option of options; track option) {
@@ -23,15 +24,16 @@ import { StatsVisibilityFlags } from './splitsbrowser/chart';
   </mat-form-field>
   `,
     styles: ` 
+    .small-text {
+      font-size: 0.8em;
+    }
    `
 })
 export class LabelFlagSelect {
 
-   flags = input.required<StatsVisibilityFlags>();
+   flags = model.required<StatsVisibilityFlags>();
 
    selected = computed(() => Object.keys(this.flags()).filter((key) => this.flags()[key]));
-
-   flagsChanged = output<StatsVisibilityFlags>();
 
    options = [
       { key: "totalTime", label: "Total Time", shortlabel: "Total" },
@@ -43,7 +45,7 @@ export class LabelFlagSelect {
    toggleOption(option: any) {
       const o = this.flags();
       o[option.key] = !o[option.key];
-      this.flagsChanged.emit(o);
+      this.flags.set(o);
    }
 
    makeSelectText(keys: string[]): string {

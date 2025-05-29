@@ -102,8 +102,8 @@ export class PaganationService<T> {
         // try concating the values
         const allValues = this.query.prepend ? values.concat(this._data.value) : this._data.value.concat(values);
 
-        console.log('values: ' + values.length);
-        console.log('allValues: ' + allValues.length);
+        console.log('PaganationService: Appending: ' + values.length);
+        console.log('PaganationService: Total number of values loaded: ' + allValues.length);
 
         // update source with new values, done loading
         this._data.next(allValues);
@@ -114,7 +114,7 @@ export class PaganationService<T> {
           this._done.next(true);
         }
       }),
-      take(1))
+      take(1),)
       .subscribe();
   }
 }

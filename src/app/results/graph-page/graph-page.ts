@@ -3,11 +3,11 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, debounceTime } from 'rxjs';
 import { FastestPanelComponent } from "../fastest-panel/fastest-panel.component";
-import { CourseClassSet } from '../model';
+import { CourseClassSet, sbTime } from '../model';
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
-import { CompareWithSelect } from './splitsbrowser/compare-with-select';
+import { CompareWithSelect } from './compare-with-select';
 import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
@@ -41,7 +41,7 @@ export class GraphPage implements AfterViewInit {
   legIndex = signal(0);
   raceTiime = signal(0);
 
-  comparisonOptions = signal(ALL_COMPARISON_OPTIONS[0]);
+  comparisonOptions = signal(ALL_COMPARISON_OPTIONS[1]);
 
   leftLabelFlags = signal<StatsVisibilityFlags>({
     totalTime: false,
@@ -69,10 +69,20 @@ export class GraphPage implements AfterViewInit {
     this.rs.selectedCompetitors().map(comp => this.courseClassSet().allCompetitors.indexOf(comp))
   );
 
-  referenceCumTimes = computed(() => {
+  referenceCumTimes = computed<sbTime[]>(() => {
     const opt = this.comparisonOptions();
-    // TODO need to actually use opt here
-    return this.courseClassSet().getFastestCumTimesPlusPercentage(5);
+    switch (opt.nameKey) {
+      case 'CompareWithWinner':
+        return this.courseClassSet().getWinnerCumTimes();
+      case 'CompareWithFastestTime':
+        return this.courseClassSet().getFastestCumTimes();
+      case 'CompareWithFastestTimePlusPercentage':
+        return this.courseClassSet().getFastestCumTimesPlusPercentage(opt.percentage);
+      case 'CompareWithAnyRunner':
+        return this.courseClassSet().getCumulativeTimesForCompetitor(0);
+      default:
+        throw new Error(`Unknown comparison option: ${opt.nameKey}`);
+    }
   });
 
   chartData = computed<ChartDisplayData>(() => {
@@ -87,7 +97,7 @@ export class GraphPage implements AfterViewInit {
   });
 
   size$ = new BehaviorSubject({ width: 0, height: 0 });
-  observer = new ResizeObserver(entries => 
+  observer = new ResizeObserver(entries =>
     this.size$.next(entries[0].contentRect)
   );
 
@@ -115,7 +125,7 @@ export class GraphPage implements AfterViewInit {
           this.redrawChart();
         } else {
           console.log('graph componennt null results');
-        } 
+        }
       }
     });
   }

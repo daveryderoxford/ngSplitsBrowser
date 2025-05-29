@@ -1,4 +1,10 @@
+@use '@angular/material' as mat;
+
 :host {
+   @include mat.tabs-overrides((divider-height: 1px,
+         active-label-text-color: var(--mat-sys-primary),
+         active-indicator-height: 3px,
+      ));
    flex-grow: 1;
    overflow: hidden;
    min-height: 20px;

@@ -9,18 +9,18 @@
 }
 
 ol {
-   margin: 5px;
-   padding: 5px;
+   margin: 3px;
+   padding: 0px;
 }
 
 li {
    display: grid;
-   grid-template-columns: 30px 1fr 1fr 50px;
+   grid-template-columns: 28px 1fr 1fr 30px;
    grid-template-rows: auto;
    grid-template-areas:
       "left name name time"
       "left club oclass behind";
-   padding: 5px;
+   padding-top: 5px;
 }
 
 .circle {
@@ -28,10 +28,12 @@ li {
 }
 
 .name {
+   font: var(--mat-sys-body-medium);
    grid-area: name;
 }
 
 .time {
+   font: var(--mat-sys-body-medium);
    grid-area: time;
 }
 

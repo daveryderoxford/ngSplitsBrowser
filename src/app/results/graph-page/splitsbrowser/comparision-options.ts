@@ -1,11 +1,13 @@
 import { CourseClassSet } from "app/results/model";
 
+type KeyName = "CompareWithWinner" | "CompareWithFastestTime" | "CompareWithFastestTimePlusPercentage" | "CompareWithAnyRunner";
+
 export interface ComparisionOption {
-    nameKey: string;
+    nameKey: KeyName;
     name: string;
     selector: (c: CourseClassSet) => number[];
     requiresWinner: boolean;
-    percentage: string;
+    percentage: number;
 }
 
 export const ALL_COMPARISON_OPTIONS: ComparisionOption[] = [
@@ -14,14 +16,14 @@ export const ALL_COMPARISON_OPTIONS: ComparisionOption[] = [
         name: "Winner",
         selector: courseClassSet => courseClassSet.getWinnerCumTimes(),
         requiresWinner: true,
-        percentage: ""
+        percentage: 0
     },
     {
         nameKey: "CompareWithFastestTime",
         name: "Fastest time",
         selector: courseClassSet => courseClassSet.getFastestCumTimes(),
         requiresWinner: false,
-        percentage: ""
+        percentage: 0
     }
 ];
 
@@ -31,10 +33,10 @@ const FASTEST_PLUS_PERCENTAGES = [5, 25, 50, 100];
 for (const percent of FASTEST_PLUS_PERCENTAGES) {
     ALL_COMPARISON_OPTIONS.push({
         nameKey: "CompareWithFastestTimePlusPercentage",
-        name: "Fastest time plus" + percent.toString() + "%",
+        name: "Fastest plus " + percent.toString() + "%",
         selector: courseClassSet => courseClassSet.getFastestCumTimesPlusPercentage(percent),
         requiresWinner: false,
-        percentage: percent.toString()
+        percentage: percent
     });
 }
 ALL_COMPARISON_OPTIONS.push({
@@ -42,5 +44,5 @@ ALL_COMPARISON_OPTIONS.push({
     name: "Specific runner",
     selector: null,
     requiresWinner: true,
-    percentage: ""
+    percentage: 0
 });

@@ -84,12 +84,12 @@ export class ResultsSearch implements OnInit {
     if (selection instanceof Competitor) {
       this.rs.selectCompetitors(selection);
       this.rs.selectClass(selection.courseClass);
-      this.rs.selectCourse(selection.courseClass.course);
+    //  this.rs.selectCourse(selection.courseClass.course);
     } else if (selection instanceof CourseClass) {
       this.rs.selectClass(selection);
-      this.rs.selectCourse(selection.course);
+    //  this.rs.selectCourse(selection.course);
     } else if (selection instanceof Course) {
-      this.rs.selectCourse(selection);
+    //  this.rs.selectCourse(selection);
       if (selection.length > 0) {
          this.rs.selectClass(selection.classes[0]);
       }

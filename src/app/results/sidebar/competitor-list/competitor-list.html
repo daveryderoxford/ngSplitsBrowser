@@ -2,7 +2,7 @@
    @for (comp of rs.displayedCompetitors(); track comp; let index= $index ) {
    <li (click)="toggleSelected(comp)">
       @if (rs.isCompetitorSelected(comp)) {
-         <app-colored-circle class="circle" [text]="(index+1).toString()" [color]="circleColor(comp)" />
+         <app-colored-circle class="circle" [text]="(index+1).toString()" [color]="comp.color" />
       } @else {
           <span class="position">{{(index+1).toString()}}</span>
       }

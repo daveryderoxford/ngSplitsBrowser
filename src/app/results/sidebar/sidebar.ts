@@ -8,10 +8,10 @@ import { CourseClass } from '../model';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
-    selector: 'app-sidebar',
-    imports: [MatTabsModule, CompetitorList, ClassList],
-    templateUrl: './sidebar.html',
-    styleUrl: './sidebar.scss'
+  selector: 'app-sidebar',
+  imports: [MatTabsModule, CompetitorList, ClassList],
+  templateUrl: './sidebar.html',
+  styleUrl: './sidebar.scss'
 })
 export class Sidebar {
 
@@ -20,14 +20,15 @@ export class Sidebar {
 
   tabs = viewChild(MatTabGroup);
 
-  tablabel = computed( () => this.rs.courseOrClass ? 'Course' : 'Class');
+  tablabel = computed(() => this.rs.courseOrClass ? 'Course' : 'Class');
 
- // tabIndex = linkedSignal(() => this.rs.oclass() ? 1 : 0 );
- tabIndex = signal(0);
+  tabIndex = linkedSignal({
+    source: this.rs.oclass,
+    computation: () => 1
+  });
 
   selectClass(oclass: CourseClass) {
     this.rs.selectClass(oclass);
-    this.tabIndex.set(1);
   }
 
 }

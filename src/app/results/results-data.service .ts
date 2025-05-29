@@ -1,3 +1,5 @@
+'use strict';
+
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -12,6 +14,13 @@ import { Competitor, InvalidData, Results } from "./model";
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
 
+const colours = [
+   "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
+   "#FFCC00", "#884400", "#9900FF", "#CCCC00", "#888800", "#CC6699",
+   "#00DD00", "#3399FF", "#BB00BB", "#00DDDD", "#FF00FF", "#0088BB",
+   "#888888", "#FF99FF", "#55BB33"
+];
+
 @Injectable({
    providedIn: 'root',
 })
@@ -25,10 +34,8 @@ export class ResultsDataService {
    private _event$: BehaviorSubject<OEvent> = new BehaviorSubject(null);
    private _results$: BehaviorSubject<Results> = new BehaviorSubject(null);
 
-   event = toSignal(this._event$);
-   results = toSignal(this._results$);
-
-   results$ = this._results$.asObservable();
+   readonly event = toSignal(this._event$);
+   readonly results = toSignal(this._results$);
 
    constructor() { }
 
@@ -45,6 +52,8 @@ export class ResultsDataService {
             results.determineTimeLosses();
 
             this.computeRanks(results);
+
+            this.computeColors(results);
 
             return results;
          }));
@@ -121,7 +130,7 @@ export class ResultsDataService {
 
       const r = ref(this.storage, path);
       const obs = from(getDownloadURL(r)).pipe(
-         switchMap(url => this.http.get(url, { responseType: 'text'}))
+         switchMap(url => this.http.get(url, { responseType: 'text' }))
       );
       return obs;
    }
@@ -129,6 +138,14 @@ export class ResultsDataService {
    private computeRanks(results: Results) {
       for (const oclass of results.classes) {
          this.computeCompetitorRanks(oclass.competitors, oclass.numControls);
+      }
+   }
+
+   private computeColors(results: Results) {
+      for (const course of results.courses) {
+         course.competitors.forEach((competitor, index) => {
+            competitor.color = colours[index % colours.length];
+         });
       }
    }
 
@@ -211,3 +228,20 @@ export class ResultsDataService {
       return ranks;
    }
 }
+
+function deepFreeze(o: any) {
+   Object.freeze(o);
+   if (o === undefined) {
+      return o;
+   }
+
+   Object.getOwnPropertyNames(o).forEach(function (prop) {
+      if (o[prop] !== null
+         && (typeof o[prop] === "object" || typeof o[prop] === "function")
+         && !Object.isFrozen(o[prop])) {
+         deepFreeze(o[prop]);
+      }
+   });
+
+   return o;
+};

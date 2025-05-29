@@ -1,4 +1,4 @@
-<mat-tab-group class="clipped-container" [selectedIndex]="tabIndex()">
+<mat-tab-group class="clipped-container" [selectedIndex]="tabIndex()" (selectedIndexChange)="tabIndex.set($event)">
    <mat-tab label="Class">
       <app-class-list 
             [classes]="rd.results().classes" 

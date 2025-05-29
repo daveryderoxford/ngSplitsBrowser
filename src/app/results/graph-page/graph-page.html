@@ -1,18 +1,23 @@
 <div class="main-container clipped-container ">
 
    <app-results-navbar [oevent]="rd.event()">
-      <app-compare-with [(selected)]="comparisonOptions"></app-compare-with>
-      <app-label-flags-select [flags]="leftLabelFlags()" (flagsChanged)="leftLabelFlags.set($event)"/>
+   <!--    <span class="title">
+         <h2>{{ rd.event()?.name }}</h2>
+         <h2>{{ rs.course()?.name }}</h2>
+      </span> -->
+
+      <app-compare-with [(selected)]="comparisonOptions" />
+      <app-label-flags-select settings [(flags)]="leftLabelFlags"/>
    </app-results-navbar>
 
    <div class="content clipped-container">
 
       <div class="sidebar">
-         <app-sidebar (mouseleave)="showFastestPanel.set(true)" (mouseenter)="showFastestPanel.set(false)"/>
+         <app-sidebar (mouseleave)="showFastestPanel.set(true)" (mouseenter)="showFastestPanel.set(false)" />
 
          @if ( showFastestPanel() ) {
-            <app-fastest-panel [results]="rd.results()" [leg]="legIndex()" [course]="rs.course()"
-               [selectedClass]="rs.oclass()" />
+         <app-fastest-panel [results]="rd.results()" [leg]="legIndex()" [course]="rs.course()"
+            [selectedClass]="rs.oclass()" />
          }
 
       </div>

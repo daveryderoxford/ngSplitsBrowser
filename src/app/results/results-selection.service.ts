@@ -1,13 +1,6 @@
-import { computed, effect, inject, Injectable, signal } from "@angular/core";
-import { Competitor, Course, CourseClass } from "./model";
+import { computed, inject, Injectable, linkedSignal, signal } from "@angular/core";
+import { Competitor, Course, CourseClass, Results } from "./model";
 import { ResultsDataService } from './results-data.service ';
-
-const colours = [
-   "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
-   "#FFCC00", "#884400", "#9900FF", "#CCCC00", "#888800", "#CC6699",
-   "#00DD00", "#3399FF", "#BB00BB", "#00DDDD", "#FF00FF", "#0088BB",
-   "#888888", "#FF99FF", "#55BB33"
-];
 
 /** 
  * Selected competitorss, control and courses
@@ -19,15 +12,26 @@ export class ResultsSelectionService {
 
    private rd = inject(ResultsDataService);
 
-   private _competitors = signal<Competitor[]>([]);
-   private _control = signal<string>(null);
-   private _course = signal<Course>(null);
-   private _oclass = signal<CourseClass>(null);
+   private _competitors = linkedSignal<Results, Competitor[]>({
+      source: this.rd.results,
+      computation: () => [] as Competitor[],
+   });
+
+   // When results change set default class to the first class
+   private _oclass = linkedSignal<CourseClass | undefined>( () => 
+      (this.rd.results().classes.length > 0) ? this.rd.results().classes[0]: undefined);
+
+   course = computed<Course | undefined>(() => this._oclass()?.course);
+
+   private _control = linkedSignal<Course, string | undefined>({
+      source: this.course,
+      computation: () => undefined
+   });
+
    private _courseOrClass = signal(false);
 
    public competitors = this._competitors.asReadonly();
    public control = this._control.asReadonly();
-   public course = this._course.asReadonly();
    public oclass = this._oclass.asReadonly();
    public courseOrClass = this._courseOrClass.asReadonly();
 
@@ -36,34 +40,14 @@ export class ResultsSelectionService {
       this.competitors().filter(comp =>
          this.courseOrClass() ?
             comp.courseClass.course.name === this.course().name :
-            comp.courseClass.name === this.oclass().name)
-         .map( (comp, index) => {
-             comp.color = colours[index % colours.length] 
-             return comp
-         }));
+            comp.courseClass.name === this.oclass().name));
 
-   /** Competitors avaluable for selection */
+   /** All competitors on course or class */
    displayedCompetitors = computed(() =>
       this.courseOrClass() ?
          this.course()?.competitors :
          this.oclass()?.competitors
    );
-
-   constructor() {
-      // TODO Change to linked sugnal when they are avaliable
-      this.rd.results$.subscribe(results => {
-         
-         this._competitors.set([]);
-         this._control.set(null);
-
-         if (results.classes.length > 0) {
-            this.selectClass(results.classes[0]);
-         } else {
-            this._course.set(null);
-            this._oclass.set(null);
-         } 
-      });
-   }
 
    /** Select a competitor or array of competitors */
    selectCompetitors(...comp: Competitor[]) {
@@ -104,18 +88,8 @@ export class ResultsSelectionService {
       this._control.set(code);
    }
 
-   selectCourse(course: Course) {
-      console.log(`Course selected${course.name}`);
-      // If course has changed then reset the selected control
-      if (course !== this._course()) {
-         this.selectControl(null);
-      }
-      this._course.set(course);
-   }
-
    selectClass(courseclass: CourseClass) {
       console.log(`Class selected${courseclass.name}`);
-      this.selectCourse(courseclass.course);
       this._oclass.set(courseclass);
    }
 

@@ -19,8 +19,6 @@ export class CompetitorList {
   rd = inject(ResultsDataService);
   rs = inject(ResultsSelectionService);
 
-  circleColor = (comp: Competitor) => comp.color;
-
   toggleSelected(comp: Competitor) {
     this.rs.toggleCompetitor(comp);
   }
