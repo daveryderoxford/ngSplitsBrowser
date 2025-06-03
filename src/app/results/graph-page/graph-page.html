@@ -7,6 +7,9 @@
       </span> -->
 
       <app-compare-with [(selected)]="comparisonOptions" />
+      @if (comparisonOptions().nameKey === 'CompareWithAnyRunner') {
+         <app-compare-with-competitor [competitors]="this.courseClassSet().allCompetitors" [(selected)]="comparisonCompetitor"/>
+      }      
       <app-label-flags-select settings [(flags)]="leftLabelFlags"/>
    </app-results-navbar>
 

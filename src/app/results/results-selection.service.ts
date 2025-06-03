@@ -2,6 +2,7 @@ import { computed, inject, Injectable, linkedSignal, signal } from "@angular/cor
 import { Competitor, Course, CourseClass, Results } from "./model";
 import { ResultsDataService } from './results-data.service ';
 
+
 /** 
  * Selected competitorss, control and courses
  * */

@@ -1,7 +1,11 @@
 <mat-selection-list>
    @for (oclass of classes(); track oclass; ) {
    <mat-list-option [selected]="selectedClass().name === oclass.name" (click)="selected.emit(oclass)">
-      <div matListItem>{{oclass.name}} <span> - course {{oclass.course.name}}</span></div>
+      <div matListItem>{{oclass.name}}
+         @if (oclass.course.classes.length > 1) {
+         <span> - {{oclass.course.name}}</span>
+         }
+      </div>
    </mat-list-option>
    } @empty {
    No classes to display

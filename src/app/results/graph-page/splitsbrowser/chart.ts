@@ -494,7 +494,7 @@ export class Chart {
    * @sb-param {jQuery.event} event - The jQuery onMouseUp event.
    */
    private onMouseUp(even: JQueryEventObject) {
-      this.popup.hide();
+    //  this.popup.hide();
       event.preventDefault();
    }
 

@@ -1,15 +1,14 @@
 <app-results-navbar>
 
-  <app-class-menu-button [selectedClass]='rs.oclass()' [oclasses]='rd.results().classes'
-      (select)='rs.selectClass($event)' />
+   <app-class-select [selected]='rs.oclass()' (onSelected)='rs.selectClass($event)' [oclasses]='rd.results().classes' />
 
-  @if (course() && course().classes.length > 1) {
-    <mat-checkbox labelPosition="after" [formControl]="courseCheckbox">Course</mat-checkbox>
-  }
+   @if (course()?.classes.length > 1) {
+      <app-course-or-class />
+   }
 
-  <mat-checkbox labelPosition="after" [formControl]="colorCheckbox">Color</mat-checkbox>
+   <mat-checkbox labelPosition="after" [formControl]="colorCheckbox">Color</mat-checkbox>
 
-  <mat-checkbox labelPosition="after" [formControl]="selectedCheckbox">Selected only</mat-checkbox>
+   <mat-checkbox labelPosition="after" [formControl]="selectedCheckbox">Selected only</mat-checkbox>
 
 </app-results-navbar>
 
@@ -19,8 +18,11 @@
     <!-- Initial columns -->
     <ng-container matColumnDef="position" sticky>
       <th mat-header-cell class="positioncolumn" *matHeaderCellDef mat-sort-header>Pos</th>
-      <td mat-cell [class.selected]="rs.isCompetitorSelected(competitor)" *matCellDef="let competitor">
-        {{competitor.position}}
+      <td mat-cell *matCellDef="let competitor">
+        @if (rs.isCompetitorSelected(competitor)) {
+          <app-colored-circle class="circle" [text]="competitor.order.toString()" [color]="competitor.color" />
+        } @else {
+        <span>{{competitor.order.toString()}}</span>}
       </td>
     </ng-container>
 

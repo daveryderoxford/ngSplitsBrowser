@@ -6,11 +6,13 @@ import { ResultsSelectionService } from '../../results-selection.service';
 import { MatIconModule } from '@angular/material/icon';
 import { ColoredCircle } from "./colored-circle";
 import { Competitor } from 'app/results/model';
+import { CourseOrClassCheckbox } from './course-or-class';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-competitor-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatListModule, FormatTimePipe, MatIconModule, ColoredCircle],
+  imports: [MatListModule, FormatTimePipe, MatButtonModule, MatIconModule, ColoredCircle, CourseOrClassCheckbox],
   templateUrl: './competitor-list.html',
   styleUrl: './competitor-list.scss'
 })

@@ -13,8 +13,5 @@ export class ClassList {
 
   classes = input.required<CourseClass[]>();
   selectedClass = input.required<CourseClass>();
-  hasCourses = input.required<boolean>();
   selected = output<CourseClass>()
-
-  
 }

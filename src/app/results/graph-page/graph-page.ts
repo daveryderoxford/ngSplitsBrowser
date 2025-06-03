@@ -3,16 +3,17 @@ import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, debounceTime } from 'rxjs';
 import { FastestPanelComponent } from "../fastest-panel/fastest-panel.component";
-import { CourseClassSet, sbTime } from '../model';
+import { Competitor, CourseClassSet, sbTime } from '../model';
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
-import { CompareWithSelect } from './compare-with-select';
+import { CompareWithSelect } from './comparison-algorithm/compare-with-select';
 import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
 import { ALL_COMPARISON_OPTIONS } from './splitsbrowser/comparision-options';
 import { Sidebar } from '../sidebar/sidebar';
+import { CompareWithCompetitorSelect } from "./comparison-algorithm/compare-with-competitor-select";
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -28,7 +29,7 @@ interface SplitsBrowserOptions {
   // These styles will just get appended to the global styles file
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Navbar, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar]
+  imports: [Navbar, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect]
 })
 export class GraphPage implements AfterViewInit {
   destroyRef = inject(DestroyRef);
@@ -42,6 +43,7 @@ export class GraphPage implements AfterViewInit {
   raceTiime = signal(0);
 
   comparisonOptions = signal(ALL_COMPARISON_OPTIONS[1]);
+  comparisonCompetitor = signal<Competitor | undefined>(undefined);
 
   leftLabelFlags = signal<StatsVisibilityFlags>({
     totalTime: false,
@@ -70,6 +72,7 @@ export class GraphPage implements AfterViewInit {
   );
 
   referenceCumTimes = computed<sbTime[]>(() => {
+     
     const opt = this.comparisonOptions();
     switch (opt.nameKey) {
       case 'CompareWithWinner':
@@ -79,7 +82,9 @@ export class GraphPage implements AfterViewInit {
       case 'CompareWithFastestTimePlusPercentage':
         return this.courseClassSet().getFastestCumTimesPlusPercentage(opt.percentage);
       case 'CompareWithAnyRunner':
-        return this.courseClassSet().getCumulativeTimesForCompetitor(0);
+        /** index of competitors in displayed competitor list */
+        const index= this.courseClassSet().allCompetitors.indexOf(this.comparisonCompetitor());
+        return this.courseClassSet().getCumulativeTimesForCompetitor(index);
       default:
         throw new Error(`Unknown comparison option: ${opt.nameKey}`);
     }

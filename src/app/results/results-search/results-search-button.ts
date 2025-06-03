@@ -23,7 +23,8 @@ export class SearchIconButtonComponent {
 
   openSearchDialog(): void {
     const dialogRef = this.dialog.open(ResultsSearchDialog, {
-      width: '450px', 
+      width: '420px', 
+      height: '80%',
       autoFocus: true,
     });
 

@@ -63,7 +63,6 @@ export class ResultsDataService {
    /**
     * Selects an event to view.
     * This will load results from storage clearing any selections relivant to the previous event
-    * The first class is selected if one exists.
     */
    setSelectedEvent(event: OEvent): Observable<Results> {
 
@@ -106,7 +105,7 @@ export class ResultsDataService {
       }
    }
 
-   /** Parse splits file with logging */
+   /** Parse splits file */
    public parseSplits(text: string): Results {
 
       let results: Results;

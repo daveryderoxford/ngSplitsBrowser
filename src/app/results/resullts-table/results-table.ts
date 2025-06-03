@@ -1,26 +1,28 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatSelectModule } from "@angular/material/select";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatSortModule, Sort } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
-import { Competitor, CourseClass } from "../model";
+import { Competitor } from "../model";
 import { BracketedPipe, FormatTimePipe } from '../model/results-pipes';
 import { TimeUtilities } from "../model/time";
+import { ClassSelect } from "../navbar/class-select";
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
-import { ClassMenuButtonComponent } from "../navbar/class-menu-button.component";
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ColoredCircle } from '../sidebar/competitor-list/colored-circle';
+import { CourseOrClassCheckbox } from '../sidebar/competitor-list/course-or-class';
 
 @Component({
     selector: "app-splits-grid",
     templateUrl: "./results-table.html",
     styleUrls: ["./results-table.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe, ClassMenuButtonComponent, MatCheckboxModule]
+    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe, ClassSelect, CourseOrClassCheckbox, MatCheckboxModule, ColoredCircle]
 })
 export class ResultsTable implements OnInit {
    protected rs = inject(ResultsSelectionService);

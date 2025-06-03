@@ -1,3 +1,14 @@
+
+<div class="top-controls">
+
+   <button mat-icon-button (click)="rs.clearCompetitors()">
+      <mat-icon>cancel</mat-icon>
+   </button>
+   @if (rs.oclass().course.classes.length > 1) {
+      <app-course-or-class/>
+   }
+</div>
+
 <ol>
    @for (comp of rs.displayedCompetitors(); track comp; let index= $index ) {
    <li (click)="toggleSelected(comp)">
