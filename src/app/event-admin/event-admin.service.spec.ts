@@ -70,7 +70,7 @@ xdescribe("EventAdminService", () => {
       ],
     });
 
-    eventAdmin = TestBed.get(EventAdminService);
+    eventAdmin = TestBed.inject(EventAdminService);
   });
 
   it("should create event admin service", () => {

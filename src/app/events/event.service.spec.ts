@@ -47,7 +47,7 @@ xdescribe('EventService', () => {
             PaganationService
          ]
       });
-      service = TestBed.get(EventService);
+      service = TestBed.inject(EventService);
    }
 
    beforeEach(() => {

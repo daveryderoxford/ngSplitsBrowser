@@ -15,12 +15,12 @@ export class FirestoreTestUtil {
    afs: Firestore;
 
    constructor() {
-      this.afAuth = TestBed.get(Auth);
+      this.afAuth = TestBed.inject(Auth);
       if (!this.afAuth) {
          throw new Error("Auth service reference no found");
       }
 
-      this.afs = TestBed.get(Firestore);
+      this.afs = TestBed.inject(Firestore);
       if (!this.afs) {
          throw new Error("Firestore service reference no found");
       }
