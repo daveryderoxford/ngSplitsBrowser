@@ -1,19 +1,19 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewEncapsulation, computed, effect, inject, signal, viewChild } from "@angular/core";
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, debounceTime } from 'rxjs';
-import { FastestPanelComponent } from "../fastest-panel/fastest-panel.component";
 import { Competitor, CourseClassSet, sbTime } from '../model';
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
+import { Sidebar } from '../selection-sidebar/sidebar';
+import { CompareWithCompetitorSelect } from "./comparison-algorithm/compare-with-competitor-select";
 import { CompareWithSelect } from './comparison-algorithm/compare-with-select';
 import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
 import { ALL_COMPARISON_OPTIONS } from './splitsbrowser/comparision-options';
-import { Sidebar } from '../sidebar/sidebar';
-import { CompareWithCompetitorSelect } from "./comparison-algorithm/compare-with-competitor-select";
+import { SelectionSidebarButton } from "../selection-sidebar/selection-sidebar-button";
 
 interface SplitsBrowserOptions {
   defaultLanguage?: boolean;
@@ -29,7 +29,7 @@ interface SplitsBrowserOptions {
   // These styles will just get appended to the global styles file
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Navbar, FastestPanelComponent, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect]
+  imports: [Navbar, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect, SelectionSidebarButton]
 })
 export class GraphPage implements AfterViewInit {
   destroyRef = inject(DestroyRef);
@@ -38,7 +38,6 @@ export class GraphPage implements AfterViewInit {
   protected rd = inject(ResultsDataService);
   protected activeRoute = inject(ActivatedRoute);
 
-  showFastestPanel = signal(true);
   legIndex = signal(0);
   raceTiime = signal(0);
 

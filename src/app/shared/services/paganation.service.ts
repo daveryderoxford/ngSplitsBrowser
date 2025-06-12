@@ -1,7 +1,8 @@
 
 /** Service to paganate Firebase queries */
 import { inject, Injectable } from '@angular/core';
-import { collection, CollectionReference, collectionSnapshots, DocumentSnapshot, Firestore, limit, orderBy, Query, query, startAfter } from '@angular/fire/firestore';
+import { FirebaseApp } from '@angular/fire/app';
+import { collection, CollectionReference, collectionSnapshots, DocumentSnapshot, getFirestore, limit, orderBy, Query, query, startAfter } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { take, tap } from 'rxjs/operators';
 
@@ -17,7 +18,7 @@ export interface QueryConfig {
   providedIn: 'root',
 })
 export class PaganationService<T> {
-  private firestore = inject(Firestore);
+  private firestore = getFirestore(inject(FirebaseApp));
   
   // Source data
   private _done = new BehaviorSubject<boolean>(false);

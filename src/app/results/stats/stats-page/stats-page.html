@@ -1,15 +1,24 @@
+<app-results-navbar class="navbar" [oevent]="rd.event()">
+   <app-selection-sidebar-button />
 
-<app-results-navbar [oevent]="rd.event()"/>
+   <mat-button-toggle-group [hideSingleSelectionIndicator]=true>
+      @for (view of views; track view) {
+         <mat-button-toggle [checked]="statsView() === view" (click)="buttonClicked(view)">
+            {{ view }}
+         </mat-button-toggle>
+      }
+   </mat-button-toggle-group>
+</app-results-navbar>
 
-<app-competitor-list />
+<app-sidebar class="sidebar"/>
 
-<div>
+<div class="content">
    @for (comp of rs.selectedCompetitors(); track comp) {
       <app-stats-panel [competitor]="comp"></app-stats-panel>
    } @empty {
-      <span class="no-competitors mat-body-large">
-         No competitors selected
-         Select a competitor to display 
-      </span>
+      <div class="no-competitors">
+         No competitors selected<br>
+         Select a competitor to display
+      </div>
    }
 </div>

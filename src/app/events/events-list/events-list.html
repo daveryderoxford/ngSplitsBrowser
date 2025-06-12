@@ -1,0 +1,19 @@
+<div class="events-virtual-list-container">
+   <cdk-virtual-scroll-viewport itemSize="88" class="events-viewport" (scrolledIndexChange)="triggerLoadMore($event)">
+
+      <mat-list>
+         <mat-list-item *cdkVirtualFor="let event of events(); let i = index" (click)="onEventClicked(event)"
+            class="event-list-item" role="listitem">
+            <div matListItemTitle>{{ event.name }}</div>
+            <div matListItemLine>{{ event.date | date:'mediumDate' }} - {{ event.club }} ({{ event.nationality }})</div>
+            <div matListItemLine>Type: {{ event.type }} | Discipline: {{ event.discipline }}</div>
+         </mat-list-item>
+      </mat-list>
+
+      @if (isLoading()) {
+      <div class="loading-spinner">
+         <mat-spinner diameter="40"></mat-spinner>
+      </div>
+      }
+   </cdk-virtual-scroll-viewport>
+</div>

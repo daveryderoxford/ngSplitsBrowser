@@ -7,46 +7,45 @@ import { FormatTimePipe } from '../model/results-pipes';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-    selector: 'app-fastest-panel',
-    imports: [MatButtonToggleModule, MatCardModule ],
-    template: `
+   selector: 'app-fastest-panel',
+   imports: [MatButtonToggleModule, MatCardModule, FormatTimePipe],
+   template: `
       <div class="chartPopup" style="position: absolute; left: 496px; top: 278.5px;">
     <div class="chartPopupHeader">
-   <span>Fastest leg - time 152 to 153 </span>
+   <span>title()</span>
 </div>
 <div class="chartPopupTableContainer">
    <table>
-      
-      <tr>
-         <td>01: 47 < /td>
-         <td>Yellow</td>
-         <td>Gregg Lippiatt < /td>
+   @for (split of fastestSplitsForLeg(); track split.name) {
+      <tr [class.primary]="split.className.localeCompare(selectedClass()?.name)">
+         <td class="mat-body-medium"> {{split.name}}</td>
+         <td class="mat-body-medium"> {{split.split | formatTime}}</td>
       </tr>
-      <tr>
-         <td>02: 11 < /td>
-         <td>W10A</td>
-         <td>Delyth Darlington < /td>
-      </tr>
-      <tr>
-         <td>02: 11 < /td>
-         <td>M12B</td>
-         <td>Matthew Kelly < /td>
-      </tr>
-      <tr class="highlighted">
-         <td>03:06 < /td>
-         <td>M10A</td>
-         <td>Jack Kelsey < /td>
-      </tr>
+      }
+
+
+      }
    </table>
 </div>
-</div>;
-
-    `,
-    styleUrl: './fastest-panel.component.scss'
+</div>
+    `, 
+   styles: `
+   `
 })
-export class ChartPopup {
+export class LegSplitsPopup {
 
+   results = input.required<Results>();
+   leg = input<number>(0);
+   course = input.required<Course>();
+   selectedClass = input.required<CourseClass>();
 
-   const header = computed((() => 'Fastest Leg - Time ' + this.legIndex() + ' to ' + (this.legIndex() + 1)))
+   startCode = computed(() => this.leg() === 0 ? '' : this.course()?.getControlCode(this.leg() - 1));
+
+   endCode = computed(() => this.leg() === 0 ? '' : this.course()?.getControlCode(this.leg()));
+
+   fastestSplitsForLeg = computed(() =>
+      this.results().getFastestSplitsForLeg(this.startCode(), this.endCode()));
+
 }
+
 

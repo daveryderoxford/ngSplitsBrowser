@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { collection, collectionData, deleteDoc, doc, Firestore, getDoc, orderBy, query, setDoc, where } from '@angular/fire/firestore';
-import { deleteObject, ref, Storage, uploadString } from '@angular/fire/storage';
+import { FirebaseApp } from '@angular/fire/app';
+import { collection, collectionData, deleteDoc, doc, Firestore, getDoc, getFirestore, orderBy, query, setDoc, where } from '@angular/fire/firestore';
+import { deleteObject, getStorage, ref, Storage, uploadString } from '@angular/fire/storage';
 import { AuthService } from 'app/auth/auth.service';
 import { CourseSummary, eventConverter, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
 import { parseEventData } from 'app/results/import';
@@ -17,8 +18,8 @@ const EVENTS_COLLECTION = 'events';
 })
 export class EventAdminService {
    protected auth = inject(AuthService);
-   protected fs = inject(Firestore);
-   protected storage = inject(Storage);
+   protected fs = getFirestore(inject(FirebaseApp));
+   protected storage = getStorage(inject(FirebaseApp));
 
    private eventsCollection = collection(this.fs, EVENTS_COLLECTION).withConverter(eventConverter);
 

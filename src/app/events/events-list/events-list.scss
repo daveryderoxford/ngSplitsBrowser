@@ -1,0 +1,39 @@
+events-virtual-list-container {
+   display: flex;
+   flex-direction: column;
+   height: 100%; // Or a specific height like 600px
+   min-height: 200px; // Ensure it has some minimum height
+}
+
+.events-viewport {
+   flex-grow: 1;
+   height: 100%; // Crucial for cdk-virtual-scroll-viewport
+}
+
+.event-list-item {
+   cursor: pointer;
+
+   &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+   }
+}
+
+.loading-spinner {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   padding: 20px;
+   position: absolute; // To overlay or position at bottom
+   bottom: 10px;
+   width: 100%;
+}
+
+.status-message {
+   text-align: center;
+   padding: 20px;
+   color: grey;
+}
+
+.no-events {
+   margin-top: 20px; // Give some space if list is empty
+}

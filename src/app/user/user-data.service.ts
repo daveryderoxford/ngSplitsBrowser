@@ -1,33 +1,26 @@
 import { Injectable, inject } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
-import { Auth, authState } from "@angular/fire/auth";
-import { DocumentReference, Firestore, doc, docData, updateDoc } from "@angular/fire/firestore";
+import { rxResource } from "@angular/core/rxjs-interop";
+import { Auth, User } from "@angular/fire/auth";
+import { DocumentReference, doc, docData, getFirestore, updateDoc } from "@angular/fire/firestore";
+import { AuthService } from 'app/auth/auth.service';
 import { of } from 'rxjs';
-import { shareReplay, startWith, switchMap } from 'rxjs/operators';
 import { UserData } from './user';
+import { FirebaseApp } from '@angular/fire/app';
 
 @Injectable({
   providedIn: "root"
 })
 export class UserDataService {
   private auth = inject(Auth);
-  private fs = inject(Firestore);
+  private fs = getFirestore(inject(FirebaseApp));
+  private as = inject(AuthService);
 
-  private user$ = authState(this.auth).pipe(
-    startWith(null),
-    switchMap((u) => {
-      if (!u) {
-        console.log("UserData: Firebase user null.  Stop monitoring user date  ");
-        return of(null);
-      } else {
-        console.log(`UserData: monitoring uid: ${u.uid}`);
-        return docData(this._doc(u.uid));
-      }
-    }),
-    shareReplay(1)
-  );
+  private _userResource = rxResource<UserData, User>({
+    params: () => this.as.user(),
+    stream: request => request.params ? docData(this._doc(request.params.uid)) : of(undefined)
+  });
 
-  user = toSignal(this.user$);
+  readonly user = this._userResource.value.asReadonly();
 
   /** Update the user info.  Returning the modified user details */
   async updateDetails(details: Partial<UserData>): Promise<void> {
@@ -39,7 +32,6 @@ export class UserDataService {
       console.log('UserDataService: Saving user: Unexectly null');
       throw Error('UserDataService: Saving user: Unexectly null');
     }
-
   }
 
   private _doc(uid: string): DocumentReference<UserData> {

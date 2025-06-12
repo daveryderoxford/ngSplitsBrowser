@@ -4,7 +4,7 @@
   </div>
 </app-toolbar>
 
-<mat-tab-group class=fill mat-stretch-tabs="false" mat-align-tabs="start" backgroundColor="primary">
+<mat-tab-group class=fill mat-stretch-tabs="false" mat-align-tabs="start" backgroundColor="primary" dynamicHeight>
   <mat-tab label="All">
     <ng-template matTabContent>
       <app-all-events-tab (eventSelected)="eventClicked($event)" />

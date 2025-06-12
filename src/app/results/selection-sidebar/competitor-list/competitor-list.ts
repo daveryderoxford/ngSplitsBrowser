@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { FormatTimePipe } from "../../model/results-pipes";
 import { ResultsDataService } from '../../results-data.service ';
@@ -21,10 +21,21 @@ export class CompetitorList {
   rd = inject(ResultsDataService);
   rs = inject(ResultsSelectionService);
 
+  showCrossing = input.required<boolean>();
+
   toggleSelected(comp: Competitor) {
     this.rs.toggleCompetitor(comp);
   }
-  
+
+  selectCrossingRunners() {
+    if (this.rs.selectedCompetitors().length> 0) {
+      const comp = this.rs.selectedCompetitors()[0];
+
+      this.rs.selectCrossingRunners(comp);
+    }
+
+  }
+
   timeBehind( comp: Competitor): number{
     if (this.rs.displayedCompetitors().length === 0) {
       return 0;

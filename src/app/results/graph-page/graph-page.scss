@@ -10,18 +10,11 @@
     flex-direction: row;
 }
 
-.sidebar {
-    min-width: 190px;
-    max-width: 190px;
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
 .chart {
-    margin: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    margin-left: 0px;
     width: 100%;
     flex-grow: 1;
     min-width: 0;

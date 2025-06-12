@@ -1,0 +1,37 @@
+@use '@angular/material' as mat;
+
+:host {
+   @include mat.tabs-overrides((divider-height: 1px,
+         active-label-text-color: var(--mat-sys-primary),
+         active-indicator-height: 3px,
+      ));
+   min-height: 20px;
+   max-height: 100%;
+   overflow: hidden;
+}
+
+:host.shown {
+   width: 226px;
+   min-width: 226px;
+   max-width: 226px;
+   transition: width 0.4s ease-in-out;
+   margin-right: 20px;
+}
+
+:host.hidden {
+   width: 0;
+   transition: width 0.4s ease-in-out;
+}
+
+// Necessary to allow contentn inside tab to scroll
+.mat-tab-body-wrapper {
+   min-height: 20px;
+   max-height: 100%;
+   overflow: hidden;
+}
+
+mat-tab {
+   overflow: scroll;
+   min-height: 20px;
+   max-height: 100%;
+}

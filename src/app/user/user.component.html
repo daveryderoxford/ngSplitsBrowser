@@ -2,10 +2,6 @@
 
 <form (ngSubmit)="save()" novalidate [formGroup]="userForm">
 
-  @if (showProgressBar) {
-  <mat-progress-bar mode="query" />
-  }
-
   <div fxFlexLayout=row fxLayoutAlign="space-between" fxLayoutGap=20px>
 
     <mat-form-field fxFlex="calc(50%-20px)">
@@ -38,8 +34,8 @@
   </mat-form-field>
 
   <div fxLayout="row" fxLayoutAlign="space-between center">
-    <button [disabled]="userForm.invalid || !userForm.dirty" mat-raised-button color=primary type="submit"
-      aria-label="login">Save</button>
+    <button [disabled]="userForm.invalid || !userForm.dirty" mat-flat-button type="submit"
+      aria-label="Save user details">Save</button>
   </div>
 
 </form>

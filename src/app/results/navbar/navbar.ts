@@ -1,4 +1,4 @@
-import { Component, inject, input, TemplateRef } from "@angular/core";
+import { Component, computed, inject, input, TemplateRef } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { OEvent } from 'app/events/model/oevent';
@@ -25,7 +25,10 @@ export class Navbar {
   oevent = input<OEvent>();
   settings = input<TemplateRef<any>>;
 
-  resultsViews: ResultsView[] = resultsViews;
+  hasStartTimes = computed(() => this.rs.oclass().competitors.some(comp => comp.hasStartTime() ));
+
+  views = computed(() => resultsViews.filter(view => view.type !== 'race' || this.hasStartTimes()));
+
   compareWith: ComparisionOption;
 
   viewSelected(view: ResultsView) {

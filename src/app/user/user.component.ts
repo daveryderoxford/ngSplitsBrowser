@@ -36,10 +36,8 @@ export class UserComponent {
     surname: new FormControl('', { validators: [Validators.required] }),
     club: new FormControl('', { validators: [Validators.minLength(2), Validators.maxLength(10)] }),
     nationality: new FormControl('', { validators: [Validators.required] }),
-    nationalId: new FormControl('', { validators: [Validators.required] }),
   });
 
-  showProgressBar = false;
   busy = false;
 
   nations = Nations.getNations();

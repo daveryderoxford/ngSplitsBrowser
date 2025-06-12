@@ -1,29 +1,23 @@
-<div class="main-container clipped-container ">
+<div class="main-container clipped-container">
 
    <app-results-navbar [oevent]="rd.event()">
-   <!--    <span class="title">
+      <app-selection-sidebar-button />
+      <!--    <span class="title">
          <h2>{{ rd.event()?.name }}</h2>
          <h2>{{ rs.course()?.name }}</h2>
       </span> -->
 
       <app-compare-with [(selected)]="comparisonOptions" />
       @if (comparisonOptions().nameKey === 'CompareWithAnyRunner') {
-         <app-compare-with-competitor [competitors]="this.courseClassSet().allCompetitors" [(selected)]="comparisonCompetitor"/>
-      }      
-      <app-label-flags-select settings [(flags)]="leftLabelFlags"/>
+      <app-compare-with-competitor [competitors]="this.courseClassSet().allCompetitors"
+         [(selected)]="comparisonCompetitor" />
+      }
+      <app-label-flags-select settings [(flags)]="leftLabelFlags" />
    </app-results-navbar>
 
    <div class="content clipped-container">
 
-      <div class="sidebar">
-         <app-sidebar (mouseleave)="showFastestPanel.set(true)" (mouseenter)="showFastestPanel.set(false)" />
-
-         @if ( showFastestPanel() ) {
-         <app-fastest-panel [results]="rd.results()" [leg]="legIndex()" [course]="rs.course()"
-            [selectedClass]="rs.oclass()" />
-         }
-
-      </div>
+      <app-sidebar />
 
       <div #chart class="chart"></div>
 

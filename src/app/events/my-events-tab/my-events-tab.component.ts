@@ -14,7 +14,7 @@ import { OEvent } from '../model/oevent';
    imports: [MatButtonModule, RouterLink, MatListModule]
 })
 export class MyEventsTabComponent {
-   private us = inject(UserDataService);
+  // private us = inject(UserDataService);
    private auth = inject(AuthService);
    eventSelected = output<OEvent>();
 

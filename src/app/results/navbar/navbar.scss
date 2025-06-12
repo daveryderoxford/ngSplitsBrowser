@@ -8,6 +8,9 @@
 
   @include mat.button-toggle-overrides((
     height: 35px,
+    shape: 5px,
+    selected-state-background-color: var(--mat-sys-primary),
+    selected-state-text-color: var(--mat-sys-on-primary)
   ));
 
 }

@@ -1,21 +1,26 @@
-
 <div class="top-controls">
-
-   <button mat-icon-button (click)="rs.clearCompetitors()">
-      <mat-icon>cancel</mat-icon>
+   <button matButton="outlined" class="dense-button" (click)="rs.clearCompetitors()">
+      Clear
    </button>
+
    @if (rs.oclass().course.classes.length > 1) {
-      <app-course-or-class/>
+      <app-course-or-class />
    }
 </div>
+
+@if (showCrossing()) {
+   <button matButton="outlined" class="dense-button crossing-runners" (click)="selectCrossingRunners()">
+      Crossing Runners
+   </button>
+}
 
 <ol>
    @for (comp of rs.displayedCompetitors(); track comp; let index= $index ) {
    <li (click)="toggleSelected(comp)">
       @if (rs.isCompetitorSelected(comp)) {
-         <app-colored-circle class="circle" [text]="(index+1).toString()" [color]="comp.color" />
+      <app-colored-circle class="circle" [text]="(index+1).toString()" [color]="comp.color" />
       } @else {
-          <span class="position">{{(index+1).toString()}}</span>
+      <span class="position">{{(index+1).toString()}}</span>
       }
       <span class="name">{{comp.name}}</span>
       <span class="club">{{comp.club}}</span>

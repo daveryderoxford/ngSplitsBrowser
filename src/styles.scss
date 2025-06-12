@@ -33,6 +33,10 @@ html {
       container-background-color: var(--mat-sys-primary-container),
       container-text-color: var(--mat-sys-primary),
     ));
+
+    @include mat.button-toggle-overrides((
+      height: 35px,
+    ));
 }
 
 body {
@@ -48,4 +52,8 @@ body {
 
 .dense-list {
   @include mat.list-density(-5);
+}
+
+.dense-button {
+  @include mat.button-density(-2);
 }

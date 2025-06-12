@@ -476,6 +476,17 @@ export class Competitor {
     }
 
     /**
+    * Returns whether this competitor is has a start time.
+    */
+    public hasStartTime = () => this.startTime !== null;
+    
+    /**
+    * Returns whether this competitor has started
+    * The competitor has starts if they have at least one split
+    */
+    public started = () => this.splitTimes.some(isNotNull);
+  
+    /**
     * Sets the split and cumulative-split ranks for this competitor.
     * @sb-param {Array} splitRanks - Array of split ranks for this competitor.
     * @sb-param {Array} cumRanks - Array of cumulative-split ranks for this competitor.

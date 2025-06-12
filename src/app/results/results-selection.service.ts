@@ -36,7 +36,7 @@ export class ResultsSelectionService {
    public oclass = this._oclass.asReadonly();
    public courseOrClass = this._courseOrClass.asReadonly();
 
-   /** Competitors currently selected */
+   /** Competitors currently selected for the selected course/class*/
    selectedCompetitors = computed(() =>
       this.competitors().filter(comp =>
          this.courseOrClass() ?
@@ -82,6 +82,11 @@ export class ResultsSelectionService {
          this.selectCompetitors(comp);
       }
    }
+
+   selectCrossingRunners(target: Competitor) {
+      const crossingRunners = this.displayedCompetitors().filter(comp => target.crosses(comp));  
+      this.selectCompetitors(...crossingRunners);
+   } 
 
    public isCompetitorSelected = (comp: Competitor) => this._competitors().includes(comp);
 

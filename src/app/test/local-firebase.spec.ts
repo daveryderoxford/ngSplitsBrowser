@@ -20,7 +20,7 @@ export class FirestoreTestUtil {
          throw new Error("Auth service reference no found");
       }
 
-      this.afs = TestBed.inject(Firestore);
+      this.afs = TestBed.getFirestore(inject(FirebaseApp));
       if (!this.afs) {
          throw new Error("Firestore service reference no found");
       }

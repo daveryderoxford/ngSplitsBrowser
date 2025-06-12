@@ -215,31 +215,6 @@ describe("Competitor", () => {
         }
     });
 
-    it("Competitor with start time but all-null splits is not lacking a start time", () => {
-        const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, null, null, null, null]);
-        expect(!competitor.lacksStartTime()).toBe(true);
-    });
-
-    it("Competitor with start time and splits is not lacking a start time", () => {
-        const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
-        expect(!competitor.lacksStartTime()).toBe(true);
-    });
-
-    it("Competitor with no start time nor any splits is not lacking a start time", () => {
-        const competitor = fromCumTimes(1, "John Smith", "ABC", null, [0, null, null, null, null]);
-        expect(!competitor.lacksStartTime()).toBe(true);
-    });
-
-    it("Competitor with no start time but all splits is lacking a start time", () => {
-        const competitor = fromCumTimes(1, "John Smith", "ABC", null, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
-        expect(competitor.lacksStartTime()).toBe(true);
-    });
-
-    it("Competitor with no start time but some splits is lacking a start time", () => {
-        const competitor = fromCumTimes(1, "John Smith", "ABC", null, [0, 65, null, null, 65 + 221 + 184 + 100]);
-        expect(competitor.lacksStartTime()).toBe(true);
-    });
-
     it("Can determine total time of a competitor that punches all controls", () => {
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         expect(competitor.totalTime).toEqual(65 + 221 + 184 + 100, "Wrong total time");

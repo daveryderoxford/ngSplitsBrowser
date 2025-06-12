@@ -11,7 +11,11 @@ import { EventDetailsForm } from './event-details-form/event-form';
          <app-toolbar title="Edit Event Details"/>
          <app-event-form [oevent]="event()" (submitted)="save($event)"/>
        `,
-   imports: [ToolbarComponent, EventDetailsForm]
+   imports: [ToolbarComponent, EventDetailsForm],
+   styles: `
+      @use "mixins" as mix;
+      @include mix.form-page("app-event-form", 400px);
+   `
 })
 
 export class EditEventDetails {

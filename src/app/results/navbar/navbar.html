@@ -2,7 +2,7 @@
 
   <app-sidenav-button />
 
-  <app-results-view-button [views]="resultsViews" [selectedView]="pageState.pageDisplayed()" (viewSelected)="viewSelected($event)" />
+  <app-results-view-button [views]="views()" [selectedView]="pageState.pageDisplayed()" (viewSelected)="viewSelected($event)" />
   
   <ng-content></ng-content>
 

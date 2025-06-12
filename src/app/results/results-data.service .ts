@@ -3,8 +3,9 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
-import { doc, docData, DocumentReference, Firestore } from '@angular/fire/firestore';
-import { getDownloadURL, ref, Storage } from '@angular/fire/storage';
+import { FirebaseApp } from '@angular/fire/app';
+import { doc, docData, DocumentReference, getFirestore } from '@angular/fire/firestore';
+import { getDownloadURL, getStorage, ref, Storage } from '@angular/fire/storage';
 import { OEvent } from "app/events/model/oevent";
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
 import { BehaviorSubject, from, Observable } from "rxjs";
@@ -26,8 +27,8 @@ const colours = [
 })
 export class ResultsDataService {
 
-   private firestore = inject(Firestore);
-   private storage = inject(Storage);
+   private firestore = getFirestore(inject(FirebaseApp));
+   private storage = getStorage(inject(FirebaseApp));
    private http = inject(HttpClient);
 
    // Behavioir subjects for all state

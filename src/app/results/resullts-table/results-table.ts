@@ -14,8 +14,8 @@ import { ClassSelect } from "../navbar/class-select";
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsSelectionService } from "../results-selection.service";
-import { ColoredCircle } from '../sidebar/competitor-list/colored-circle';
-import { CourseOrClassCheckbox } from '../sidebar/competitor-list/course-or-class';
+import { ColoredCircle } from '../selection-sidebar/competitor-list/colored-circle';
+import { CourseOrClassCheckbox } from '../selection-sidebar/competitor-list/course-or-class';
 
 @Component({
     selector: "app-splits-grid",
@@ -111,14 +111,13 @@ export class ResultsTable implements OnInit {
 
    /** Format title for split time */
    splitTitle(index: number): string {
-      // eslint-disable-next-line radix
       if (index === 0) {
          return 'S-1';
       } else if (index === this.course().numSplits) {
          return (index.toString() + '-F');
       } else {
          let ret = (index + 1).toString();
-         if (this.course().hasControls) {
+         if (this.course()?.hasControls) {
             ret = ret + ' (' + this.course().controls[index].toString() + ')';
          }
          return ret;

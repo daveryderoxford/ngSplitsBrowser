@@ -2,7 +2,8 @@
  * Event service
  */
 import { inject, Injectable, signal } from "@angular/core";
-import { collection, collectionData, doc, docData, DocumentReference, Firestore, orderBy, query, where } from '@angular/fire/firestore';
+import { FirebaseApp } from '@angular/fire/app';
+import { collection, collectionData, doc, docData, DocumentReference, getFirestore, orderBy, query, where } from '@angular/fire/firestore';
 import { PaganationService } from "app/shared";
 import { BehaviorSubject, merge, Observable } from "rxjs";
 import { Club } from './model/club';
@@ -17,7 +18,7 @@ const EVENTS_COLLECTION = 'events';
   providedIn: 'root',
 })
 export class EventService {
-  private firestore = inject(Firestore);
+  private firestore = getFirestore(inject(FirebaseApp));
   private ps = inject(PaganationService);
 
   private eventsCollection = collection(this.firestore, EVENTS_COLLECTION).withConverter(eventConverter);

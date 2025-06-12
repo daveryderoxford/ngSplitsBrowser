@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from "@angular/material/tabs";
 import { Router, RouterLink } from "@angular/router";
@@ -11,25 +11,32 @@ import { EventService } from "../event.service";
 import { MyEventsTabComponent } from "../my-events-tab/my-events-tab.component";
 
 @Component({
-    selector: "app-results",
-    templateUrl: "./events-view.component.html",
-    styleUrls: ["./events-view.component.scss"],
-    imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent, ToolbarComponent, MatButtonModule, RouterLink]
+   selector: "app-results",
+   templateUrl: "./events-view.component.html",
+   styleUrls: ["./events-view.component.scss"],
+   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent, ToolbarComponent, MatButtonModule, RouterLink]
 })
 export class EventsViewComponent {
-  private router = inject(Router);
-  public es = inject(EventService);
-  private ds = inject(DialogsService);
+   private router = inject(Router);
+   public es = inject(EventService);
+   private ds = inject(DialogsService);
 
-  eventClicked(event: OEvent) {
-    if (!event.splits || event.splits.valid === false) {
-      this.ds.message("Results display failed", "No valid splits avaliable for event");
-    } else {
-      this.router.navigate(["results", "graph", event.key]);
-      //.catch((err) => {
-      //  console.log('Errror in loading results for ' + event.name + ' \n' + err.toString());
-     //   this.ds.message('Error loading results', 'Error loading results for event');
-    //  });
-    }
-  }
+   busy = signal(false);
+
+   async eventClicked(event: OEvent) {
+
+      if (!event.splits || event.splits.valid === false) {
+         this.ds.message("Results display failed", "No valid splits avaliable for event");
+      } else {
+         this.busy.set(true);
+         try {
+            await this.router.navigate(["results", "graph", event.key]);
+         } catch (err) {
+            console.log('Errror in loading results for ' + event.name + ' \n' + err.toString());
+            this.ds.message('Error loading results', 'Error loading results for event');
+         } finally {
+            this.busy.set(false);;
+         }
+      }
+   }
 }
