@@ -5,7 +5,6 @@
 
 
 import { select as d3_select, Selection } from "d3-selection";
-import $ from 'jquery'
 
 import { TimeUtilities } from "../../model";
 
@@ -59,16 +58,15 @@ export class ChartPopup {
       // This is solely for the benefit of IE < 11, as IE11 and other
       // browsers support pointer-events: none, which means that this div
       // receives no mouse events at all.
-      for ( const eventName in handlers ) {
-         if ( handlers.hasOwnProperty( eventName ) ) {
-            $( this._popupDiv.node() ).on( eventName, handlers[ eventName ] );
+      for (const eventName in handlers) {
+         if (Object.prototype.hasOwnProperty.call(handlers, eventName)) {
+            this._popupDiv.node().addEventListener(eventName, handlers[eventName]);
          }
       }
 
-      $( this._popupDiv.node() ).mouseenter( () => { this._mouseIn = true; } );
-      $( this._popupDiv.node() ).mouseleave( () => { this._mouseIn = false; } );
+      this._popupDiv.node().addEventListener('mouseenter', () => { this._mouseIn = true; });
+      this._popupDiv.node().addEventListener('mouseleave', () => { this._mouseIn = false; });
    }
-
    /**
    * Returns whether the popup is currently shown.
    * @sb-return {boolean} True if the popup is shown, false otherwise.
@@ -197,6 +195,6 @@ export class ChartPopup {
    * @sb-return {Number} Height of the popup, in pixels.
    */
    height() {
-      return $( this._popupDiv.node() ).height();
+      return (this._popupDiv.node() as HTMLElement).offsetHeight;
    }
 }

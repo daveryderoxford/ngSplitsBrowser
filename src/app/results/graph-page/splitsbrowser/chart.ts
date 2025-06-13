@@ -1,11 +1,9 @@
-
 import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
 import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
 import { map as d3_map } from "d3-collection";
 import { scaleLinear as d3_scaleLinear, ScaleLinear as d3_ScaleLinear } from "d3-scale";
 import { select as d3_select, selectAll as d3_selectAll, Selection } from "d3-selection";
 import { line as d3_line } from "d3-shape";
-import $ from 'jquery';
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/results_util";
 import { ChartPopup } from "./chart-popup";
@@ -83,10 +81,10 @@ const LEGEND_LINE_WIDTH = 10;
 const MIN_COMPETITOR_TICK_MARK_DISTANCE = 10;
 
 // The number that identifies the left mouse button in a jQuery event.
-const JQUERY_EVENT_LEFT_BUTTON = 1;
+const DOM_EVENT_LEFT_BUTTON = 0;
 
 // The number that identifies the right mouse button in a jQuery event.
-const JQUERY_EVENT_RIGHT_BUTTON = 3;
+const DOM_EVENT_RIGHT_BUTTON = 2;
 
 const SPACER = "\xa0\xa0\xa0\xa0";
 
@@ -195,7 +193,7 @@ export class Chart {
    private contentWidth = -1;
    private contentHeight = -1;
 
-   private popup: ChartPopup;
+   public popup: ChartPopup;
    private popupData: SplitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
    private popupUpdateFunc: () => void = null;
 
@@ -255,33 +253,34 @@ export class Chart {
    constructor(parent: HTMLElement) {
       this.parent = parent;
 
-      this.svg = d3_select<HTMLElement, SVGElement>(this.parent).append("svg").attr("id", CHART_SVG_ID);
+      this.svg = d3_select<HTMLElement, SVGElement>(this.parent).append("svg")
+         .attr("id", CHART_SVG_ID)
+         // Disable text selection on the chart
+         .style("-webkit-user-select", "none") // Safari
+         .style("-moz-user-select", "none")    // Firefox
+         .style("-ms-user-select", "none")     // Internet Explorer/Edge
+         .style("user-select", "none");        // Standard
 
       this.svgGroup = this.svg.append("g");
       this.setLeftMargin(MARGIN.left);
 
-      const mousemoveHandler = (event: JQuery.Event) => this.onMouseMove(event);
-      const mouseupHandler = (event: JQuery.Event) => this.onMouseUp(event);
-      const mousedownHandler = (event: JQuery.Event) => this.onMouseDown(event);
-      $(this.svg.node()).mouseenter(event => this.onMouseEnter(event))
-         .mousemove(mousemoveHandler)
-         .mouseleave(() => this.onMouseLeave())
-         .mousedown(mousedownHandler)
-         .mouseup(mouseupHandler);
-
+      const svgNode = this.svg.node() as SVGSVGElement;
+      svgNode.addEventListener('mouseenter', (event: MouseEvent) => this.onMouseEnter(event));
+      svgNode.addEventListener('mousemove', (event: MouseEvent) => this.onMouseMove(event));
+      svgNode.addEventListener('mouseleave', () => this.onMouseLeave());
+      svgNode.addEventListener('mousedown', (event: MouseEvent) => this.onMouseDown(event));
+      svgNode.addEventListener('mouseup', (event: MouseEvent) => this.onMouseUp(event));
 
       // Disable the context menu on the chart, so that it doesn't open when
       // showing the right-click popup.
-      $(this.svg.node()).contextmenu(e => e.preventDefault());
+      svgNode.addEventListener('contextmenu', (event: MouseEvent) => event.preventDefault());
 
       // Add an invisible text element used for determining text size.
       this.textSizeElement = this.svg.append("text").attr("fill", "transparent")
          .attr("id", TEXT_SIZE_ELEMENT_ID);
-
-      const handlers = { "mousemove": mousemoveHandler, "mousedown": mousedownHandler, "mouseup": mouseupHandler };
+      
+      const handlers = { "mousemove": this.onMouseMove.bind(this), "mousedown": this.onMouseDown.bind(this), "mouseup": this.onMouseUp.bind(this) };
       this.popup = new ChartPopup(parent, handlers);
-
-      $(document).mouseup(() => { this.popup.hide(); });
    }
 
    registerEventHandlers(
@@ -356,7 +355,7 @@ export class Chart {
    setSize(overallWidth: number, overallHeight: number) {
       this.overallWidth = overallWidth;
       this.overallHeight = overallHeight;
-      $(this.svg.node()).width(overallWidth).height(overallHeight);
+      this.svg.attr("width", overallWidth).attr("height", overallHeight);
       this.adjustContentSize();
    }
 
@@ -373,12 +372,13 @@ export class Chart {
    * Gets the location the chart popup should be at following a mouse-button
    * press or a mouse movement.
    * @sb-param {jQuery.event} event - jQuery mouse-down or mouse-move event.
+   * @sb-param {MouseEvent} event - Standard mouse-down or mouse-move event.
    * @sb-return {Object} Location of the popup.
    */
-   private getPopupLocation(event: JQuery.Event): { x: number, y: number; } {
+   private getPopupLocation(event: MouseEvent): { x: number, y: number; } {
       return {
          x: event.pageX + CHART_POPUP_X_OFFSET,
-         y: Math.max(event.pageY - this.popup.height() / 2, 0)
+         y: Math.max(event.pageY - (this.popup.height() / 2), 0)
       };
    }
 
@@ -402,10 +402,12 @@ export class Chart {
 
    /**
    * Stores the current time the mouse is at, on the race graph.
-   * @sb-param {jQuery.event} event - The mouse-down or mouse-move event.
+   * @sb-param {MouseEvent} event - The mouse-down or mouse-move event.
    */
-   private setCurrentChartTime(event: JQuery.Event) {
-      const yOffset = event.pageY - $(this.svg.node()).offset().top - MARGIN.top;
+   private setCurrentChartTime(event: MouseEvent) {
+      const svgNode = this.svg.node() as SVGSVGElement;
+      const svgRect = svgNode.getBoundingClientRect();
+      const yOffset = event.pageY - (svgRect.top + window.scrollY) - MARGIN.top;
       this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
 
    }
@@ -432,9 +434,9 @@ export class Chart {
 
    /**
    * Handle the mouse entering the chart.
-   * @sb-param {jQuery.event} event - jQuery event object.
+   * @sb-param {MouseEvent} event - Standard MouseEvent object.
    */
-   private onMouseEnter(event: JQuery.Event) {
+   private onMouseEnter(event: MouseEvent) {
       if (this.mouseOutTimeout !== null) {
          clearTimeout(this.mouseOutTimeout);
          this.mouseOutTimeout = null;
@@ -448,9 +450,9 @@ export class Chart {
 
    /**
    * Handle a mouse movement.
-   * @sb-param {jQuery.event} event - jQuery event object.
+   * @sb-param {MouseEvent} event - Standard MouseEvent object.
    */
-   private onMouseMove(event: JQuery.Event) {
+   private onMouseMove(event: MouseEvent) {
       if (this.hasData && this.isMouseIn && this.xScale !== null) {
          this.updateControlLineLocation(event);
       }
@@ -482,9 +484,9 @@ export class Chart {
 
    /**
    * Handles a mouse button being pressed over the chart.
-   * @sb-param {jQuery.Event} event - jQuery event object.
+   * @sb-param {MouseEvent} event - Standard MouseEvent object.
    */
-   private onMouseDown(event: JQuery.Event) {
+   private onMouseDown(event: MouseEvent) {
       // Use a timeout to open the dialog as we require other events
       // (mouseover in particular) to be processed first, and the precise
       // order of these events is not consistent between browsers.
@@ -493,9 +495,9 @@ export class Chart {
 
    /**
    * Handles a mouse button being pressed over the chart.
-   * @sb-param {jQuery.event} event - The jQuery onMouseUp event.
+   * @sb-param {MouseEvent} event - The standard onMouseUp event.
    */
-   private onMouseUp(even: JQuery.Event) {
+   private onMouseUp(event: MouseEvent) {
     //  this.popup.hide();
       event.preventDefault();
    }
@@ -503,22 +505,23 @@ export class Chart {
    /**
    * Shows the popup window, populating it with data as necessary
    * @sb-param {jQuery.event} event - The jQuery onMouseDown event that triggered
+   * @sb-param {MouseEvent} event - The standard onMouseDown event that triggered
    *     the popup.
    */
-   private showPopupDialog(event: JQuery.Event) {
+   private showPopupDialog(event: MouseEvent) {
       if (this.isMouseIn && this.currentControlIndex !== null) {
          let showPopup = false;
-         if (this.isRaceGraph && (event.which === JQUERY_EVENT_LEFT_BUTTON || event.which === JQUERY_EVENT_RIGHT_BUTTON)) {
+         if (this.isRaceGraph && (event.button === DOM_EVENT_LEFT_BUTTON || event.button === DOM_EVENT_RIGHT_BUTTON)) {
             if (this.hasControls) {
                this.setCurrentChartTime(event);
                // eslint-disable-next-line max-len
                this.popupUpdateFunc = () => this.popup.setData(this.getCompetitorsVisitingCurrentControlPopupData(), true);
                showPopup = true;
             }
-         } else if (event.which === JQUERY_EVENT_LEFT_BUTTON) {
+         } else if (event.button === DOM_EVENT_LEFT_BUTTON) {
             this.popupUpdateFunc = () => this.popup.setData(this.getFastestSplitsPopupData(), false);
             showPopup = true;
-         } else if (event.which === JQUERY_EVENT_RIGHT_BUTTON) {
+         } else if (event.button === DOM_EVENT_RIGHT_BUTTON) {
             if (this.hasControls) {
                // eslint-disable-next-line max-len
                this.popupUpdateFunc = () => this.popup.setData(this.getFastestSplitsForCurrentLegPopupData(), true);
@@ -541,9 +544,12 @@ export class Chart {
    * be being shown.
    *
    * @sb-param {jQuery.event} event - jQuery mouse-move event.
+   * @sb-param {MouseEvent} event - Standard mouse-move event.
    */
-   private updatePopupContents(event: JQuery.Event) {
-      const yOffset = event.pageY - $(this.svg.node()).offset().top;
+   private updatePopupContents(event: MouseEvent) {
+      const svgNode = this.svg.node() as SVGSVGElement;
+      const svgRect = svgNode.getBoundingClientRect();
+      const yOffset = event.pageY - (svgRect.top + window.scrollY);
       const showNextControls = this.hasControls && yOffset < MARGIN.top;
       if (showNextControls) {
          this.updateNextControlInformation();
@@ -582,20 +588,20 @@ export class Chart {
 
    /**
    * Updates the location of the control line from the given mouse event.
-   * @sb-param {jQuery.event} event - jQuery mousedown or mousemove event.
+   * @sb-param {MouseEvent} event - Standard mousedown or mousemove event.
    */
-   private updateControlLineLocation(event: JQuery.Event) {
+   private updateControlLineLocation(event: MouseEvent) {
+      const svgNode = this.svg.node() as SVGSVGElement;
+      const svgRect = svgNode.getBoundingClientRect();
 
-      const svgNodeAsJQuery = $(this.svg.node());
-      const offset = svgNodeAsJQuery.offset();
-      const xOffset = event.pageX - offset.left;
-      const yOffset = event.pageY - offset.top;
+      const xOffsetInSvg = event.pageX - (svgRect.left + window.scrollX);
+      const yOffsetInSvg = event.pageY - (svgRect.top + window.scrollY);
 
-      if (this.currentLeftMargin <= xOffset && xOffset < svgNodeAsJQuery.width() - MARGIN.right &&
-         yOffset < svgNodeAsJQuery.height() - MARGIN.bottom) {
+      if (this.currentLeftMargin <= xOffsetInSvg && xOffsetInSvg < svgRect.width - MARGIN.right &&
+         yOffsetInSvg < svgRect.height - MARGIN.bottom) {
          // In the chart.
          // Get the time offset that the mouse is currently over.
-         const chartX = this.xScale.invert(xOffset - this.currentLeftMargin);
+         const chartX = this.xScale.invert(xOffsetInSvg - this.currentLeftMargin);
          const bisectIndex = d3_bisect(this.referenceCumTimesSorted, chartX);
 
          // bisectIndex is the index at which to insert chartX into
@@ -628,7 +634,7 @@ export class Chart {
             if (this.isRaceGraph) {
                this.setCurrentChartTime(event);
             }
-
+            
             this.updatePopupContents(event);
             this.popup.setLocation(this.getPopupLocation(event));
          }
@@ -1325,7 +1331,7 @@ export class Chart {
       // Put together a map that maps cumulative times to the first split to
       // register that time.
       const cumTimesToControlIndex = d3_map<number>();
-      this.referenceCumTimes.forEach((cumTime, index) => {
+      this.referenceCumTimes.forEach((cumTime: number, index: number) => {
          const cumTimeKey = cumTime.toString();
          if (!cumTimesToControlIndex.has(cumTimeKey)) {
             cumTimesToControlIndex.set(cumTimeKey, index);

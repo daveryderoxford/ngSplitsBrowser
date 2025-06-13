@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, ViewEncapsulation, computed, effect, inject, signal, viewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewEncapsulation, computed, effect, inject, signal, viewChild } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, debounceTime } from 'rxjs';
@@ -157,5 +157,12 @@ export class GraphPage implements AfterViewInit {
   ngOnDestroy() {
     this.observer.unobserve(this.chartElement()?.nativeElement);
     this.size$.unsubscribe();
+  }
+
+  @HostListener('document:mouseup')
+  onDocumentMouseUp() {
+    if (this.chart && this.chart.popup) {
+      this.chart.popup.hide();
+    }
   }
 }
