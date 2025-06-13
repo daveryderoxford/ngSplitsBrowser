@@ -27,7 +27,6 @@
     "@angular/router": "20.0.0",
     "@ngbracket/ngx-layout": "15.1.3",
     "@ngneat/until-destroy": "^9.2.3",
-    "angular-split": "^19.0.0",
     "core-js": "^3.6.5",
     "d3": "^5.7.0",
     "d3-collection": "^1.0.7",

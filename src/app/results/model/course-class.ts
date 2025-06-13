@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { range as d3_range } from "d3-array";
 import { Competitor } from "./competitor";
@@ -13,8 +12,8 @@ export interface FastestSplitInfo {
 }
 
 export interface FastestTimeInfo {
-   name: string;
-   time: sbTime;
+    name: string;
+    time: sbTime;
 }
 
 export class CourseClass {
@@ -30,7 +29,7 @@ export class CourseClass {
         public numControls: number,
         public competitors: Array<Competitor>) {
 
-        this.competitors.forEach( (comp) => {
+        this.competitors.forEach((comp) => {
             comp.setClass(this);
         });
     }
@@ -47,12 +46,12 @@ export class CourseClass {
     * Determines the time losses for the competitors in this course-class.
     */
     public determineTimeLosses(): void {
-        const fastestSplitTimes = d3_range(1, this.numControls + 2).map( (controlIdx) => {
+        const fastestSplitTimes = d3_range(1, this.numControls + 2).map((controlIdx) => {
             const splitRec = this.getFastestSplitTo(controlIdx);
             return (splitRec === null) ? null : splitRec.split;
         }, this);
 
-        this.competitors.forEach( (comp) => {
+        this.competitors.forEach((comp) => {
             comp.determineTimeLosses(fastestSplitTimes);
         });
     }
@@ -86,9 +85,10 @@ export class CourseClass {
             throw new InvalidData("Cannot return splits to leg '" + controlIdx + "' in a course with " + this.numControls + " control(s)");
         }
 
-        let fastestSplit = null;
-        let fastestCompetitor = null;
-        this.competitors.forEach( (comp) => {
+        let fastestSplit: number | null = null;
+        let fastestCompetitor: Competitor | null = null;
+
+        this.competitors.forEach((comp) => {
             const compSplit = comp.getSplitTimeTo(controlIdx);
             if (isNotNullNorNaN(compSplit)) {
                 if (fastestSplit === null || compSplit < fastestSplit) {
@@ -114,15 +114,15 @@ export class CourseClass {
     * @sb-return {Array} Array of objects listing the name and start time of each
     *     competitor visiting the control within the given time interval.
     */
-    public getCompetitorsAtControlInTimeRange(controlNum: number,
-        intervalStart: sbTime,
-        intervalEnd: sbTime): Array<FastestTimeInfo> {
+    public getCompetitorsAtControlInTimeRange(controlNum: number, intervalStart: sbTime, intervalEnd: sbTime): FastestTimeInfo[] {
+
         if (typeof controlNum !== "number" || isNaN(controlNum) || controlNum < 0 || controlNum > this.numControls + 1) {
             throw new InvalidData("Control number must be a number between 0 and " + this.numControls + " inclusive");
         }
 
-        const matchingCompetitors = [];
-        this.competitors.forEach( (comp) => {
+        const matchingCompetitors: FastestTimeInfo[] = [];
+
+        this.competitors.forEach((comp) => {
             const cumTime = comp.getCumulativeTimeTo(controlNum);
             if (cumTime !== null && comp.startTime !== null) {
                 const actualTimeAtControl = cumTime + comp.startTime;

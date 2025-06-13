@@ -1,10 +1,9 @@
-// @ts-nocheck
 
 import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
 import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
 import { map as d3_map } from "d3-collection";
 import { scaleLinear as d3_scaleLinear, ScaleLinear as d3_ScaleLinear } from "d3-scale";
-import { BaseType, select as d3_select, selectAll as d3_selectAll, Selection } from "d3-selection";
+import { select as d3_select, selectAll as d3_selectAll, Selection } from "d3-selection";
 import { line as d3_line } from "d3-shape";
 import $ from 'jquery';
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
@@ -14,22 +13,26 @@ import { ChartType } from "./chart-types";
 import { Lang } from "./lang";
 import { FastestSplitsPopupData, NextControlData, SplitsPopupData } from "./splits-popup-data";
 
-export interface GraphColData {
-   x: number;
-   ys: number[];
-}
-
 export interface ChartDisplayData {
-   chartData: {
-      numControls?: number;
-      competitorNames?: string[];
-      datacolumns?: GraphColData[];
-      dubiousTimesInfo?: Array<Array<{ start: number, end: number; }>>;
-   };
+   chartData: ChartData
    eventData: Results;
    courseClassSet: CourseClassSet;
    referenceCumTimes: sbTime[];
    fastestCumTimes: sbTime[];
+}
+
+export interface ChartData {
+   dataColumns: DataColumn[];
+   competitorNames: string[];
+   numControls: number;
+   xExtent: number[];
+   yExtent: number[];
+   dubiousTimesInfo: { start: number, end: number }[][];
+}
+
+export interface DataColumn {
+   x: number;
+   ys: number[];
 }
 
 export interface StatsVisibilityFlags {
@@ -38,7 +41,6 @@ export interface StatsVisibilityFlags {
    behindFastest: boolean;
    timeLoss: boolean;
 }
-
 
 /* Internal interfaces  */
 interface CurrentCompetitorData {
@@ -49,7 +51,7 @@ interface CurrentCompetitorData {
    index: number;
 }
 
-type tickFormatterFunction = (value: number) => string | null;
+type TickFormatterFunction = (domainValue: any, index: number) => string | null;
 
 // Local shorthand functions.
 const formatTime = TimeUtilities.formatTime;
@@ -71,7 +73,7 @@ const MARGIN = {
    top: 18, // Needs to be high enough not to obscure the upper X-axis.
    right: 0,
    bottom: 18, // Needs to be high enough not to obscure the lower X-axis.
-   left: 53 // Needs to be wide enough for times on the race graph.
+   left: 20 // Needs to be 53 for race graph for legend.
 };
 
 const LEGEND_LINE_WIDTH = 10;
@@ -165,7 +167,7 @@ function getSuffix(competitor: Competitor): string {
 * @sb-param {Array} values - Array of values.
 * @sb-return {Number} Maximum non-null or NaN value.
 */
-function maxNonNullNorNaNValue(values: Array<number | null>): number {
+function maxNonNullNorNaNValue(values: (number | null)[]): number {
    const nonNullNorNaNValues: Array<number> = values.filter(isNotNullNorNaN);
    return (nonNullNorNaNValues.length > 0) ? d3_max(nonNullNorNaNValues) : 0;
 }
@@ -182,8 +184,8 @@ function maxNonNullNorNaNValue(values: Array<number | null>): number {
 }) */
 export class Chart {
    private parent: HTMLElement;
-   private svg: Selection<BaseType, {}, null, undefined>;
-   private svgGroup: Selection<BaseType, {}, null, undefined>;
+   private svg: any; // D3 typing is a nightmare so we use 'any' here.
+   private svgGroup: any;
    private textSizeElement: Selection<any, {}, null, undefined>;
 
    private xScale: d3_ScaleLinear<number, number> = null;
@@ -197,7 +199,7 @@ export class Chart {
    private popupData: SplitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
    private popupUpdateFunc: () => void = null;
 
-   private mouseOutTimeout = null; // Mouse timeout function
+   private mouseOutTimeout: number | null = null; 
    private isMouseIn = false;
 
    // The position the mouse cursor is currently over, or null for not over
@@ -210,7 +212,7 @@ export class Chart {
    // constrained by the minimum control that a chart type specifies.
    private actualControlIndex: number | null = null;
 
-   private controlLine = null;  // SVG line running the lenght of the control
+   private controlLine: SVGLineElement = null;  // SVG line running the lenght of the control
 
    private currentChartTime: number | null = null;
 
@@ -242,8 +244,8 @@ export class Chart {
    private xScaleMinutes: d3_ScaleLinear<number, number>;
 
    // Event handlers
-   selectedLegUpdated: (number) => void;
-   raceTimeUpdated: (sbTime) => void;
+   selectedLegUpdated: (number: number) => void;
+   raceTimeUpdated: (sbTime: number) => void;
 
    /**
    * A chart object in a window.
@@ -253,15 +255,15 @@ export class Chart {
    constructor(parent: HTMLElement) {
       this.parent = parent;
 
-      this.svg = d3_select(this.parent).append("svg").attr("id", CHART_SVG_ID);
+      this.svg = d3_select<HTMLElement, SVGElement>(this.parent).append("svg").attr("id", CHART_SVG_ID);
 
       this.svgGroup = this.svg.append("g");
       this.setLeftMargin(MARGIN.left);
 
-      const mousemoveHandler = event => this.onMouseMove(event);
-      const mouseupHandler = event => this.onMouseUp(event);
-      const mousedownHandler = event => this.onMouseDown(event);
-      $(this.svg.node()).mouseenter(event => this.onMouseEnter(<JQueryEventObject><unknown>event))
+      const mousemoveHandler = (event: JQuery.Event) => this.onMouseMove(event);
+      const mouseupHandler = (event: JQuery.Event) => this.onMouseUp(event);
+      const mousedownHandler = (event: JQuery.Event) => this.onMouseDown(event);
+      $(this.svg.node()).mouseenter(event => this.onMouseEnter(event))
          .mousemove(mousemoveHandler)
          .mouseleave(() => this.onMouseLeave())
          .mousedown(mousedownHandler)
@@ -314,7 +316,7 @@ export class Chart {
       chartType: ChartType,
    ) {
 
-      const chartData = data.chartData;
+      const chartData: ChartData = data.chartData;
 
       this.numControls = chartData.numControls;
       this.numLines = chartData.competitorNames.length;
@@ -373,7 +375,7 @@ export class Chart {
    * @sb-param {jQuery.event} event - jQuery mouse-down or mouse-move event.
    * @sb-return {Object} Location of the popup.
    */
-   private getPopupLocation(event: JQueryEventObject): { x: number, y: number; } {
+   private getPopupLocation(event: JQuery.Event): { x: number, y: number; } {
       return {
          x: event.pageX + CHART_POPUP_X_OFFSET,
          y: Math.max(event.pageY - this.popup.height() / 2, 0)
@@ -402,7 +404,7 @@ export class Chart {
    * Stores the current time the mouse is at, on the race graph.
    * @sb-param {jQuery.event} event - The mouse-down or mouse-move event.
    */
-   private setCurrentChartTime(event: JQueryEventObject) {
+   private setCurrentChartTime(event: JQuery.Event) {
       const yOffset = event.pageY - $(this.svg.node()).offset().top - MARGIN.top;
       this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
 
@@ -432,7 +434,7 @@ export class Chart {
    * Handle the mouse entering the chart.
    * @sb-param {jQuery.event} event - jQuery event object.
    */
-   private onMouseEnter(event: JQueryEventObject) {
+   private onMouseEnter(event: JQuery.Event) {
       if (this.mouseOutTimeout !== null) {
          clearTimeout(this.mouseOutTimeout);
          this.mouseOutTimeout = null;
@@ -448,7 +450,7 @@ export class Chart {
    * Handle a mouse movement.
    * @sb-param {jQuery.event} event - jQuery event object.
    */
-   private onMouseMove(event: JQueryEventObject) {
+   private onMouseMove(event: JQuery.Event) {
       if (this.hasData && this.isMouseIn && this.xScale !== null) {
          this.updateControlLineLocation(event);
       }
@@ -470,7 +472,7 @@ export class Chart {
       // clear it if the mouse subsequently re-enters.  This happens a lot
       // more often than might be expected for a function with a timeout of
       // only a single millisecond.
-      this.mouseOutTimeout = setTimeout(() => {
+      this.mouseOutTimeout = window.setTimeout(() => {
          if (!this.popup.isMouseIn()) {
             this.isMouseIn = false;
             this.removeControlLine();
@@ -482,18 +484,18 @@ export class Chart {
    * Handles a mouse button being pressed over the chart.
    * @sb-param {jQuery.Event} event - jQuery event object.
    */
-   private onMouseDown(event: JQueryEventObject) {
+   private onMouseDown(event: JQuery.Event) {
       // Use a timeout to open the dialog as we require other events
       // (mouseover in particular) to be processed first, and the precise
       // order of these events is not consistent between browsers.
-      setTimeout(() => this.showPopupDialog(event), 1);
+      window.setTimeout(() => this.showPopupDialog(event), 1);
    }
 
    /**
    * Handles a mouse button being pressed over the chart.
    * @sb-param {jQuery.event} event - The jQuery onMouseUp event.
    */
-   private onMouseUp(even: JQueryEventObject) {
+   private onMouseUp(even: JQuery.Event) {
     //  this.popup.hide();
       event.preventDefault();
    }
@@ -503,7 +505,7 @@ export class Chart {
    * @sb-param {jQuery.event} event - The jQuery onMouseDown event that triggered
    *     the popup.
    */
-   private showPopupDialog(event: JQueryEventObject) {
+   private showPopupDialog(event: JQuery.Event) {
       if (this.isMouseIn && this.currentControlIndex !== null) {
          let showPopup = false;
          if (this.isRaceGraph && (event.which === JQUERY_EVENT_LEFT_BUTTON || event.which === JQUERY_EVENT_RIGHT_BUTTON)) {
@@ -540,7 +542,7 @@ export class Chart {
    *
    * @sb-param {jQuery.event} event - jQuery mouse-move event.
    */
-   private updatePopupContents(event: JQueryEventObject) {
+   private updatePopupContents(event: JQuery.Event) {
       const yOffset = event.pageY - $(this.svg.node()).offset().top;
       const showNextControls = this.hasControls && yOffset < MARGIN.top;
       if (showNextControls) {
@@ -582,7 +584,7 @@ export class Chart {
    * Updates the location of the control line from the given mouse event.
    * @sb-param {jQuery.event} event - jQuery mousedown or mousemove event.
    */
-   private updateControlLineLocation(event: JQueryEventObject) {
+   private updateControlLineLocation(event: JQuery.Event) {
 
       const svgNodeAsJQuery = $(this.svg.node());
       const offset = svgNodeAsJQuery.offset();
@@ -739,8 +741,8 @@ export class Chart {
    *
    * @sb-returns {function} Tick-formatting function.
    */
-   private getTickFormatter() {
-      return (value: any, idx: number) => {
+   private getTickFormatter(): TickFormatterFunction{
+      return (idx: number) => {
          return (idx === 0) ? getMessage("StartNameShort") :
             ((idx === this.numControls + 1) ? getMessage("FinishNameShort") : idx.toString());
       };
@@ -795,17 +797,18 @@ export class Chart {
                                     data.
    * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
    */
-   private getMaxTimeAndRankTextWidth(timeFuncName: string, rankFuncName: string): number {
+   private getMaxTimeAndRankTextWidth(timeForControl: (comp: Competitor, control: number) => number,
+      rankForControl: (comp: Competitor, control: number) => number): number {
       let maxTime = 0;
       let maxRank = 0;
 
       const selectedCompetitors = this.selectedIndexes.map(index => this.courseClassSet.allCompetitors[index]);
 
       d3_range(1, this.numControls + 2).forEach(controlIndex => {
-         const times: Array<number> = selectedCompetitors.map((comp): number => comp[timeFuncName](controlIndex));
+         const times: number[] = selectedCompetitors.map(comp => timeForControl(comp, controlIndex));
          maxTime = Math.max(maxTime, maxNonNullNorNaNValue(times));
 
-         const ranks = selectedCompetitors.map(comp => comp[rankFuncName](controlIndex));
+         const ranks = selectedCompetitors.map(comp => rankForControl(comp, controlIndex));
          maxRank = Math.max(maxRank, maxNonNullNorNaNValue(ranks));
       });
 
@@ -819,7 +822,8 @@ export class Chart {
    * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
    */
    private getMaxSplitTimeAndRankTextWidth(): number {
-      return this.getMaxTimeAndRankTextWidth("getSplitTimeTo", "getSplitRankTo");
+      return this.getMaxTimeAndRankTextWidth((comp, leg) => comp.getSplitTimeTo(leg), 
+                                             (comp, leg) => comp.getSplitRankTo(leg));
    }
 
    /**
@@ -829,7 +833,8 @@ export class Chart {
    *                   pixels.
    */
    private getMaxCumulativeTimeAndRankTextWidth(): number {
-      return this.getMaxTimeAndRankTextWidth("getCumulativeTimeTo", "getCumulativeRankTo");
+      return this.getMaxTimeAndRankTextWidth((comp, leg) => comp.getCumulativeTimeTo(leg),
+                                             (comp, leg) => comp.getCumulativeRankTo(leg));
    }
 
    /**
@@ -897,7 +902,7 @@ export class Chart {
    * @sb-param {object} chartData - Object containing the chart data.
    * @sb-return {Number} Maximum width of a start time label.
    */
-   private determineMaxStartTimeLabelWidth(chartData): number {
+   private determineMaxStartTimeLabelWidth(chartData: ChartData): number {
       let maxWidth: number;
       if (chartData.competitorNames.length > 0) {
          maxWidth = d3_max<number>(chartData.competitorNames.map(name => this.getTextWidth("00:00:00 " + name)));
@@ -912,7 +917,7 @@ export class Chart {
    * Creates the X and Y scales necessary for the chart and its axes.
    * @sb-param {object} chartData - Chart data object.
    */
-   private createScales(chartData) {
+   private createScales(chartData: ChartData) {
       this.xScale = d3_scaleLinear().domain(chartData.xExtent).range([0, this.contentWidth]);
       this.yScale = d3_scaleLinear().domain(chartData.yExtent).range([0, this.contentHeight]);
       this.xScaleMinutes = d3_scaleLinear().domain([chartData.xExtent[0] / 60, chartData.xExtent[1] / 60]).range([0, this.contentWidth]);
@@ -948,11 +953,11 @@ export class Chart {
 
       rects = this.svgGroup.selectAll("rect")
          .data(d3_range(refCumTimesSorted.length - 1));
-      rects.attr("x", i => this.xScale(refCumTimesSorted[i]))
+      rects.attr("x", (i: number) => this.xScale(refCumTimesSorted[i]))
          .attr("y", 0)
-         .attr("width", i => this.xScale(refCumTimesSorted[i + 1]) - this.xScale(refCumTimesSorted[i]))
+         .attr("width", (i: number) => this.xScale(refCumTimesSorted[i + 1]) - this.xScale(refCumTimesSorted[i]))
          .attr("height", this.contentHeight)
-         .attr("class", i => (i % 2 === 0) ? "background1" : "background2");
+         .attr("class", (i: number) => (i % 2 === 0) ? "background1" : "background2");
 
       rects.exit().remove();
    }
@@ -972,7 +977,7 @@ export class Chart {
    *     d3 formatter.
    */
 
-   private determineYAxisTickFormatter(chartData): tickFormatterFunction {
+   private determineYAxisTickFormatter(chartData: ChartData): TickFormatterFunction {
       if (this.isRaceGraph) {
          // Assume column 0 of the data is the start times.
          // However, beware that there might not be any data.
@@ -986,7 +991,7 @@ export class Chart {
 
             const yScale = this.yScale;
             return time => {
-               const yarray: Array<number> = startTimes.map((startTime) => {
+               const yarray: Array<number> = startTimes.map((startTime: number) => {
                   return Math.abs(yScale(startTime) - yScale(time));
                });
                const nearestOffset = d3_min(yarray);
@@ -1004,7 +1009,7 @@ export class Chart {
    * @sb-param {String} yAxisLabel - The label to use for the Y-axis.
    * @sb-param {object} chartData - The chart data to use.
    */
-   private drawAxes(yAxisLabel: string, chartData) {
+   private drawAxes(yAxisLabel: string, chartData: ChartData) {
 
       const tickFormatter = this.determineYAxisTickFormatter(chartData);
 
@@ -1054,19 +1059,19 @@ export class Chart {
    * Draw the lines on the chart.
    * @sb-param {Array} chartData - Array of chart data.
    */
-   private drawChartLines(chartData) {
-      const lineFunctionGenerator = selCompIdx => {
+   private drawChartLines(chartData: ChartData) {
+      const lineFunctionGenerator = (selCompIdx: number) => {
          if (!chartData.dataColumns.some(col => isNotNullNorNaN(col.ys[selCompIdx]))) {
             // This competitor's entire row is null/NaN, so there's no data
             // to draw.  WebKit will report an error ('Error parsing d=""')
             // if no points on the line are defined, as will happen in this
             // case, so we substitute a single zero point instead.
-            return d3_line()
+            return d3_line<DataColumn>()
                .x(0)
                .y(0)
-               .defined((d, i) => i === 0);
+               .defined((_, i) => i === 0);
          } else {
-            return d3_line()
+            return d3_line<DataColumn>()
                .x(d => this.xScale(d.x))
                .y(d => this.yScale(d.ys[selCompIdx]))
                .defined(d => isNotNullNorNaN(d.ys[selCompIdx]));
@@ -1134,7 +1139,7 @@ export class Chart {
    * Draws the start-time labels for the currently-selected competitors.
    * @sb-param {object} chartData - The chart data that contains the start offsets.
    */
-   private drawCompetitorStartTimeLabels(chartData) {
+   private drawCompetitorStartTimeLabels(chartData: ChartData) {
       const startColumn = chartData.dataColumns[0];
 
       let startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
@@ -1143,14 +1148,14 @@ export class Chart {
 
       startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
       startLabels.attr("x", -7)
-         .attr("y", (_compIndex, selCompIndex) => {
+         .attr("y", (_compIndex: number, selCompIndex: number) => {
             return this.yScale(startColumn.ys[selCompIndex])
                + this.getTextHeight(chartData.competitorNames[selCompIndex]) / 4;
          })
-         .attr("class", compIndex => "startLabel competitor" + compIndex)
-         .on("mouseenter", compIndex => this.highlight(compIndex))
+         .attr("class", (compIndex: number) => "startLabel competitor" + compIndex)
+         .on("mouseenter", (compIndex: number) => this.highlight(compIndex))
          .on("mouseleave", () => this.unhighlight())
-         .text((_compIndex, selCompIndex) => {
+         .text((selCompIndex: number) => {
             return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + " "
                + chartData.competitorNames[selCompIndex];
          });
@@ -1213,7 +1218,7 @@ export class Chart {
    * Draw legend labels to the right of the chart.
    * @sb-param {object} chartData - The chart data that contains the final time offsets.
    */
-   private drawCompetitorLegendLabels(chartData): void {
+   private drawCompetitorLegendLabels(chartData: ChartData): void {
 
       let minLastY = 0;
       if (chartData.dataColumns.length === 0) {
@@ -1263,12 +1268,12 @@ export class Chart {
 
       legendLines = this.svgGroup.selectAll("line.competitorLegendLine").data(this.currentCompetitorData);
       legendLines.attr("x1", this.contentWidth + 1)
-         .attr("y1", data => data.y)
+         .attr("y1", (data: CurrentCompetitorData) => data.y)
          .attr("x2", this.contentWidth + LEGEND_LINE_WIDTH + 1)
-         .attr("y2", data => data.y)
-         .attr("stroke", data => data.colour)
-         .attr("class", data => "competitorLegendLine competitor" + data.index)
-         .on("mouseenter", data => this.highlight(data.index))
+         .attr("y2", (data: CurrentCompetitorData) => data.y)
+         .attr("stroke", (data: CurrentCompetitorData) => data.colour)
+         .attr("class", (data: CurrentCompetitorData) => "competitorLegendLine competitor" + data.index)
+         .on("mouseenter", (data: CurrentCompetitorData) => this.highlight(data.index))
          .on("mouseleave", () => this.unhighlight());
 
       legendLines.exit().remove();
@@ -1278,11 +1283,11 @@ export class Chart {
 
       labels = this.svgGroup.selectAll("text.competitorLabel").data(this.currentCompetitorData);
       labels.attr("x", this.contentWidth + LEGEND_LINE_WIDTH + 2)
-         .attr("y", data => data.y + data.textHeight / 4)
-         .attr("class", data => "competitorLabel competitor" + data.index)
-         .on("mouseenter", data => this.highlight(data.index))
+         .attr("y", (data: CurrentCompetitorData) => data.y + data.textHeight / 4)
+         .attr("class", (data: CurrentCompetitorData) => "competitorLabel competitor" + data.index)
+         .on("mouseenter", (data: CurrentCompetitorData) => this.highlight(data.index))
          .on("mouseleave", () => this.unhighlight())
-         .text(data => data.label);
+         .text((data: CurrentCompetitorData) => data.label);
 
       labels.exit().remove();
    }

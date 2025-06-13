@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import {
    ascending as d3_ascending, max as d3_max, min as d3_min, range as d3_range,
@@ -10,20 +9,20 @@ import { ChartType } from "../graph-page/splitsbrowser/chart-types";
 import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
-import { sbTime } from "./time";
 import { isNaNStrict, isNotNull, isNotNullNorNaN } from "./results_util";
+import { sbTime } from "./time";
+import { ChartData } from '../graph-page/splitsbrowser/chart';
+
+interface BlankRange {
+   start: number; 
+   end: number; 
+   size: number; 
+   overallSplit: number;
+}
 
 export interface FatestSplitsData {
    name: string;  // full name of competitor
    split: sbTime;  // Split time
-}
-export interface ChartData {
-   dataColumns: { x: any, ys: any }[];
-   competitorNames: string[];
-   numControls: number;
-   xExtent: number[];
-   yExtent: number[];
-   dubiousTimesInfo: { start: number, end: number }[][];
 }
 
 export class CourseClassSet {
@@ -157,7 +156,7 @@ export class CourseClassSet {
          const fastestBlankRanges = this.getBlankRanges(fastestSplits, true);
 
          // Find all blank-ranges of competitors.
-         const allCompetitorBlankRanges = [];
+         const allCompetitorBlankRanges: { start: number; end: number; size: number; overallSplit: number; }[] = [];
          this.allCompetitors.forEach((competitor) => {
             const competitorBlankRanges = this.getBlankRanges(competitor.getAllCumulativeTimes(), false);
             competitorBlankRanges.forEach((range) => {
@@ -178,8 +177,8 @@ export class CourseClassSet {
                return compRange.start <= fastestRange.start && fastestRange.end <= compRange.end + 1;
             });
 
-            let minSize = null;
-            let minOverallSplit = null;
+            let minSize: number | null = null;
+            let minOverallSplit: number | null = null;
             coveringCompetitorRanges.forEach((coveringRange) => {
                if (minSize === null || coveringRange.size < minSize) {
                   minSize = coveringRange.size;
@@ -241,8 +240,8 @@ export class CourseClassSet {
          return;
       }
 
-      const splitRanksByCompetitor = [];
-      const cumRanksByCompetitor = [];
+      const splitRanksByCompetitor: (number | undefined)[][] = [];
+      const cumRanksByCompetitor: (number | undefined)[][] = [];
 
       this.allCompetitors.forEach(() => {
          splitRanksByCompetitor.push([]);
@@ -413,7 +412,7 @@ export class CourseClassSet {
          return [];
       }
 
-      const allCompetitors = [];
+      const allCompetitors: Competitor[] = [];
       const expectedControlCount = classes[0]?.numControls;
       classes.forEach((courseClass) => {
          if (courseClass?.numControls !== expectedControlCount) {
@@ -468,7 +467,7 @@ export class CourseClassSet {
   * @sb-return {Array} Array of objects that describes when the given array has
   *    ranges of null and/or NaN values.
   */
-   private getBlankRanges(times: Array<sbTime>, includeEnd: boolean): Array<{ start: number, end: number }> {
+   private getBlankRanges(times: Array<sbTime>, includeEnd: boolean): { start: number, end: number }[] {
       const blankRangeInfo = [];
       let startIndex = 1;
       while (startIndex + 1 < times.length) {
