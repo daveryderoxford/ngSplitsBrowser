@@ -1,6 +1,5 @@
 
 import { range as d3_range } from "d3-array";
-import { map as d3_map, Map as d3_Map, set as d3_set, Set as d3_Set } from "d3-collection";
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
 import { isNaNStrict } from "../model/results_util";
@@ -79,8 +78,8 @@ const MIN_CONTROLS_OFFSET = 37;
 
 class OEReader {
 
-    private classes = d3_map<ClassDetails>();  // Map that associates classes to all of the competitors running on that class.
-    private courseDetails = d3_map<CourseDetails>();  // Map that associates course names to length and climb values.
+    private classes = new Map<string, ClassDetails>();  // Map that associates classes to all of the competitors running on that class.
+    private courseDetails = new Map<string, CourseDetails>();  // Map that associates course names to length and climb values.
     private columnIndexes: any = null; // The indexes of the columns that we read data from.
     private classCoursePairs: string[][] = [];   // Set of all pairs of classes and course
     // (While it is common that one course may have multiple classes, it
@@ -509,8 +508,8 @@ class OEReader {
     */
     private getMapsBetweenClassesAndCourses() {
 
-        const classesToCourses = d3_map<string[]>();
-        const coursesToClasses = d3_map<string[]>();
+        const classesToCourses = new Map<string, string[]>();
+        const coursesToClasses = new Map<string, string[]>();
 
         for (const pair of this.classCoursePairs) {
             const className = pair[0];
@@ -537,7 +536,7 @@ class OEReader {
     * @sb-return {Array} Array of CourseClass objects.
     */
     private createClasses(): CourseClass[] {
-        const classNames = this.classes.keys();
+        const classNames = Array.from(this.classes.keys());
         classNames.sort();
         return classNames.map((className) => {
             const courseClass = this.classes.get(className);
@@ -562,17 +561,17 @@ class OEReader {
     * @sb-param {String} initCourseName - The name of the initial course.
     * @sb-param {Object} manyToManyMaps - Object that contains the two maps that
     *     map between class names and course names.
-    * @sb-param {d3 set} doneCourseNames - Set of all course names that have been
+    * @sb-param {Set<string>} doneCourseNames - Set of all course names that have been
     *     'done', i.e. included in a Course object that has been returned from
     *     a call to this method.
-    * @sb-param {d3_map} classesMap - Map that maps class names to CourseClass
+    * @sb-param {Map<string, CourseClass>} classesMap - Map that maps class names to CourseClass
     *     objects.
     * @sb-return {SplitsBrowser.Model.Course} - The created Course object.
     */
     private createCourseFromLinkedClassesAndCourses(initCourseName: string,
         manyToManyMaps: any,
-        doneCourseNames: d3_Set,
-        classesMap: d3_Map<CourseClass>): Course {
+        doneCourseNames: Set<string>,
+        classesMap: Map<string, CourseClass>): Course {
 
         const courseNamesToDo = [initCourseName];
         const classNamesToDo = [];
@@ -643,9 +642,9 @@ class OEReader {
         // uses course 1A and 1B).  In this set we collect up all of the
         // courses that we have now processed, so that if we later come across
         // one we've already dealt with, we can ignore it.
-        const doneCourseNames = d3_set();
+        const doneCourseNames = new Set<string>();
 
-        const classesMap = d3_map<CourseClass>();
+        const classesMap = new Map<string, CourseClass>();
         for (const courseClass of classes) {
             classesMap.set(courseClass.name, courseClass);
         }

@@ -3,7 +3,6 @@ import {
    ascending as d3_ascending, max as d3_max, min as d3_min, range as d3_range,
    transpose as d3_transpose, zip as d3_zip
 } from "d3-array";
-import { map as d3_map, Map as d3_Map } from "d3-collection";
 import { Course } from ".";
 import { ChartType } from "../graph-page/splitsbrowser/chart-types";
 import { Competitor } from "./competitor";
@@ -442,8 +441,7 @@ export class CourseClassSet {
       sortedData.sort(d3_ascending);
 
       // Now construct a map that maps from source value to rank.
-      // TODO - Check this section DKR was  var rankMap = new d3_map();
-      const rankMap = d3_map<number>() as d3_Map<number>;
+      const rankMap = new Map<string, number>();
       sortedData.forEach((value: number, index: number) => {
          if (!rankMap.has(value.toString())) {
             rankMap.set(value.toString(), index + 1);

@@ -27,8 +27,9 @@ import { TestSupport } from '../test-support.spec';
 import { Competitor } from './competitor';
 import { Course } from './course';
 import { CourseClass } from './course-class';
-import { ChartData, CourseClassSet } from './course-class-set';
+import { CourseClassSet } from './course-class-set';
 import { isNaNStrict } from './results_util';
+import { ChartData } from '../graph-page/splitsbrowser/chart';
 
 
 describe('Course-class set', () => {

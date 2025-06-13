@@ -1,6 +1,4 @@
 
-
-import { map as d3_map } from "d3-collection";
 import $ from 'jquery';
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
@@ -43,8 +41,8 @@ export function parseIOFXMLEventData(data: string): Results {
     // d3 map that maps course IDs plus comma-separated lists of controls
     // to the temporary course with that ID and controls.
     // (We expect that all classes with the same course ID have consistent
-    // controls, but we don't assume that.)
-    const coursesMap = d3_map<any>();
+    // controls, but we don't assume that.)    
+    const coursesMap = new Map<string, CourseDeatils>();
 
     const warnings: Array<string> = [];
 

@@ -1,8 +1,7 @@
 import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
 import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
-import { map as d3_map } from "d3-collection";
 import { scaleLinear as d3_scaleLinear, ScaleLinear as d3_ScaleLinear } from "d3-scale";
-import { select as d3_select, selectAll as d3_selectAll, Selection } from "d3-selection";
+import { select as d3_select, selectAll as d3_selectAll, Selection, pointer as d3_pointer } from "d3-selection";
 import { line as d3_line } from "d3-shape";
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/results_util";
@@ -12,7 +11,7 @@ import { Lang } from "./lang";
 import { FastestSplitsPopupData, NextControlData, SplitsPopupData } from "./splits-popup-data";
 
 export interface ChartDisplayData {
-   chartData: ChartData
+   chartData: ChartData;
    eventData: Results;
    courseClassSet: CourseClassSet;
    referenceCumTimes: sbTime[];
@@ -49,6 +48,7 @@ interface CurrentCompetitorData {
    index: number;
 }
 
+// Domain value is value of the tick in the axis, index is it index
 type TickFormatterFunction = (domainValue: any, index: number) => string | null;
 
 // Local shorthand functions.
@@ -197,7 +197,7 @@ export class Chart {
    private popupData: SplitsPopupData = new SplitsPopupData(MAX_FASTEST_SPLITS, RACE_GRAPH_COMPETITOR_WINDOW);
    private popupUpdateFunc: () => void = null;
 
-   private mouseOutTimeout: number | null = null; 
+   private mouseOutTimeout: number | null = null;
    private isMouseIn = false;
 
    // The position the mouse cursor is currently over, or null for not over
@@ -264,23 +264,22 @@ export class Chart {
       this.svgGroup = this.svg.append("g");
       this.setLeftMargin(MARGIN.left);
 
-      const svgNode = this.svg.node() as SVGSVGElement;
-      svgNode.addEventListener('mouseenter', (event: MouseEvent) => this.onMouseEnter(event));
-      svgNode.addEventListener('mousemove', (event: MouseEvent) => this.onMouseMove(event));
-      svgNode.addEventListener('mouseleave', () => this.onMouseLeave());
-      svgNode.addEventListener('mousedown', (event: MouseEvent) => this.onMouseDown(event));
-      svgNode.addEventListener('mouseup', (event: MouseEvent) => this.onMouseUp(event));
+      this.svg
+         .on('mouseenter', (event: MouseEvent) => this.onMouseEnter(event))
+         .on('mousemove', (event: MouseEvent) => this.onMouseMove(event))
+         .on('mouseleave', () => this.onMouseLeave())
+         .on('mousedown', (event: MouseEvent) => this.onMouseDown(event))
+         .on('mouseup', (event: MouseEvent) => this.onMouseUp(event));
 
       // Disable the context menu on the chart, so that it doesn't open when
       // showing the right-click popup.
-      svgNode.addEventListener('contextmenu', (event: MouseEvent) => event.preventDefault());
+      this.svg.on('contextmenu', (event: MouseEvent) => event.preventDefault());
 
       // Add an invisible text element used for determining text size.
       this.textSizeElement = this.svg.append("text").attr("fill", "transparent")
          .attr("id", TEXT_SIZE_ELEMENT_ID);
-      
-      const handlers = { "mousemove": this.onMouseMove.bind(this), "mousedown": this.onMouseDown.bind(this), "mouseup": this.onMouseUp.bind(this) };
-      this.popup = new ChartPopup(parent, handlers);
+
+      this.popup = new ChartPopup(parent);
    }
 
    registerEventHandlers(
@@ -437,6 +436,7 @@ export class Chart {
    * @sb-param {MouseEvent} event - Standard MouseEvent object.
    */
    private onMouseEnter(event: MouseEvent) {
+
       if (this.mouseOutTimeout !== null) {
          clearTimeout(this.mouseOutTimeout);
          this.mouseOutTimeout = null;
@@ -498,7 +498,7 @@ export class Chart {
    * @sb-param {MouseEvent} event - The standard onMouseUp event.
    */
    private onMouseUp(event: MouseEvent) {
-    //  this.popup.hide();
+      //  this.popup.hide();
       event.preventDefault();
    }
 
@@ -547,10 +547,8 @@ export class Chart {
    * @sb-param {MouseEvent} event - Standard mouse-move event.
    */
    private updatePopupContents(event: MouseEvent) {
-      const svgNode = this.svg.node() as SVGSVGElement;
-      const svgRect = svgNode.getBoundingClientRect();
-      const yOffset = event.pageY - (svgRect.top + window.scrollY);
-      const showNextControls = this.hasControls && yOffset < MARGIN.top;
+      const [_, yInSvg] = d3_pointer(event, this.svg.node());
+      const showNextControls = this.hasControls && yInSvg < MARGIN.top;
       if (showNextControls) {
          this.updateNextControlInformation();
       } else {
@@ -634,7 +632,7 @@ export class Chart {
             if (this.isRaceGraph) {
                this.setCurrentChartTime(event);
             }
-            
+
             this.updatePopupContents(event);
             this.popup.setLocation(this.getPopupLocation(event));
          }
@@ -747,10 +745,18 @@ export class Chart {
    *
    * @sb-returns {function} Tick-formatting function.
    */
-   private getTickFormatter(): TickFormatterFunction{
-      return (idx: number) => {
-         return (idx === 0) ? getMessage("StartNameShort") :
-            ((idx === this.numControls + 1) ? getMessage("FinishNameShort") : idx.toString());
+
+   private getTickFormatter(): TickFormatterFunction {
+      return (value: any, idx: number) => {  // Note value requred to agree with TickFormatter signature
+         switch (idx) {
+            case 0:
+               return getMessage("StartNameShort");
+            case this.numControls + 1:
+               return getMessage("FinishNameShort");
+            default:
+               return idx.toString();
+         }
+
       };
    }
 
@@ -782,8 +788,7 @@ export class Chart {
    */
    private getMaxGraphEndTextWidth(): number {
       if (this.selectedIndexes.length === 0) {
-         // No competitors selected.  Avoid problems caused by trying to
-         // find the maximum of an empty array.
+
          return 0;
       } else {
          const nameWidths = this.selectedIndexes.map((index: number) => {
@@ -828,8 +833,8 @@ export class Chart {
    * @sb-returns {Number} Maximum width of split-time and rank text, in pixels.
    */
    private getMaxSplitTimeAndRankTextWidth(): number {
-      return this.getMaxTimeAndRankTextWidth((comp, leg) => comp.getSplitTimeTo(leg), 
-                                             (comp, leg) => comp.getSplitRankTo(leg));
+      return this.getMaxTimeAndRankTextWidth((comp, leg) => comp.getSplitTimeTo(leg),
+         (comp, leg) => comp.getSplitRankTo(leg));
    }
 
    /**
@@ -840,7 +845,7 @@ export class Chart {
    */
    private getMaxCumulativeTimeAndRankTextWidth(): number {
       return this.getMaxTimeAndRankTextWidth((comp, leg) => comp.getCumulativeTimeTo(leg),
-                                             (comp, leg) => comp.getCumulativeRankTo(leg));
+         (comp, leg) => comp.getCumulativeRankTo(leg));
    }
 
    /**
@@ -990,13 +995,13 @@ export class Chart {
          const startTimes = (chartData.dataColumns.length === 0) ? [] : chartData.dataColumns[0].ys;
          if (startTimes.length === 0) {
             // No start times - draw all tick marks.
-            return (time => formatTime(time * 60));
+            return (time, _) => formatTime(time * 60);
          } else {
             // Some start times are to be drawn - only draw tick marks if
             // they are far enough away from competitors.
 
             const yScale = this.yScale;
-            return time => {
+            return (time, _) => {
                const yarray: Array<number> = startTimes.map((startTime: number) => {
                   return Math.abs(yScale(startTime) - yScale(time));
                });
@@ -1330,7 +1335,7 @@ export class Chart {
    private sortReferenceCumTimes(): void {
       // Put together a map that maps cumulative times to the first split to
       // register that time.
-      const cumTimesToControlIndex = d3_map<number>();
+      const cumTimesToControlIndex = new Map<string, number>();
       this.referenceCumTimes.forEach((cumTime: number, index: number) => {
          const cumTimeKey = cumTime.toString();
          if (!cumTimesToControlIndex.has(cumTimeKey)) {

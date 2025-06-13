@@ -1,5 +1,4 @@
 
-import { map as d3_map } from "d3-collection";
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { isNotNull } from "../model/results_util";
 import { normaliseLineEndings, parseCourseLength } from "./util";
@@ -1135,7 +1134,7 @@ class HtmlFormatParser {
     *     different classes, false otherwise.
     */
     areClassesUniqueWithinCourses() {
-        const classesToCoursesMap = d3_map();
+        const classesToCoursesMap = new Map<string, string>();
         for (let courseIndex = 0; courseIndex < this.courses.length; courseIndex += 1) {
             const course = this.courses[courseIndex];
             for (let competitorIndex = 0; competitorIndex < course.competitors.length; competitorIndex += 1) {
@@ -1173,7 +1172,7 @@ class HtmlFormatParser {
 
         this.courses.forEach(function (course) {
             // Firstly, sort competitors by class.
-            const classToCompetitorsMap = <any>d3_map();
+            const classToCompetitorsMap = new Map<string, CompetitorParseRecord[]>();
             course.competitors.forEach(function (competitor) {
                 const className = (competitorsHaveClasses && classesUniqueWithinCourses) ? competitor.className : course.name;
                 if (classToCompetitorsMap.has(className)) {
@@ -1185,17 +1184,15 @@ class HtmlFormatParser {
 
             const classesForThisCourse: CourseClass[] = [];
 
-            classToCompetitorsMap.keys().forEach((className: string) => {
+            for (const className of classToCompetitorsMap.keys()) {
                 const numControls = course.controls.length - 1;
                 const oldCompetitors = classToCompetitorsMap.get(className);
-                const newCompetitors = oldCompetitors.map(function (competitor: CompetitorParseRecord, index: number) {
-                    return competitor.toCompetitor(index + 1);
-                });
+                const newCompetitors = oldCompetitors.map((competitor: CompetitorParseRecord, index: number) => competitor.toCompetitor(index + 1));
 
                 const courseClass = new CourseClass(className, numControls, newCompetitors);
                 classesForThisCourse.push(courseClass);
                 classes.push(courseClass);
-            });
+            }
 
             const newCourse = new Course(course.name, classesForThisCourse, course.distance,
                 course.climb, course.controls.slice(0, course.controls.length - 1));
@@ -1278,4 +1275,3 @@ export function parseHTMLEventData(data: string): Results {
     // If we get here, the format wasn't recognized.
     throw new WrongFileFormat("No HTML recognizers recognised this as HTML they could parse");
 }
-

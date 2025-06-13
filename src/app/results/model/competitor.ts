@@ -462,29 +462,19 @@ export class Competitor {
     }
 
     /**
-    * Returns whether this competitor is missing a start time.
-    *
-    * The competitor is missing its start time if it doesn't have a start time
-    * and it also has at least one split.  (A competitor that has no start time
-    * and no splits either didn't start the race.)
-    *
-    * @sb-return {boolean} True if the competitor doesn't have a start time, false
-    *     if they do, or if they have no other splits.
-    */
-    public lacksStartTime(): boolean {
-        return this.startTime === null && this.splitTimes.some(isNotNull);
-    }
-
-    /**
     * Returns whether this competitor is has a start time.
     */
-    public hasStartTime = () => this.startTime !== null;
+    public hasStartTime() {
+       return this.startTime !== null && this.started();
+    }
     
     /**
     * Returns whether this competitor has started
     * The competitor has starts if they have at least one split
     */
-    public started = () => this.splitTimes.some(isNotNull);
+    public started() {
+       return this.splitTimes.some(isNotNull);
+    }
   
     /**
     * Sets the split and cumulative-split ranks for this competitor.

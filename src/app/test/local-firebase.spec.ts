@@ -1,8 +1,9 @@
 import { TestBed } from "@angular/core/testing";
 import { Auth, signInWithEmailAndPassword, UserCredential } from '@angular/fire/auth';
-import { collection, collectionData, deleteDoc, doc, Firestore, setDoc } from '@angular/fire/firestore';
+import { collection, collectionData, deleteDoc, doc, Firestore, getFirestore, setDoc } from '@angular/fire/firestore';
 // import { testUser1Password } from "app/app.firebase-config";
 import { test_clubs, test_events, test_userdata } from './testdata.spec';
+import { FirebaseApp } from '@angular/fire/app';
 
 
 const testUser1Password = 'xxxxx';
@@ -20,7 +21,7 @@ export class FirestoreTestUtil {
          throw new Error("Auth service reference no found");
       }
 
-      this.afs = TestBed.getFirestore(inject(FirebaseApp));
+      this.afs = getFirestore(TestBed.inject(FirebaseApp));
       if (!this.afs) {
          throw new Error("Firestore service reference no found");
       }

@@ -8,12 +8,6 @@ import { select as d3_select, Selection } from "d3-selection";
 
 import { TimeUtilities } from "../../model";
 
-interface ChartPopupHandlers {
-   mousemove: any;
-   mousedown: any;
-   mouseup: any;
-}
-
 /**
 * Creates a ChartPopup control.
 * @constructor
@@ -33,7 +27,7 @@ export class ChartPopup {
    * @sb-param {HTMLElement} parent - Parent HTML element.
    * @sb-param {Object} handlers - Object that maps mouse event names to handlers.
    */
-   constructor ( parent: HTMLElement, handlers: ChartPopupHandlers ) {
+   constructor ( parent: HTMLElement ) {
 
       this._shown = false;
       this._mouseIn = false;
@@ -54,15 +48,6 @@ export class ChartPopup {
 
       this._popupDiv.selectAll( ".nextControls" ).style( "display", "none" );
 
-      // At this point we need to pass through mouse events to the parent.
-      // This is solely for the benefit of IE < 11, as IE11 and other
-      // browsers support pointer-events: none, which means that this div
-      // receives no mouse events at all.
-      for (const eventName in handlers) {
-         if (Object.prototype.hasOwnProperty.call(handlers, eventName)) {
-            this._popupDiv.node().addEventListener(eventName, handlers[eventName]);
-         }
-      }
 
       this._popupDiv.node().addEventListener('mouseenter', () => { this._mouseIn = true; });
       this._popupDiv.node().addEventListener('mouseleave', () => { this._mouseIn = false; });

@@ -116,7 +116,7 @@ export const test_events = [eventA, eventB, eventC];
 /* Results Event A
    Event has 2 courses. one with one class and one with 2 classes */
 export const splitsInfoA: SplitsFileInfo = {
-   uploadDate: new Date('2018-10-23').toISOString(),
+   uploadDate: new Date('2018-10-23'),
    splitsFilename: 'resultsa',
    splitsFileFormat: 'SICSV',
    valid: true,
