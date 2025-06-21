@@ -26,6 +26,9 @@ export function parseIOFXMLEventData(data: string): Results {
 
     validateData(xml, reader);
 
+    const EventElement = $("> Event", $(xml));
+    parseEventDetails(EventElement);
+
     const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
 
     if (classResultElements.length === 0) {
@@ -111,6 +114,8 @@ function parseXml(xmlString: string): XMLDocument {
 
     return xml;
 }
+
+
 
 /**
 * Parses and returns a competitor name from the given XML element.
@@ -343,3 +348,20 @@ function determineReader(data: string) {
 
     throw new WrongFileFormat("Data apparently not of any recognised IOF XML format");
 }
+function parseEventDetails(eventElement: JQuery<HTMLElement>): { eventName: string | undefined, eventDate: Date | undefined } {
+    let eventName: string | undefined;
+    let eventDate: Date | undefined;
+
+    const nameElement = $("Name", eventElement);
+    if (nameElement) {
+        eventName = nameElement.text()?.trim();
+    }
+
+    const dateElement = $("StartTime > Date", eventElement);
+    if (dateElement) {
+        eventDate = new Date(dateElement.text().trim());
+    }
+
+    return { eventName, eventDate };
+}
+

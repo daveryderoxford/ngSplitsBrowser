@@ -1,4 +1,4 @@
-<app-results-navbar class="navbar" [oevent]="rd.event()">
+<app-results-navbar class="navbar">
    <app-selection-sidebar-button />
 
    <mat-button-toggle-group [hideSingleSelectionIndicator]=true>
@@ -10,7 +10,7 @@
    </mat-button-toggle-group>
 </app-results-navbar>
 
-<app-sidebar class="sidebar"/>
+<app-sidebar class="sidebar" [view]="'stats'"/>
 
 <div class="content">
    @for (comp of rs.selectedCompetitors(); track comp) {

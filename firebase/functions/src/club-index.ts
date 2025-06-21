@@ -82,7 +82,7 @@ export const rebuildClubs = functions.https.onCall( async (data, context): Promi
       throw new functions.https.HttpsError('permission-denied' , 'rebuildClubs: Error: Not authorised to run function');
    }
 
-   await admin.firestore().doc('clubs').delete();
+   await admin.firestore().doc<Club>('clubs').delete();
 
    // Read all events
    const snap = await admin.firestore().collection('events').get();
@@ -166,6 +166,11 @@ function makeKey(evt: OEvent): string {
    key = encodeAsFirebaseKey(key);
    return key;
 }
+
+function deleteAllClubs() {
+   admin.firestore().doc('clubs').delete();
+}
+
 
 function padRight(str: string, length: number): string {
    while (str.length < length) {

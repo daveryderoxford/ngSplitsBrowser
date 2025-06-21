@@ -4,11 +4,9 @@
   </div>
 </app-toolbar>
 
-<mat-tab-group class=fill mat-stretch-tabs="false" mat-align-tabs="start" backgroundColor="primary" dynamicHeight>
+<mat-tab-group class=fill mat-stretch-tabs="false" mat-align-tabs="start" dynamicContent="true" preserveContent="">
   <mat-tab label="All">
-    <ng-template matTabContent>
       <app-all-events-tab (eventSelected)="eventClicked($event)" />
-    </ng-template>
   </mat-tab>
 
   <mat-tab #tabClub label="Club">

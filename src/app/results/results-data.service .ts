@@ -1,19 +1,18 @@
 'use strict';
 
 import { HttpClient } from "@angular/common/http";
-import { inject, Injectable } from "@angular/core";
-import { toSignal } from '@angular/core/rxjs-interop';
+import { inject, Injectable, signal } from "@angular/core";
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FirebaseApp } from '@angular/fire/app';
-import { doc, docData, DocumentReference, getFirestore } from '@angular/fire/firestore';
-import { getDownloadURL, getStorage, ref, Storage } from '@angular/fire/storage';
-import { OEvent } from "app/events/model/oevent";
+import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
 import { BehaviorSubject, from, Observable } from "rxjs";
-import { map, switchMap, tap } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { parseEventData } from "./import";
 import { Competitor, InvalidData, Results } from "./model";
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
+import { ResultsEventDetails } from './model/event_details';
 
 const colours = [
    "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
@@ -27,24 +26,26 @@ const colours = [
 })
 export class ResultsDataService {
 
-   private firestore = getFirestore(inject(FirebaseApp));
    private storage = getStorage(inject(FirebaseApp));
    private http = inject(HttpClient);
 
-   // Behavioir subjects for all state
-   private _event$: BehaviorSubject<OEvent> = new BehaviorSubject(null);
-   private _results$: BehaviorSubject<Results> = new BehaviorSubject(null);
+   _event = signal<string>(undefined);
+   event = this._event.asReadonly();
 
-   readonly event = toSignal(this._event$);
-   readonly results = toSignal(this._results$);
+   _results = signal<Results>(undefined);
+   results = this._results.asReadonly();
+
+   isLoading = signal<boolean>(false);
+
+   private _results$ = toObservable(this._results);
 
    constructor() { }
 
    /** Loads results for a specified event returning an observable of the results.
     * This just loads the results file from storage and does not clear any current selections.
     */
-   public loadResults(event: OEvent): Observable<Results> {
-      const ret = this.downloadResultsFile(event).pipe(
+   public loadResults(key: string): Observable<Results> {
+      const ret = this.downloadResultsFile(key).pipe(
          map(text => {
             const results = this.parseSplits(text);
             if (results.needsRepair()) {
@@ -65,44 +66,42 @@ export class ResultsDataService {
     * Selects an event to view.
     * This will load results from storage clearing any selections relivant to the previous event
     */
-   setSelectedEvent(event: OEvent): Observable<Results> {
+   setSelectedEvent(key: string): Observable<Results> {
 
-      if (!event) {
+      if (!key) {
          throw new InvalidData('ResultsSelection: Event not specified');
       }
 
-      if (!this._event$.value || event.key !== this._event$.value.key) {
+      if (!this._event() || key !== this._event()) {
 
-         const ret = this.loadResults(event).pipe(
+         this.isLoading.set(true);
+
+         const ret = this.loadResults(key).pipe(
             tap(results => {
-               this._event$.next(event);
-               this._results$.next(results);
-            }));
+               console
+               const event: ResultsEventDetails = {
+                  key: key,
+                  name: results.eventName,
+                  date: results.eventDate
+               }
+               this._event.set(key);
+               this._results.set(results);
+               this.isLoading.set(false);
+            }),
+            finalize(() => {
+               this.isLoading.set(false);
+            }),
+            catchError((err) => {
+               console.log("EventService: Error loading results for event " + key + ": " + err);
+               this.isLoading.set(false);
+               throw err;
+            }
+         ));
 
          return ret;
       } else {
-         return this._results$.asObservable();
-      }
-   }
-
-   /** Selects event based on the event key, loading the event results */
-   setSelectedEventByKey(key: string): Observable<Results> {
-      if (!this._event$.value || key !== this._event$.value.key) {
-
-         const d = doc(this.firestore, "events", key) as DocumentReference<OEvent>;
-         const obs = docData(d).pipe(
-            tap(evt => {
-               if (evt) {
-                  console.log("ResultsSelectionService: Loading Event for key: " + evt.key);
-               } else {
-                  console.log("ResultsSelectionService:: Event not found. key:" + evt.key);
-               }
-            }),
-            switchMap(evt => this.setSelectedEvent(evt))
-         );
-         return obs;
-      } else {
-         return this._results$.asObservable();
+         console.log("EventService: Event already selected, returning current results");
+         return this._results$;
       }
    }
 
@@ -125,10 +124,14 @@ export class ResultsDataService {
    }
 
    /** Downloads results for an event from google storage */
-   public downloadResultsFile(event: OEvent): Observable<string> {
-      const path = event.splits.splitsFilename;
+   public downloadResultsFile(key: string): Observable<string> {
+
+      const path = isNaN(parseInt(key)) ? 
+                      `results /${key} ` : 
+                      `results/legacy/${key}`;
 
       const r = ref(this.storage, path);
+      
       const obs = from(getDownloadURL(r)).pipe(
          switchMap(url => this.http.get(url, { responseType: 'text' }))
       );

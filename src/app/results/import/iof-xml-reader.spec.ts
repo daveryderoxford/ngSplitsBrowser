@@ -37,7 +37,10 @@ const FEET_PER_KILOMETRE = 3280;
 
 const V2_HEADER = '<?xml version="1.0" ?>\n<!DOCTYPE ResultList SYSTEM "IOFdata.dtd">\n';
 
-const V3_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0">\n';
+const V3_RESULT_LIST_START = '<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0">';
+const V3_RESULT_LIST_END = '</ResultList>';
+const V3_XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n';
+
 
 describe("Input.IOFXml", () => {
 
@@ -69,7 +72,7 @@ describe("Input.IOFXml", () => {
 
     const Version2Formatter: any = {
         name: "version 2.0.3",
-        header: V2_HEADER + "\n<ResultList>\n<IOFVersion version=\"2.0.3\" />\n"
+        header: V2_HEADER + "\n<ResultList>\n<IOFVersion version=\"2.0.3\" />\n",
     };
 
     /**
@@ -242,7 +245,7 @@ describe("Input.IOFXml", () => {
 
     const Version3Formatter: any = {
         name: "version 3.0",
-        header: V3_HEADER + "<Event><Name>Test event name</Name></Event>\n"
+        header: V3_XML_HEADER + V3_RESULT_LIST_START + "<Event><Name>Test event name</Name><StartTime><Date>2023-01-15</Date></StartTime></Event>\n",
     };
 
     /**
@@ -422,8 +425,8 @@ describe("Input.IOFXml", () => {
             xml += clazz.competitors.map(function (comp) { return formatter.getPersonResultXml(comp, clazz); }).join("\n");
             xml += "</ClassResult>\n";
         });
-
-        xml += "</ResultList>\n";
+        if (formatter.name === Version2Formatter.name) { xml += "</ResultList>\n"; } // v2 ends here
+        else { xml += V3_RESULT_LIST_END; } // v3 needs closing tag if header didn't include it
         return xml;
     }
 
@@ -626,19 +629,19 @@ describe("Input.IOFXml", () => {
     });
 
     it("Cannot parse a string for the v3.0 format that mentions the IOF XSD but is not well-formed XML", () => {
-        assertInvalidData(V3_HEADER.replace("<ResultList", "<ResultList <<<"));
+        assertInvalidData(V3_XML_HEADER + V3_RESULT_LIST_START.replace("<ResultList", "<ResultList <<<") + V3_RESULT_LIST_END);
     });
 
     it("Cannot parse a string for the v3.0 format that uses the wrong root element name", () => {
-        assertWrongFileFormat(V3_HEADER.replace("<ResultList", "<Wrong") + "</Wrong>");
+        assertWrongFileFormat(V3_XML_HEADER + V3_RESULT_LIST_START.replace("<ResultList", "<Wrong") + "</Wrong>");
     });
 
     it("Cannot parse a string for the v3.0 format that contains no iofVersion attribute", () => {
-        assertWrongFileFormat(V3_HEADER.replace("iofVersion=\"3.0\"", "") + "</ResultList>");
+        assertWrongFileFormat(V3_XML_HEADER + V3_RESULT_LIST_START.replace("iofVersion=\"3.0\"", "") + V3_RESULT_LIST_END);
     });
 
     it("Cannot parse a string for the v3.0 format that has an iofVersion element with a version other than 3.0", () => {
-        assertWrongFileFormat(V3_HEADER.replace("iofVersion=\"3.0\"", "iofVersion=\"4.6\"") + "</ResultList>");
+        assertWrongFileFormat(V3_XML_HEADER + V3_RESULT_LIST_START.replace("iofVersion=\"3.0\"", "iofVersion=\"4.6\"") + V3_RESULT_LIST_END);
     });
 
     it("Cannot parse a string for the v3.0 format that has a status of something other than complete", () => {
@@ -646,7 +649,7 @@ describe("Input.IOFXml", () => {
             V3_HEADER.replace("<ResultList", "<ResultList status=\"Delta\"") + "</ResultList>",
             "Exception should be thrown attempting to parse XML that contains an IOFVersion element with a wrong version");
     });
-
+    
     it("Cannot parse a string that has no class results in it", () => {
         runFailingXmlFormatParseTest([]);
     });
@@ -665,6 +668,29 @@ describe("Input.IOFXml", () => {
                 expect(eventData.classes.length).toEqual(0, "No classes should have been read - " + formatterName);
                 expect(eventData.warnings.length).toEqual(1, "One warning should have been issued");
             });
+    });
+
+    it("Can parse event details from IOF v3.0 format", () => {
+        const eventName = "My Awesome Event";
+        const eventDateStr = "2024-07-31";
+        const eventDate = new Date(eventDateStr);
+
+        const person = getPerson();
+        const classes = [{ name: "Test Class", length: 2300, competitors: [person] }];
+
+        // Construct XML with specific Event details
+        let xml = V3_XML_HEADER + V3_RESULT_LIST_START +
+            `<Event>
+              <Name>${eventName}</Name>
+              <StartTime><Date>${eventDateStr}</Date></StartTime>
+            </Event>`;
+        xml += "<ClassResult>\n" + Version3Formatter.getClassXml(classes[0].name) + Version3Formatter.getCourseXml(classes[0]);
+        xml += classes[0].competitors.map(comp => Version3Formatter.getPersonResultXml(comp, classes[0])).join("\n");
+        xml += "</ClassResult>\n" + V3_RESULT_LIST_END;
+
+        const eventData = parseEventData(xml);
+        expect(eventData.eventName).toEqual(eventName, "Event name should be parsed correctly");
+        expect(eventData.eventDate).toEqual(eventDate, "Event date should be parsed correctly");
     });
 
     it("Can parse a string that has a single class with a single competitor", () => {
@@ -1316,4 +1342,3 @@ describe("Input.IOFXml", () => {
             });
     });
 });
-

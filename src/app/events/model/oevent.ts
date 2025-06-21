@@ -1,7 +1,5 @@
 import { DocumentSnapshot, Timestamp } from '@angular/fire/firestore';
 
-type ISODateString = string;
-
 export type EventGrade = "IOF" | "International" | "National" | "Regional" | "Club" | "Local";
 
 export class EventGrades {
@@ -35,6 +33,16 @@ export class ControlCardTypes {
 }
 
 export type SplitsFileFormat = "auto" | "IOFv3" | "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML";
+
+export interface OEvent extends EventInfo {
+   key: string;
+   userId: string;
+   splits?: SplitsFileInfo;
+   summary?: EventSummary;
+   legacyPassword?: string;
+   yearIndex: number;  // Used for filtering
+   gradeIndex: any;  // Used for filtering
+}
 
 export interface EventInfo {
    name: string;
@@ -70,50 +78,4 @@ export interface CourseSummary {
    classes: Array<string>;
 }
 
-export interface OEvent extends EventInfo {
-   key: string;
-   userId: string;
-   splits?: SplitsFileInfo;
-   summary?: EventSummary;
-   legacyPassword?: string;
-   yearIndex: number;  // Used for filtering
-   gradeIndex: any;  // Used for filtering
-}
 
-const undefinedToNull = (value: any) => value === undefined ? null : value;
-const nullToUndefined = (value: any) => value === null ? undefined : value;
-
-function dateFromFireStore(raw: string | Timestamp): Date {
-   if (raw === null) return undefined;
-   return (raw instanceof Timestamp) ? raw.toDate() : new Date(raw);
-}
-
-function mapSplits(raw: any): SplitsFileInfo {
-   if (!raw) return undefined;
-   return {
-      ...raw,
-      uploadDate: dateFromFireStore(raw.uploadDate)
-   }
-}
-
-// Firestore data converters
-// 1. Firebase only supports null while undefined is perferred in project
-// 2. Firebase stores dates as Timestamps rather than Javascript dates.  
-export const eventConverter = {
-   toFirestore: (event: OEvent) => {
-      return {
-         ...event,
-         splits: undefinedToNull(event.splits),
-         summary: undefinedToNull(event.summary),
-      };
-   },
-   fromFirestore: (snapshot: DocumentSnapshot<any>): OEvent => {
-      const data = snapshot.data()!;
-      return {
-         ...data,
-         date: dateFromFireStore(data.date),
-         splits: mapSplits(data.splitss),
-         summary: nullToUndefined(data.summary),
-      } as OEvent;
-   }
-};

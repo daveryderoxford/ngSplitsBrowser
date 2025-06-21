@@ -80,10 +80,10 @@ const LEGEND_LINE_WIDTH = 10;
 // time, in pixels.
 const MIN_COMPETITOR_TICK_MARK_DISTANCE = 10;
 
-// The number that identifies the left mouse button in a jQuery event.
+// The number that identifies the left mouse button in a DOM event.
 const DOM_EVENT_LEFT_BUTTON = 0;
 
-// The number that identifies the right mouse button in a jQuery event.
+// The number that identifies the right mouse button in a DOM event.
 const DOM_EVENT_RIGHT_BUTTON = 2;
 
 const SPACER = "\xa0\xa0\xa0\xa0";
@@ -172,7 +172,7 @@ function maxNonNullNorNaNValue(values: (number | null)[]): number {
 /* 
 @Component({
   selector: "app-chart",
-  templateUrl: "..html",
+  template: `<svg id="${CHART_SVG_ID}"></svg>`,
   styleUrls: ["./chart.scss"],
   // To avoid angular re-writting style names that will be used by graphs view.
   // These styles will just get appended to the global styles file
@@ -370,8 +370,7 @@ export class Chart {
    /**
    * Gets the location the chart popup should be at following a mouse-button
    * press or a mouse movement.
-   * @sb-param {jQuery.event} event - jQuery mouse-down or mouse-move event.
-   * @sb-param {MouseEvent} event - Standard mouse-down or mouse-move event.
+   * @sb-param {MouseEvent} event - Mouse-down or mouse-move event.
    * @sb-return {Object} Location of the popup.
    */
    private getPopupLocation(event: MouseEvent): { x: number, y: number; } {
@@ -407,6 +406,8 @@ export class Chart {
       const svgNode = this.svg.node() as SVGSVGElement;
       const svgRect = svgNode.getBoundingClientRect();
       const yOffset = event.pageY - (svgRect.top + window.scrollY) - MARGIN.top;
+      const [_, Y2] = d3_pointer(event, svgNode);
+      console.log(`Y2: ${Y2}, yOffset: ${yOffset} MARGIN.top: ${MARGIN.top}`);
       this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
 
    }
@@ -504,7 +505,6 @@ export class Chart {
 
    /**
    * Shows the popup window, populating it with data as necessary
-   * @sb-param {jQuery.event} event - The jQuery onMouseDown event that triggered
    * @sb-param {MouseEvent} event - The standard onMouseDown event that triggered
    *     the popup.
    */
@@ -543,7 +543,6 @@ export class Chart {
    * X-axis, control information is shown instead of whatever other data would
    * be being shown.
    *
-   * @sb-param {jQuery.event} event - jQuery mouse-move event.
    * @sb-param {MouseEvent} event - Standard mouse-move event.
    */
    private updatePopupContents(event: MouseEvent) {
@@ -1093,7 +1092,7 @@ export class Chart {
 
       this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
 
-      d3_range(this.numLines).forEach(selCompIdx => {
+      for (let selCompIdx = 0; selCompIdx < this.numLines; selCompIdx++) {
          const strokeColour = colours[this.selectedIndexes[selCompIdx] % colours.length];
          const highlighter = () => this.highlight(this.selectedIndexes[selCompIdx]);
          const unhighlighter = () => this.unhighlight();
@@ -1120,7 +1119,7 @@ export class Chart {
                .append("title")
                .text(chartData.competitorNames[selCompIdx]);
          });
-      });
+      }
    }
 
    /**
@@ -1356,4 +1355,12 @@ export class Chart {
          return cumTimesToControlIndex.get(cumTime.toString());
       });
    }
+}
+
+/**  the lables to the right of the chart */
+class CompetitorRightLables {
+   construcrtor() { }
+ 
+
+
 }

@@ -43,7 +43,7 @@ service cloud.firestore {
       allow update: if (request.auth.uid == userId || isAdmin(request)) && validUserUpdate(request.resource.data,resource.data);
     }
 
-    match /clubs {
+    match /clubs/{clubid} {
       allow write: if request.auth.uid != null;
       allow read;
     }

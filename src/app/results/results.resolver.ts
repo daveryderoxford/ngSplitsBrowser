@@ -21,7 +21,7 @@ export class ResultsResolver  {
         if (!id) {
             return toObservable(this.rs.results);
         } else {
-            return this.rs.setSelectedEventByKey(id).pipe(take(1));
+            return this.rs.setSelectedEvent(id).pipe(take(1));
         }
     }
 }

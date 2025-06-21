@@ -1,6 +1,6 @@
 
 .background {
-   background: rgb(207, 204, 204);
+   background-color: var(--mat-sys-surface-container-low);
    display: flex;
    flex-direction: column;
    flex-grow: 1;
@@ -17,9 +17,11 @@
    flex-direction: column;
    max-width: 1500px;
    min-width: 300px;
-   margin: 20px;
+   margin: 5px;
    height: 100%;
    box-sizing: border-box;
    flex-grow: 1;
    overflow: scroll;
 }
+
+

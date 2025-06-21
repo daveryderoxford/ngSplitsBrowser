@@ -15,7 +15,7 @@
 }
 
 <ol>
-   @for (comp of rs.displayedCompetitors(); track comp; let index= $index ) {
+   @for (comp of rs.displayedCompetitors(); track comp.key; let index= $index ) {
    <li (click)="toggleSelected(comp)">
       @if (rs.isCompetitorSelected(comp)) {
       <app-colored-circle class="circle" [text]="(index+1).toString()" [color]="comp.color" />

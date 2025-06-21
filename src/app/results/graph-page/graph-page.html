@@ -1,6 +1,6 @@
 <div class="main-container clipped-container">
 
-   <app-results-navbar [oevent]="rd.event()">
+   <app-results-navbar>
       <app-selection-sidebar-button />
       <!--    <span class="title">
          <h2>{{ rd.event()?.name }}</h2>
@@ -17,7 +17,7 @@
 
    <div class="content clipped-container">
 
-      <app-sidebar />
+      <app-sidebar [view]="chartType().nameKey"/>
 
       <div #chart class="chart"></div>
 

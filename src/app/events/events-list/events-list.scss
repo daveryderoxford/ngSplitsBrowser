@@ -1,17 +1,28 @@
-events-virtual-list-container {
+:host {
    display: flex;
    flex-direction: column;
-   height: 100%; // Or a specific height like 600px
-   min-height: 200px; // Ensure it has some minimum height
+   height: 100%; 
+   max-width: 600px;
+   width: 100vw;
+   overflow: hidden; 
 }
 
 .events-viewport {
-   flex-grow: 1;
-   height: 100%; // Crucial for cdk-virtual-scroll-viewport
+   height: calc(100vh - 60px - 44px); // Set fixed height for virtual viewport
+}
+
+.centered-list {
+   display: flex;
+   flex-direction: row;
+   align-items: center;
+   justify-content: center;
+   height: 100%;
 }
 
 .event-list-item {
    cursor: pointer;
+   max-width: 600px;
+   width: 100vw;
 
    &:hover {
       background-color: rgba(0, 0, 0, 0.04);

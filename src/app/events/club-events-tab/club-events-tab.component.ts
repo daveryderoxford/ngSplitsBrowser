@@ -11,17 +11,17 @@ import { UntilDestroy } from '@ngneat/until-destroy';
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { map, tap } from 'rxjs/operators';
 import { EventService } from "../event.service";
-import { EventsTableComponent } from "../events-table/events-table.component";
 import { EventGrades, OEvent } from '../model/oevent';
 import { Club } from '../model/club';
 import { Nation, Nations } from '../model/nations';
+import { EventListItemComponent } from "../events-list/event-list-item.component";
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
     selector: "app-club-events-tab",
     templateUrl: "./club-events-tab.component.html",
     styleUrls: ["./club-events-tab.component.scss"],
-    imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, EventsTableComponent, MatProgressBarModule, AsyncPipe, DatePipe]
+    imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, MatProgressBarModule, AsyncPipe, DatePipe, EventListItemComponent]
 })
 export class ClubEventsTabComponent implements OnInit {
       private es = inject(EventService);

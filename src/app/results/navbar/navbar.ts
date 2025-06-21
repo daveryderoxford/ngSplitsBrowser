@@ -22,7 +22,7 @@ export class Navbar {
   public rd = inject(ResultsDataService);
   public pageState = inject(ResultsPageState);
 
-  oevent = input<OEvent>();
+  oevent = input<string>();
   settings = input<TemplateRef<any>>;
 
   hasStartTimes = computed(() => this.rs.oclass().competitors.some(comp => comp.hasStartTime() ));

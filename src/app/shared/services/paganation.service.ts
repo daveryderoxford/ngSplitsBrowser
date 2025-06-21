@@ -2,9 +2,9 @@
 /** Service to paganate Firebase queries */
 import { inject, Injectable } from '@angular/core';
 import { FirebaseApp } from '@angular/fire/app';
-import { collection, CollectionReference, collectionSnapshots, DocumentSnapshot, getFirestore, limit, orderBy, Query, query, startAfter } from '@angular/fire/firestore';
+import { collection, CollectionReference, collectionSnapshots, DocumentSnapshot, FirestoreDataConverter, getFirestore, limit, orderBy, Query, query, startAfter } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
+import { shareReplay, take, tap } from 'rxjs/operators';
 
 export interface QueryConfig {
   path: string; //  path to collection
@@ -32,11 +32,10 @@ export class PaganationService<T> {
   done: Observable<boolean> = this._done.asObservable();
   loading: Observable<boolean> = this._loading.asObservable();
 
-  // TODO private _cursor: firebase.firestore.QueryDocumentSnapshot;
   private _cursor: DocumentSnapshot | null = null;
   // Initial query sets options and defines the Observable
   // passing opts will override the defaults
-  init(path: string, field: string, opts?: any) {
+  init(path: string, field: string, opts?: any, converter?: FirestoreDataConverter<T> ) {
 
     this._cursor = null;
     this._data.next([]);
@@ -51,7 +50,10 @@ export class PaganationService<T> {
       ...opts
     };
 
-    const c = collection(this.firestore, this.query.path) as CollectionReference<T>;
+
+    const c = (converter) ?  
+         collection(this.firestore, this.query.path).withConverter(converter) :
+         collection(this.firestore, this.query.path) as CollectionReference<T>;
 
     const first = query(c,
       orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
@@ -61,7 +63,7 @@ export class PaganationService<T> {
     this.mapAndUpdate(first);
 
     // Create the observable array for consumption in components
-    this.data = this._data.asObservable();
+    this.data = this._data.asObservable().pipe(shareReplay(1));
 
   }
 

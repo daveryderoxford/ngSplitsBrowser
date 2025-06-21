@@ -22,7 +22,9 @@ export class Results {
     */
     constructor(public classes: CourseClass[],
         public courses: Course[],
-        warnings?: string[]) {
+        warnings?: string[],
+        public eventName?: string,
+        public eventDate?: Date) {
         if (warnings) {
             this.warnings = warnings;
         }

@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewEncapsulation, computed, effect, inject, signal, viewChild } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewEncapsulation, computed, effect, inject, input, signal, viewChild } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, debounceTime } from 'rxjs';
@@ -37,6 +37,8 @@ export class GraphPage implements AfterViewInit {
   protected rs = inject(ResultsSelectionService);
   protected rd = inject(ResultsDataService);
   protected activeRoute = inject(ActivatedRoute);
+
+  id = input.required<string>();  // Route
 
   legIndex = signal(0);
   raceTiime = signal(0);
@@ -110,7 +112,11 @@ export class GraphPage implements AfterViewInit {
 
   constructor() {
 
-    /** Effect to create chart */
+    effect(() => {
+      this.rd.setSelectedEvent(this.id());
+    });
+
+    /** Effect to create chart - Runs when rd.results() changes state  */
     effect(() => {
 
       if (this.chartElement().nativeElement) {

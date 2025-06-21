@@ -14,10 +14,10 @@ export class ResultsPageState {
    private _pageDisplayed = signal<ResultsView>(resultsViews[0]);
    pageDisplayed = this._pageDisplayed.asReadonly();
 
-   setPage(view: ResultsView, event: OEvent) {
+   setPage(view: ResultsView, key: string) {
 
-      this.router.navigate(["results", view.type, event.key]).catch((err) => {
-         console.log('Errror in navigating to page ' + event.name + ' ' + err.toString());
+      this.router.navigate(["results", view.type, key]).catch((err) => {
+         console.log('Errror in navigating to page ' + key + ' ' + err.toString());
          this.ds.message('Error loading results', 'Errror in navigating to page');
       });
       this._pageDisplayed.set(view);
