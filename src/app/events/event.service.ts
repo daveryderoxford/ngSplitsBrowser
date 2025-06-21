@@ -112,7 +112,7 @@ export const eventConverter = {
     return {
       ...data,
       date: dateFromFireStore(data.date),
-      splits: mapSplits(data.splitss),
+      splits: mapSplits(data.splits),
       summary: nullToUndefined(data.summary),
     } as OEvent;
   }
