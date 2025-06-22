@@ -17,7 +17,7 @@ import { ResultsSearchDialog, SearchSelectedItem } from './results-search-dialog
     </button>
   `,
 })
-export class SearchIconButtonComponent {
+export class SearchIconButton {
   private dialog = inject(MatDialog);
   private rs = inject(ResultsSelectionService);
 

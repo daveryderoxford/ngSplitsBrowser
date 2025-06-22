@@ -2,7 +2,7 @@ import { Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
 import { DialogsService } from 'app/shared';
-import { ToolbarComponent } from 'app/shared/components/toolbar.component';
+import { Toolbar } from 'app/shared/components/toolbar';
 import { EventAdminService } from '../event-admin.service';
 import { FileButton } from '../file-button/file-button';
 import { EventDetailsForm } from '../event-details-form/event-form';
@@ -15,7 +15,7 @@ type Steps = 'details' | 'upload';
     selector: 'app-add-event',
     templateUrl: 'add-event.html',
     styleUrl: 'add-event.scss',
-    imports: [EventDetailsForm, FileButton, ToolbarComponent, EventDetailsForm, MatStepperModule, MatButtonModule]
+    imports: [EventDetailsForm, FileButton, Toolbar, EventDetailsForm, MatStepperModule, MatButtonModule]
 })
 export class AddEvent {
    router = inject(Router);

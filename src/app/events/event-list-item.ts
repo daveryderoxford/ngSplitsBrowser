@@ -4,6 +4,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-event-list-item',
@@ -12,7 +13,8 @@ import { DatePipe } from '@angular/common';
     MatListModule,
     MatIconModule,
     MatButtonModule,
-    DatePipe
+    DatePipe,
+    MatDividerModule
   ],
   template: `
     <mat-list-item class="event-list-item">
@@ -25,8 +27,14 @@ import { DatePipe } from '@angular/common';
         </button>
       </div>
     </mat-list-item>
+    <mat-divider/>
   `,
-  styles: ``,
+  styles: `
+    .event-list-item {
+      background: var(--mat-sys-surface);
+      cursor: pointer;
+    }
+    `,  
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventListItem {

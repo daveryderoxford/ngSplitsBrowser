@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { SidenavButtonComponent } from './sidenav-button.component';
+import { SidenavButton } from './sidenav-button';
 import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
@@ -13,7 +13,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
       <ng-content select="[end]" />
     </mat-toolbar>
     `,
-    imports: [MatToolbarModule, SidenavButtonComponent],
+    imports: [MatToolbarModule, SidenavButton],
     styles: ` 
     .title {
        margin-right: 7px;
@@ -29,7 +29,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
     }
     `
 })
-export class ToolbarComponent {
+export class Toolbar {
 
     title = input.required<string>();
 

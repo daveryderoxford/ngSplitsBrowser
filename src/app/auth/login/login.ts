@@ -12,7 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
-import { ToolbarComponent } from 'app/shared/components/toolbar.component';
+import { Toolbar } from 'app/shared/components/toolbar';
 
 export type AuthType = "EmailAndPassword" | "Google" | "Facebook";
 
@@ -28,7 +28,7 @@ const isInStandaloneMode = () =>
    selector: 'app-login',
    templateUrl: './login.html',
    styleUrls: ['./login.scss'],
-   imports: [MatCardModule, ToolbarComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+   imports: [MatCardModule, Toolbar, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class LoginComponent {
    private router = inject(Router);

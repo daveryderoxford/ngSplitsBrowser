@@ -11,7 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
        </div>
      }
      `,
-    styleUrls: ['./spinner.component.scss'],
+    styleUrls: ['./spinner.scss'],
     imports: [MatProgressSpinnerModule]
 })
 export class SpinnerComponent {

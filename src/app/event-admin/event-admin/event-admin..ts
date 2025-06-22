@@ -1,6 +1,6 @@
 import { Component, inject } from "@angular/core";
 import { provideNativeDateAdapter } from '@angular/material/core';
-import { ToolbarComponent } from 'app/shared/components/toolbar.component';
+import { Toolbar } from 'app/shared/components/toolbar';
 import { OEvent } from "../../events/model/oevent";
 import { DialogsService } from "../../shared/dialogs/dialogs.service";
 import { EventAdminService } from "../event-admin.service";
@@ -18,7 +18,7 @@ interface SplitsUpload {
     selector: "app-event-admin",
     templateUrl: "./event-admin.html",
     styleUrls: ["./event-admin.scss"],
-    imports: [ToolbarComponent, EventList, MatButtonModule, RouterLink, MatIconModule],
+    imports: [Toolbar, EventList, MatButtonModule, RouterLink, MatIconModule],
     providers: [provideNativeDateAdapter()]
 })
 export class EventAdminComponent {

@@ -17,8 +17,8 @@ import { MatDividerModule } from '@angular/material/divider';
     imports: [MatDialogModule, MatDividerModule, MatButtonModule]
 })
 
-export class MessageDialogComponent {
-      public dialogRef = inject<MatDialogRef<MessageDialogComponent>>(MatDialogRef<MessageDialogComponent>);
+export class MessageDialog {
+      public dialogRef = inject<MatDialogRef<MessageDialog>>(MatDialogRef<MessageDialog>);
     public title: string;
     public message: string;
 }

@@ -14,7 +14,7 @@ import { FlexModule } from "@ngbracket/ngx-layout/flex";
 import { UntilDestroy } from '@ngneat/until-destroy';
 import { UserData } from 'app/user/user';
 import { UserDataService } from "app/user/user-data.service";
-import { ToolbarComponent } from "../shared/components/toolbar.component";
+import { Toolbar } from "../shared/components/toolbar";
 import { Nations } from "app/events/model/nations";
 import { AuthService } from 'app/auth/auth.service';
 
@@ -23,7 +23,7 @@ import { AuthService } from 'app/auth/auth.service';
   selector: "app-user",
   templateUrl: "./user-page.html",
   styleUrls: ["./user-page.scss"],
-  imports: [ToolbarComponent, FlexModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
+  imports: [Toolbar, FlexModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
 export class UserPage {
   private afAuth = inject(AuthService);

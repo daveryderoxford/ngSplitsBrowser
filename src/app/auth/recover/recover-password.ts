@@ -7,13 +7,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
-import { ToolbarComponent } from 'app/shared/components/toolbar.component';
+import { Toolbar } from 'app/shared/components/toolbar';
 
 @Component({
   selector: 'app-recover',
   templateUrl: './recover-password.html',
   styleUrls: ['./recover-password.scss'],
-  imports: [FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, ToolbarComponent]
+  imports: [FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, Toolbar]
 })
 export class RecoverComponent {
   private router = inject(Router);

@@ -4,7 +4,7 @@ import { MatTabsModule } from "@angular/material/tabs";
 import { Router, RouterLink } from "@angular/router";
 import { OEvent } from "app/events/model/oevent";
 import { DialogsService } from "app/shared";
-import { ToolbarComponent } from 'app/shared/components/toolbar.component';
+import { Toolbar } from 'app/shared/components/toolbar';
 import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.component";
 import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab";
 import { EventService } from "../event.service";
@@ -14,7 +14,7 @@ import { MyEventsTab } from "../my-events-tab/my-events-tab";
    selector: "app-results",
    templateUrl: "./events-page.html",
    styleUrls: ["./events-page.scss"],
-   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTab, ToolbarComponent, MatButtonModule, RouterLink]
+   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTab, Toolbar, MatButtonModule, RouterLink]
 })
 export class EventsPage {
    private router = inject(Router);

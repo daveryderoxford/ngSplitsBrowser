@@ -15,13 +15,15 @@ import { EventGrades, OEvent } from '../model/oevent';
 import { Club } from '../model/club';
 import { Nation, Nations } from '../model/nations';
 import { EventListItem } from "../event-list-item";
+import { MatDividerModule } from '@angular/material/divider';
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
     selector: "app-club-events-tab",
     templateUrl: "./club-events-tab.html",
     styleUrls: ["./club-events-tab.scss"],
-    imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, MatProgressBarModule, AsyncPipe, DatePipe, EventListItem]
+    imports: [MatFormFieldModule, 
+      MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, MatProgressBarModule, MatDividerModule, AsyncPipe, DatePipe, EventListItem]
 })
 export class ClubEventsTabComponent implements OnInit {
       private es = inject(EventService);

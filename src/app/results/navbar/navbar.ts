@@ -8,14 +8,14 @@ import { ResultsDataService } from '../results-data.service ';
 import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from "../results-selection.service";
 import { ResultsViewButtonComponent } from "./results-view-button.component";
-import { SidenavButtonComponent } from "../../shared/components/sidenav-button.component";
-import { SearchIconButtonComponent } from "../results-search/results-search-button";
+import { SidenavButton } from "../../shared/components/sidenav-button";
+import { SearchIconButton } from "../results-search/results-search-button";
 
 @Component({
     selector: "app-results-navbar",
     templateUrl: "./navbar.html",
     styleUrls: ["./navbar.scss"],
-    imports: [MatToolbarModule, MatIconModule, ResultsViewButtonComponent, SidenavButtonComponent, SearchIconButtonComponent]
+    imports: [MatToolbarModule, MatIconModule, ResultsViewButtonComponent, SidenavButton, SearchIconButton]
 })
 export class Navbar {
   public rs = inject(ResultsSelectionService);

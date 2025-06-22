@@ -12,7 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
     `,
     imports: [MatButtonModule, MatIconModule]
 })
-export class SidenavButtonComponent {
+export class SidenavButton {
       public sidenavService = inject(SidenavService);
 
   openSidenav() {

@@ -1,7 +1,7 @@
 import { Component, computed, inject, input, viewChild } from "@angular/core";
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
-import { ToolbarComponent } from 'app/shared/components/toolbar.component';
+import { Toolbar } from 'app/shared/components/toolbar';
 import { EventAdminService } from './event-admin.service';
 import { EventDetailsForm } from './event-details-form/event-form';
 
@@ -11,7 +11,7 @@ import { EventDetailsForm } from './event-details-form/event-form';
          <app-toolbar title="Edit Event Details"/>
          <app-event-form [oevent]="event()" (submitted)="save($event)"/>
        `,
-   imports: [ToolbarComponent, EventDetailsForm],
+   imports: [Toolbar, EventDetailsForm],
    styles: `
       @use "mixins" as mix;
       @include mix.form-page("app-event-form", 400px);

@@ -24,9 +24,9 @@
         <mat-expansion-panel (opened)="setSelectedClub(club)">
           <mat-expansion-panel-header>
             <mat-panel-title>
-              <b> {{club.name}}  @if ((clubNationalityFilter$ | async) === '') {
+              {{club.name}}  @if ((clubNationalityFilter$ | async) === '') {
                 <span> &nbsp;&nbsp;&nbsp; {{club.nationality}} </span>
-              }</b>
+              }
             </mat-panel-title>
             <mat-panel-description>
               {{club.numEvents}} events &nbsp;&nbsp;&nbsp; Last event {{club.lastEvent | date}}
