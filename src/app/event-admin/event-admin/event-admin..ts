@@ -16,8 +16,8 @@ interface SplitsUpload {
 
 @Component({
     selector: "app-event-admin",
-    templateUrl: "./event-admin.component.html",
-    styleUrls: ["./event-admin.component.scss"],
+    templateUrl: "./event-admin.html",
+    styleUrls: ["./event-admin.scss"],
     imports: [ToolbarComponent, EventList, MatButtonModule, RouterLink, MatIconModule],
     providers: [provideNativeDateAdapter()]
 })

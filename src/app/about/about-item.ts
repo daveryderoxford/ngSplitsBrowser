@@ -17,7 +17,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [MatExpansionModule]
 })
-export class AboutItemComponent {
+export class AboutItem {
 
   title = input<string>();
 

@@ -9,10 +9,9 @@ import { AuthService } from '../auth.service';
   selector: 'app-auth-button',
   standalone: true,
   imports: [MatButtonModule, MatIconModule, MatMenuModule, RouterLink],
-  templateUrl: './auth-button.component.html',
-  styleUrl: './auth-button.component.scss'
+  templateUrl: './auth-button.html',
 })
-export class AuthButtonComponent {
+export class AuthButton {
 
   protected authService = inject(AuthService);
   private router = inject(Router);

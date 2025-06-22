@@ -1,6 +1,6 @@
 /** Lazy loaded routing module for event administration components */
 import { Routes } from "@angular/router";
-import { EventAdminComponent } from "./event-admin/event-admin.component";
+import { EventAdminComponent } from "./event-admin/event-admin.";
 import { AuthGuard } from 'app/auth/guards/auth-guard';
 import { AddEvent } from './add-event/add-event';
 import { PendingChangesGuard } from 'app/shared/services/pending-changes-guard-service.guard';

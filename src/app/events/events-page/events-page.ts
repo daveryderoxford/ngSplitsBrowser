@@ -6,17 +6,17 @@ import { OEvent } from "app/events/model/oevent";
 import { DialogsService } from "app/shared";
 import { ToolbarComponent } from 'app/shared/components/toolbar.component';
 import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.component";
-import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab.component";
+import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab";
 import { EventService } from "../event.service";
-import { MyEventsTabComponent } from "../my-events-tab/my-events-tab.component";
+import { MyEventsTab } from "../my-events-tab/my-events-tab";
 
 @Component({
    selector: "app-results",
-   templateUrl: "./events-view.component.html",
-   styleUrls: ["./events-view.component.scss"],
-   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTabComponent, ToolbarComponent, MatButtonModule, RouterLink]
+   templateUrl: "./events-page.html",
+   styleUrls: ["./events-page.scss"],
+   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTab, ToolbarComponent, MatButtonModule, RouterLink]
 })
-export class EventsViewComponent {
+export class EventsPage {
    private router = inject(Router);
    public es = inject(EventService);
    private ds = inject(DialogsService);

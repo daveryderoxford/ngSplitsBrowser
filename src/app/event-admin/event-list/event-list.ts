@@ -4,7 +4,7 @@ import { OEvent } from "../../events/model/oevent";
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { FileButtonComponent } from '../file-button/file-button.component';
+import { FileButton } from '../file-button/file-button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
@@ -35,7 +35,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
    styleUrl: 'event-list.scss',
    standalone: true,
    changeDetection: ChangeDetectionStrategy.OnPush,
-   imports: [MatListModule, DatePipe, MatIconModule, MatButtonModule, FileButtonComponent, MatTooltipModule],
+   imports: [MatListModule, DatePipe, MatIconModule, MatButtonModule, FileButton, MatTooltipModule],
 })
 export class EventList {
    events = input.required<OEvent[]>();

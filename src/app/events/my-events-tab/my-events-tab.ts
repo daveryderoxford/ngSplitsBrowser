@@ -9,11 +9,11 @@ import { OEvent } from '../model/oevent';
 
 @Component({
    selector: "app-my-events-tab",
-   templateUrl: "./my-events-tab.component.html",
-   styleUrls: ["./my-events-tab.component.scss"],
+   templateUrl: "./my-events-tab.html",
+   styleUrls: ["./my-events-tab.scss"],
    imports: [MatButtonModule, RouterLink, MatListModule]
 })
-export class MyEventsTabComponent {
+export class MyEventsTab {
    private us = inject(UserDataService);
    protected auth = inject(AuthService);
 

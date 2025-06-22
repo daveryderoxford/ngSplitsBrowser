@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
     imports: [MatButtonModule, MatIconModule]
 })
 
-export class FileButtonComponent {
+export class FileButton {
   accept = input<string>();
   multiple = input(false);
   label = input("");

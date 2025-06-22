@@ -26,8 +26,8 @@ const isInStandaloneMode = () =>
 
 @Component({
    selector: 'app-login',
-   templateUrl: './login.component.html',
-   styleUrls: ['./login.component.scss'],
+   templateUrl: './login.html',
+   styleUrls: ['./login.scss'],
    imports: [MatCardModule, ToolbarComponent, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
 })
 export class LoginComponent {

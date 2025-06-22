@@ -21,11 +21,11 @@ import { AuthService } from 'app/auth/auth.service';
 @UntilDestroy()
 @Component({
   selector: "app-user",
-  templateUrl: "./user.component.html",
-  styleUrls: ["./user.component.scss"],
+  templateUrl: "./user-page.html",
+  styleUrls: ["./user-page.scss"],
   imports: [ToolbarComponent, FlexModule, ReactiveFormsModule, MatProgressBarModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatOptionModule, MatButtonModule, MatIconModule, MatCheckboxModule]
 })
-export class UserComponent {
+export class UserPage {
   private afAuth = inject(AuthService);
   private router = inject(Router);
   private usd = inject(UserDataService);

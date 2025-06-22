@@ -12,11 +12,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-change-password',
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.scss'],
+  templateUrl: './change-password.html',
+  styleUrls: ['./change-password.scss'],
   imports: [FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, ToolbarComponent]
 })
-export class ChangePasswordComponent {
+export class ChangePassword {
   private router = inject(Router);
   private formBuilder = inject(FormBuilder);
   private afAuth = inject(Auth);

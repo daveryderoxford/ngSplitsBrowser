@@ -1,4 +1,18 @@
 
   :host {
     height: 100%;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 500px) 1fr;
+    grid-template-rows: calc(100vh - 40px - 44px);
+    grid-template-areas: " ...       list    ... ";
+    background-color: var(--mat-sys-surface-container-low);
   }
+
+  .filter {
+    grid-area: filter;
+  }
+
+  .list {
+    grid-area: list;
+  }
+

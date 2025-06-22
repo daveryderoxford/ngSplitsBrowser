@@ -1,17 +1,18 @@
 import { Component, OnInit, input, output } from '@angular/core';
-import { OEvent, UserResult } from 'app/model';
 import { TimeUtilities, sbTime } from 'app/results/model';
 import { DatePipe } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
+import { UserResult } from 'app/user/user';
+import { OEvent } from '../model/oevent';
 
 @Component({
     selector: 'app-my-results-table',
-    templateUrl: './my-results-table.component.html',
-    styleUrls: ['./my-results-table.component.scss'],
+    templateUrl: './my-results-table.html',
+    styleUrls: ['./my-results-table.scss'],
     standalone: true,
     imports: [MatTableModule, DatePipe]
 })
-export class MyResultsTableComponent implements OnInit {
+export class MyResultsTable implements OnInit {
 
   dataSource = input<UserResult[]>();
   displayedColumns = input(["eventInfo.date",

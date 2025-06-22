@@ -14,14 +14,14 @@ import { EventService } from "../event.service";
 import { EventGrades, OEvent } from '../model/oevent';
 import { Club } from '../model/club';
 import { Nation, Nations } from '../model/nations';
-import { EventListItemComponent } from "../events-list/event-list-item.component";
+import { EventListItem } from "../event-list-item";
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
     selector: "app-club-events-tab",
-    templateUrl: "./club-events-tab.component.html",
-    styleUrls: ["./club-events-tab.component.scss"],
-    imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, MatProgressBarModule, AsyncPipe, DatePipe, EventListItemComponent]
+    templateUrl: "./club-events-tab.html",
+    styleUrls: ["./club-events-tab.scss"],
+    imports: [MatFormFieldModule, MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, MatProgressBarModule, AsyncPipe, DatePipe, EventListItem]
 })
 export class ClubEventsTabComponent implements OnInit {
       private es = inject(EventService);

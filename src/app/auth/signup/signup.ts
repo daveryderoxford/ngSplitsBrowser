@@ -12,11 +12,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
    selector: 'app-signup',
-   templateUrl: './signup.component.html',
-   styleUrls: ['./signup.component.scss'],
+   templateUrl: './signup.html',
+   styleUrls: ['./signup.scss'],
    imports: [MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, ToolbarComponent]
 })
-export class SignupComponent {
+export class Signup {
    private router = inject(Router);
    private formBuilder = inject(FormBuilder);
    private afAuth = inject(Auth);

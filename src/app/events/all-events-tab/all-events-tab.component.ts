@@ -1,23 +1,33 @@
 
-import { DataSource } from '@angular/cdk/table';
-import { Component, OnInit, output, inject } from '@angular/core';
-import { EventService } from 'app/events/event.service';
-import { Observable } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { ScrollingModule } from '@angular/cdk/scrolling';
+import { Component, inject, output } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { AsyncPipe } from '@angular/common';
-import { EventsTableComponent } from '../events-table/events-table.component';
-import { EventGrades, OEvent } from '../model/oevent';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { EventSearchOrder, EventService } from 'app/events/event.service';
+import { EventListItem } from '../event-list-item';
 import { Nations } from '../model/nations';
-import { EventsList } from '../events-list/events-list';
+import { EventGrades, OEvent } from '../model/oevent';
 
 @Component({
   selector: 'app-all-events-tab',
   templateUrl: './all-events-tab.component.html',
   styleUrls: ['./all-events-tab.component.scss'],
-  imports: [EventsList, MatProgressBarModule, AsyncPipe]
+  imports: [MatProgressBarModule, 
+    ScrollingModule,
+    MatListModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatIconModule,
+    EventListItem
+  ],
+
 })
-export class AllEventsTabComponent implements OnInit {
+export class AllEventsTabComponent {
   private es = inject(EventService);
   
   eventSelected = output<OEvent>();
@@ -25,15 +35,30 @@ export class AllEventsTabComponent implements OnInit {
   grades = EventGrades.grades;
   nations = Nations.getNations();
 
-  loading: Observable<boolean>;
+  // Configuration for data fetching
+  private defaultOrderBy: EventSearchOrder = 'date';
+  private defaultPageSize = 30; // Number of events to fetch per page
+  private scrollBuffer = 10; // Load more when X items from the end are reached
 
-  ngOnInit() {
-    this.loading = this.es.loading.pipe(delay(0));
-  }
+  isLoading = toSignal(this.es.loading, { initialValue: false });
+  isDone = toSignal(this.es.done, { initialValue: false });
+
+  private events$ = this.es.search(this.defaultOrderBy, {}, this.defaultPageSize);
+  events = toSignal(this.events$, { initialValue: [] });
 
   eventClicked(event: OEvent) {
     this.eventSelected.emit(event);
   }
 
-  
+  protected trackByEventId(_: number, event: OEvent): string {
+    return event.key;
+  }
+
+  protected scrollPositionChanged(currentIndex: number): void {
+    // Load more if the current scroll index is within the buffer zone from the end of the list
+    console.log(`Current index: ${currentIndex}, Total events: ${this.events().length}, Scroll buffer: ${this.scrollBuffer}`);
+    if (currentIndex >= this.events().length - this.scrollBuffer) {
+      this.es.extendSearch();
+    }
+  }
 }

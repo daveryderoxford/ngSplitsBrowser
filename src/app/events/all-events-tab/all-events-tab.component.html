@@ -1,10 +1,15 @@
+<div class="filter">
 
 
-  
-    <app-events-list class="list" (eventSelected)="eventClicked($event)"></app-events-list>
+</div>
 
-    @if (loading | async) {
-      <mat-progress-bar mode="indeterminate" />
-    }
+<cdk-virtual-scroll-viewport itemSize="88" class="list" (scrolledIndexChange)="scrollPositionChanged($event)">
+  <mat-list>
+    <app-event-list-item *cdkVirtualFor="let event of events(); trackBy: trackByEventId" [event]="event"
+      (eventClicked)="eventClicked(event)" />
+  </mat-list>
+</cdk-virtual-scroll-viewport>
 
->
+@if (isLoading()) {
+<mat-progress-bar mode="indeterminate" />
+}

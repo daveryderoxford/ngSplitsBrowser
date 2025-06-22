@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Output, EventEmitter, input, output } from '@angular/core';
-import { OEvent } from '../model/oevent';
+import { OEvent } from './model/oevent';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,7 +29,7 @@ import { DatePipe } from '@angular/common';
   styles: ``,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventListItemComponent {
+export class EventListItem {
   readonly event = input.required<OEvent>();
   readonly eventClicked = output<OEvent>();
 
