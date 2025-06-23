@@ -407,7 +407,7 @@ export class CourseClassSet {
 * @sb-return {Array} Merged array of competitors.
 */
    private mergeCompetitors(classes: Array<CourseClass>): Competitor[] {
-      if (classes.length === 0) {
+      if (!classes || classes.length === 0) {
          return [];
       }
 

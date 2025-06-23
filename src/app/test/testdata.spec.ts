@@ -21,8 +21,6 @@ export const userdata1: UserData = {
    nationality: 'GBR',
    nationalId: 'GBR12345',
    ecards: [{ id: '11111', type: 'SI' }, { id: '55555', type: "Emit" }],
-   autoFind: true,
-   resultsLastupDated: new Date('2018-10-21').toISOString(),
    postcode: 'TW18 2AB'
 };
 export const userdata2: UserData = {
@@ -35,9 +33,7 @@ export const userdata2: UserData = {
    nationality: 'NOR',
    nationalId: 'NOR12345',
    ecards: [{ id: '22222', type: 'SI' }, { id: '66666', type: "Emit" }],
-   autoFind: false,
-   resultsLastupDated: new Date('2018-10-21').toISOString(),
-      postcode: 'TW18 2AB'
+   postcode: 'TW18 2AB'
 
 };
 export const userdata3: UserData = {
@@ -50,9 +46,7 @@ export const userdata3: UserData = {
    nationality: 'GBR',
    nationalId: 'GBR12345',
    ecards: [{ id: '33333', type: 'SI' }],
-   autoFind: true,
-   resultsLastupDated: new Date('2018-10-21').toISOString(),
-      postcode: 'TW18 2AB'
+   postcode: 'TW18 2AB'
 };
 export const test_userdata = [userdata1, userdata2, userdata3];
 
@@ -148,9 +142,9 @@ export const resultsa: string =
  ];
 
  export const test_clubs: Club[] = [
-    { key: 'GBR-TVOC', name: 'TVOC', nationality: 'GBR', numEvents: 1, lastEvent: '2018-10-21' },
-    { key: 'GBR-SN', name: 'SN', nationality: 'GBR', numEvents: 1, lastEvent: '2018-10-21' },
-    { key: 'NOR-SN', name: 'SN', nationality: 'NOR', numEvents: 1, lastEvent: '2017-01-10' }
+    { key: 'GBR-TVOC', name: 'TVOC', nationality: 'GBR', numEvents: 1, lastEvent: new Date('2018-10-21') },
+    { key: 'GBR-SN', name: 'SN', nationality: 'GBR', numEvents: 1, lastEvent: new Date('2018-10-21')},
+    { key: 'NOR-SN', name: 'SN', nationality: 'NOR', numEvents: 1, lastEvent: new Date('2017-01-10') }
  ];
 /* Results Event B */
 

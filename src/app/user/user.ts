@@ -16,8 +16,6 @@ export interface UserInfo {
     nationality: string;  // short nationality code
     nationalId: string;
     ecards: ECard[];
-    autoFind: boolean;
-    resultsLastupDated: string;
     postcode: string;
 }
 

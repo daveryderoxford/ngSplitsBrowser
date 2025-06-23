@@ -1,17 +1,17 @@
-import { Component, computed, HostBinding, inject, input, linkedSignal, viewChild } from '@angular/core';
+import { Component, computed, inject, input, linkedSignal, viewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabGroup, MatTabsModule } from '@angular/material/tabs';
 import { CourseClass } from '../model';
 import { ResultsDataService } from '../results-data.service ';
+import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from '../results-selection.service';
 import { ClassList } from './class-list/class-list';
 import { CompetitorList } from './competitor-list/competitor-list';
 import { SelectionSidebarService } from './selection-sidebar.service';
-import { ResultsPageState } from '../results-page-state';
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'apps-selection-sidebar',
   imports: [MatTabsModule, MatIconModule, MatButtonModule, CompetitorList, ClassList],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',

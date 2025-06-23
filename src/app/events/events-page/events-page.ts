@@ -21,22 +21,12 @@ export class EventsPage {
    public es = inject(EventService);
    private ds = inject(DialogsService);
 
-   busy = signal(false);
-
    async eventClicked(event: OEvent) {
 
       if (!event.splits || event.splits.valid === false) {
-         this.ds.message("Results display failed", "No valid splits avaliable for event");
+         this.ds.message("No valid splits avaliable for event", "Press OK to select another event");
       } else {
-         this.busy.set(true);
-         try {
-            await this.router.navigate(["results", "graph", event.key]);
-         } catch (err) {
-            console.log('Errror in loading results for ' + event.name + ' \n' + err.toString());
-            this.ds.message('Error loading results', 'Error loading results for event');
-         } finally {
-            this.busy.set(false);;
-         }
+         this.router.navigate(["results", "graph", event.key]);
       }
    }
 }

@@ -1,18 +1,17 @@
 'use strict';
 
-import { HttpClient } from "@angular/common/http";
-import { inject, Injectable, signal } from "@angular/core";
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
+import { computed, inject, Injectable, resource, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
-import { BehaviorSubject, from, Observable } from "rxjs";
-import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
+import { firstValueFrom, Observable } from "rxjs";
+import { catchError } from 'rxjs/operators';
 import { parseEventData } from "./import";
-import { Competitor, InvalidData, Results } from "./model";
+import { Competitor, Results } from "./model";
+import { ResultsEventDetails } from './model/event_details';
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
-import { ResultsEventDetails } from './model/event_details';
 
 const colours = [
    "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
@@ -29,80 +28,51 @@ export class ResultsDataService {
    private storage = getStorage(inject(FirebaseApp));
    private http = inject(HttpClient);
 
-   _event = signal<string>(undefined);
+   _event = signal<ResultsEventDetails>(undefined);
    event = this._event.asReadonly();
 
-   _results = signal<Results>(undefined);
-   results = this._results.asReadonly();
+   private _key = computed(() => this._event().key);  // Computed signal for key property only
 
-   isLoading = signal<boolean>(false);
+   private _resultsResource = resource({
+      params: () => ({ id: this._key() }),
+      loader: async ({ params }) => {
+         const results = await this.loadResults(params.id);
+         return results;
+      },
+   });
 
-   private _results$ = toObservable(this._results);
+   results = this._resultsResource.value;
 
-   constructor() { }
+   isLoading = this._resultsResource.isLoading;
+   error = this._resultsResource.error;
+
+   setSelectedEvent(key: string, name = "", date?: Date) {
+      this._event.set({
+         key: key,
+         name: name,
+         date: date
+      });
+   }
 
    /** Loads results for a specified event returning an observable of the results.
     * This just loads the results file from storage and does not clear any current selections.
     */
-   public loadResults(key: string): Observable<Results> {
-      const ret = this.downloadResultsFile(key).pipe(
-         map(text => {
-            const results = this.parseSplits(text);
-            if (results.needsRepair()) {
-               Repairer.repairEventData(results);
-            }
-            results.determineTimeLosses();
+   public async loadResults(key: string): Promise<Results> {
 
-            this.computeRanks(results);
+      const text = await this.downloadResultsFile(key);
 
-            this.computeColors(results);
-
-            return results;
-         }));
-      return ret;
-   }
-
-   /**
-    * Selects an event to view.
-    * This will load results from storage clearing any selections relivant to the previous event
-    */
-   setSelectedEvent(key: string): Observable<Results> {
-
-      if (!key) {
-         throw new InvalidData('ResultsSelection: Event not specified');
+      const results = this.parseSplits(text);
+      if (results.needsRepair()) {
+         Repairer.repairEventData(results);
       }
+      results.determineTimeLosses();
 
-      if (!this._event() || key !== this._event()) {
+      this.computeRanks(results);
 
-         this.isLoading.set(true);
+      this.computeColors(results);
 
-         const ret = this.loadResults(key).pipe(
-            tap(results => {
-               console
-               const event: ResultsEventDetails = {
-                  key: key,
-                  name: results.eventName,
-                  date: results.eventDate
-               }
-               this._event.set(key);
-               this._results.set(results);
-               this.isLoading.set(false);
-            }),
-            finalize(() => {
-               this.isLoading.set(false);
-            }),
-            catchError((err) => {
-               console.log("EventService: Error loading results for event " + key + ": " + err);
-               this.isLoading.set(false);
-               throw err;
-            }
-         ));
+      return results;
 
-         return ret;
-      } else {
-         console.log("EventService: Event already selected, returning current results");
-         return this._results$;
-      }
    }
 
    /** Parse splits file */
@@ -124,18 +94,23 @@ export class ResultsDataService {
    }
 
    /** Downloads results for an event from google storage */
-   public downloadResultsFile(key: string): Observable<string> {
+   public async downloadResultsFile(key: string): Promise<string> {
 
-      const path = isNaN(parseInt(key)) ? 
-                      `results /${key} ` : 
-                      `results/legacy/${key}`;
+      const path = isNaN(parseInt(key)) ?
+         `results /${key} ` :
+         `results/legacy/${key}`;
 
       const r = ref(this.storage, path);
-      
-      const obs = from(getDownloadURL(r)).pipe(
-         switchMap(url => this.http.get(url, { responseType: 'text' }))
+
+      const url = await getDownloadURL(r);
+
+      const text = await firstValueFrom(
+         this.http.get(url, { responseType: 'text' }).pipe(
+            catchError( error => handleError(error))
+         )
       );
-      return obs;
+
+      return text;
    }
 
    private computeRanks(results: Results) {
@@ -248,3 +223,23 @@ function deepFreeze(o: any) {
 
    return o;
 };
+
+
+function handleError(error: Error | HttpErrorResponse): Observable<string> {
+
+   if (error instanceof HttpErrorResponse) {
+       if (error.status === 0) {
+         // A client-side or network error occurred. Handle it accordingly.
+         console.error('ResultsDataService: Client side network error occurred:', error.error);
+      } else {
+         // The backend returned an unsuccessful response code.
+         // The response body may contain clues as to what went wrong.
+         console.error(
+            `ResultsDataService: Backend returned code ${error.status}, body was: `, error.error);
+      }
+   } else {
+      console.error(`ResultsDataService: Unexpected Error occurred ${error.toString()}`);
+   }
+
+   throw(error);
+}

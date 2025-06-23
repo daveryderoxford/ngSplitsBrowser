@@ -1,24 +1,32 @@
-<app-results-navbar class="navbar">
-   <app-selection-sidebar-button />
+@if (rd.isLoading()) {
+   <app-results-loading/>
+} @else if (rd.error()) {
+   <app-results-error error="rd.error()" />
+} @else {
+<div class="container">
+   <app-results-navbar class="navbar">
+      <app-selection-sidebar-button />
 
-   <mat-button-toggle-group [hideSingleSelectionIndicator]=true>
-      @for (view of views; track view) {
-         <mat-button-toggle [checked]="statsView() === view" (click)="buttonClicked(view)">
-            {{ view }}
-         </mat-button-toggle>
+      <mat-button-toggle-group [hideSingleSelectionIndicator]=true>
+         @for (view of views; track view) {
+            <mat-button-toggle [checked]="statsView() === view" (click)="buttonClicked(view)">
+               {{ view }}
+            </mat-button-toggle>
+         }
+      </mat-button-toggle-group>
+   </app-results-navbar>
+
+   <apps-selection-sidebar class="sidebar" [view]="'stats'"/>
+
+   <div class="content">
+      @for (comp of rs.selectedCompetitors(); track comp) {
+         <app-stats-panel [competitor]="comp"></app-stats-panel>
+      } @empty {
+         <div class="no-competitors">
+            No competitors selected<br>
+            Select a competitor to display
+         </div>
       }
-   </mat-button-toggle-group>
-</app-results-navbar>
-
-<app-sidebar class="sidebar" [view]="'stats'"/>
-
-<div class="content">
-   @for (comp of rs.selectedCompetitors(); track comp) {
-      <app-stats-panel [competitor]="comp"></app-stats-panel>
-   } @empty {
-      <div class="no-competitors">
-         No competitors selected<br>
-         Select a competitor to display
-      </div>
-   }
+   </div>
 </div>
+}

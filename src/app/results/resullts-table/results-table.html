@@ -1,67 +1,73 @@
-<app-results-navbar>
+@if (rd.isLoading()) {
+  <app-results-loading />
+} @else if (rd.error()) {
+  <app-results-error error="rd.error()" />
+} @else {
+  <app-results-navbar>
 
-   <app-class-select [selected]='rs.oclass()' (onSelected)='rs.selectClass($event)' [oclasses]='rd.results().classes' />
+    <app-class-select [selected]='rs.oclass()' (onSelected)='rs.selectClass($event)' [oclasses]='rd.results().classes' />
 
-   @if (course()?.classes.length > 1) {
-      <app-course-or-class />
-   }
-
-   <mat-checkbox labelPosition="after" [formControl]="colorCheckbox">Color</mat-checkbox>
-
-   <mat-checkbox labelPosition="after" [formControl]="selectedCheckbox">Selected only</mat-checkbox>
-
-</app-results-navbar>
-
-<div class="table-container">
-  <table mat-table class="table" [dataSource]="tableData()" matSort (matSortChange)="this.sortState.set($event)">
-
-    <!-- Initial columns -->
-    <ng-container matColumnDef="position" sticky>
-      <th mat-header-cell class="positioncolumn" *matHeaderCellDef mat-sort-header>Pos</th>
-      <td mat-cell *matCellDef="let competitor">
-        @if (rs.isCompetitorSelected(competitor)) {
-          <app-colored-circle class="circle" [text]="competitor.order.toString()" [color]="competitor.color" />
-        } @else {
-        <span>{{competitor.order.toString()}}</span>}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="name" sticky>
-      <th mat-header-cell class="namecolumn" *matHeaderCellDef>Name</th>
-      <td mat-cell *matCellDef="let competitor">
-        {{competitor.name}}
-        <br> {{competitor.club}}
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="total" sticky>
-      <th mat-header-cell class="timecolumn" *matHeaderCellDef mat-sort-header>Total</th>
-      <td mat-cell *matCellDef="let competitor"> {{ getTimeOrStatus(competitor) }} </td>
-    </ng-container>
-
-    <!-- Splits times columns -->
-    @for (split of splitsColumns(); track split; let i = $index) {
-    <ng-container [matColumnDef]="split">
-      <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }} <br> test</th>
-      <td mat-cell [style.background]="cellColor(colorCheckbox.value, i, competitor)" *matCellDef="let competitor">
-        <span [class.fastest]="competitor.splitRanks[i]===1" [class.second]="competitor.splitRanks[i]===2"
-          [class.third]="competitor.splitRanks[i]===3">
-          {{ competitor.splitTimes[i] | formatTime:true }}
-          {{competitor.splitRanks[i] | bracketed}}
-        </span>
-        <br>
-        @if (i !== 0) {
-        <span [class.fastest]="competitor?.cumRanks[i]===1">{{ competitor.cumTimes[i] | formatTime:true }}
-          {{competitor.cumRanks[i] | bracketed }}</span>
-        }
-        <br>
-      </td>
-    </ng-container>
+    @if (course()?.classes.length > 1) {
+        <app-course-or-class />
     }
 
-    <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
-    <tr mat-row *matRowDef="let competitor; columns: displayedColumns();"
-      [class.selected]="rs.isCompetitorSelected(competitor)" (click)="updateSelectedCompetitor(competitor)">
-    </tr>
-  </table>
-</div>
+    <mat-checkbox labelPosition="after" [formControl]="colorCheckbox">Color</mat-checkbox>
+
+    <mat-checkbox labelPosition="after" [formControl]="selectedCheckbox">Selected only</mat-checkbox>
+
+  </app-results-navbar>
+
+  <div class="table-container">
+    <table mat-table class="table" [dataSource]="tableData()" matSort (matSortChange)="this.sortState.set($event)">
+
+      <!-- Initial columns -->
+      <ng-container matColumnDef="position" sticky>
+        <th mat-header-cell class="positioncolumn" *matHeaderCellDef mat-sort-header>Pos</th>
+        <td mat-cell *matCellDef="let competitor">
+          @if (rs.isCompetitorSelected(competitor)) {
+            <app-colored-circle class="circle" [text]="competitor.order.toString()" [color]="competitor.color" />
+          } @else {
+          <span>{{competitor.order.toString()}}</span>}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="name" sticky>
+        <th mat-header-cell class="namecolumn" *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let competitor">
+          {{competitor.name}}
+          <br> {{competitor.club}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="total" sticky>
+        <th mat-header-cell class="timecolumn" *matHeaderCellDef mat-sort-header>Total</th>
+        <td mat-cell *matCellDef="let competitor"> {{ getTimeOrStatus(competitor) }} </td>
+      </ng-container>
+
+      <!-- Splits times columns -->
+      @for (split of splitsColumns(); track split; let i = $index) {
+      <ng-container [matColumnDef]="split">
+        <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }}</th>
+        <td mat-cell [style.background]="cellColor(colorCheckbox.value, i, competitor)" *matCellDef="let competitor">
+          <span [class.fastest]="competitor.splitRanks[i]===1" [class.second]="competitor.splitRanks[i]===2"
+            [class.third]="competitor.splitRanks[i]===3">
+            {{ competitor.splitTimes[i] | formatTime:true }}
+            {{competitor.splitRanks[i] | bracketed}}
+          </span>
+          <br>
+          @if (i !== 0) {
+          <span [class.fastest]="competitor?.cumRanks[i]===1">{{ competitor.cumTimes[i] | formatTime:true }}
+            {{competitor.cumRanks[i] | bracketed }}</span>
+          }
+          <br>
+        </td>
+      </ng-container>
+      }
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns(); sticky: true"></tr>
+      <tr mat-row *matRowDef="let competitor; columns: displayedColumns();"
+        [class.selected]="rs.isCompetitorSelected(competitor)" (click)="updateSelectedCompetitor(competitor)">
+      </tr>
+    </table>
+  </div>
+}

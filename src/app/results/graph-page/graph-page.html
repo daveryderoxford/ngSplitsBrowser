@@ -1,4 +1,9 @@
 <div class="main-container clipped-container">
+   @if (rd.isLoading()) {
+      <app-results-loading />
+   } @else if (rd.error()) {
+      <app-results-error error="rd.error()"/>
+   } @else {
 
    <app-results-navbar>
       <app-selection-sidebar-button />
@@ -17,8 +22,10 @@
 
    <div class="content clipped-container">
 
-      <app-sidebar [view]="chartType().nameKey"/>
+      <apps-selection-sidebar [view]="chartType().nameKey" />
 
       <div #chart class="chart"></div>
 
    </div>
+}
+</div>

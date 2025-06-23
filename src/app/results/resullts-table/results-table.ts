@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, OnInit, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -7,12 +7,15 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatSortModule, Sort } from "@angular/material/sort";
 import { MatTableModule } from "@angular/material/table";
+import { ResultsError } from '../loading/results-error';
+import { ResultsLoading } from '../loading/results-loading';
 import { Competitor } from "../model";
 import { BracketedPipe, FormatTimePipe } from '../model/results-pipes';
 import { TimeUtilities } from "../model/time";
 import { ClassSelect } from "../navbar/class-select";
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
+import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from "../results-selection.service";
 import { ColoredCircle } from '../selection-sidebar/competitor-list/colored-circle';
 import { CourseOrClassCheckbox } from '../selection-sidebar/competitor-list/course-or-class';
@@ -22,11 +25,15 @@ import { CourseOrClassCheckbox } from '../selection-sidebar/competitor-list/cour
     templateUrl: "./results-table.html",
     styleUrls: ["./results-table.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, BracketedPipe, ClassSelect, CourseOrClassCheckbox, MatCheckboxModule, ColoredCircle]
+    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, 
+      BracketedPipe, ClassSelect, CourseOrClassCheckbox, MatCheckboxModule, ColoredCircle, ResultsLoading, ResultsError]
 })
 export class ResultsTable implements OnInit {
    protected rs = inject(ResultsSelectionService);
    protected rd = inject(ResultsDataService);
+   private ps = inject(ResultsPageState);
+
+   id = input.required<string>();  // Route parameter
 
    course = this.rs.course;
    oclass = this.rs.oclass;
@@ -63,15 +70,21 @@ export class ResultsTable implements OnInit {
       }
    });
 
-   ngOnInit() {
+   constructor() {
+      effect(() => {
+         this.rd.setSelectedEvent(this.id());
+         this.ps.setDisplayedPage('table');
+      });
+   }
 
+   ngOnInit() {
       this.courseCheckbox.valueChanges.subscribe((courseDisplayed: boolean) => {
          this.rs.setCourseOrClass(courseDisplayed);
       });
    }
 
    /** Returns color om a red/green color scale for a given percentage along the scale */
-   private colorScale(percent: number): string {
+   private _colorScale(percent: number): string {
       let r = 0;
       let g = 0;
       let b = 0;
@@ -88,7 +101,7 @@ export class ResultsTable implements OnInit {
    }
 
    /** Select cell color based on time loss */
-   cellColor(enabled: boolean, control: number, competitor: Competitor): string {
+   protected cellColor(enabled: boolean, control: number, competitor: Competitor): string {
 
       let ret: string;
       const maxLoss = 180;
@@ -98,19 +111,19 @@ export class ResultsTable implements OnInit {
          let percent = (maxLoss - competitor.timeLosses[control]) * 100 / (maxLoss + maxGain);
          percent = Math.min(percent, 100);
          percent = Math.max(percent, 0);
-         ret = this.colorScale(percent);
+         ret = this._colorScale(percent);
       } else {
          ret = 'rgb(255,255,255)';
       }
       return ret;
    }
 
-   updateSelectedCompetitor(competitor: Competitor) {
+   protected updateSelectedCompetitor(competitor: Competitor) {
       this.rs.toggleCompetitor(competitor);
    }
 
    /** Format title for split time */
-   splitTitle(index: number): string {
+   protected splitTitle(index: number): string {
       if (index === 0) {
          return 'S-1';
       } else if (index === this.course().numSplits) {
@@ -124,7 +137,7 @@ export class ResultsTable implements OnInit {
       }
    }
 
-   getTimeOrStatus(competitor: Competitor): string {
+   protected getTimeOrStatus(competitor: Competitor): string {
       if (competitor.isNonStarter) {
          return 'DNS';
       } else if (competitor.isNonFinisher) {
@@ -140,7 +153,7 @@ export class ResultsTable implements OnInit {
       }
    }
 
-   applySort(sortState: Sort, competitors: Competitor[]) {
+   protected applySort(sortState: Sort, competitors: Competitor[]) {
 
       if (sortState.direction) {
          console.log(`Sorting ${sortState.active} ${sortState.direction} ending`);

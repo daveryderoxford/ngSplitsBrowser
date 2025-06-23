@@ -1,7 +1,6 @@
 import { Component, computed, inject, input, TemplateRef } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { OEvent } from 'app/events/model/oevent';
 import { ComparisionOption } from 'app/results/graph-page/splitsbrowser/comparision-options';
 import { ResultsView, resultsViews } from "../model/results-view";
 import { ResultsDataService } from '../results-data.service ';
@@ -33,6 +32,6 @@ export class Navbar {
 
   viewSelected(view: ResultsView) {
     console.log('Results navbar.  view seleted ' + view.name);
-    this.pageState.setPage(view, this.rd.event());
+    this.pageState.navigateToPage(view, this.rd.event().key);
   }
 }

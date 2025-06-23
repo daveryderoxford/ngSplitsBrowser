@@ -1,5 +1,5 @@
 
-type ResultsViewType = 'graph' | 'race' | 'table' | 'stats' | 'splitpos' | 'racepos' | 'percentbehind';
+export type ResultsViewType = 'graph' | 'race' | 'table' | 'stats';
 
 export interface ResultsView {
    type: ResultsViewType;

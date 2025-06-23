@@ -1,11 +1,15 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewEncapsulation, computed, effect, inject, input, signal, viewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewEncapsulation, computed, effect, inject, input, signal, viewChild } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, debounceTime } from 'rxjs';
+import { ResultsError } from '../loading/results-error';
+import { ResultsLoading } from '../loading/results-loading';
 import { Competitor, CourseClassSet, sbTime } from '../model';
 import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
+import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from "../results-selection.service";
+import { SelectionSidebarButton } from "../selection-sidebar/selection-sidebar-button";
 import { Sidebar } from '../selection-sidebar/sidebar';
 import { CompareWithCompetitorSelect } from "./comparison-algorithm/compare-with-competitor-select";
 import { CompareWithSelect } from './comparison-algorithm/compare-with-select';
@@ -13,162 +17,174 @@ import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
 import { ALL_COMPARISON_OPTIONS } from './splitsbrowser/comparision-options';
-import { SelectionSidebarButton } from "../selection-sidebar/selection-sidebar-button";
 
 interface SplitsBrowserOptions {
-  defaultLanguage?: boolean;
-  containerElement?: string;
-  topBar?: string;
+   defaultLanguage?: boolean;
+   containerElement?: string;
+   topBar?: string;
 }
 
 @Component({
-  selector: "app-graph",
-  templateUrl: "./graph-page.html",
-  styleUrls: ["./graph-page.scss"],
-  // To avoid angular re-writting style names that will be used by graphs view.
-  // These styles will just get appended to the global styles file
-  encapsulation: ViewEncapsulation.None,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Navbar, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect, SelectionSidebarButton]
+   selector: "app-graph",
+   templateUrl: "./graph-page.html",
+   styleUrls: ["./graph-page.scss"],
+   // To avoid angular re-writting style names that will be used by graphs view.
+   // These styles will just get appended to the global styles file
+   encapsulation: ViewEncapsulation.None,
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   imports: [Navbar, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect, SelectionSidebarButton, ResultsLoading, ResultsError]
 })
-export class GraphPage implements AfterViewInit {
-  destroyRef = inject(DestroyRef);
+export class GraphPage {
+   destroyRef = inject(DestroyRef);
 
-  protected rs = inject(ResultsSelectionService);
-  protected rd = inject(ResultsDataService);
-  protected activeRoute = inject(ActivatedRoute);
+   protected rs = inject(ResultsSelectionService);
+   protected rd = inject(ResultsDataService);
+   protected activeRoute = inject(ActivatedRoute);
+   protected ps = inject(ResultsPageState);
 
-  id = input.required<string>();  // Route
+   id = input.required<string>();  // Route parameter
 
-  legIndex = signal(0);
-  raceTiime = signal(0);
+   legIndex = signal(0);
+   raceTiime = signal(0);
 
-  comparisonOptions = signal(ALL_COMPARISON_OPTIONS[1]);
-  comparisonCompetitor = signal<Competitor | undefined>(undefined);
+   comparisonOptions = signal(ALL_COMPARISON_OPTIONS[1]);
+   comparisonCompetitor = signal<Competitor | undefined>(undefined);
 
-  leftLabelFlags = signal<StatsVisibilityFlags>({
-    totalTime: false,
-    splitTime: true,
-    behindFastest: false,
-    timeLoss: true
-  });
+   leftLabelFlags = signal<StatsVisibilityFlags>({
+      totalTime: false,
+      splitTime: true,
+      behindFastest: false,
+      timeLoss: true
+   });
 
-  url = toSignal(this.activeRoute.url);
+   url = toSignal(this.activeRoute.url);
 
-  chartType = computed(() =>
-    this.url()[0].path.includes('race') ?
-      ChartTypeClass.chartTypes.RaceGraph :
-      ChartTypeClass.chartTypes.SplitsGraph
-  );
+   page = computed(() =>
+      this.url()[0].path.includes('race') ?
+         'race' :
+         'graph'
+   );
 
-  courseClassSet = computed(() =>
-    this.rs.courseOrClass() ?
-      new CourseClassSet(this.rs.course().classes) :
-      new CourseClassSet([this.rs.oclass()])
-  );
+   chartType = computed(() =>
+      (this.page() === 'race') ?
+         ChartTypeClass.chartTypes.RaceGraph :
+         ChartTypeClass.chartTypes.SplitsGraph
+   );
 
-  /** index of competitors in displayed competitor list */
-  selectedIndices = computed(() =>
-    this.rs.selectedCompetitors().map(comp => this.courseClassSet().allCompetitors.indexOf(comp))
-  );
 
-  referenceCumTimes = computed<sbTime[]>(() => {
-     
-    const opt = this.comparisonOptions();
-    switch (opt.nameKey) {
-      case 'CompareWithWinner':
-        return this.courseClassSet().getWinnerCumTimes();
-      case 'CompareWithFastestTime':
-        return this.courseClassSet().getFastestCumTimes();
-      case 'CompareWithFastestTimePlusPercentage':
-        return this.courseClassSet().getFastestCumTimesPlusPercentage(opt.percentage);
-      case 'CompareWithAnyRunner':
-        /** index of competitors in displayed competitor list */
-        const index= this.courseClassSet().allCompetitors.indexOf(this.comparisonCompetitor());
-        return this.courseClassSet().getCumulativeTimesForCompetitor(index);
-      default:
-        throw new Error(`Unknown comparison option: ${opt.nameKey}`);
-    }
-  });
+   courseClassSet = computed(() =>
+      this.rs.courseOrClass() ?
+         new CourseClassSet(this.rs.course()?.classes) :
+         new CourseClassSet([this.rs.oclass()])
+   );
 
-  chartData = computed<ChartDisplayData>(() => {
+   /** index of competitors in displayed competitor list */
+   selectedIndices = computed(() =>
+      this.rs.selectedCompetitors().map(comp => this.courseClassSet().allCompetitors.indexOf(comp))
+   );
 
-    return {
-      eventData: this.rd.results(),
-      courseClassSet: this.courseClassSet(),
-      referenceCumTimes: this.referenceCumTimes(),
-      fastestCumTimes: this.courseClassSet().getFastestCumTimes(),
-      chartData: this.courseClassSet().getChartData(this.referenceCumTimes(), this.selectedIndices(), this.chartType())
-    };
-  });
+   referenceCumTimes = computed<sbTime[]>(() => {
 
-  size$ = new BehaviorSubject({ width: 0, height: 0 });
-  observer = new ResizeObserver(entries =>
-    this.size$.next(entries[0].contentRect)
-  );
-
-  chart: Chart;
-  chartElement = viewChild.required<ElementRef>('chart');
-
-  constructor() {
-
-    effect(() => {
-      this.rd.setSelectedEvent(this.id());
-    });
-
-    /** Effect to create chart - Runs when rd.results() changes state  */
-    effect(() => {
-
-      if (this.chartElement().nativeElement) {
-        const element = this.chartElement().nativeElement;
-
-        if (!this.chart) {
-          this.chart = new Chart(element);
-          this.chart.registerEventHandlers(
-            (leg) => this.legIndex.set(leg),
-            (time) => this.raceTiime.set(time)
-          );
-        }
-
-        if (this.rd.results()) {
-          this.chart.setSize(element.clientWidth, element.clientHeight);
-          this.redrawChart();
-        } else {
-          console.log('graph componennt null results');
-        }
+      const opt = this.comparisonOptions();
+      switch (opt.nameKey) {
+         case 'CompareWithWinner':
+            return this.courseClassSet().getWinnerCumTimes();
+         case 'CompareWithFastestTime':
+            return this.courseClassSet().getFastestCumTimes();
+         case 'CompareWithFastestTimePlusPercentage':
+            return this.courseClassSet().getFastestCumTimesPlusPercentage(opt.percentage);
+         case 'CompareWithAnyRunner':
+            /** index of competitors in displayed competitor list */
+            const index = this.courseClassSet().allCompetitors.indexOf(this.comparisonCompetitor());
+            return this.courseClassSet().getCumulativeTimesForCompetitor(index);
+         default:
+            throw new Error(`Unknown comparison option: ${opt.nameKey}`);
       }
-    });
-  }
+   });
 
-  ngAfterViewInit() {
+   chartData = computed<ChartDisplayData>(() => {
 
-    this.observer.observe(this.chartElement().nativeElement);
+      return {
+         eventData: this.rd.results(),
+         courseClassSet: this.courseClassSet(),
+         referenceCumTimes: this.referenceCumTimes(),
+         fastestCumTimes: this.courseClassSet().getFastestCumTimes(),
+         chartData: this.courseClassSet().getChartData(this.referenceCumTimes(), this.selectedIndices(), this.chartType())
+      };
+   });
 
-    this.size$.pipe(debounceTime(100)).subscribe(rect => {
-      const element = this.chartElement().nativeElement;
-      this.chart.setSize(element.clientWidth, element.clientHeight);
-      this.redrawChart();
-    });
-  }
+   size$ = new BehaviorSubject({ width: 0, height: 0 });
+   observer = new ResizeObserver(entries =>
+      this.size$.next(entries[0].contentRect)
+   );
 
-  redrawChart() {
-    this.chart.drawChart(
-      this.chartData(),
-      this.selectedIndices(),
-      this.leftLabelFlags(),
-      this.chartType()
-    );
-  }
+   sizeChange$ = this.size$.pipe(debounceTime(100)).subscribe(rect => {
+      if (this.chart) {
+         const element = this.chartElement().nativeElement;
+         this.chart.setSize(element.clientWidth, element.clientHeight);
+         this.redrawChart();
+      }
+   });
 
-  ngOnDestroy() {
-    this.observer.unobserve(this.chartElement()?.nativeElement);
-    this.size$.unsubscribe();
-  }
+   chart: Chart;
+   chartElement = viewChild<ElementRef>('chart');
 
-  @HostListener('document:mouseup')
-  onDocumentMouseUp() {
-    if (this.chart && this.chart.popup) {
-      this.chart.popup.hide();
-    }
-  }
+   constructor() {
+
+      effect(() => {
+         this.rd.setSelectedEvent(this.id());
+         this.ps.setDisplayedPage(this.page());
+      });
+
+      /** Effect to create and redraw the chart when its data or container becomes available. */
+      effect(() => {
+         const chartContainer = this.chartElement();
+         const chartDisplayData = this.chartData();
+
+         // Exit if the chart container isn't ready or if results are still loading.
+         if (!chartContainer || this.rd.isLoading()) {
+            return;
+         }
+
+         // One-time initialization of the chart instance.
+         if (!this.chart) {
+            this.chart = new Chart(chartContainer.nativeElement);
+            this.chart.registerEventHandlers(
+               (leg) => this.legIndex.set(leg),
+               (time) => this.raceTiime.set(time)
+            );
+            this.observer.observe(this.chartElement().nativeElement);
+         }
+
+         if (chartDisplayData) {
+            // Redraw the chart with the latest data.
+            const element = chartContainer.nativeElement;
+            this.chart.setSize(element.clientWidth, element.clientHeight);
+            this.redrawChart();
+         }
+      });
+   }
+
+   redrawChart() {
+      this.chart.drawChart(
+         this.chartData(),
+         this.selectedIndices(),
+         this.leftLabelFlags(),
+         this.chartType()
+      );
+   }
+
+   ngOnDestroy() {
+      if (this.chartElement()) {
+         this.observer.unobserve(this.chartElement().nativeElement);
+         this.size$.unsubscribe();
+      }
+   }
+
+   @HostListener('document:mouseup')
+   onDocumentMouseUp() {
+      if (this.chart && this.chart.popup) {
+         this.chart.popup.hide();
+      }
+   }
 }
