@@ -19,12 +19,17 @@
    <apps-selection-sidebar class="sidebar" [view]="'stats'"/>
 
    <div class="content">
-      @for (comp of rs.selectedCompetitors(); track comp) {
-         <app-stats-panel [competitor]="comp"></app-stats-panel>
+      @for (comp of rs.selectedCompetitors(); track comp.key) {
+         @if (statsView() === 'Summary') {
+         <app-summary-graph 
+             [competitor]="comp" 
+             [maxCompetitors]="rs.displayedCompetitors().length" 
+             [maxSplits]="4"
+             class="panel"/>
+         }
       } @empty {
          <div class="no-competitors">
-            No competitors selected<br>
-            Select a competitor to display
+            Select a competitor to display graph
          </div>
       }
    </div>

@@ -7,46 +7,49 @@ import { ResultsDataService } from 'app/results/results-data.service ';
 import { ResultsPageState } from 'app/results/results-page-state';
 import { ResultsSelectionService } from 'app/results/results-selection.service';
 import { Sidebar } from 'app/results/selection-sidebar/sidebar';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { SelectionSidebarButton } from "../../selection-sidebar/selection-sidebar-button";
-import { StatsPanel } from "../stats-panel/stats-panel";
+import { SummaryGraph } from '../summary-graph';
 
 @Component({
-    selector: 'app-stats-page',
-  imports: [
-      Navbar, 
-      MatButtonToggleModule, 
-      StatsPanel, 
-      Sidebar, 
+   selector: 'app-stats-page',
+   imports: [
+      Navbar,
+      MatButtonToggleModule,
+      Sidebar,
       SelectionSidebarButton,
       ResultsLoading,
-      ResultsError
-    ],
-    templateUrl: './stats-page.html',
-    styleUrl: './stats-page.scss',
-    changeDetection: ChangeDetectionStrategy.OnPush
+      ResultsError,
+      SummaryGraph
+   ],
+   providers: [
+      provideCharts(withDefaultRegisterables())
+   ],
+   templateUrl: './stats-page.html',
+   styleUrl: './stats-page.scss',
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatsPage {
-  ps = inject(ResultsPageState);
+   private ps = inject(ResultsPageState);
+   protected rs = inject(ResultsSelectionService);
+   protected rd = inject(ResultsDataService);
 
-  readonly views = ['Splits', 'Leg'];
+   readonly views = ['Summary', 'Leg'];
 
-  protected rs = inject(ResultsSelectionService);
-  protected rd = inject(ResultsDataService);
+   statsView = signal<string>('Summary');
 
-  statsView = signal<string>('overall');
+   id = input.required<string>();  // Route parameter
 
-  id = input.required<string>();  // Route parameter
+   constructor() {
+      effect(() => {
+         this.rd.setSelectedEvent(this.id());
+         this.ps.setDisplayedPage('stats');
 
-  constructor() {
-    effect(() => {
-      this.rd.setSelectedEvent(this.id());
-      this.ps.setDisplayedPage('stats');
+      });
+   }
 
-    });
-  }
-
-  buttonClicked(view: string) {
-    this.statsView.set(view);
-  }
+   buttonClicked(view: string) {
+      this.statsView.set(view);
+   }
 
 }

@@ -36,8 +36,6 @@ describe("ResultsDataService", () => {
       expect(service).toBeTruthy();
    });
 
-
-
    it("should load results for an event", (done: DoneFn) => {
       spyOn(service, "downloadResultsFile").and.returnValue(of("Sample CSV data"));
       spyOn(service, "parseSplits").and.returnValue(resultsa);

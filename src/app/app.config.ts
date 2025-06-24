@@ -5,6 +5,7 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading } from '@angular/router';
 import { APP_ROUTES } from './app-routes';
 import { firebaseConfig } from './app.firebase-config';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 export const appConfig: ApplicationConfig = {
    providers: [
@@ -15,6 +16,6 @@ export const appConfig: ApplicationConfig = {
          withPreloading(PreloadAllModules),
          withComponentInputBinding(),
       //  withDebugTracing(),
-      ),
+      ), provideCharts(withDefaultRegisterables()),
    ],
 };

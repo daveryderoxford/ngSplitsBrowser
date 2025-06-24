@@ -28,10 +28,10 @@ export class ResultsDataService {
    private storage = getStorage(inject(FirebaseApp));
    private http = inject(HttpClient);
 
-   _event = signal<ResultsEventDetails>(undefined);
+   _event = signal<ResultsEventDetails | undefined>(undefined);
    event = this._event.asReadonly();
 
-   private _key = computed(() => this._event().key);  // Computed signal for key property only
+   private _key = computed(() => this._event()?.key);  // Computed signal for key property only
 
    private _resultsResource = resource({
       params: () => ({ id: this._key() }),
