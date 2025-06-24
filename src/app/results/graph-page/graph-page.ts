@@ -43,6 +43,8 @@ export class GraphPage {
    protected ps = inject(ResultsPageState);
 
    id = input.required<string>();  // Route parameter
+   eventName = input<string>("");  // Route parameter
+   eventDate = input<Date>();   // Route parameter
 
    legIndex = signal(0);
    raceTiime = signal(0);
@@ -58,6 +60,7 @@ export class GraphPage {
    });
 
    url = toSignal(this.activeRoute.url);
+   queryParams = toSignal(this.activeRoute.queryParams);
 
    page = computed(() =>
       this.url()[0].path.includes('race') ?
@@ -132,7 +135,11 @@ export class GraphPage {
    constructor() {
 
       effect(() => {
-         this.rd.setSelectedEvent(this.id());
+         const eventId = this.id();
+         const name = this.eventName();
+         const date = this.eventDate() ? new Date(this.eventDate()) : undefined;
+
+         this.rd.setSelectedEvent(eventId, name, date);
          this.ps.setDisplayedPage(this.page());
       });
 

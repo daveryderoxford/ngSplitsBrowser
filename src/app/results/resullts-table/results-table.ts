@@ -34,6 +34,8 @@ export class ResultsTable implements OnInit {
    private ps = inject(ResultsPageState);
 
    id = input.required<string>();  // Route parameter
+   eventName = input<string>("");  // Route parameter
+   eventDate = input<Date>();   // Route parameter
 
    course = this.rs.course;
    oclass = this.rs.oclass;
@@ -72,7 +74,11 @@ export class ResultsTable implements OnInit {
 
    constructor() {
       effect(() => {
-         this.rd.setSelectedEvent(this.id());
+         const eventId = this.id();
+         const name = this.eventName();
+         const date = this.eventDate() ? new Date(this.eventDate()) : undefined;
+
+         this.rd.setSelectedEvent(eventId, name, date);
          this.ps.setDisplayedPage('table');
       });
    }

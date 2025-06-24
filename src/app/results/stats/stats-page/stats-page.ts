@@ -39,12 +39,17 @@ export class StatsPage {
    statsView = signal<string>('Summary');
 
    id = input.required<string>();  // Route parameter
+   eventName = input<string>("");  // Route parameter
+   eventDate = input<Date>();   // Route parameter
 
    constructor() {
       effect(() => {
-         this.rd.setSelectedEvent(this.id());
-         this.ps.setDisplayedPage('stats');
+         const eventId = this.id();
+         const name = this.eventName();
+         const date = this.eventDate() ? new Date(this.eventDate()) : undefined;
 
+         this.rd.setSelectedEvent(eventId, name, date);
+         this.ps.setDisplayedPage('stats');
       });
    }
 
