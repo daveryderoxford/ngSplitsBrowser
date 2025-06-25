@@ -1,8 +1,8 @@
 <h2 mat-dialog-title>Search</h2>
 
 <mat-form-field class="search-field" appearance="outline" subscriptSizing="dynamic">
-   <mat-label>Competitors, Classes, or Courses</mat-label>
-   <input matInput type="search" aria-label="Search for Competitors, Classes, or Courses" [formControl]="searchControl">
+   <mat-label>Competitor, Club, Course/Class</mat-label>
+   <input matInput type="search" aria-label="Search for competitor, club or course/class" [formControl]="searchControl">
 </mat-form-field>
 
 <mat-dialog-content>
@@ -14,7 +14,9 @@
          <mat-list-item (click)="optionSelected(option)">
             <span>{{ option.name }}</span>
             @if (isCompetitor(option)) {
-            <span class="option-detail">  {{ asCompetitor(option).club }}</span>
+            <span class="option-detail"> {{ asCompetitor(option).club }}</span>
+            <span class="option-detail"> {{ asCompetitor(option).courseClass.name }}</span>
+
             }
          </mat-list-item>
          }

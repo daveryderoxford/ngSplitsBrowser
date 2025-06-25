@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendEmailVerification } from '@angular/fire/auth';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,6 +9,8 @@ import { Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
 import { Toolbar } from "../../shared/components/toolbar";
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FirebaseError } from '@angular/fire/app';
+import { getFirebaseErrorMessage } from '../firebase-error-messages';
 
 @Component({
    selector: 'app-signup',
@@ -22,10 +24,12 @@ export class Signup {
    private afAuth = inject(Auth);
    private snackBar = inject(MatSnackBar);
 
+   loading = signal(false);
+
    signupForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required],
-      confirmPassword: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]],
    }, { validator: this.passwordMissMatch });
 
    passwordMissMatch(g: FormGroup): any {
@@ -48,6 +52,8 @@ export class Signup {
       const password = this.signupForm.get('password')!.value!;
 
       try {
+         this.loading.set(true);
+
          await createUserWithEmailAndPassword(this.afAuth, email, password);
 
          // User is automatically signed in so get the current user and send verification email
@@ -61,12 +67,25 @@ export class Signup {
          this.router.navigateByUrl('/user');
 
       } catch (error) {
-         if (error instanceof Error) {
-            console.log('SignupComponent: Error creating user code:' + error.message);
-         } else {
-            console.log('SignupComponent: unexpected error');
-         }
-         this.snackBar.open('Error occurred creating user', 'Close', { duration: 3000 });
+         this.handleError(error);
+      } finally {
+         this.loading.set(false);
       }
+   }
+
+   private handleError(error: any) {
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+
+      if (error instanceof FirebaseError) {
+         errorMessage = getFirebaseErrorMessage(error);
+         console.log(`SignupComponent: Firebase error code: ${error.code} messsage: ${errorMessage}`);
+      } else if (error instanceof Error) {
+         console.log('SignupComponent: Error creating user:' + error.message);
+         errorMessage = `Error: ${error.message}`;
+      } else {
+         console.log('SignupComponent: unexpected error');
+      }
+      this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+
    }
 }

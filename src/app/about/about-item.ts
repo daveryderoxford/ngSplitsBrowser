@@ -13,7 +13,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     <ng-content  />
   </mat-expansion-panel>
   `,
-    styles: [],
+  styles: `
+  `,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [MatExpansionModule]
 })

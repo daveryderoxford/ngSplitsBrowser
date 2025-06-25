@@ -28,7 +28,7 @@
                      </mat-form-field>
 
                      <div fxLayout="row" fxLayoutAlign="center">
-                        <button mat-flat-button type="submit" aria-label="login">Sign In</button>
+                        <button mat-flat-button type="submit" [disabled]="loading()" aria-label="login">Sign In</button>
                      </div>
 
                      <div fxLayout="row" fxLayoutAlign="space-between">
@@ -45,8 +45,8 @@
 
             <span class="mat-title-medium">OR LOGIN USING</span>
 
-            <button mat-flat-button (click)="signInWith('Google')" fxFlexAlign="stretch">GOOGLE</button>
-            <button mat-flat-button  (click)="signInWith('Facebook')"
+            <button mat-flat-button (click)="signInWith('Google')" [disabled]="loading()" fxFlexAlign="stretch">GOOGLE</button>
+            <button mat-flat-button  (click)="signInWith('Facebook')" [disabled]="loading()"
                fxFlexAlign="stretch">FACEBOOK</button>
 
          </div>

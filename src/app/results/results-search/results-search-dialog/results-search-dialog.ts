@@ -61,15 +61,11 @@ export class ResultsSearchDialog {
       }
       // If value is null or an unexpected type, filterText remains ''
 
-      const courses = results.findCourses(filterText);
       const classes = results.findCourseClasss(filterText);
       const competitors = results.findCompetitors(filterText);
 
       let filterPanelContents = [];
 
-      if (courses && courses.length > 0) {
-         filterPanelContents.push({ name: 'Courses', options: courses });
-      }
       if (classes && classes.length > 0) {
          filterPanelContents.push({ name: 'Classes', options: classes });
       }

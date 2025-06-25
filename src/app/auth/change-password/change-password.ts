@@ -9,6 +9,8 @@ import { Router } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
 import { Toolbar } from '../../shared/components/toolbar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { FirebaseError } from '@angular/fire/app';
+import { getFirebaseErrorMessage } from '../firebase-error-messages';
 
 @Component({
   selector: 'app-change-password',
@@ -23,8 +25,8 @@ export class ChangePassword {
   private snackBar = inject(MatSnackBar);
 
   form = this.formBuilder.group({
-    password: ['', Validators.required],
-    confirmPassword: ['', Validators.required],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    confirmPassword: ['', [Validators.required]],
   }, { validator: this.passwordMissMatch });
 
   passwordMissMatch(g: FormGroup): ValidationErrors | null {
@@ -51,8 +53,14 @@ export class ChangePassword {
       this.router.navigateByUrl('/');
 
     } catch (e: unknown) {
-      if (e instanceof Error) {
-        console.log('SignupComponent: Error updating password:' + e.message);
+      let msg = 'Unexpected error updating passowrd. Please try again.';
+      if (e instanceof FirebaseError) {
+        msg = getFirebaseErrorMessage(e);
+        console.log(`SignupComponent: Error updating password  Error code: ${e.code} msg: ${msg}`);
+      } else if (e instanceof Error) {
+        console.log('SignupComponent: Error updating password:' + msg);
+      } else {
+        console.log('SignupComponent: Unexpected error updating password');
       }
       this.snackBar.open('Error updating password', 'Close', { duration: 3000 });
     }

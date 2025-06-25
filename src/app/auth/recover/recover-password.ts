@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Auth, sendPasswordResetEmail } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -21,6 +21,8 @@ export class RecoverComponent {
   private afAuth = inject(Auth);
   private snackBar = inject(MatSnackBar);
 
+  loading = signal(false);
+
   recoverForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
   });
@@ -29,11 +31,14 @@ export class RecoverComponent {
     const emailAddress = this.recoverForm.get('email')!.value!;
 
     try {
+      this.loading.set(true);
       await sendPasswordResetEmail(this.afAuth, emailAddress);
       this.router.navigate(["/auth/login"]);
     } catch (err) {
       console.log('RecoverComponent: Error requesting password reset for email');
       this.snackBar.open('Error requesting password reset for email', 'Close', { duration: 3000 });
+    } finally {
+      this.loading.set(false);
     }
   }
 }

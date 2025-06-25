@@ -6,19 +6,34 @@
 
 <mat-tab-group class=fill mat-stretch-tabs="false" mat-align-tabs="start" dynamicContent="true" preserveContent="">
   <mat-tab label="All">
-      <app-all-events-tab (eventSelected)="eventClicked($event)" />
+    <app-all-events-tab (eventSelected)="eventClicked($event)" />
   </mat-tab>
 
   <mat-tab #tabClub label="Club">
     <ng-template matTabContent>
-      <app-club-events-tab (eventSelected)="eventClicked($event)" />
+      @defer {
+       <app-club-events-tab (eventSelected)="eventClicked($event)" />
+      } @loading {
+        ...Loading
+      } @error {
+        Error occured loading tab
+      }
     </ng-template>
+
   </mat-tab>
 
   <mat-tab #tabMyEvents label="My Results">
+
     <ng-template matTabContent>
-      <app-my-events-tab (eventSelected)="eventClicked($event)" />
+      @defer {
+        <app-my-events-tab (eventSelected)="eventClicked($event)" />
+      } @loading {
+        ...Loading
+      } @error {
+        Error occured loading tab
+      }
     </ng-template>
+
   </mat-tab>
 
 </mat-tab-group>

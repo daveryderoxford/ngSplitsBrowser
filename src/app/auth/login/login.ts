@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
+import { FirebaseError } from '@angular/fire/app';
 import {
    Auth,
    FacebookAuthProvider, GoogleAuthProvider, UserCredential, getRedirectResult,
@@ -10,9 +11,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
 import { Toolbar } from 'app/shared/components/toolbar';
+import { getFirebaseErrorMessage } from '../firebase-error-messages';
 
 export type AuthType = "EmailAndPassword" | "Google" | "Facebook";
 
@@ -41,7 +43,7 @@ export class LoginComponent {
       password: ['', Validators.required]
    });
 
-   loading = false;
+   loading = signal(false);
 
    returnUrl = input(''); //Route parameter
 
@@ -54,7 +56,7 @@ export class LoginComponent {
    async signInWith(provider: AuthType, credentials?: { email: string, password: string; }) {
 
       try {
-         this.loading = true;
+         this.loading.set(true);
 
          switch (provider) {
 
@@ -74,7 +76,7 @@ export class LoginComponent {
       } catch (err) {
          this._handleSigninError(err);
       } finally {
-         this.loading = false;
+         this.loading.set(false);
       }
    }
 
@@ -96,8 +98,18 @@ export class LoginComponent {
    }
 
    private _handleSigninError(err: any) {
-      console.log('LoginComponent: Error loging in.  Error code:' + + err.code + '  ' + err.message);
-      this.snackBar.open('Error updating password', 'Close', { duration: 3000 });
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+
+      if (err instanceof FirebaseError) {
+         errorMessage = getFirebaseErrorMessage(err);
+         console.log(`LoginComponent: Firebase error code: ${err.code} message: ${errorMessage}`);
+      } else if (err instanceof Error) {
+         console.log(`LoginComponent: Error logging in:${err.message}`);
+         errorMessage = `An unexpected error occurred. ${err.message}`;
+      } else {
+         console.log('LoginComponent: unexpected error');
+      }
+      this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
    }
 
    private _handleSignInSuccess() {
