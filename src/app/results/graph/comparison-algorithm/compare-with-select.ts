@@ -1,5 +1,5 @@
 import { Component, model } from '@angular/core';
-import { ALL_COMPARISON_OPTIONS, ComparisionOption } from 'app/results/graph-page/splitsbrowser/comparision-options';
+import { ALL_COMPARISON_OPTIONS, ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 

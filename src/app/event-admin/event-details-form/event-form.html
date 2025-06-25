@@ -19,9 +19,9 @@
     <mat-label>Nationality</mat-label>
     <mat-select formControlName="nationality">
       @for (nation of nations; track nation) {
-      <mat-option [value]="nation.abrievation">
-        {{ nation.fullname }}
-      </mat-option>
+        <mat-option [value]="nation.abrievation">
+          {{ nation.fullname }}
+        </mat-option>
       }
     </mat-select>
   </mat-form-field>
@@ -32,11 +32,11 @@
     <mat-hint>Between 2 and 10 characters</mat-hint>
     <mat-error>Club required</mat-error>
 
-    <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayClub">
-      @for (club of filteredClubs$ | async; track club) {
-      <mat-option [value]="club.name">
-        {{ club.name }}
-      </mat-option>
+    <mat-autocomplete #auto="matAutocomplete">
+      @for (club of filteredClubs(); track club.key) {
+        <mat-option [value]="club.name">
+          {{ club.name }}
+        </mat-option>
       }
     </mat-autocomplete>
 
@@ -46,9 +46,9 @@
     <mat-label>Grade</mat-label>
     <mat-select formControlName="grade">
       @for (grade of grades; track grade; let i = $index) {
-      <mat-option [value]="grade">
-        {{ grade }}
-      </mat-option>
+        <mat-option [value]="grade">
+          {{ grade }}
+        </mat-option>
       }
     </mat-select>
   </mat-form-field>
@@ -57,9 +57,9 @@
     <mat-label>Type</mat-label>
     <mat-select formControlName="type">
       @for (type of types; track type) {
-      <mat-option [value]="type">
-        {{ type }}
-      </mat-option>
+          <mat-option [value]="type">
+            {{ type }}
+          </mat-option>
       }
     </mat-select>
   </mat-form-field>
@@ -68,9 +68,9 @@
     <mat-label>Discipline</mat-label>
     <mat-select formControlName="discipline">
       @for (discipline of disciplines; track discipline) {
-      <mat-option [value]="discipline">
-        {{ discipline }}
-      </mat-option>
+        <mat-option [value]="discipline">
+          {{ discipline }}
+        </mat-option>
       }
     </mat-select>
   </mat-form-field>

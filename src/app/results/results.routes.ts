@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { GraphPage } from "./graph-page/graph-page";
-import { ResultsTable } from './resullts-table/results-table';
+import { GraphPage } from "./graph/graph-page";
+import { ResultsTable } from './table/results-table';
 
 export const RESULTS_ROUTES: Routes = [
    {

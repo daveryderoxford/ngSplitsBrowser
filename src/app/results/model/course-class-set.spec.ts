@@ -22,14 +22,14 @@
 /* eslint-disable max-len */
 import { } from 'jasmine';
 import 'jasmine-expect';
-import { ChartType } from '../graph-page/splitsbrowser/chart-types';
+import { ChartType } from '../graph/splitsbrowser/chart-types';
 import { TestSupport } from '../test-support.spec';
 import { Competitor } from './competitor';
 import { Course } from './course';
 import { CourseClass } from './course-class';
 import { CourseClassSet } from './course-class-set';
 import { isNaNStrict } from './results_util';
-import { ChartData } from '../graph-page/splitsbrowser/chart';
+import { ChartData } from '../graph/splitsbrowser/chart';
 
 
 describe('Course-class set', () => {

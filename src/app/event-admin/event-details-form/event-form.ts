@@ -1,5 +1,5 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, computed, effect, inject, input, OnInit, output } from '@angular/core';
+import { Component, computed, effect, inject, input, output } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DateFnsAdapter, MAT_DATE_FNS_FORMATS, provideDateFnsAdapter } from '@angular/material-date-fns-adapter';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
@@ -12,13 +12,11 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FlexModule } from '@ngbracket/ngx-layout';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { UntilDestroy } from '@ngneat/until-destroy';
 import { Club } from 'app/events/model/club';
 import { Nations } from 'app/events/model/nations';
 import { startOfDay } from 'date-fns';
 import { enGB } from 'date-fns/locale';
-import { combineLatest, Observable } from 'rxjs';
-import { map, startWith } from 'rxjs/operators';
 import { EventService } from '../../events/event.service';
 import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/model/oevent';
 
@@ -30,7 +28,6 @@ import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/
    imports: [
       FlexModule,
       ReactiveFormsModule,
-      AsyncPipe,
       MatFormFieldModule,
       MatInputModule,
       MatOptionModule,
@@ -47,26 +44,19 @@ import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/
       provideDateFnsAdapter(),
    ],
 })
-export class EventDetailsForm implements OnInit {
+export class EventDetailsForm  {
    private es = inject(EventService);
    public snackBar = inject(MatSnackBar);
 
    oevent = input<OEvent | null>();
    submitted = output<Partial<OEvent>>();
 
-   new = computed(() => this.oevent() === null);
-
    grades = EventGrades.grades;
    nations = Nations.getNations();
    types = EventTypes.types;
    disciplines = EventDisciplines.disciplines;
 
-   clubs: Club[] = [];
-   filteredClubs$: Observable<Club[]>;
-
    today = startOfDay(new Date());
-
-   filteredClubs = computed;
 
    form = new FormGroup({
       name: new FormControl('', Validators.required),
@@ -79,6 +69,11 @@ export class EventDetailsForm implements OnInit {
       webpage: new FormControl('', Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i))
    });
 
+   clubFormValue = toSignal(this.form.controls.club.valueChanges, {initialValue: ''});
+   natFormValue = toSignal(this.form.controls.nationality.valueChanges, {initialValue: ''});
+   allClubs = toSignal(this.es.getClubs(), {initialValue: []});
+   filteredClubs = computed(() => filterClubs(this.allClubs(), this.clubFormValue(), this.natFormValue()));
+
    constructor() {
       effect(() => {
          if (this.oevent()) {
@@ -87,54 +82,10 @@ export class EventDetailsForm implements OnInit {
       });
    }
 
-   ngOnInit() {
-
-      this.filteredClubs$ = combineLatest([this.es.getClubs(),
-      this.form.controls.club.valueChanges.pipe(startWith('')),
-      this.form.controls.nationality.valueChanges.pipe(startWith(''))])
-         .pipe(
-            map(([clubs, name, nat]) => this.filterClubs(clubs, name, nat))
-         ).pipe(untilDestroyed(this));
-
-      this.filteredClubs$.subscribe((clubs) => {
-         this.clubs = clubs;
-      });
-   }
-
-   filterClubs(clubs: Club[], name: string, nationality: string): Club[] {
-
-      const ret: Club[] = [];
-
-      if (clubs) {
-         for (const club of clubs) {
-            if (!nationality || nationality === '' || club.nationality === nationality) {
-               if (!name || name === '') {
-                  ret.push(club);
-               } else if (club.name.startsWith(name.toUpperCase())) {
-                  ret.push(club);
-               }
-            }
-         }
-      }
-      return ret;
-   }
-
-   displayClub(club?: Club): string {
-      return club ? club.name : undefined;
-   }
-
-   private addhttp(url: string | null): string | null {
-      if (url) {
-         if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
-            url = "http://" + url;
-         }
-      }
-      return url;
-   }
-
    submit() {
       const output = this.form.getRawValue() as Partial<OEvent>;
-      output.webpage = this.addhttp(output.webpage);
+      output.webpage = addhttp(output.webpage);
+      output.club = output.club.toLocaleUpperCase();
 
       this.submitted.emit(output);
       this.form.reset();
@@ -143,4 +94,26 @@ export class EventDetailsForm implements OnInit {
    public canDeactivate(): boolean {
       return !this.form.dirty;
    }
+}
+
+function filterClubs(clubs: Club[], enteredText: string, nat: string): Club[] {
+
+   const ret = clubs.filter(club => {
+      const natOK = !nat || nat === '' || club.nationality === nat;
+      const clubOK = !enteredText || club.name.startsWith(enteredText.toUpperCase());
+      return natOK && clubOK;
+   });
+
+   ret.sort((a, b) => a.name.localeCompare(b.name));
+
+   return ret;
+}
+
+function addhttp(url: string | null): string | null {
+   if (url) {
+      if (!/^(?:f|ht)tps?\:\/\//.test(url)) {
+         url = "http://" + url;
+      }
+   }
+   return url;
 }

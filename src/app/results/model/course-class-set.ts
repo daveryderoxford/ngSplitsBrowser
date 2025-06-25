@@ -4,13 +4,13 @@ import {
    transpose as d3_transpose, zip as d3_zip
 } from "d3-array";
 import { Course } from ".";
-import { ChartType } from "../graph-page/splitsbrowser/chart-types";
+import { ChartType } from "../graph/splitsbrowser/chart-types";
 import { Competitor } from "./competitor";
 import { CourseClass } from "./course-class";
 import { InvalidData } from "./exception";
 import { isNaNStrict, isNotNull, isNotNullNorNaN } from "./results_util";
 import { sbTime } from "./time";
-import { ChartData } from '../graph-page/splitsbrowser/chart';
+import { ChartData } from '../graph/splitsbrowser/chart';
 
 interface BlankRange {
    start: number; 

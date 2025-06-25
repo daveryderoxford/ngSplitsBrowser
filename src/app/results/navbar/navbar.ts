@@ -1,14 +1,14 @@
 import { Component, computed, inject, input, TemplateRef } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { ComparisionOption } from 'app/results/graph-page/splitsbrowser/comparision-options';
+import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
 import { ResultsView, resultsViews } from "../model/results-view";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from "../results-selection.service";
 import { ResultsViewButtonComponent } from "./results-view-button.component";
 import { SidenavButton } from "../../shared/components/sidenav-button";
-import { SearchIconButton } from "../results-search/results-search-button";
+import { SearchIconButton } from "../search/results-search-button";
 
 @Component({
     selector: "app-results-navbar",
