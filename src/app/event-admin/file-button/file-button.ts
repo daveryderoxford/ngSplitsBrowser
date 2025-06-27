@@ -8,9 +8,16 @@ import { MatIconModule } from '@angular/material/icon';
     template: `
         <span>
         <input [accept]="accept()" [multiple]="multiple()" type="file" (change)="onNativeInputFileSelect($event)" #inputFile hidden />
+        @if (label() ==="") {
         <button type="button" mat-icon-button [disabled]=disabled() (click)="selectFile()">
           <mat-icon>upload</mat-icon>
         </button>
+        } @else {
+          <button type="button" matButton="tonal" [disabled]=disabled() (click)="selectFile()">
+            <mat-icon>upload</mat-icon>
+            {{label()}}
+        </button>
+        }
     </span>`,
     imports: [MatButtonModule, MatIconModule]
 })
@@ -22,7 +29,7 @@ export class FileButton {
   disabled = input(false);
   fileSelected = output<File[]>();
 
-  nativeInputFile = viewChild<ElementRef>("inputFile");
+  nativeInputFile = viewChild.required<ElementRef>("inputFile");
 
   private _files: File[];
 

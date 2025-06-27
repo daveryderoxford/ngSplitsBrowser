@@ -88,7 +88,7 @@ export class EventDetailsForm  {
       output.club = output.club.toLocaleUpperCase();
 
       this.submitted.emit(output);
-      this.form.reset();
+      this.form.reset(output); 
    }
 
    public canDeactivate(): boolean {

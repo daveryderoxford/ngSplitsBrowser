@@ -1,4 +1,4 @@
-import { Component, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
 import { DialogsService } from 'app/shared';
@@ -8,37 +8,44 @@ import { FileButton } from '../file-button/file-button';
 import { EventDetailsForm } from '../event-details-form/event-form';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
-
-type Steps = 'details' | 'upload';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
-    selector: 'app-add-event',
-    templateUrl: 'add-event.html',
-    styleUrl: 'add-event.scss',
-    imports: [EventDetailsForm, FileButton, Toolbar, EventDetailsForm, MatStepperModule, MatButtonModule]
+   selector: 'app-add-event',
+   templateUrl: 'add-event.html',
+   styleUrl: 'add-event.scss',
+   imports: [EventDetailsForm, FileButton, Toolbar, EventDetailsForm, MatStepperModule, MatButtonModule, MatTooltipModule]
 })
-export class AddEvent {
+export class AddEvent implements AfterViewInit {
    router = inject(Router);
    eventService = inject(EventAdminService);
    dialogsService = inject(DialogsService);
 
-   oevent = signal<OEvent | null>(null);
+   oevent = signal<OEvent | undefined>(undefined);
 
-   eventForm = viewChild(EventDetailsForm);
-   stepper = viewChild(MatStepper);
-   stepsCompleted = signal(0);
+   eventForm = viewChild.required(EventDetailsForm);
+   stepper = viewChild.required(MatStepper);
 
    loading = signal(false);
 
+   ngAfterViewInit() {
+      // Workaround for [completed] directive not working.
+      // Set completed state to false/true in code
+      for (const step of this.stepper().steps) {
+         step.completed = false;
+      }
+   }
+
    async saveEventDetails(details: Partial<OEvent>) {
       try {
-        const evt = await this.eventService.add(details);
-        this.oevent.set(evt);
-         this.stepsCompleted.set(1);
-         this.stepper().next()
+         const evt = await this.eventService.add(details);
+         this.oevent.set(evt);
+         this.stepper().selected.completed = true;
+         this.stepper().selected.editable = false;
+         this.stepper().next();
       } catch (e: any) {
-         console.log('Error encountered saving event details' + e.toSting());
-         //TODO add a message here
+         console.error(`AddEvent: Error encountered saving event details  ${e.toSting()}`);
+         this.dialogsService.message("Error saving event details", "Error saving event details");
       }
    }
 
@@ -49,15 +56,14 @@ export class AddEvent {
          if (results.warnings && results.warnings.length > 0) {
             const msg = results.warnings.reduce((acc = '', warn) => acc + '\n' + warn);
             await this.dialogsService.message("Warnings uploading splits",
-               "Splits uploaded sucessfully with the following warning messages\n" + msg);
-         } else {
-            this.router.navigate(['events']);
+               "Splits uploaded with the following warning messages\n" + msg);
          }
+         this.stepper().selected.completed = true;
+         this.stepper().next();
       } catch (err) {
-         console.log("EventAdminComponnet: Error uploading splits" + err);
+         console.log("EventAdminComponnet: Error uploading splits\n " + err);
          this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);
       } finally {
-         this.stepsCompleted.set(2);
          this.loading.set(false);
       }
    }
@@ -69,4 +75,9 @@ export class AddEvent {
    canDeactivate(): boolean {
       return this.eventForm()!.canDeactivate();
    }
+
+   copyText(s: string) {
+      navigator.clipboard.writeText(s);
+   }
+
 }

@@ -1,11 +1,12 @@
 <app-toolbar title="Upload new event" style="grid-area: toolbar" />
 
-<mat-stepper orientation="horizontal" linear class="steps">
-   <mat-step label="Details" [completed]="stepsCompleted() > 0" [editable]="stepsCompleted() > 2">
+<mat-stepper orientation="horizontal" [linear]="true" class="steps">
+
+   <mat-step label="Details">
       <app-event-form #eventform (submitted)="saveEventDetails($event)" />
    </mat-step>
 
-   <mat-step #step2 label="Upload results" [completed]="stepsCompleted() > 1">
+   <mat-step label="Upload results">
       <p>
          Select results file to upload.
       </p>
@@ -13,13 +14,14 @@
 
    </mat-step>
 
-   <mat-step #step2 label="Done">
+   <mat-step label="Done">
       <p class="mat-title-medium">
          Results sucessfilly uploaded.
       </p>
       <p>Copy the following URL to link directly to Splitsbropwser for the event</p>
       <p class="mat-title-medium">
-         htttps//:splitsbrowser.org.uk/{{oevent()?.key}}
+         @let url = "htttps//:splitsbrowser.org.uk/" + oevent()?.key;
+         {{url}} <mat-icon (click)="copyText(url)" class="copy-icon" matTooltip="Copy">content_copy</mat-icon>
       </p>
       <button mat-flat-button (click)="done()">Done</button>
    </mat-step>

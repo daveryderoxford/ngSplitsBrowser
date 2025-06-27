@@ -74,7 +74,7 @@ export class EventService {
     if (!this._clubsRead) {
       const d = collection(this.firestore, "/clubs").withConverter(clubConverter);
       this._clubs$ = collectionData(d);
-      this._clubsRead = true
+      this._clubsRead = true;
     }
     return this._clubs$;
   }
@@ -129,10 +129,9 @@ export const clubConverter = {
   },
   fromFirestore: (snapshot: DocumentSnapshot<any>, options: any): Club => {
     const data = snapshot.data()!;
-    console.log(`converting:  ${data.key}   date: ${data.lastEvent} date type:  ${typeof data.lastEvent}`);
-      return {
-        ...data,
-        lastEvent: dateFromFireStore(data.lastEvent)
-      };
+    return {
+      ...data,
+      lastEvent: dateFromFireStore(data.lastEvent)
+    };
   }
 };

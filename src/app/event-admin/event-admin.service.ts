@@ -35,7 +35,7 @@ export class EventAdminService {
             return collectionData(q);
          }
       }),
-      tap((events) => console.log("EventAdminService: Events loaded", events)),
+    //  tap((events) => console.log("EventAdminService: Events loaded", events)),
    );
 
    events = toSignal(this.events$, { initialValue: [] });
@@ -173,7 +173,7 @@ export class EventAdminService {
          courses: new Array()
       };
 
-      results.courses.forEach((course) => {
+      for (const course of results.courses) {
          const courseSummary = this.createCourseSummary(course);
 
          course.classes.forEach((eclass) => {
@@ -182,7 +182,7 @@ export class EventAdminService {
             courseSummary.classes.push(eclass.name);
          });
          summary.courses.push(courseSummary);
-      });
+      }
 
       return (summary);
    }
