@@ -2,10 +2,23 @@
   "firebase ionit ": {
     "rules": "firebase/database.rules.json"
   },
-  "functions": {
-    "source": "firebase/functions",
-    "predeploy": "npm --prefix firebase/functions run build"
-  },
+  "functions": [
+    {
+      "source": "firebase/functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix firebase/functions run lint",
+        "npm --prefix firebase/functions run build"
+      ]
+    }
+  ],
   "hosting": [
     {
       "target": "splitsbrowser",
@@ -26,5 +39,29 @@
   "firestore": {
     "rules": "firebase/firestore.rules",
     "indexes": "firebase/firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "firebase/storage.rules"
+  },
+  "emulators": {
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "auth": {
+      "port": "9099"
+    },
+    "storage": {
+      "port": "9199"
+    },
+    "hosting": {
+      "port": 4999
+    },
+    "ui": {
+      "enabled": true
+    }
   }
 }
+

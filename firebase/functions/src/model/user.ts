@@ -1,32 +1,19 @@
 
 /** data associated with a user */
-import { ControlCardType, OEvent } from "./oevent";
-import { ISODateString } from "./date";
+import { OEvent } from './oevent.js';
+import { sbTime } from './time.js';
 
-export interface ECard {
-    id: string;
-    type: ControlCardType;
-}
-
-/** Information set by the users abouth themselves */
-export interface UserInfo {
-    email: string;         // Not on client
+/** All the user data stored for the user */
+export interface UserData {
+    key: string;  // Matches with the users Firebase reference
+    email: string;
     firstname: string;
     surname: string;
     club: string;
     nationality: string;  // short nationality code
     nationalId: string;
-    ecards: ECard[];
-    autoFind: boolean;
-    resultsLastupDated: ISODateString;
     postcode: string;
-}
-
-/** All the user data stored for the user */
-export interface UserData extends UserInfo {
-    key: string;  // Matches with the users Firebase reference
     results: UserResult[];
-    archived: boolean;
 }
 
 /** Information on the results for a user.
@@ -43,17 +30,12 @@ export interface UserResult {
         courseclass: string;
         coursePosition: number;
         classPosition: number;
-        totalTime: number;
+        totalTime: sbTime;
         distance: number;
         climb: number;
         courseWinner: string;
-        courseWinningTime: number;
+        courseWinningTime: sbTime;
         classWinner: string;
-        classWinningTime: number;
+        classWinningTime: sbTime;
     };
-}
-export interface UserFixture {
-    eventId: string;
-    date: string;
-    name: string;
 }

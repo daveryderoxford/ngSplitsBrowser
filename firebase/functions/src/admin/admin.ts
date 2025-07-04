@@ -12,7 +12,7 @@ async function grantModeratorRole( email: string ) {
 export const grantAdmin = functions.https.onCall( async ( data, context ) => {
 
    // Only alllow super user or admin user
-   if ( context.auth.token.admin === true || context.auth.uid === SUPER_USER ) {
+   if ( context.auth?.token.admin === true || context.auth?.uid === SUPER_USER ) {
       await grantModeratorRole( data.email );
       return { result: "Request fulfilled! ${email} is now a moderator." };
 

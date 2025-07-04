@@ -2,6 +2,9 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "env": {
+        "NODE_OPTIOBS": "--loader ts-node/esm",
+      },
       "type": "node",
       "request": "attach",
    
@@ -18,10 +21,10 @@
         "tdd",
         "--timeout",
         "999999",
-        "--require",
         "ts-node/register",
+        "--project tsconfig.test.json",
         "--colors",
-        "${workspaceFolder}/firebase/functions/src/spec/*.ts",
+        "${workspaceFolder}/firebase/functions/test/*.ts",
       ],
       "sourceMaps": true,
       "console": "integratedTerminal",

@@ -23,6 +23,19 @@
          @let url = "htttps//:splitsbrowser.org.uk/" + oevent()?.key;
          {{url}} <mat-icon (click)="copyText(url)" class="copy-icon" matTooltip="Copy">content_copy</mat-icon>
       </p>
+      @let evt = oevent();
+      @if (evt) {
+         @if (evt.splits) {
+            Uploaded aplits file:  {{evt.splits.splitsFilename}} 
+            {{evt.splits.splitsFilename ? 'Splits valid' : 'Error in uploaded splits - Correct error and upload again'}}
+         } @else {
+            Splits not yet uploaded.
+         }
+         @if (evt.summary) {
+            <p>{{evt.summary.numcompetitors}} competitors</p>
+            <p>{{evt.summary.courses.length}} courses</p>
+         }
+      }
       <button mat-flat-button (click)="done()">Done</button>
    </mat-step>
 </mat-stepper>

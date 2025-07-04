@@ -1,27 +1,18 @@
 
 /** data associated with a user */
 import { sbTime } from "../results/model";
-import { ControlCardType, OEvent } from "../events/model/oevent";
+import { OEvent } from "../events/model/oevent";
 
-export interface ECard {
-    id: string;
-    type: ControlCardType;
-}
-
-/** Information set by the users abouth themselves */
-export interface UserInfo {
+/** All the user data stored for the user */
+export interface UserData   {
+    key: string;  // Matches with the users Firebase reference
+    email: string;
     firstname: string;
     surname: string;
     club: string;
     nationality: string;  // short nationality code
     nationalId: string;
-    ecards: ECard[];
     postcode: string;
-}
-
-/** All the user data stored for the user */
-export interface UserData extends UserInfo {
-    key: string;  // Matches with the users Firebase reference
     results: UserResult[];
 }
 

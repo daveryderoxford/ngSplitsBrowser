@@ -3,11 +3,13 @@
  */
 import { inject, Injectable, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
-import { collection, collectionData, CollectionReference, doc, docData, DocumentReference, DocumentSnapshot, getFirestore, orderBy, query, Timestamp, where } from '@angular/fire/firestore';
+import { collection, collectionData, getFirestore, orderBy, query, where } from '@angular/fire/firestore';
 import { PaganationService } from "app/shared";
 import { BehaviorSubject, merge, Observable, of } from "rxjs";
+import { clubConverter, eventConverter } from './event-firestore-converter';
 import { Club } from './model/club';
-import { EventInfo, OEvent, SplitsFileInfo } from './model/oevent';
+import { EventInfo, OEvent } from './model/oevent';
+export { eventConverter };
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
@@ -79,59 +81,3 @@ export class EventService {
     return this._clubs$;
   }
 }
-
-const undefinedToNull = (value: any) => value === undefined ? null : value;
-const nullToUndefined = (value: any) => value === null ? undefined : value;
-
-function dateFromFireStore(raw: string | Timestamp): Date {
-  if (raw === null) return undefined;
-  return (raw instanceof Timestamp) ? raw.toDate() : new Date(raw);
-}
-
-function mapSplits(raw: any): SplitsFileInfo {
-  if (!raw) return undefined;
-  return {
-    ...raw,
-    uploadDate: dateFromFireStore(raw.uploadDate)
-  };
-}
-
-// Firestore data converters
-// 1. Firebase only supports null while undefined is perferred in project
-// 2. Firebase stores dates as Timestamps rather than Javascript dates.  
-export const eventConverter = {
-  toFirestore: (event: OEvent) => {
-    return {
-      ...event,
-      splits: undefinedToNull(event.splits),
-      summary: undefinedToNull(event.summary),
-    };
-  },
-  fromFirestore: (snapshot: DocumentSnapshot<any>): OEvent => {
-    const data = snapshot.data()!;
-    return {
-      ...data,
-      date: dateFromFireStore(data.date),
-      splits: mapSplits(data.splits),
-      summary: nullToUndefined(data.summary),
-    } as OEvent;
-  }
-};
-
-// Firestore data converters
-// 1. Firebase only supports null while undefined is perferred in project
-// 2. Firebase stores dates as Timestamps rather than Javascript dates.  
-export const clubConverter = {
-  toFirestore: (club: Club) => {
-    return {
-      ...club,
-    };
-  },
-  fromFirestore: (snapshot: DocumentSnapshot<any>, options: any): Club => {
-    const data = snapshot.data()!;
-    return {
-      ...data,
-      lastEvent: dateFromFireStore(data.lastEvent)
-    };
-  }
-};

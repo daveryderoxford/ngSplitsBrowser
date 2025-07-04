@@ -1,20 +1,21 @@
 /**
  * Splitsbrowser Google clould functions exports
  */
-import * as admin from "firebase-admin";
-import * as functions from "firebase-functions";
-import * as sysAdmin from "./admin/admin";
-import * as clubIndex from "./club-index";
-import * as user from "./user/user";
+import { getApps, initializeApp } from "firebase-admin/app";  // Need to explicitly reference app for ESM 
 
-const firebaseAdmin = admin.initializeApp();
+if (getApps().length === 0) {
+   const app = initializeApp();
+   console.log('Initialized Firebase app: ' + app.name);
+}
 
-export const eventClubReferencesCreate = clubIndex.created;
-export const eventClubReferencesUpdate = clubIndex.updated;
-export const eventClubReferencesDelete = clubIndex.deleted;
-export const rebuildClubs = clubIndex.rebuildClubs;
+// Export functions from their respective modules with clearer, grouped exports.
+export {
+   clubsEventCreated,
+   clubsEventUpdated,
+   clubsEventDeleted,
+   rebuildClubs,
+} from "./club/club-index.js";
 
-export const grantAdmin = sysAdmin.grantAdmin;
+export { grantAdmin } from "./admin/admin.js";
 
-export const createUsder = user.createUser;
-export const deleteUsder = user.deleteUser;
+export { createUser, deleteUser } from "./user/user.js";

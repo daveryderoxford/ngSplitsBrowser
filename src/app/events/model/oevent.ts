@@ -77,5 +77,3 @@ export interface CourseSummary {
    numcompetitors: number;
    classes: Array<string>;
 }
-
-
