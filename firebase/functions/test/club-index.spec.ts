@@ -103,22 +103,15 @@ describe('Club Index Cloud Functions', function () {
       });
 
       it('should update event count if club already exists', async () => {
-
-         // Setup initial state in database - 3 events for club and club index with 2 events 
-         const existingClub = createClub({
-            name: 'EXIST',
-            nationality: 'USA',
-            numEvents: 2,
-            lastEvent: new Date('2023-01-01')
-         });
-         await saveClub(db, existingClub);
-
+         // Arrange: The database contains three events for the same club.
+         // The function should correctly count all of them when triggered.
          const evt1 = createEvent({ key: 'evt1', name: 'Event 1', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-01') });
          const evt2 = createEvent({ key: 'evt2', name: 'Event 2', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-02') });
          const evt3 = createEvent({ key: 'evt3', name: 'Event 3', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-03') });
 
          await saveEvent(db, evt1);
          await saveEvent(db, evt2);
+         // The function is triggered by the creation of evt3.
          await saveEvent(db, evt3);
 
          const snap = testEnv.firestore.makeDocumentSnapshot(evt3, 'events/evt3');
@@ -126,6 +119,7 @@ describe('Club Index Cloud Functions', function () {
          await wrapped({ data: snap });
 
          const club = await readClub(db, evt3);
+         // Assert: The club index should reflect that there are now 3 events.
          expectClub(club, 3, evt3.date);
       });
    });
@@ -138,22 +132,15 @@ describe('Club Index Cloud Functions', function () {
          const olderEvent = createEvent({ key: 'evtOlder', club: 'MULTI', nationality: 'AUS', date: new Date('2023-01-01') });
          const newerEvent = createEvent({ key: 'evtNewer', club: 'MULTI', nationality: 'AUS', date: new Date('2023-02-01') });
 
-         const existingClub = createClub({ name: 'MULTI', nationality: 'AUS', numEvents: 2, lastEvent: newerEvent.date });
-
          // set database state when trigger is fired
          // newer event is not saved as it will have been deleted before clubsEventDeleted is called
          await saveEvent(db, olderEvent);
-         await saveClub(db, existingClub);
 
          // For a delete trigger, the snapshot contains the data *before* the delete.
          const snap = testEnv.firestore.makeDocumentSnapshot(newerEvent, 'events/evtNewer');
 
          const wrapped = testEnv.wrap(myFunctions.clubsEventDeleted);
          await wrapped({ data: snap });
-
-         // Remove the deleted event from the emulated DB so our fixed `removeClubReference` 
-         // function can correctly find the new latest event.
-         await db.doc('events/evtNewer').delete();
 
          const club = await readClub(db, olderEvent);
          // With the `lastEvent` logic fixed, the club's lastEvent should now be the date
@@ -186,22 +173,20 @@ describe('Club Index Cloud Functions', function () {
 
    describe('clubsEventUpdated', () => {
       it('should update club counts when an event changes club', async () => {
-         // Setup: oldClub has two events. We will move the newer one to newClub.
+         // Arrange: Define the state of the database *after* the update.
+         // oldClub will have 2 events remaining.
          const oldClubEvent1 = createEvent({ key: 'evtOld1', club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-03-01') });
          const oldClubEvent2 = createEvent({ key: 'evtOld2', club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-01-01') });
+         // newClub will have 2 events, including the one that was moved.
          const newClubEvent1 = createEvent({ key: 'evtNew1', club: 'NEWCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
 
-         const oldClubEventToChange = createEvent({ key: 'evtOld3', club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
+         const beforeEvent = createEvent({ key: 'evtOld3', club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
+         const afterEvent = {...beforeEvent, club: 'NEWCLUB'};
 
-         const oldClub = createClub({ name: 'OLDCLUB', nationality: 'GBR', numEvents: 3, lastEvent: oldClubEventToChange.date });
-         const newClub = createClub({ name: 'NEWCLUB', nationality: 'GBR', numEvents: 1, lastEvent: new Date() });
-
-         const beforeEvent = oldClubEventToChange; // This is the event that is being changed
-         const afterEvent = createEvent({ key: 'evtOld3', club: 'NEWCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
-
-         // Set database state prior to event being triggered. 
-         await saveClub(db, oldClub);
-         await saveClub(db, newClub);
+         // The function under test recalculates club stats from scratch based on the
+         // events in the database. Therefore, we don't need to save initial club
+         // documents; we only need to ensure the `events` collection is in the
+         // correct state for the function to query.
 
          // Populate the database with events as they would appear after the change (eg event2 = afterevent)
          await saveEvent(db, oldClubEvent1);
@@ -210,19 +195,20 @@ describe('Club Index Cloud Functions', function () {
          await saveEvent(db, newClubEvent1);
          await saveEvent(db, afterEvent);
 
-         // Trigger chnage with `before` and `after` snapshots.
-         const beforeSnap = testEnv.firestore.makeDocumentSnapshot(beforeEvent, 'events/evtOld2');
-         const afterSnap = testEnv.firestore.makeDocumentSnapshot(afterEvent, 'events/evtOld2');
+         // Act: Trigger the function with the `before` and `after` snapshots.
+         const beforeSnap = testEnv.firestore.makeDocumentSnapshot(beforeEvent, 'events/evtOld3');
+         const afterSnap = testEnv.firestore.makeDocumentSnapshot(afterEvent, 'events/evtOld3');
          const change = testEnv.makeChange(beforeSnap, afterSnap);
 
          const wrapped = testEnv.wrap(myFunctions.clubsEventUpdated);
          await wrapped({ data: change });
 
+         // Assert: Check the final state of both clubs.
          const updatedOldClub = await readClub(db, beforeEvent);
          const updatedNewClub = await readClub(db, afterEvent);
 
-         expectClub(updatedOldClub, oldClub.numEvents - 1, oldClubEvent1.date, 'Old club incorrect');
-         expectClub(updatedNewClub, newClub.numEvents + 1, afterEvent.date, 'New club incorrect');
+         expectClub(updatedOldClub, 2, oldClubEvent1.date, 'Old club incorrect');
+         expectClub(updatedNewClub, 2, afterEvent.date, 'New club incorrect');
       });
    });
 

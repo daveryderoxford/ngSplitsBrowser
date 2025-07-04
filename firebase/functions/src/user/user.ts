@@ -1,16 +1,19 @@
-import * as admin from "firebase-admin";
-import * as functions from "firebase-functions";
+import { getFirestore } from 'firebase-admin/firestore';
+import * as functions from 'firebase-functions';
+import * as logger from "firebase-functions/logger";
 import { UserData } from "../model/user.js";
+import { userConverter } from '../model/user-firebase-converters.js';
+
 
 /** Creates new user data and saves it to the database */
-function createUserData(): UserData {
+function createUserData(uid: string, email?: string): UserData {
     const userdata: UserData = {
-        key: "",
-        email: "",
+        key: uid,
+        email: email ?? "",
         firstname: "",
         surname: "",
         club: "",
-        nationality: "",
+        nationality: "", 
         nationalId: "",
         results: [],
         postcode: "",
@@ -18,24 +21,24 @@ function createUserData(): UserData {
     return userdata;
 }
 
-export const createUser = functions.auth.user().onCreate(async (user: any, context) => {
-    // Create user data when a user is created
-    const userdata = createUserData();
-    userdata.key = user.uid;
-    userdata.email = user.email;
+export const createUser = functions.auth.user().onCreate(async (user) => {
+    const userdata = createUserData(user.uid, user.email);
     try {
-        await admin.firestore().doc( 'users/' + user.uid ).set( userdata );
-        console.log( 'Creating user data for ' + user.uid );
-    } catch ( err: any ) {
-        console.error( 'createUser: Error encountered creating user data.  User Id: ' + user.uid + "  " + err.toString() );
+        await getFirestore().collection('users').doc(user.uid).withConverter(userConverter).set(userdata);
+        logger.info(`Successfully created user data for ${user.uid}`);
+    } catch (err) {
+        logger.error(`createUser: Error creating user data for ${user.uid}.`, err);
     }
-} );
+});
 
-export const deleteUser = functions.auth.user().onDelete(async (user: any) => {
-    // When a user is deleted mark the user data as archived
+export const deleteUser = functions.auth.user().onDelete(async (user) => {
+    // When a user is deleted, mark the user data as archived
     try {
-        await admin.firestore().doc( 'users/' + user.uid ).update( { archived: true } );
-    } catch ( err: any) {
-        console.error( 'deleteUser: Error encountered marking deleted user as archived.  User Id: ' + user.uid + "  " + err.toString() );
+        // Also update email to prevent a new user with the same email from linking to old data.
+        const deletedEmail = user.email ? `${user.email}-DELETED` : `${user.uid}-DELETED`;
+        await getFirestore().collection('users').doc(user.uid).update({ archived: true, email: deletedEmail });
+        logger.info(`Successfully marked user ${user.uid} as archived.`);
+    } catch (err) {
+        logger.error(`deleteUser: Error archiving user ${user.uid}.`, err);
     }
-} );
+});

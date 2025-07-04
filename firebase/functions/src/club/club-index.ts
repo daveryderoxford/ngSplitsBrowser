@@ -3,13 +3,13 @@
 /**
  * Cloud functions to maintain clubs list
 */
+import { isEqual } from 'date-fns';
 import { getFirestore } from 'firebase-admin/firestore';
 import { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } from 'firebase-functions/v2/firestore';
-import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { OEvent } from '../model/oevent.js';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { Club, createClub } from '../model/club.js';
 import { clubConverter, eventConverter } from '../model/event-firebase-converters.js';
-import { isEqual } from 'date-fns';
+import { OEvent } from '../model/oevent.js';
 
 interface ClubKeyData {
   name: string,
@@ -117,7 +117,10 @@ export const rebuildClubs = onCall(async (request): Promise<void> => {
   await batch.commit();
 });
 
-function printClub(club: Club) {
+
+// eslint-disable-next-line no-undef 
+// @ts-ignore 
+ function printClub(club: Club) {
   console.log(`club:
     Key: ${club.key} 
     Name: ${club.name}
@@ -126,7 +129,7 @@ function printClub(club: Club) {
     numEvents:  ${club.numEvents}
     numSplits ${club.numSplits}
     `);
-}
+} 
 
 
 /** Update club data for a specified event based on current events in the database */
@@ -136,8 +139,6 @@ async function updateClub(oevent: OEvent) {
 
   const events = await getEvents(keyData);
   const club = createClubFromEvents(events, keyData);
-
-  printClub(club);
   
   await writeClub(club);
 
@@ -146,7 +147,6 @@ async function updateClub(oevent: OEvent) {
 /* Gets clubs for event ordered by event date */
 async function getEvents(keyData: ClubKeyData): Promise<OEvent[]> {
   const eventsCollection = getFirestore().collection('events').withConverter<OEvent>(eventConverter);
-  console.log(`Reading events for  Club: ${keyData.name}  Nat: ${keyData.nationality}`);
   const eventQuery = eventsCollection
     .where('club', '==', keyData.name)
     .where('nationality', '==', keyData.nationality)
@@ -180,7 +180,7 @@ async function writeClub(club: Club): Promise<void> {
     console.error('ClubIndex:  Number of events unexopectily negative for key.  Key: ' + club.key);
   } else if (club.numEvents === 0) {
     await clubDoc.delete();
-    console.log(`ClubIndex: Deleted club ${club.name}` + '  ' + club.nationality);
+   // console.log(`ClubIndex: Deleted club ${club.name}` + '  ' + club.nationality);
   } else {
     await clubDoc.set(club);
   }

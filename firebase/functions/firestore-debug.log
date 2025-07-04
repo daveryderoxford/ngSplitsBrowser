@@ -1,4 +1,4 @@
-Jul 01, 2025 2:00:14 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
+Jul 05, 2025 12:01:48 AM com.google.cloud.datastore.emulator.firestore.websocket.WebSocketServer start
 INFO: Started WebSocket server on ws://127.0.0.1:9150
 API endpoint: http://127.0.0.1:8080
 If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
@@ -12,18 +12,19 @@ If you are running a Firestore in Datastore Mode project, run:
 Note: Support for Datastore Mode is in preview. If you encounter any bugs please file at https://github.com/firebase/firebase-tools/issues.
 Dev App Server is now running.
 
-Jul 01, 2025 2:00:19 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Jul 05, 2025 12:01:53 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected non-HTTP/2 connection.
-Jul 01, 2025 2:00:19 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Jul 05, 2025 12:01:53 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Jul 01, 2025 2:00:21 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
-INFO: Detected non-HTTP/2 connection.
-Multiple projectIds are not recommended in single project mode. Requested project ID splitysbrowser-functions, but the emulator is configured for splitsbrowser-b5948. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Jul 01, 2025 2:00:21 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+Jul 05, 2025 12:01:57 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
 INFO: Detected HTTP/2 connection.
-Multiple projectIds are not recommended in single project mode. Requested project ID splitysbrowser-functions, but the emulator is configured for splitsbrowser-b5948. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID splitysbrowser-functions, but the emulator is configured for splitsbrowser-b5948. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID splitysbrowser-functions, but the emulator is configured for splitsbrowser-b5948. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
-Multiple projectIds are not recommended in single project mode. Requested project ID splitysbrowser-functions, but the emulator is configured for splitsbrowser-b5948. To opt-out of single project mode add/set the '"singleProjectMode": false' property in the firebase.json emulators config.
+Jul 05, 2025 12:01:58 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Jul 05, 2025 12:01:59 AM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
 *** shutting down gRPC server since JVM is shutting down
+Jul 05, 2025 12:01:59 AM com.google.cloud.datastore.emulator.impl.events.FunctionsEmulatorEventPublisher publishV2Event
+WARNING: Failed to publish v2 event to 127.0.0.1:5001: Connection refused
+250705 00:01:59.512:W 50 [pool-1-thread-1] [com.google.cloud.datastore.emulator.impl.events.FunctionsEmulatorEventPublisher.publishV2Event:154] Failed to publish v2 event to 127.0.0.1:5001: Connection refused
 *** server shut down
+25
