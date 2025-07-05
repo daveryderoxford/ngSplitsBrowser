@@ -1,17 +1,10 @@
 // Initialize the test environment. This must be done before importing the functions file.
-import test from 'firebase-functions-test';
-import { initializeApp, getApps, deleteApp } from 'firebase-admin/app';
-import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { expect } from 'chai';
-import { before, after, describe, it, afterEach } from 'mocha';
-import { UserData } from '../src/model/user.js';
+import { Firestore } from 'firebase-admin/firestore';
+import { describe, it } from 'mocha';
 import { userConverter } from '../src/model/user-firebase-converters.js';
-
-const projectId = 'splitsbrowser-b5948';
-const testEnv = test({ projectId });
-
-// Dynamically import the functions in the `before()` hook to ensure the app is initialized first.
-let myFunctions: typeof import('../src/index.js');
+import { UserData } from '../src/model/user.js';
+import { setupMochaHooks, testEnv } from './test-helper.js';
 
 /* UTILITY FUNCTIONS */
 
@@ -33,36 +26,7 @@ describe('User Cloud Functions', function () {
    // Set a default timeout of 5 seconds for all tests and hooks in this suite.
    this.timeout(5000);
 
-   let db: Firestore;
-
-   before(async () => {
-      // Initialize the Firebase Admin SDK *first*. This creates the default app.
-      initializeApp({ projectId });
-
-      // Now that the app is initialized, we can dynamically import our functions
-      // file. The guarded initializeApp() in `src/index.ts` will be skipped.
-      myFunctions = await import('../src/index.js');
-
-      db = getFirestore();
-   });
-
-   after(async () => {
-      testEnv.cleanup();
-      // Delete the app to prevent state leakage between test files.
-      await deleteApp(getApps()[0]);
-   });
-
-   afterEach(async () => {
-      // Using `clearFirestoreData` as it was found to be unreliable (different project Id?)
-      try {
-         const collections = await db.listCollections();
-         for (const collection of collections) {
-            await db.recursiveDelete(collection);
-         }
-      } catch (error: any) {
-         console.log('\n ****** afterEach:  Error in aftereach\n', error.toString());
-      }
-   });
+   const context = setupMochaHooks();
 
    describe('createUser', () => {
       it('should create a new user data document when a user is created', async () => {
@@ -73,12 +37,12 @@ describe('User Cloud Functions', function () {
          });
 
          // 2. Wrap the function.
-         const wrapped = testEnv.wrap(myFunctions.createUser);
+         const wrapped = testEnv.wrap(context.myFunctions.createUser);
          // For v1 Auth triggers, the user record is passed directly.
          await wrapped(user);
 
          // 4. Read the user data from Firestore.
-         const userData = await readUser(db, user.uid);
+         const userData = await readUser(context.db, user.uid);
 
          // 5. Assertions.
          expect(userData).to.not.be.undefined;
@@ -109,15 +73,15 @@ describe('User Cloud Functions', function () {
             results: [],
             postcode: '',
          };
-         await saveUser(db, initialUserData);
+         await saveUser(context.db, initialUserData);
 
          // Call function
-         const wrapped = testEnv.wrap(myFunctions.deleteUser);
+         const wrapped = testEnv.wrap(context.myFunctions.deleteUser);
          // For v1 Auth triggers, the user record is passed directly.
          await wrapped(user);
 
          // Verify updated user has archived set
-         const userData = await readUser(db, user.uid);
+         const userData = await readUser(context.db, user.uid);
 
          expect(userData).to.not.be.undefined;
          expect((userData as any).archived).to.be.true;
