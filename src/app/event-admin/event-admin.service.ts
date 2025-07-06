@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FirebaseApp } from '@angular/fire/app';
-import { collection, collectionData, deleteDoc, doc, Firestore, getDoc, getFirestore, orderBy, query, setDoc, where } from '@angular/fire/firestore';
-import { deleteObject, getStorage, ref, Storage, uploadString } from '@angular/fire/storage';
+import { collection, collectionData, deleteDoc, doc, getDoc, getFirestore, orderBy, query, setDoc, where } from '@angular/fire/firestore';
+import { deleteObject, getStorage, ref, uploadString } from '@angular/fire/storage';
 import { AuthService } from 'app/auth/auth.service';
 import { eventConverter } from 'app/events/event.service';
 import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
@@ -10,7 +10,7 @@ import { parseEventData } from 'app/results/import';
 import { Results } from 'app/results/model';
 import { SplitsbrowserException } from 'app/results/model/exception';
 import { of } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { switchMap } from 'rxjs/operators';
 
 const EVENTS_COLLECTION = 'events';
 
@@ -71,7 +71,7 @@ export class EventAdminService {
    }
 
    /** Sets index propeties on a partial even object  */
-   private setIndexProperties(partialEvent: Partial<OEvent>) {
+   public setIndexProperties(partialEvent: Partial<OEvent>) {
       partialEvent.yearIndex = new Date(partialEvent.date).getFullYear();
       partialEvent.gradeIndex = EventGrades.indexObject(partialEvent.grade);
    }
