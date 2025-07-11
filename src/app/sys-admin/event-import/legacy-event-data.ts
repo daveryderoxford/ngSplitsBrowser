@@ -16,7 +16,7 @@ export interface LegacyEvent {
    format: string;
 }
 
- export const inputJSON: LegacyEvent[] =
+ export const legacyEvents: LegacyEvent[] =
  [
   {
     "id": 1,

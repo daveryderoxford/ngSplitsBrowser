@@ -126,7 +126,7 @@ export class EventAdminService {
       // save event details
       await setDoc(doc(this.fs, "/events/" + event.key), event);
 
-      console.log("EventAdminService: Results file uploaded " + file + " to " + event.splits.splitsFilename);
+      console.log("EventAdminService: Results file loaded " + file + " to " + event.splits.splitsFilename);
 
       return results;
 
@@ -135,7 +135,7 @@ export class EventAdminService {
    private logUploadWarnings(eventname: string, results: Results) {
       if (results.warnings && results.warnings.length > 0) {
          const msg = results.warnings.reduce((acc = '', warn) => acc + '\n' + warn);
-         console.log("EventAdminComponnet: Splits uploaded with warnings\n Event key: " + eventname + '\n' + msg);
+         console.log("EventAdminService: Splits uploaded with warnings\n Event key: " + eventname + '\n' + msg);
       }
    }
 
@@ -172,6 +172,16 @@ export class EventAdminService {
          numcompetitors: 0,
          courses: new Array()
       };
+
+      if (!results) {
+         console.warn("EventAdminService: No results provided to populate summary");
+         return summary;
+      }
+
+      if (!results.courses || results.courses.length === 0) {
+         console.warn("EventAdminService: No courses found in results");
+         return summary;
+      }
 
       for (const course of results.courses) {
          const courseSummary = this.createCourseSummary(course);

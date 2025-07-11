@@ -22,7 +22,7 @@
   "hosting": [
     {
       "target": "splitsbrowser",
-      "public": "dist/splitsbrowser",
+      "public": "dist/splitsbrowser/browser",
       "ignore": [
         "firebase.json",
         "**/.*",

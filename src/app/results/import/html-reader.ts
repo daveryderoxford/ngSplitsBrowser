@@ -28,7 +28,10 @@ function isNonEmpty(string: string): boolean {
 * @sb-param {String} string - The string to test.
 * @sb-return True if the string contains a number, false if not.
 */
-function hasNumber(string: string): boolean {
+function hasNumber(string: string | null ): boolean {
+    if (!string) {
+        return false;
+    }
     string = string.trim();
     // isFinite is not enough on its own: isFinite("") is true.
     return string !== "" && isFinite(+string);

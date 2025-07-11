@@ -10,6 +10,7 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { Club, createClub } from '../model/club.js';
 import { clubConverter, eventConverter } from '../model/event-firebase-converters.js';
 import { OEvent } from '../model/oevent.js';
+import { error, log, warn } from 'firebase-functions/logger';
 
 interface ClubKeyData {
   name: string,
@@ -20,7 +21,7 @@ interface ClubKeyData {
 export const clubsEventCreated = onDocumentCreated('events/{eventId}', async (event) => {
   const snapshot = event.data;
   if (!snapshot) {
-    console.log('clubsEventCreated: No data associated with the event on create.');
+    log('clubsEventCreated: No data associated with the event on create.');
     return;
   }
   const evt = snapshot.data() as OEvent;
@@ -35,7 +36,7 @@ const keyChanged = (evt1: OEvent, evt2: OEvent) => (evt1.club !== evt2.club || e
 export const clubsEventUpdated = onDocumentUpdated('events/{eventId}', async (event) => {
   const change = event.data;
   if (!change) {
-    console.log('onDocumentUpdated: No data associated with the event on update.');
+    log('onDocumentUpdated: No data associated with the event on update.');
     return;
   }
 
@@ -61,7 +62,7 @@ export const clubsEventUpdated = onDocumentUpdated('events/{eventId}', async (ev
 export const clubsEventDeleted = onDocumentDeleted('events/{eventId}', async (event) => {
   const snapshot = event.data;
   if (!snapshot) {
-    console.log('onDocumentDeleted: No data associated with the event on delete.');
+    log('onDocumentDeleted: No data associated with the event on delete.');
     return;
   }
   const evt = snapshot.data() as OEvent;
@@ -72,9 +73,11 @@ export const clubsEventDeleted = onDocumentDeleted('events/{eventId}', async (ev
 
 /** Rebuild the complete clubs list */
 export const rebuildClubs = onCall(async (request): Promise<void> => {
+  log('rebuildClubs: Rebuilding clubs list...');
+
   // Check user is at least logged on
   if (!request.auth) {
-    console.log('rebuildClubs: Error: Not authorised to run function');
+    log('rebuildClubs: Error: Not authorised to run function');
     throw new HttpsError('permission-denied', 'rebuildClubs: Error: Not authorised to run function');
   }
 
@@ -85,6 +88,11 @@ export const rebuildClubs = onCall(async (request): Promise<void> => {
   // Form a map of events for clubkey
   const clubsMap = new Map<string, OEvent[]>();
   for (const evt of events) {
+    if (!evt.club || !evt.nationality) {
+      warn(`Event with key ${evt.key || 'unknown'} is missing 'club' or 'nationality' property. Skipping.`);
+      continue;
+    }
+
     const clubKey = makeClubKey(evt.club, evt.nationality);
 
     const eventsForClub = clubsMap.get(clubKey);
@@ -121,7 +129,7 @@ export const rebuildClubs = onCall(async (request): Promise<void> => {
 // eslint-disable-next-line no-undef 
 // @ts-ignore 
  function printClub(club: Club) {
-  console.log(`club:
+  log(`club:
     Key: ${club.key} 
     Name: ${club.name}
     Natioanlity: ${club.nationality}
@@ -177,10 +185,10 @@ async function writeClub(club: Club): Promise<void> {
   const clubDoc = getFirestore().doc('clubs/' + club.key).withConverter<Club>(clubConverter);
 
   if (club.numEvents < 0) {
-    console.error('ClubIndex:  Number of events unexopectily negative for key.  Key: ' + club.key);
+    error('ClubIndex:  Number of events unexopectily negative for key.  Key: ' + club.key);
   } else if (club.numEvents === 0) {
     await clubDoc.delete();
-   // console.log(`ClubIndex: Deleted club ${club.name}` + '  ' + club.nationality);
+   // log(`ClubIndex: Deleted club ${club.name}` + '  ' + club.nationality);
   } else {
     await clubDoc.set(club);
   }

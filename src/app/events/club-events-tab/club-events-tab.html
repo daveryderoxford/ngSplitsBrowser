@@ -1,7 +1,7 @@
 <div class="background">
 
   <div class="class-filter">
-    <mat-form-field appearance="outline" >
+    <mat-form-field appearance="outline" class="dense-form-field" subscriptSizing="dynamic">
       <mat-select placeholder="Nationality" (selectionChange)="clubNationalFilterChange($event)">
         @for (nation of nations; track nation) {
           <mat-option [value]="nation.abrievation">
@@ -11,7 +11,7 @@
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
+    <mat-form-field appearance="outline" class="dense-form-field" subscriptSizing="dynamic">
       <input matInput #clubNameFilter placeholder="Name"  (keyup)="clubNameFilterChange($event)">
     </mat-form-field>
   </div>
@@ -33,9 +33,11 @@
             </mat-panel-description>
           </mat-expansion-panel-header>
           <ng-template matExpansionPanelContent>
-            @for (event of clubEvents; track event.key) {
-               <app-event-list-item [event]="event" (eventClicked)="eventClicked($event)" /> 
-            }
+            <mat-list>
+              @for (event of clubEvents; track event.key) {
+                <app-event-list-item [event]="event" (eventClicked)="eventClicked(event)" />
+              }
+            </mat-list>
           </ng-template>
         </mat-expansion-panel>
       }

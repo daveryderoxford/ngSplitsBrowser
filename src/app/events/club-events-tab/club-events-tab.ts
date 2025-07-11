@@ -16,6 +16,7 @@ import { Club } from '../model/club';
 import { Nation, Nations } from '../model/nations';
 import { EventListItem } from "../event-list-item";
 import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
 
 @UntilDestroy( { checkProperties: true } )
 @Component({
@@ -23,7 +24,16 @@ import { MatDividerModule } from '@angular/material/divider';
     templateUrl: "./club-events-tab.html",
     styleUrls: ["./club-events-tab.scss"],
     imports: [MatFormFieldModule, 
-      MatSelectModule, MatOptionModule, MatInputModule, MatExpansionModule, MatProgressBarModule, MatDividerModule, AsyncPipe, DatePipe, EventListItem]
+      MatSelectModule, 
+      MatOptionModule, 
+      MatInputModule, 
+      MatExpansionModule, 
+      MatProgressBarModule, 
+      MatDividerModule, 
+      AsyncPipe, 
+      DatePipe, 
+      MatListModule,
+      EventListItem]
 })
 export class ClubEventsTabComponent implements OnInit {
       private es = inject(EventService);
