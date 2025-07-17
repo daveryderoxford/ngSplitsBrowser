@@ -1,0 +1,56 @@
+@if (event()) {
+   @let evt = event();
+<mat-card class="mat-elevation-z2">
+   <mat-card-header>
+      <mat-card-title>{{ evt.name }}</mat-card-title>
+      <mat-card-subtitle>
+         {{ evt.date | date }} - {{ evt.club }}
+      </mat-card-subtitle>
+   </mat-card-header>
+   <mat-card-content>
+      <div class=grid>
+         <span> Event Key:</span><span> {{ evt.key }} </span>
+
+         <span> Grade:</span><span> {{ evt.grade }} </span>
+         <span> Type:</span><span> {{ evt.type }} </span>
+         <span> Discipline:</span><span> {{ evt.discipline }} </span>
+         <span> Webpage:</span><span> {{ evt.webpage }} </span>
+
+         @if (evt.splits) {
+            @let splits = evt.splits;
+            <span>Filename:</span> <span>{{splits.splitsFilename}}</span>
+            <span>Upload date: </span> <span> {{splits.uploadDate | date}}</span>
+            <span>File format: </span> <span> {{splits.splitsFileFormat}}</span>
+
+            @if (splits.valid === false) {
+                <span>Warnings: </span> <span> {{splits.failurereason}}</span>
+            }
+         } @else {
+            NO SPLITS UPLOADED
+         }
+      </div>
+
+      @if (evt.summary) {
+         <span>Summary</span>
+         <div class="grid">
+         @let summary = evt.summary;
+         <span>No of competitors</span><span> {{summary.numcompetitors}}</span>
+         </div>
+         <div class="courses">
+            @for (course of summary.courses; track course.name) {
+               <span>Course: </span><span>{{course.name}}</span>
+               <span>Length: </span><span>{{course.length}}</span>
+               <span>Climb: </span><span>{{course.climb}}</span>
+               <span>Competitors:</span><span>{{course.numcompetitors}}</span>
+            }
+         </div>
+      }
+         
+   </mat-card-content>
+   <mat-card-actions>
+
+      <button matButton="tonal" (click)="downloadSplits(evt)">Download Splits</button>
+
+   </mat-card-actions>
+</mat-card>
+}

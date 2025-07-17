@@ -3,11 +3,9 @@ import { MatListModule } from '@angular/material/list';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterOutlet } from "@angular/router";
-import { UntilDestroy } from '@ngneat/until-destroy';
 import { AuthService } from './auth/auth.service';
 import { SidenavService } from './shared/services/sidenav.service';
 
-@UntilDestroy()
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',

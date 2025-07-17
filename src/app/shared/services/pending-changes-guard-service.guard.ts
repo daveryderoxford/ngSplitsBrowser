@@ -10,8 +10,8 @@ export interface ComponentCanDeactivate {
 @Injectable({
   providedIn: 'root'
 })
-export class PendingChangesGuard  {
-      private ds = inject(DialogsService);
+export class PendingChangesGuard {
+  private ds = inject(DialogsService);
 
   canDeactivate(component: ComponentCanDeactivate, currentRoute: ActivatedRouteSnapshot,
     currentState: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {

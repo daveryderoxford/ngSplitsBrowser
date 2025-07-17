@@ -10,6 +10,15 @@
    overflow: hidden;
 }
 
+
+.header {
+   display: flex;
+   align-items: center;
+   padding: 8px;
+   border-bottom: 1px solid var(--mat-sys-divider);
+   box-shadow: var(--mat-sys-level1)
+}
+
 :host.shown {
    width: 226px;
    min-width: 226px;

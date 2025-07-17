@@ -26,6 +26,7 @@ export class UserDataService {
   async updateDetails(details: Partial<UserData>): Promise<void> {
     if (this.user()) {
       console.log('UserDataService: Saving user' + this.user()!.key);
+      details.key = this.user()!.key;
       const doc = this._doc(this.user()!.key);
       return updateDoc(doc, details);
     } else {

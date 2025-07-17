@@ -1,7 +1,7 @@
 'use strict';
 
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { computed, inject, Injectable, resource, signal } from "@angular/core";
+import { computed, inject, Injectable, linkedSignal, resource, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
@@ -41,7 +41,11 @@ export class ResultsDataService {
       },
    });
 
-   results = this._resultsResource.value;
+   // Ensure thta results always has a value.  Avoids having to managed undefined states in computations
+   results = linkedSignal<Results, Results>({
+      source: this._resultsResource.value,
+      computation: (data, previous) => previous?.value ?? data,
+   });
 
    isLoading = this._resultsResource.isLoading;
    error = this._resultsResource.error;
@@ -106,7 +110,7 @@ export class ResultsDataService {
 
       const text = await firstValueFrom(
          this.http.get(url, { responseType: 'text' }).pipe(
-            catchError( error => handleError(error))
+            catchError(error => handleError(error))
          )
       );
 
@@ -228,7 +232,7 @@ function deepFreeze(o: any) {
 function handleError(error: Error | HttpErrorResponse): Observable<string> {
 
    if (error instanceof HttpErrorResponse) {
-       if (error.status === 0) {
+      if (error.status === 0) {
          // A client-side or network error occurred. Handle it accordingly.
          console.error('ResultsDataService: Client side network error occurred:', error.error);
       } else {
@@ -241,5 +245,5 @@ function handleError(error: Error | HttpErrorResponse): Observable<string> {
       console.error(`ResultsDataService: Unexpected Error occurred ${error.toString()}`);
    }
 
-   throw(error);
+   throw (error);
 }

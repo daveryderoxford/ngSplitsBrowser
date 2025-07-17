@@ -9,7 +9,6 @@ import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from "../results-selection.service";
-import { SelectionSidebarButton } from "../selection-sidebar/selection-sidebar-button";
 import { Sidebar } from '../selection-sidebar/sidebar';
 import { CompareWithCompetitorSelect } from "./comparison-algorithm-select/compare-with-competitor-select";
 import { CompareWithSelect } from './comparison-algorithm-select/compare-with-select';
@@ -17,7 +16,6 @@ import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
 import { ALL_COMPARISON_OPTIONS } from './splitsbrowser/comparision-options';
-import { EventTitle } from "../navbar/event-title";
 
 interface SplitsBrowserOptions {
    defaultLanguage?: boolean;
@@ -34,7 +32,7 @@ interface SplitsBrowserOptions {
    encapsulation: ViewEncapsulation.None,
    changeDetection: ChangeDetectionStrategy.OnPush,
    imports: [Navbar, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect, 
-      SelectionSidebarButton, ResultsLoading, ResultsError, EventTitle]
+       ResultsLoading, ResultsError]
 })
 export class GraphPage {
    destroyRef = inject(DestroyRef);
@@ -61,17 +59,18 @@ export class GraphPage {
       timeLoss: true
    });
 
-   url = toSignal(this.activeRoute.url);
    queryParams = toSignal(this.activeRoute.queryParams);
 
-   page = computed(() =>
+   // Determine view from URL path
+   url = toSignal(this.activeRoute.url);
+   view = computed(() =>
       this.url()[0].path.includes('race') ?
          'race' :
          'graph'
    );
 
    chartType = computed(() =>
-      (this.page() === 'race') ?
+      (this.view() === 'race') ?
          ChartTypeClass.chartTypes.RaceGraph :
          ChartTypeClass.chartTypes.SplitsGraph
    );
@@ -136,13 +135,14 @@ export class GraphPage {
 
    constructor() {
 
+      // Effect to set the selected event when the component initializes or when the route parameters change.
       effect(() => {
          const eventId = this.id();
          const name = this.eventName();
          const date = this.eventDate() ? new Date(this.eventDate()) : undefined;
 
          this.rd.setSelectedEvent(eventId, name, date);
-         this.ps.setDisplayedPage(this.page());
+         this.ps.setDisplayedPage(this.view());
       });
 
       /** Effect to create and redraw the chart when its data or container becomes available. */

@@ -6,10 +6,6 @@
    } @else {
 
    <app-results-navbar>
-      <app-selection-sidebar-button />
-      <app-event-title [name]="rd.event()?.name" 
-                       [date]="rd.event()?.date"
-                      [courseClassName]="rs.course()?.name" />  
    
       <app-compare-with [(selected)]="comparisonOptions" />
       @if (comparisonOptions().nameKey === 'CompareWithAnyRunner') {

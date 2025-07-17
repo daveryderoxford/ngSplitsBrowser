@@ -46,7 +46,6 @@ import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/
 })
 export class EventDetailsForm  {
    private es = inject(EventService);
-   public snackBar = inject(MatSnackBar);
 
    oevent = input<OEvent | null>();
    submitted = output<Partial<OEvent>>();
@@ -88,7 +87,10 @@ export class EventDetailsForm  {
       output.club = output.club.toLocaleUpperCase();
 
       this.submitted.emit(output);
-      this.form.reset(output); 
+   }
+
+   public reset() {
+      this.form.reset();
    }
 
    public canDeactivate(): boolean {

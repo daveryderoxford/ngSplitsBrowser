@@ -5,7 +5,7 @@ import { DialogsService } from 'app/shared';
 import { Toolbar } from 'app/shared/components/toolbar';
 import { EventAdminService } from '../event-admin.service';
 import { FileButton } from '../file-button/file-button';
-import { EventDetailsForm } from '../event-details-form/event-form';
+import { EventDetailsForm } from '../event-form/event-form';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -26,7 +26,7 @@ export class AddEvent implements AfterViewInit {
    eventForm = viewChild.required(EventDetailsForm);
    stepper = viewChild.required(MatStepper);
 
-   loading = signal(false);
+   busy = signal(false);
 
    ngAfterViewInit() {
       // Workaround for [completed] directive not working.
@@ -37,8 +37,10 @@ export class AddEvent implements AfterViewInit {
    }
 
    async saveEventDetails(details: Partial<OEvent>) {
+      this.busy.set(true);
       try {
          const evt = await this.eventService.add(details);
+         this.eventForm().reset();
          this.oevent.set(evt);
          this.stepper().selected.completed = true;
          this.stepper().selected.editable = false;
@@ -46,11 +48,13 @@ export class AddEvent implements AfterViewInit {
       } catch (e: any) {
          console.error(`AddEvent: Error encountered saving event details  ${e.toSting()}`);
          this.dialogsService.message("Error saving event details", "Error saving event details");
+      } finally {
+         this.busy.set(false);
       }
    }
 
    async uploadSplits(files: File[]) {
-      this.loading.set(true);
+      this.busy.set(true);
       try {
          const results = await this.eventService.uploadResults(this.oevent(), files[0]);
          if (results.warnings && results.warnings.length > 0) {
@@ -64,7 +68,7 @@ export class AddEvent implements AfterViewInit {
          console.log("EventAdminComponnet: Error uploading splits\n " + err);
          this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);
       } finally {
-         this.loading.set(false);
+         this.busy.set(false);
       }
    }
 

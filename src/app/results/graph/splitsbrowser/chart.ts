@@ -88,13 +88,6 @@ const DOM_EVENT_RIGHT_BUTTON = 2;
 
 const SPACER = "\xa0\xa0\xa0\xa0";
 
-const colours = [
-   "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
-   "#FFCC00", "#884400", "#9900FF", "#CCCC00", "#888800", "#CC6699",
-   "#00DD00", "#3399FF", "#BB00BB", "#00DDDD", "#FF00FF", "#0088BB",
-   "#888888", "#FF99FF", "#55BB33"
-];
-
 // The maximum number of fastest splits to show when the popup is open.
 const MAX_FASTEST_SPLITS = 10;
 
@@ -358,6 +351,16 @@ export class Chart {
       this.adjustContentSize();
    }
 
+   /** Color for seelcted competitor index */ 
+   private selectedIndexColor(index: number) {
+      const compIndex = this.selectedIndexes[index];
+      return this.competitorIndexColor(compIndex);
+   }
+
+   private competitorIndexColor(competitorIndex: number) {
+      return this.courseClassSet.allCompetitors[competitorIndex].color;
+   }
+   
    /**
    * Sets the left margin of the chart.
    * @sb-param {Number} leftMargin - The left margin of the chart.
@@ -1093,7 +1096,7 @@ export class Chart {
       this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
 
       for (let selCompIdx = 0; selCompIdx < this.numLines; selCompIdx++) {
-         const strokeColour = colours[this.selectedIndexes[selCompIdx] % colours.length];
+         const strokeColour = this.selectedIndexColor(selCompIdx);
          const highlighter = () => this.highlight(this.selectedIndexes[selCompIdx]);
          const unhighlighter = () => this.unhighlight();
 
@@ -1244,7 +1247,7 @@ export class Chart {
                label: formatNameAndSuffix(name, getSuffix(this.courseClassSet.allCompetitors[competitorIndex])),
                textHeight: textHeight,
                y: (isNotNullNorNaN(finishColumn.ys[i])) ? this.yScale(finishColumn.ys[i]) : null,
-               colour: colours[competitorIndex % colours.length],
+               colour: this.competitorIndexColor(competitorIndex),
                index: competitorIndex
             };
          }, this);

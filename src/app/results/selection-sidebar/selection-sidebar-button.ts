@@ -9,7 +9,7 @@ import { SelectionSidebarService } from './selection-sidebar.service';
   template: `
     <button mat-icon-button (click)='this.ss.toggle()'>
       @if (ss.isOpen()) {
-        <mat-icon>menu_open</mat-icon>
+        <mat-icon>chevron_left</mat-icon>
       } @else {
         <mat-icon>menu</mat-icon>
       }

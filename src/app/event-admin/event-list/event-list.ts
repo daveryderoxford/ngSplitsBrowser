@@ -12,9 +12,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
    template: `
    <mat-list>
       @for (event of events(); track event.key) {
-         <mat-list-item>
+         <mat-list-item (click)="additionalDetail.emit(event)">
             <span matListItemTitle> {{ event.date | date }} </span>
             <span matListItemLine>{{ event.name }} {{ event.club }}</span>
+            @if (!event.splits) {
+                <span matListItemLine>SPLITS NOT UPLOADED</span>
+            } @else if (event.splits.valid === false) {
+               <span matListItemLine>SPLITS NOT VALID - {{event.splits.splitsFilename}}</span>
+            }
             <span matListItemMeta>
                <button mat-icon-button matTooltip="Edit details" (click)="edit.emit(event)">
                   <mat-icon class=green>edit</mat-icon>
@@ -42,4 +47,5 @@ export class EventList {
    edit = output<OEvent>();
    delete = output<OEvent>();
    upload = output<{ event: OEvent, files: File[]; }>();
+   additionalDetail = output<OEvent>();
 }

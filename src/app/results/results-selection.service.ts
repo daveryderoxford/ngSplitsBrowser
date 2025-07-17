@@ -20,7 +20,9 @@ export class ResultsSelectionService {
 
    // When results change set default class to the first class
    private _oclass = linkedSignal<CourseClass | undefined>( () => 
-      (this.rd.results().classes.length > 0) ? this.rd.results().classes[0]: undefined);
+      (this.rd.results() && this.rd.results().classes.length > 0) ? 
+       this.rd.results().classes[0]: 
+       undefined);
 
    course = computed<Course | undefined>(() => this._oclass()?.course);
 

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, computed, inject, signal } from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from "@angular/material/tabs";
 import { Router, RouterLink } from "@angular/router";
@@ -9,6 +9,8 @@ import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.componen
 import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab";
 import { EventService } from "../event.service";
 import { MyEventsTab } from "../my-events-tab/my-events-tab";
+import { AppBreakpoints } from 'app/shared/services/breakpoints';
+
 
 @Component({
    selector: "app-results",
@@ -20,6 +22,10 @@ export class EventsPage {
    private router = inject(Router);
    public es = inject(EventService);
    private ds = inject(DialogsService);
+   private breakpoints = inject(AppBreakpoints);
+
+   pageTitle = computed(() => this.breakpoints.narrowScreen() ? "Events" : "Splitsbrowser Events");
+   uploadButtonTitle = computed(() => this.breakpoints.narrowScreen() ? "Upload" : "Upload results");
 
    async eventClicked(event: OEvent) {
 

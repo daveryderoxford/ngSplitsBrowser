@@ -1,6 +1,6 @@
-<app-toolbar title="Splitsbrowser events">
+<app-toolbar [title]="pageTitle()">
   <div end>
-    <a mat-button routerLink='/admin/add-event'>Upload results</a>
+    <a mat-button routerLink='/admin/add-event'>{{uploadButtonTitle()}}</a>
   </div>
 </app-toolbar>
 

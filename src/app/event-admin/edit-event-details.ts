@@ -1,9 +1,10 @@
-import { Component, computed, inject, input, viewChild } from "@angular/core";
+import { Component, computed, inject, input, signal, viewChild } from "@angular/core";
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
 import { Toolbar } from 'app/shared/components/toolbar';
 import { EventAdminService } from './event-admin.service';
-import { EventDetailsForm } from './event-details-form/event-form';
+import { EventDetailsForm } from './event-form/event-form';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
    selector: "app-edit-event-details",
@@ -21,18 +22,30 @@ import { EventDetailsForm } from './event-details-form/event-form';
 export class EditEventDetails {
    ea = inject(EventAdminService);
    router = inject(Router);
+   public snackBar = inject(MatSnackBar);
 
    eventId = input.required<string>(); // Route parametyer
    event = computed(() => this.ea.events().find(e => e.key === this.eventId()));
 
-   readonly EditForm = viewChild.required(EventDetailsForm);
+   busy = signal(false);
+
+   readonly editForm = viewChild.required(EventDetailsForm);
 
    async save(event: Partial<OEvent>) {
-      await this.ea.update(this.eventId(), event);
-      this.router.navigate(["/admin"]);
+      this.busy.set(true)
+      try {
+         await this.ea.update(this.eventId(), event);
+         this.editForm().reset();
+         this.router.navigate(["/admin"]);
+      } catch (e) {
+         console.error('EditEventDetails: Error saving event', e);
+         this.snackBar.open("Error saving event details", "Dismiss");
+      } finally {
+         this.busy.set(false);
+      }
    }
 
    canDeactivate(): boolean {
-      return this.EditForm().canDeactivate();
+      return this.editForm().canDeactivate();
    }
 }

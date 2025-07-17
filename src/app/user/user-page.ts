@@ -17,6 +17,7 @@ import { UserDataService } from "app/user/user-data.service";
 import { Toolbar } from "../shared/components/toolbar";
 import { Nations } from "app/events/model/nations";
 import { AuthService } from 'app/auth/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @UntilDestroy()
 @Component({
@@ -29,7 +30,7 @@ export class UserPage {
   private afAuth = inject(AuthService);
   private router = inject(Router);
   private usd = inject(UserDataService);
-
+  private snackBar = inject(MatSnackBar);
 
   userForm = new FormGroup({
     firstname: new FormControl('', { validators: [Validators.required] }),
@@ -47,7 +48,6 @@ export class UserPage {
     effect(() => {
       const userData = this.usd.user();
       if (userData) {
-        this.userForm.reset();
         this.userForm.patchValue(userData);
       };
     });
@@ -66,9 +66,13 @@ export class UserPage {
     try {
       await this.usd.updateDetails(this.userForm.value as Partial<UserData>);
       console.log('UserComponnet: User results saved');
+      this.userForm.reset();
+      this.router.navigate(["/"]);
+    } catch (e) {
+      console.error('UserComponent: Error saving user results', e);
+      this.snackBar.open("Error saving event details", "Dismiss");
     } finally {
       this.busy = false;
-      this.router.navigate(["/"]);
     }
   }
 

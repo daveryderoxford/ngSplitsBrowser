@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { Toolbar } from 'app/shared/components/toolbar';
 import { OEvent } from "../../events/model/oevent";
@@ -8,6 +8,10 @@ import { EventList } from "../event-list/event-list";
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { AuthService } from 'app/auth/auth.service';
+import { MatProgressBar } from "@angular/material/progress-bar";
+import { EventDetailsPanel } from "./event-detail-panel/event-detail-panel";
+import { AppBreakpoints } from 'app/shared/services/breakpoints';
 
 interface SplitsUpload {
   event: OEvent;
@@ -15,18 +19,26 @@ interface SplitsUpload {
 }
 
 @Component({
-    selector: "app-event-admin",
-    templateUrl: "./event-admin.html",
-    styleUrls: ["./event-admin.scss"],
-    imports: [Toolbar, EventList, MatButtonModule, RouterLink, MatIconModule],
-    providers: [provideNativeDateAdapter()]
+  selector: "app-event-admin",
+  templateUrl: "./event-admin.html",
+  styleUrls: ["./event-admin.scss"],
+  imports: [Toolbar, EventList, MatButtonModule, RouterLink, MatIconModule, MatProgressBar, EventDetailsPanel],
+  providers: [provideNativeDateAdapter()]
 })
 export class EventAdminComponent {
   protected eventAdmin = inject(EventAdminService);
   protected dialogsService = inject(DialogsService);
+  protected auth = inject(AuthService);
   private router = inject(Router);
+  protected breakpoints = inject(AppBreakpoints);
+
+  detailEvent = signal<OEvent | undefined>(undefined);
 
   loading = false;
+
+  constructor() {
+    this.eventAdmin.loadEvents('invalid-splits');
+  }
 
   async uploadSplits(upload: SplitsUpload) {
     const event = upload.event;
@@ -58,7 +70,6 @@ export class EventAdminComponent {
   editEvent(event: OEvent) {
     this.router.navigate(["/admin/edit-event/", event.key]);
   }
-
 
   async deleteEvent(event: OEvent) {
     const confirm = await this.dialogsService.confirm("Confirm Dialog", "Are you sure you want to delete is event?");

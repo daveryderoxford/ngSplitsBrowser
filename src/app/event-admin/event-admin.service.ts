@@ -1,7 +1,8 @@
-import { inject, Injectable } from '@angular/core';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { inject, Injectable, signal } from '@angular/core';
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FirebaseApp } from '@angular/fire/app';
-import { collection, collectionData, deleteDoc, doc, getDoc, getFirestore, orderBy, query, setDoc, where } from '@angular/fire/firestore';
+import { User } from '@angular/fire/auth';
+import { collection, collectionData, deleteDoc, doc, getDoc, getFirestore, limit, orderBy, query, setDoc, updateDoc, where } from '@angular/fire/firestore';
 import { deleteObject, getStorage, ref, uploadString } from '@angular/fire/storage';
 import { AuthService } from 'app/auth/auth.service';
 import { eventConverter } from 'app/events/event.service';
@@ -10,9 +11,15 @@ import { parseEventData } from 'app/results/import';
 import { Results } from 'app/results/model';
 import { SplitsbrowserException } from 'app/results/model/exception';
 import { of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
 
 const EVENTS_COLLECTION = 'events';
+type EventFilter = 'unset' | 'all' | 'invalid-splits';
+
+interface AdminResourceParams {
+   filter: EventFilter;
+   user: User;
+   isAdmin: boolean;
+}
 
 @Injectable({
    providedIn: 'root',
@@ -24,37 +31,70 @@ export class EventAdminService {
 
    private eventsCollection = collection(this.fs, EVENTS_COLLECTION).withConverter(eventConverter);
 
-   private events$ = toObservable(this.auth.user).pipe(
-      switchMap((user) => {
-         if (!user) {
+   filter = signal<EventFilter>('unset');
+
+   private _eventResource = rxResource<OEvent[], AdminResourceParams>({
+      params: () => ( { 
+         filter: this.filter(), 
+         user: this.auth.user(), 
+         isAdmin: this.auth.isAdmin() }),
+      defaultValue: [],
+      stream: request => {
+         const filter = request.params.filter;
+         const user = request.params.user;
+         const isAdmin = request.params.isAdmin;
+
+         if (filter=='unset' || !user) {
             return of<OEvent[]>([]);
          } else {
-            const q = this.auth.isAdmin() ?
-               query(this.eventsCollection, orderBy('date', 'desc')) :
-               query(this.eventsCollection, where('userId', '==', user.uid), orderBy('date', 'desc'));
-            return collectionData(q);
+            if (isAdmin) {
+               return collectionData(this.adminQuery(filter));
+            } else {
+               return collectionData(this.userQuery);
+            }
          }
-      }),
-    //  tap((events) => console.log("EventAdminService: Events loaded", events)),
-   );
+      }
+   });
 
-   events = toSignal(this.events$, { initialValue: [] });
+   private adminQuery(filter: EventFilter) {
+      if (filter === 'invalid-splits') {
+         return query(this.eventsCollection,
+            where('splits.valid', '==', false),
+            orderBy('date', 'desc'),
+            limit(200));
+      } else {
+         return query(this.eventsCollection,
+            orderBy('date', 'desc'),
+            limit(200));
+      }
+   }  
+
+   private userQuery = query(this.eventsCollection,
+      where('userId', '==', this.auth.user().uid),
+      orderBy('date', 'desc'),
+      limit(1000));
+
+   events = this._eventResource.value.asReadonly();
+   loading = this._eventResource.isLoading;
+   error = this._eventResource.error;
+
+   loadEvents(filter: EventFilter): void {
+      this.filter.set(filter);
+   }
 
    async update(id: string, event: Partial<OEvent>): Promise<void> {
-      const d = doc(this.fs, EVENTS_COLLECTION, id);
-      await setDoc(d, event, { merge: true });
+      const d = doc(this.eventsCollection, id);
+      await updateDoc(d, event);
    }
 
    async add(event: Partial<OEvent>): Promise<OEvent> {
 
-      const eventsCollectionRef = await collection(this.fs, EVENTS_COLLECTION);
-      event.key = doc(eventsCollectionRef).id;
-
+      event.key = doc(this.eventsCollection).id;
       event.userId = this.auth.user().uid;
 
       this.setIndexProperties(event);
 
-      await setDoc(doc(this.fs, EVENTS_COLLECTION, event.key), event);
+      await setDoc(doc(this.eventsCollection, event.key), event);
 
       return (event as OEvent);
 
@@ -62,7 +102,7 @@ export class EventAdminService {
 
    async delete(event: OEvent): Promise<void> {
 
-      const d = doc(this.fs, EVENTS_COLLECTION, event.key);
+      const d = doc(this.eventsCollection, event.key);
       await deleteDoc(d);
 
       if (event.splits) {
@@ -77,7 +117,7 @@ export class EventAdminService {
    }
 
    async getEvent(key: string): Promise<OEvent> {
-      const d = doc(this.fs, EVENTS_COLLECTION, key);
+      const d = doc(this.eventsCollection, key);
       // TODO need to add conversion
       return (await getDoc(d)).data() as OEvent;
    }
@@ -119,12 +159,12 @@ export class EventAdminService {
          // If an error has occueed save reason in the database
          event.splits.valid = false;
          event.splits.failurereason = err.toString();
-         await setDoc(doc(this.fs, "/events/" + event.key), event);
+         await this.update(event.key, event);
          throw err;
       }
 
       // save event details
-      await setDoc(doc(this.fs, "/events/" + event.key), event);
+      await this.update(event.key, event);
 
       console.log("EventAdminService: Results file loaded " + file + " to " + event.splits.splitsFilename);
 

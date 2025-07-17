@@ -10,7 +10,7 @@
       <p>
          Select results file to upload.
       </p>
-      <file-button (fileSelected)="uploadSplits($event)" [disabled]="loading()" label="Select results file" />
+      <file-button (fileSelected)="uploadSplits($event)" [disabled]="busy()" label="Select results file" />
 
    </mat-step>
 

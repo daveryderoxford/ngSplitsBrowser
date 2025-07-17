@@ -5,14 +5,14 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   selector: 'app-event-title',
   imports: [DatePipe],
   template: `
-    <span class="class">
+    <span class="oclass">
       {{ courseClassName()}}
     </span>
     <span class="name">
       {{ name()}}
     </span>
     <span class="date">
-      @if (date()) {
+    @if (date()) {
         {{ date() | date: 'dd.MM.yyyy' }}
       } 
     </span>
@@ -21,18 +21,24 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
     :host {
       display: grid;
       grid-template-rows: 1fr, 1fr;
-      grid-template-colunms: auto, auto;
-      grid-areas: "class  name"
-                  "class date";
+      grid-template-columns: auto, auto;
+      grid-template-areas: "name name"
+                           "oclass date";
     }
-    .class {
-      grid-area: class;
+    .oclass {
+      grid-area: oclass;
+      align-self: center;
+      font-size: 80%;
+
     }
     .name {
       grid-area: name;
+      font-size: 80%;
     }
     .date {
       grid-area: date;
+      font-size: 80%;
+
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush

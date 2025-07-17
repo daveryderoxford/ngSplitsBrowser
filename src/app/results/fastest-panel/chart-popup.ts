@@ -2,31 +2,26 @@ import { Component, computed, input, signal } from '@angular/core';
 import { Results } from '../model/results';
 import { Course } from '../model/course';
 import { CourseClass } from '../model/course-class';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { FormatTimePipe } from '../model/results-pipes';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
    selector: 'app-fastest-panel',
-   imports: [MatButtonToggleModule, MatCardModule, FormatTimePipe],
+   imports: [FormatTimePipe],
    template: `
-      <div class="chartPopup" style="position: absolute; left: 496px; top: 278.5px;">
-    <div class="chartPopupHeader">
-   <span>title()</span>
-</div>
-<div class="chartPopupTableContainer">
-   <table>
-   @for (split of fastestSplitsForLeg(); track split.name) {
-      <tr [class.primary]="split.className.localeCompare(selectedClass()?.name)">
-         <td class="mat-body-medium"> {{split.name}}</td>
-         <td class="mat-body-medium"> {{split.split | formatTime}}</td>
-      </tr>
-      }
-
-
-      }
-   </table>
-</div>
+   <div class="chartPopup" style="position: absolute; left: 496px; top: 278.5px;">
+      <div class="chartPopupHeader">
+         <span>title()</span>
+      </div>
+      <div class="chartPopupTableContainer">
+         <table>
+            @for (split of fastestSplitsForLeg(); track split.name) {
+               <tr [class.primary]="split.className.localeCompare(selectedClass()?.name)">
+                  <td class="mat-body-medium"> {{split.name}}</td>
+                  <td class="mat-body-medium"> {{split.split | formatTime}}</td>
+               </tr>
+            }
+         </table>
+      </div>
 </div>
     `, 
    styles: `
@@ -47,5 +42,3 @@ export class LegSplitsPopup {
       this.results().getFastestSplitsForLeg(this.startCode(), this.endCode()));
 
 }
-
-
