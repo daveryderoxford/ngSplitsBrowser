@@ -20,8 +20,8 @@ export const userdata1: UserData = {
    club: 'ACLUB',
    nationality: 'GBR',
    nationalId: 'GBR12345',
-   ecards: [{ id: '11111', type: 'SI' }, { id: '55555', type: "Emit" }],
-   postcode: 'TW18 2AB'
+   postcode: 'TW18 2AB',
+   email: 'user1.@mydomain.co.uk'
 };
 export const userdata2: UserData = {
    /** All the user data stored for the user */
@@ -32,8 +32,8 @@ export const userdata2: UserData = {
    club: 'BCLUBNAME',
    nationality: 'NOR',
    nationalId: 'NOR12345',
-   ecards: [{ id: '22222', type: 'SI' }, { id: '66666', type: "Emit" }],
-   postcode: 'TW18 2AB'
+   postcode: 'TW18 2AB',
+   email: 'user2.@mydomain.co.uk'
 
 };
 export const userdata3: UserData = {
@@ -45,8 +45,8 @@ export const userdata3: UserData = {
    club: 'ACLUB',
    nationality: 'GBR',
    nationalId: 'GBR12345',
-   ecards: [{ id: '33333', type: 'SI' }],
-   postcode: 'TW18 2AB'
+   postcode: 'TW18 2AB',
+   email: 'user3.@mydomain.co.uk'
 };
 export const test_userdata = [userdata1, userdata2, userdata3];
 

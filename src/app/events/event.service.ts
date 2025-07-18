@@ -9,7 +9,7 @@ import { BehaviorSubject, merge, Observable, of } from "rxjs";
 import { clubConverter, eventConverter } from './event-firestore-converter';
 import { Club } from './model/club';
 import { EventInfo, OEvent } from './model/oevent';
-export { eventConverter };
+import { mappedCollectionRef } from 'app/shared/utils/firestore-helper';
 
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
@@ -23,7 +23,7 @@ export class EventService {
   private firestore = getFirestore(inject(FirebaseApp));
   private ps = inject(PaganationService);
 
-  private eventsCollection = collection(this.firestore, EVENTS_COLLECTION).withConverter(eventConverter);
+  private eventsCollection = mappedCollectionRef<OEvent>(this.firestore, EVENTS_COLLECTION);
 
   private _loading = new BehaviorSubject<boolean>(false);
 

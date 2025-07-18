@@ -25,7 +25,7 @@ export interface UserResult {
     firstname: string;
     surname: string;
     club: string;
-    result?: {
+    result: {
         course: string;
         courseclass: string;
         coursePosition: number;

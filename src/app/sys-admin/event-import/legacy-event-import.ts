@@ -4,7 +4,7 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
-import { collection, doc, getDocs, getFirestore, limit, orderBy, query, setDoc } from '@angular/fire/firestore';
+import { collection, doc, getDocs, getFirestore, limit, orderBy, query, setDoc, updateDoc } from '@angular/fire/firestore';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { EventAdminService } from "app/event-admin/event-admin.service";
 import { eventConverter } from 'app/events/event-firestore-converter';
@@ -15,6 +15,7 @@ import { LegacyEvent, legacyEvents } from "./legacy-event-data";
 
 const SYS_ADMIN_UID = 'qWLOONZF1NhBZCV1FI9htz3AitI2';
 
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,6 +24,9 @@ export class LegacyEventImport {
   protected fs = getFirestore(inject(FirebaseApp));
   protected storage = getStorage(inject(FirebaseApp));
   private http = inject(HttpClient);
+
+  private eventsCollection = collection(this.fs, 'events').withConverter(eventConverter);
+
 
   BATCH_SIZE = 500;
 
@@ -85,7 +89,7 @@ export class LegacyEventImport {
     const filtered = events.reverse().filter(event => {
       const key = `${event.name}|${event.eventdate}|${event.club}`;
       if (keysFound.has(key)) {
-       // console.log(`LegacyUpload: Removing duplicate event ${event.id} - ${event.name}`);
+        // console.log(`LegacyUpload: Removing duplicate event ${event.id} - ${event.name}`);
         return false;
       }
       keysFound.add(key);
@@ -157,10 +161,10 @@ export class LegacyEventImport {
     /** Set indices */
     this.es.setIndexProperties(event);
 
-     console.log("LegacyUpload: Event added  " + event.key + " - " + event.name);
-     this.message.set(`Event added: ${event.key} - ${event.name}`);
+    console.log("LegacyUpload: Event added  " + event.key + " - " + event.name);
+    this.message.set(`Event added: ${event.key} - ${event.name}`);
 
-    const ref = doc(this.fs, "/events/" + event.key);
+    const ref = doc(this.eventsCollection, event.key);
     await setDoc(ref, event);
 
     return Promise.resolve(event);
@@ -175,6 +179,7 @@ export class LegacyEventImport {
       if (!text || text.length === 0) {
         console.log(`LegacyUpload: No results found for event ${event.key}. Skipping processing.`);
         this.message.set(`No results found for event ${event.key}. Skipping processing.`);
+        throw new Error(`No results found in gooole storage for event ${event.key}`);
       }
 
       const results = this.es.parseSplits(text);
@@ -188,11 +193,25 @@ export class LegacyEventImport {
         valid: (results) ? true : false,
         uploadDate: new Date()
       };
+    } catch (err) {
+      console.error(`LegacyEventUpload: Error encountered processing results for event ${event.key}:`, err);
+      this.message.set(`Error processing results for event ${event.key}: ${err}`);
+      // If an error has occurred, save reason in the database
+      event.splits = {
+        splitsFilename: path,
+        splitsFileFormat: fileFormat,
+        valid: false,
+        failurereason: err.toString(),
+        uploadDate: new Date()
 
-      // seve event details
+      };
+    }
 
-      const d = doc(this.fs, "/events/" + event.key);
-      await setDoc(d, event);
+    // seve splits details
+    try {
+
+      const d = doc(this.eventsCollection, event.key);
+      await updateDoc(d, { ...event });  // workaround  typing error in Firebase 
 
       this.message.set('Sys-admin: Rebuild indices completed successfully:');
 
@@ -203,7 +222,7 @@ export class LegacyEventImport {
       this.message.set(`Error processing event ${event.key}: ${error.message}`);
       console.log(error.toString);
       return Promise.reject(error);
-    } 
+    }
   }
 
   /** Downloads results for an event from google storage */

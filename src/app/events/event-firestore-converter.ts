@@ -3,19 +3,34 @@
  1. Firebase only supports null while undefined is perferred in project
  2. Firebase stores dates as Timestamps rather than Javascript dates.  
 */
-import { DocumentData, FirestoreDataConverter, QueryDocumentSnapshot, SnapshotOptions, Timestamp } from '@angular/fire/firestore';
+import { FirestoreDataConverter, QueryDocumentSnapshot, SnapshotOptions, Timestamp } from '@angular/fire/firestore';
 import { Club } from './model/club';
 import { OEvent, SplitsFileInfo } from './model/oevent';
 
-export const eventConverter: FirestoreDataConverter<OEvent> = {
-  toFirestore: (event: OEvent): DocumentData => {
+interface OEventFirestore extends Omit<OEvent, 'date' | 'splits'>  {
+  date: Timestamp;
+  splits: SplitsInfoFirestore;
+}
+
+interface SplitsInfoFirestore extends Omit<SplitsFileInfo, 'uploadDate'> {
+  uploadDate: Timestamp;
+}
+
+interface ClubFirestore extends Omit<Club, 'lastEvent'> {
+  lastEvent: Timestamp;
+}
+
+export const eventConverter: FirestoreDataConverter<OEvent, OEventFirestore> = {
+  toFirestore: (event: OEvent): OEventFirestore => {
+    console.log('To Firestore called. ' + JSON.stringify(event));
     return {
       ...event,
+      date: Timestamp.fromDate(event.date),
       splits: undefinedToNull(event.splits),
       summary: undefinedToNull(event.summary),
     };
   },
-  fromFirestore: (snapshot: QueryDocumentSnapshot<any>, options?: SnapshotOptions): OEvent => {
+  fromFirestore: (snapshot: QueryDocumentSnapshot<OEventFirestore>, options?: SnapshotOptions): OEvent => {
     const data = snapshot.data(options);
     return {
       ...data,
@@ -26,10 +41,11 @@ export const eventConverter: FirestoreDataConverter<OEvent> = {
   }
 };
 
-export const clubConverter: FirestoreDataConverter<Club> = {
-  toFirestore: (club: Club): DocumentData => {
+export const clubConverter: FirestoreDataConverter<Club, ClubFirestore> = {
+  toFirestore: (club: Club): ClubFirestore => {
     return {
       ...club,
+      lastEvent: Timestamp.fromDate(club.lastEvent)
     };
   },
   fromFirestore: (snapshot: QueryDocumentSnapshot<any>, options?: SnapshotOptions): Club => {

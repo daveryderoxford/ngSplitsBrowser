@@ -22,7 +22,7 @@ export class UserDataService {
 
   readonly user = this._userResource.value.asReadonly();
 
-  /** Update the user info.  Returning the modified user details */
+  /** Update the user info.  */
   async updateDetails(details: Partial<UserData>): Promise<void> {
     if (this.user()) {
       console.log('UserDataService: Saving user' + this.user()!.key);
@@ -30,8 +30,8 @@ export class UserDataService {
       const doc = this._doc(this.user()!.key);
       return updateDoc(doc, details);
     } else {
-      console.log('UserDataService: Saving user: Unexectly null');
-      throw Error('UserDataService: Saving user: Unexectly null');
+      console.log('UserDataService: Saving user: Unexpectly null');
+      throw Error('UserDataService: Saving user: Unexpectly null');
     }
   }
 
