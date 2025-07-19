@@ -7,9 +7,9 @@ import { sbTime } from "./time";
 
 export class Results {
 
-    private allCompetitorsList: Array<Competitor> | undefined = undefined;
+    private allCompetitorsList: Competitor[] | undefined = undefined;
 
-    warnings: Array<string> = [];
+    warnings: string[] = [];
 
     /**
     * Contains all of the data for an event.

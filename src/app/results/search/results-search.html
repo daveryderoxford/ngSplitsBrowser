@@ -1,5 +1,6 @@
 <div class="docs-search-input-container">
-  <input placeholder="Search" type="text" class="docs-search-input"
+  <mat-label>Search</mat-label>
+  <input type="text" class="docs-search-input"
     (focus)="toggleIsExpanded()"
     [matAutocomplete]="autoCompletePanel" [formControl]="searchControl">
   <mat-icon class="docs-search-icon">search</mat-icon>

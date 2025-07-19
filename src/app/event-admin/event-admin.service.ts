@@ -2,10 +2,9 @@ import { inject, Injectable, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FirebaseApp } from '@angular/fire/app';
 import { User } from '@angular/fire/auth';
-import { collection, collectionData, deleteDoc, doc, getDoc, getFirestore, limit, orderBy, query, setDoc, updateDoc, where } from '@angular/fire/firestore';
+import { collectionData, deleteDoc, doc, getDoc, getFirestore, limit, orderBy, query, setDoc, where } from '@angular/fire/firestore';
 import { deleteObject, getStorage, ref, uploadString } from '@angular/fire/storage';
 import { AuthService } from 'app/auth/auth.service';
-import { eventConverter } from 'app/events/event-firestore-converter';
 import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
 import { parseEventData } from 'app/results/import';
 import { Results } from 'app/results/model';
@@ -14,7 +13,9 @@ import { mappedCollectionRef } from 'app/shared/utils/firestore-helper';
 import { of } from 'rxjs';
 
 const EVENTS_COLLECTION = 'events';
-type EventFilter = 'unset' | 'all' | 'invalid-splits';
+
+export type EventFilter = 'unset' | 'recent' | 'all' | 'invalid-splits';
+export const EVENT_FILTERS = ['unset', 'all', 'invalid-splits'];
 
 interface AdminResourceParams {
    filter: EventFilter;
@@ -30,7 +31,6 @@ export class EventAdminService {
    protected fs = getFirestore(inject(FirebaseApp));
    protected storage = getStorage(inject(FirebaseApp));
 
- //  private eventsCollection = collection(this.fs, EVENTS_COLLECTION).withConverter(eventConverter);
   private eventsCollection = mappedCollectionRef<OEvent>(this.fs, EVENTS_COLLECTION);
 
    filter = signal<EventFilter>('unset');
@@ -52,33 +52,39 @@ export class EventAdminService {
             if (isAdmin) {
                return collectionData(this.adminQuery(filter));
             } else {
-               return collectionData(this.userQuery);
+               return collectionData(this.userQuery(filter));
             }
          }
       }
    });
 
    private adminQuery(filter: EventFilter) {
+      const limitValue = (filter === 'all') ? 1000 : 30;
+
       if (filter === 'invalid-splits') {
          return query(this.eventsCollection,
             where('splits.valid', '==', false),
             orderBy('date', 'desc'),
-            limit(200));
+            limit(limitValue));
       } else {
          return query(this.eventsCollection,
             orderBy('date', 'desc'),
-            limit(200));
+            limit(limitValue));
       }
    }  
 
-   private userQuery = query(this.eventsCollection,
+   private userQuery(filter: EventFilter) {
+      const limitValue = (filter === 'all') ? 1000 : 30;
+
+      return  query(this.eventsCollection,
       where('userId', '==', this.auth.user().uid),
       orderBy('date', 'desc'),
-      limit(1000));
+      limit(limitValue));
+   }
 
-   events = this._eventResource.value.asReadonly();
-   loading = this._eventResource.isLoading;
-   error = this._eventResource.error;
+   readonly events = this._eventResource.value.asReadonly();
+   readonly loading = this._eventResource.isLoading;
+   readonly error = this._eventResource.error;
 
    loadEvents(filter: EventFilter): void {
       this.filter.set(filter);
@@ -87,7 +93,6 @@ export class EventAdminService {
    async update(id: string, event: Partial<OEvent>): Promise<void> {
       const d = doc(this.eventsCollection, id);
       await setDoc(d, event, { merge: true })
-    //  await updateDoc(d, event);
    }
 
    async add(event: Partial<OEvent>): Promise<OEvent> {

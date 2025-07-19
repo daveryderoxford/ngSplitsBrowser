@@ -4,17 +4,16 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
-import { collection, doc, getDocs, getFirestore, limit, orderBy, query, setDoc, updateDoc } from '@angular/fire/firestore';
+import { doc, getDocs, getFirestore, limit, orderBy, query, setDoc } from '@angular/fire/firestore';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { EventAdminService } from "app/event-admin/event-admin.service";
-import { eventConverter } from 'app/events/event-firestore-converter';
 import { EventGrade, EventGrades, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
+import { mappedCollectionRef } from 'app/shared/utils/firestore-helper';
 import { firstValueFrom, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { LegacyEvent, legacyEvents } from "./legacy-event-data";
 
 const SYS_ADMIN_UID = 'qWLOONZF1NhBZCV1FI9htz3AitI2';
-
 
 @Injectable({
   providedIn: 'root',
@@ -25,8 +24,7 @@ export class LegacyEventImport {
   protected storage = getStorage(inject(FirebaseApp));
   private http = inject(HttpClient);
 
-  private eventsCollection = collection(this.fs, 'events').withConverter(eventConverter);
-
+  private eventsCollection = mappedCollectionRef<OEvent>(this.fs, 'events');
 
   BATCH_SIZE = 500;
 
@@ -53,9 +51,9 @@ export class LegacyEventImport {
 
   /** read last event id from database */
   private async getLastSavedEventId(): Promise<number> {
-    const collectionRef = collection(this.fs, 'events').withConverter<OEvent>(eventConverter);
+
     // The keys are stored as strings, so we need to order by date to get the most recent event.
-    const lastEventQuery = query(collectionRef, orderBy('date', 'desc'), limit(1));
+    const lastEventQuery = query(this.eventsCollection, orderBy('date', 'desc'), limit(1));
 
     const event = (await getDocs(lastEventQuery)).docs[0]?.data();
 
@@ -76,7 +74,6 @@ export class LegacyEventImport {
       event.club = event.club.toUpperCase();
       return event;
     });
-
   }
 
   /** Remove duplicate events */
@@ -105,12 +102,7 @@ export class LegacyEventImport {
       const event = await this.addEvent(inputEvent);
 
       const resultsFilename = "results/legacy/" + inputEvent.id;
-      try {
-        await this.processResults(event, resultsFilename);
-      } catch (err) {
-        console.error(`LegacyUpload: Error encountered processing results for event ${inputEvent.id}:`, err);
-        this.message.set(`Error processing results for event ${inputEvent.id}: ${err}`);
-      }
+      await this.processResults(event, resultsFilename);
 
     } catch (err) {
       // Log the error but don't re-throw, so the loop can continue with the next event.
@@ -187,10 +179,17 @@ export class LegacyEventImport {
       event.summary = this.es.populateSummary(results);
 
       // Update event object with stored file location
+      let valid = true;
+      let reason = results.warnings?.reduce((acc = '', warn) => acc + '\n' + warn, '');
+      if (!results) {
+        valid = false;
+        reason = 'No results parsed - reason unknown';
+      }
       event.splits = {
         splitsFilename: path,
         splitsFileFormat: fileFormat,
-        valid: (results) ? true : false,
+        valid: valid,
+        failurereason: reason,
         uploadDate: new Date()
       };
     } catch (err) {
@@ -207,11 +206,11 @@ export class LegacyEventImport {
       };
     }
 
-    // seve splits details
+    // Save splits details
     try {
 
       const d = doc(this.eventsCollection, event.key);
-      await updateDoc(d, { ...event });  // workaround  typing error in Firebase 
+      await setDoc(d, event, {merge: true}); 
 
       this.message.set('Sys-admin: Rebuild indices completed successfully:');
 

@@ -50,7 +50,6 @@ export class PaganationService<T> {
       ...opts
     };
 
-
     const c = (converter) ?  
          collection(this.firestore, this.query.path).withConverter(converter) :
          collection(this.firestore, this.query.path) as CollectionReference<T>;

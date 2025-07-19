@@ -11,6 +11,7 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ResultsDataService } from '../results-data.service ';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { M } from "../../../../node_modules/@angular/material/module.d-D1Ym5Wf2";
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 
@@ -24,7 +25,7 @@ interface FilterPanelGroup {
     selector: 'app-results-search',
     templateUrl: './results-search.html',
     styleUrls: ['./results-search.scss'],
-    imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule]
+    imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule, M]
 })
 export class ResultsSearch implements OnInit {
   private rd = inject(ResultsDataService);

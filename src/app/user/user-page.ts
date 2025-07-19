@@ -1,5 +1,5 @@
 
-import { Component, effect, OnInit, inject } from "@angular/core";
+import { Component, effect, OnInit, inject, signal } from "@angular/core";
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
@@ -39,7 +39,7 @@ export class UserPage {
     nationality: new FormControl('', { validators: [Validators.required] }),
   });
 
-  busy = false;
+  busy = signal(false);
 
   nations = Nations.getNations();
 
@@ -62,7 +62,7 @@ export class UserPage {
 
   async save() {
 
-    this.busy = true;
+    this.busy.set(true);
     try {
       await this.usd.updateDetails(this.userForm.value as Partial<UserData>);
       console.log('UserComponnet: User results saved');
@@ -72,7 +72,7 @@ export class UserPage {
       console.error('UserComponent: Error saving user results', e);
       this.snackBar.open("Error saving event details", "Dismiss");
     } finally {
-      this.busy = false;
+      this.busy.set(false);
     }
   }
 
