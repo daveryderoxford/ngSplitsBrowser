@@ -1,5 +1,5 @@
 @if (event()) {
-   @let evt = event();
+@let evt = event();
 <mat-card class="mat-elevation-z2">
    <mat-card-header>
       <mat-card-title>{{ evt.name }}</mat-card-title>
@@ -8,6 +8,7 @@
       </mat-card-subtitle>
    </mat-card-header>
    <mat-card-content>
+      <mat-divider />
       <div class=grid>
          <span> Event Key:</span><span> {{ evt.key }} </span>
 
@@ -16,36 +17,48 @@
          <span> Discipline:</span><span> {{ evt.discipline }} </span>
          <span> Webpage:</span><span> {{ evt.webpage }} </span>
 
-         @if (evt.splits) {
-            @let splits = evt.splits;
-            <span>Filename:</span> <span>{{splits.splitsFilename}}</span>
-            <span>Upload date: </span> <span> {{splits.uploadDate | date}}</span>
-            <span>File format: </span> <span> {{splits.splitsFileFormat}}</span>
 
-            @if (splits.valid === false) {
-                <span>Warnings: </span> <span> {{splits.failurereason}}</span>
-            }
+         @if (evt.splits) {
+
+         @let splits = evt.splits;
+         <span>File name:</span> <span>{{splits.splitsFilename}}</span>
+         <span>Upload date: </span> <span> {{splits.uploadDate | date}}</span>
+         <span>File format: </span> <span> {{splits.splitsFileFormat}}</span>
+
+         @if (splits.valid === false) {
+         <span>Failure reason</span> <span class=error> {{splits.failurereason}}</span>
+         }
          } @else {
-            NO SPLITS UPLOADED
+         <span class=error> NO SPLITS UPLOADED</span>
          }
       </div>
+      <mat-divider />
 
-      @if (evt.summary) {
-         <span>Summary</span>
-         <div class="grid">
+      @if (evt.summary && evt.summary.courses.length > 0) {
+      <span>Summary</span>
+      <div class="grid">
          @let summary = evt.summary;
          <span>No of competitors</span><span> {{summary.numcompetitors}}</span>
-         </div>
-         <div class="courses">
-            @for (course of summary.courses; track course.name) {
-               <span>Course: </span><span>{{course.name}}</span>
-               <span>Length: </span><span>{{course.length}}</span>
-               <span>Climb: </span><span>{{course.climb}}</span>
-               <span>Competitors:</span><span>{{course.numcompetitors}}</span>
-            }
-         </div>
+      </div>
+      <table>
+         <thead>
+            <th>Course</th>
+            <th>Length</th>
+            <th>Climb</th>
+            <th>Competitors</th>
+         </thead>
+         @for (course of summary.courses; track course.name) {
+         <tr>
+            <td>{{course.name}}</td>
+            <td>{{formatCourseLength(course.length)}}</td>
+            <td>{{course.climb}}</td>
+            <td>{{course.numcompetitors}}</td>
+         </tr>
+         }
+      </table>
+      <mat-divider />
       }
-         
+
    </mat-card-content>
    <mat-card-actions>
 

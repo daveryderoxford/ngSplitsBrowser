@@ -19,14 +19,27 @@ import { MatButtonModule } from '@angular/material/button';
       }
       .grid {
          display: grid;
-         grid-template-columns: repeat(2, 1fr);
+         grid-template-columns: 120px 1fr;
          gap: 8px;
        } 
-       .courses {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 8px;
+       
+       td {
+         text-align: center;
+         padding-left: 15px;
+         padding-right: 15px;
        }
+      mat-divider {
+         margin-top: 15px;
+         margin-bottom: 15px;
+      }
+      .error {
+         color: var(--mat-sys-on-error);
+         background-color: var(--mat-sys-error);
+         font-weight: bold;
+         padding: 3px;
+         padding-left: 7px;
+         border-radius: 5px;
+      }
    `,
    templateUrl: './event-detail-panel.html',
    changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,5 +69,11 @@ export class EventDetailsPanel {
       const url = await getDownloadURL(r);
 
       return url;
+   }
+
+   formatCourseLength(length: number): string {
+      if (!length || length === 0) return '';
+      if (length > 1000) length = length / 1000;
+      return (Math.round(length * 10) / 10).toFixed(1);
    }
 }
