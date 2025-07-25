@@ -1,6 +1,6 @@
 
 import { DatePipe } from "@angular/common";
-import { Component, computed, inject, output, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from "@angular/core";
 import { MatOptionModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from "@angular/material/expansion";
@@ -30,7 +30,8 @@ import { EventGrades, OEvent } from '../model/oevent';
       MatDividerModule,
       DatePipe,
       MatListModule,
-      EventListItem]
+      EventListItem],
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ClubEventsTabComponent {
    protected es = inject(EventService);

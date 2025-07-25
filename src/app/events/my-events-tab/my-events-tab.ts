@@ -1,5 +1,5 @@
 
-import { Component, computed, inject, output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, output } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatListModule } from "@angular/material/list";
 import { RouterLink } from "@angular/router";
@@ -11,7 +11,8 @@ import { OEvent } from '../model/oevent';
    selector: "app-my-events-tab",
    templateUrl: "./my-events-tab.html",
    styleUrls: ["./my-events-tab.scss"],
-   imports: [MatButtonModule, RouterLink, MatListModule]
+   imports: [MatButtonModule, RouterLink, MatListModule],
+   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MyEventsTab {
    private us = inject(UserDataService);

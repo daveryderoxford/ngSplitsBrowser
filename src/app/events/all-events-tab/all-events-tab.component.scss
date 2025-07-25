@@ -1,5 +1,5 @@
 
-  :host {
+ :host {
     height: 100%;
     display: grid;
     grid-template-columns: 1fr minmax(0, 500px) 1fr;
@@ -8,15 +8,13 @@
     background-color: var(--mat-sys-surface-container-low);
   }
 
-  mat-list {
-    width: minmax(0,500px);
-  }
-
   .filter {
     grid-area: filter;
   }
 
   .list {
     grid-area: list;
+    width: 100%;
+    height: 100%;
   }
 

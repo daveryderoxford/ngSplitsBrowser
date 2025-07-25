@@ -3,10 +3,16 @@
 
 </div>
 
-<cdk-virtual-scroll-viewport itemSize="88" class="list" (scrolledIndexChange)="scrollPositionChanged($event)">
+<cdk-virtual-scroll-viewport 
+    itemSize="88" 
+    class="list" 
+    (scrolledIndexChange)="scrollPositionChanged($event)">
   <mat-list>
-    <app-event-list-item *cdkVirtualFor="let event of events(); trackBy: trackByEventId" [event]="event"
-      (eventClicked)="eventClicked(event)" />
+    <app-event-list-item 
+         *cdkVirtualFor="let event of events(); trackBy: trackByEventId" 
+         [event]="event"
+         [truncateTitle] ="this.breakpoints.narrowScreen()"
+         (eventClicked)="eventClicked(event)" />
   </mat-list>
 </cdk-virtual-scroll-viewport>
 

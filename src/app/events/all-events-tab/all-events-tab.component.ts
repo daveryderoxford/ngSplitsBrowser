@@ -1,6 +1,6 @@
 
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { Component, inject, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,9 +11,11 @@ import { EventSearchOrder, EventService } from 'app/events/event.service';
 import { EventListItem } from '../event-list-item';
 import { Nations } from '../model/nations';
 import { EventGrades, OEvent } from '../model/oevent';
+import { AppBreakpoints } from 'app/shared/services/breakpoints';
 
 @Component({
   selector: 'app-all-events-tab',
+
   templateUrl: './all-events-tab.component.html',
   styleUrls: ['./all-events-tab.component.scss'],
   imports: [MatProgressBarModule, 
@@ -25,16 +27,17 @@ import { EventGrades, OEvent } from '../model/oevent';
     MatIconModule,
     EventListItem
   ],
-
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AllEventsTabComponent {
   private es = inject(EventService);
+  protected breakpoints = inject(AppBreakpoints);
   
   eventSelected = output<OEvent>();
 
   grades = EventGrades.grades;
   nations = Nations.getNations();
-
+  
   // Configuration for data fetching
   private defaultOrderBy: EventSearchOrder = 'date';
   private defaultPageSize = 30; // Number of events to fetch per page

@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DatePipe } from '@angular/common';
 import { MatDividerModule } from '@angular/material/divider';
+import { EllipsisPipe } from "../shared/pipes/ellipsis-pipe";
 
 @Component({
   selector: 'app-event-list-item',
@@ -14,11 +15,16 @@ import { MatDividerModule } from '@angular/material/divider';
     MatIconModule,
     MatButtonModule,
     DatePipe,
-    MatDividerModule
-  ],
+    MatDividerModule,
+    EllipsisPipe
+],
   template: `
     <mat-list-item class="event-list-item">
-      <span matListItemTitle>{{ event().name }}</span>
+      @if (truncateTitle()) {
+        <span matListItemTitle>{{ event().name | ellipsis:29 }}</span>
+    } @else {
+        <span matListItemTitle>{{ event().name  }}</span>
+    }
       <span matListItemLine>{{ event().date | date:'mediumDate' }} - {{ event().club }} ({{ event().nationality }})</span>
       <span matListItemLine>Type: {{ event().type }} | Discipline: {{ event().discipline }}</span>
       <div matListItemMeta>
@@ -29,17 +35,16 @@ import { MatDividerModule } from '@angular/material/divider';
     </mat-list-item>
     <mat-divider/>
   `,
-  styles: `
-    .event-list-item {
-      background: var(--mat-sys-surface);
-      cursor: pointer;
-    }
-    `,  
+  styles: ``,  
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventListItem {
   readonly event = input.required<OEvent>();
+  // Workaround where titles are not trancated with ellipsis 
+  // inside a cdkVirtualFor
+  readonly truncateTitle = input(false);
   readonly eventClicked = output<OEvent>();
+  
 
   itemClicked(): void {
     this.eventClicked.emit(this.event());
