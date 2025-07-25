@@ -276,7 +276,7 @@ class OEReader {
     * @sb-param {Number} numControls - The number of controls to read.
     * @sb-return {Array} Array of cumulative times.
     */
-    private readCumulativeTimes(row: string[], lineNumber: number, numControls: number): Array<sbTime> {
+    private readCumulativeTimes(row: string[], lineNumber: number, numControls: number): sbTime[] {
 
         const cumTimes = [0];
 
@@ -398,7 +398,7 @@ class OEReader {
     * @sb-param {Array} row - Row of items read from a line of the input data.
     * @sb-param {Array} cumTimes - Array of cumulative times for the competitor.
     */
-    private addCompetitor(row: string[], cumTimes: Array<number>) {
+    private addCompetitor(row: string[], cumTimes: number[]) {
 
         const className = this.getClassName(row);
         const placing = row[this.columnIndexes.placing];
@@ -633,7 +633,7 @@ class OEReader {
     * @sb-param {Array} classes - Array of CourseClass objects read.
     * @sb-return {Array} Array of course objects.
     */
-    private determineCourses(classes: Array<CourseClass>): Array<Course> {
+    private determineCourses(classes: CourseClass[]): Course[] {
 
         const manyToManyMaps = this.getMapsBetweenClassesAndCourses();
 

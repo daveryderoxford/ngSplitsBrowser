@@ -5,6 +5,8 @@ import { normaliseLineEndings } from "./util";
 
 const parseTime = TimeUtilities.parseTime;
 
+const name ='CVS';
+
 /**
 * Parse a row of competitor data.
 * @sb-param {Number} index - Index of the competitor line.
@@ -18,7 +20,7 @@ function parseCompetitors(index: number,
     line: string,
     controlCount: number,
     className: string,
-    warnings: Array<string>): Competitor {
+    warnings: string[]): Competitor {
 
     // Expect forename, surname, club, start time then (controlCount + 1) split times in the form MM:SS.
     const parts = line.split(",");
@@ -79,7 +81,7 @@ function parseCompetitors(index: number,
 * @sb-param {Array} warnings - Array of warnings to add any warnings found to.
 * @sb-return {CourseClass} Parsed class data.
 */
-function parseCourseClass(courseClass: string, warnings: Array<string>): CourseClass {
+function parseCourseClass(courseClass: string, warnings: string[]): CourseClass {
     const lines = courseClass.split(/\r?\n/).filter(isTrue);
     if (lines.length === 0) {
         throw new InvalidData("parseCourseClass got an empty list of lines");
@@ -129,7 +131,7 @@ export function parseCSVEventData(data: string): Results {
     data = data.replace(/,+\n/g, "\n").replace(/,+$/, "");
 
     const classSections = data.split(/\n\n/).map( (s) => s.trim()).filter(isTrue);
-    const warnings = [] as Array<string>;
+    const warnings: string[] = [];
 
     let classes = classSections.map( (section) => parseCourseClass(section, warnings));
 
@@ -143,7 +145,7 @@ export function parseCSVEventData(data: string): Results {
     // the source data files, so we can't do anything about them.
     const courses = classes.map( (cls) => new Course(cls.name, [cls], null, null, null));
 
-    for (let i = 0; i < classes.length; i += 1) {
+    for (let i = 0; i < classes.length; i++) {
         classes[i].setCourse(courses[i]);
     }
 

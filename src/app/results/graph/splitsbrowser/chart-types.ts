@@ -109,7 +109,7 @@ export class ChartTypeClass {
     * @sb-return {Array} Array of objects containing indexes around dubious
     *     cumulative times.
     */
-    private static getIndexesAroundDubiousCumulativeTimes(competitor: Competitor): Array<DubiousTimeInfo> {
+    private static getIndexesAroundDubiousCumulativeTimes(competitor: Competitor): DubiousTimeInfo[] {
         return competitor.getControlIndexesAroundDubiousCumulativeTimes();
     }
 
@@ -119,7 +119,7 @@ export class ChartTypeClass {
     * @sb-return {Array} Array of objects containing indexes around dubious split
     *     times.
     */
-    private static getIndexesAroundDubiousSplitTimes(competitor: Competitor): Array<DubiousTimeInfo> {
+    private static getIndexesAroundDubiousSplitTimes(competitor: Competitor): DubiousTimeInfo[] {
         return competitor.getControlIndexesAroundDubiousSplitTimes();
     }
 }

@@ -1,8 +1,3 @@
-<div class="header">
-   <app-event-title [name]="rd.event()?.name" [date]="rd.event()?.date" [courseClassName]="rs.course()?.name" />
-   <app-selection-sidebar-button />
-</div>
-
 
 <mat-tab-group class="clipped-container" disablePagination [selectedIndex]="tabIndex()"
    (selectedIndexChange)="tabIndex.set($event)">

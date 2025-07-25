@@ -140,7 +140,7 @@ export class EventAdminService {
     *  - results file location in google
     *  - club index lookup
    */
-   async uploadResults(event: OEvent, file: File, fileFormat: SplitsFileFormat = "auto"): Promise<Results> {
+   async uploadResults(event: OEvent, file: File, fileFormat: SplitsFileFormat = 'auto'): Promise<Results> {
 
       let results: Results = null;
 
@@ -152,7 +152,7 @@ export class EventAdminService {
          event.summary = this.populateSummary(results);
 
          // Save file to users area on Google Clould  Storage
-         const path = "results/" + this.auth.user().uid + "/" + event.key + "-results";
+         const path = `results/${this.auth.user().uid}/${event.key}-results`;
          await this._uploadToGoogle(text, path);
 
          // Update event object with stored file location
@@ -175,7 +175,7 @@ export class EventAdminService {
       // save event details
       await this.update(event.key, event);
 
-      console.log("EventAdminService: Results file loaded " + file + " to " + event.splits.splitsFilename);
+      console.log(`EventAdminService: Results file loaded ${file} to ${event.splits.splitsFilename}`);
 
       return results;
 
@@ -184,7 +184,7 @@ export class EventAdminService {
    private logUploadWarnings(eventname: string, results: Results) {
       if (results.warnings && results.warnings.length > 0) {
          const msg = results.warnings.reduce((acc = '', warn) => acc + '\n' + warn);
-         console.log("EventAdminService: Splits uploaded with warnings\n Event key: " + eventname + '\n' + msg);
+         console.log(`EventAdminService: Splits uploaded with warnings\n Event key: ${eventname}\n${msg}`);
       }
    }
 
@@ -195,10 +195,10 @@ export class EventAdminService {
       try {
          results = parseEventData(text);
       } catch (e: unknown) {
-         if (e instanceof SplitsbrowserException && e.name === "InvalidData") {
-            console.log("EventAdminService: Error parsing results" + e.message);
+         if (e instanceof SplitsbrowserException && e.name === 'InvalidData') {
+            console.log('EventAdminService: Error parsing results' + e.message);
          } else {
-            console.log("EventAdminService: Error parsing results" + e);
+            console.log('EventAdminService: Error parsing results' + e);
          }
          throw e;
       }
@@ -223,12 +223,12 @@ export class EventAdminService {
       };
 
       if (!results) {
-         console.warn("EventAdminService: No results provided to populate summary");
+         console.warn('EventAdminService: No results provided to populate summary');
          return summary;
       }
 
       if (!results.courses || results.courses.length === 0) {
-         console.warn("EventAdminService: No courses found in results");
+         console.warn('EventAdminService: No courses found in results');
          return summary;
       }
 

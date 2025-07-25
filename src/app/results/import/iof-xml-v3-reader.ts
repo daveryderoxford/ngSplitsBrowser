@@ -10,8 +10,8 @@ export interface CourseDeatils {
     length: number;
     climb: number;
     numberOfControls: number;
-    classes? : Array<CourseClass>;
-    controls? : Array<string>;
+    classes? : CourseClass[];
+    controls? : string[];
 }
 
 /** interface implemented by IOF XML reader classes */
@@ -19,7 +19,7 @@ export interface IOFXMLReader {
     isOfThisVersion(data: string): boolean;
     checkVersion(rootElement: JQuery<HTMLElement>): void;
     readClassName(classResultElement: JQuery<HTMLElement>): string;
-    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: Array<string>): CourseDeatils;
+    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: string[]): CourseDeatils;
     getCompetitorNameElement(element: JQuery<HTMLElement>): void;
     readClubName(element: JQuery<HTMLElement>): string;
     readDateOfBirth(element: JQuery<HTMLElement>): number | null;
@@ -106,7 +106,7 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {Object} Course details: id, name, length, climb and number of
     *     controls.
     */
-    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: Array<string>): CourseDeatils {
+    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: string[]): CourseDeatils {
         const courseElement = $("> Course", classResultElement);
         const id = $("> Id", courseElement).text() || null;
         const name = $("> Name", courseElement).text();

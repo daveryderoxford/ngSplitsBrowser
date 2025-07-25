@@ -70,7 +70,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-param {Array} warnings - Array that accumulates warning messages.
     * @sb-return {Object} Course details: id, name, length, climb and numberOfControls
     */
-    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: Array<string>): CourseDeatils {
+    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: string[]): CourseDeatils {
         // Although the IOF v2 format appears to support courses, they
         // haven't been specified in any of the files I've seen.
         // So instead grab course details from the class and the first

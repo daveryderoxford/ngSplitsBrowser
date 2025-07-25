@@ -11,7 +11,7 @@ import { SelectionSidebarService } from './selection-sidebar.service';
       @if (ss.isOpen()) {
         <mat-icon>chevron_left</mat-icon>
       } @else {
-        <mat-icon>menu</mat-icon>
+        <mat-icon>chevron_right</mat-icon>
       }
     </button>
   `,

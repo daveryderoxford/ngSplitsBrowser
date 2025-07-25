@@ -34,10 +34,6 @@ export class StatsPage {
    protected rs = inject(ResultsSelectionService);
    protected rd = inject(ResultsDataService);
 
-   readonly views = ['Summary', 'Leg'];
-
-   statsView = signal<string>('Summary');
-
    id = input.required<string>();  // Route parameter
    eventName = input<string>("");  // Route parameter
    eventDate = input<Date>();   // Route parameter
@@ -52,9 +48,4 @@ export class StatsPage {
          this.ps.setDisplayedPage('stats');
       });
    }
-
-   buttonClicked(view: string) {
-      this.statsView.set(view);
-   }
-
 }

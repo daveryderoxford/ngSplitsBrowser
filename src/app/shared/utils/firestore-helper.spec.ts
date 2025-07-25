@@ -11,7 +11,7 @@ interface TestModel {
     anotherDate?: Date;
   };
   tags: (string | undefined)[];
-  participants: Array<{ name: string; joined: Date }>;
+  participants: { name: string; joined: Date }[];
   optionalField?: string;
   fieldToBeUndefined?: string | undefined;
 }

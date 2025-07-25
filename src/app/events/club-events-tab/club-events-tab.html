@@ -1,18 +1,18 @@
 <div class="background">
 
   <div class="class-filter">
-    <mat-form-field appearance="outline" class="dense-form-field" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="dense-form-field nationality-filter" subscriptSizing="dynamic">
       <mat-label>Nationality</mat-label>
       <mat-select (selectionChange)="clubNationalFilterChange($event)">
         @for (nation of nations; track nation) {
-          <mat-option [value]="nation.abrievation">
-            {{ nation.fullname }}
-          </mat-option>
+        <mat-option [value]="nation.abrievation">
+          {{ nation.fullname }}
+        </mat-option>
         }
       </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="dense-form-field" subscriptSizing="dynamic">
+    <mat-form-field appearance="outline" class="dense-form-field name-filter" subscriptSizing="dynamic">
       <mat-label>Name</mat-label>
       <input matInput #clubNameFilter (keyup)="clubNameFilterChange($event)">
     </mat-form-field>
@@ -22,30 +22,44 @@
 
     <mat-accordion multi="false">
 
-      @for (club of clubs$ | async; track club) {
-        <mat-expansion-panel (opened)="setSelectedClub(club)">
-          <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{club.name}}  @if ((clubNationalityFilter$ | async) === '') {
-                <span> &nbsp;&nbsp;&nbsp; {{club.nationality}} </span>
-              }
-            </mat-panel-title>
-            <mat-panel-description>
-              {{club.numEvents}} events &nbsp;&nbsp;&nbsp; Last event {{club.lastEvent | date}}
-            </mat-panel-description>
-          </mat-expansion-panel-header>
-          <ng-template matExpansionPanelContent>
-            <mat-list>
-              @for (event of clubEvents; track event.key) {
+      @for (club of filteredClubs(); track club.key) {
+      <mat-expansion-panel (opened)="setSelectedClub(club)">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            {{club.name}}
+            @if (natFilter() === '' && !breakpoints.narrowScreen() ) {
+            <span> &nbsp; {{club.nationality}} </span>
+            }
+          </mat-panel-title>
+          <mat-panel-description>
+            @if (!breakpoints.narrowScreen()) {
+            {{club.numEvents}} events &nbsp;&nbsp;&nbsp; Last event {{club.lastEvent | date}}
+            }
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+          <mat-list>
+            @if (es.eventsForClubLoading()) {
+              ...loading club events
+            } @else if (es.eventsForClubError()) {
+              Error loading club events
+            } @else {
+              @for (event of es.eventsForClub(); track event.key) {
                 <app-event-list-item [event]="event" (eventClicked)="eventClicked(event)" />
               }
-            </mat-list>
-          </ng-template>
-        </mat-expansion-panel>
+            }
+          </mat-list>
+        </ng-template>
+      </mat-expansion-panel>
       }
 
-      @if (loading$ | async) {
-        <mat-progress-bar mode="indeterminate" />
+      @if (es.clubsLoading()) {
+      <mat-progress-bar mode="indeterminate" />
+      ...loading clubs
+      } @else if (es.clubsError()) {
+        Error loading clubs
+      } @else if (filteredClubs().length === 0) {
+        No clubs found
       }
 
     </mat-accordion>

@@ -8,7 +8,7 @@ export class Nations {
 
     static nullNation: Nation = {abrievation: "", fullname: "--Any--"};
 
-    static getNations(): Array<Nation> {
+    static getNations(): Nation[] {
 
         const nations = [
             { abrievation: "ARG", fullname: "Argentina", },

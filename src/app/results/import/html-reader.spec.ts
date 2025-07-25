@@ -223,9 +223,9 @@ describe("Input.Html", () => {
                                 useClasses: boolean,
                                 className: string,
                                 time: string,
-                                cumTimes: Array<string>,
-                                splits: Array<string>,
-                                extras?: Array<any>) {
+                                cumTimes: string[],
+                                splits: string[],
+                                extras?: any[]) {
 
         if (cumTimes.length !== splits.length) {
             throw new Error("Cumulative times and split times must have the same length");
@@ -342,9 +342,9 @@ describe("Input.Html", () => {
                                   useClasses: boolean,
                                   className: string,
                                   time: string,
-                                  cumTimes: Array<string>,
-                                  splits: Array<string>,
-                                  extras?: Array<any>) {
+                                  cumTimes: string[],
+                                  splits: string[],
+                                  extras?: any[]) {
 
         if (cumTimes.length !== splits.length) {
             throw new Error("Cumulative times and split times must have the same length");
@@ -617,7 +617,7 @@ describe("Input.Html", () => {
     * @param {Object} options - Options object, the contents of which are
     *     described above.
     */
-    function runHtmlFormatParseTest(courses: Array<any>, checkFunc, options?) {
+    function runHtmlFormatParseTest(courses: Course[], checkFunc, options?) {
         const useClasses = (options && options.useClasses) || false;
         const templates = (options && options.templates) || ALL_TEMPLATES;
         templates.forEach(function (template) {

@@ -42,15 +42,15 @@ export class ResultsDataService {
    });
 
    // Ensure thta results always has a value.  Avoids having to managed undefined states in computations
-   results = linkedSignal<Results, Results>({
-      source: this._resultsResource.value,
-      computation: (data, previous) => previous?.value ?? data,
-   });
+   results = this._resultsResource.value;
+   //   source: this._resultsResource.value,
+  //    computation: (data, previous) => previous?.value ?? data,
+ //  });
 
    isLoading = this._resultsResource.isLoading;
    error = this._resultsResource.error;
 
-   setSelectedEvent(key: string, name = "", date?: Date) {
+   setSelectedEvent(key: string, name = "", date?: Date | undefined) {
       this._event.set({
          key: key,
          name: name,
@@ -189,7 +189,7 @@ export class ResultsDataService {
    * @sb-param {Array} sourceData - Array of number values.
    * @sb-returns Array of corresponding ranks.
    */
-   private getRanks(sourceData: Array<number>): Array<number> {
+   private getRanks(sourceData: number[]): number[] {
       // First, sort the source data, removing nulls.
       const sortedData = sourceData.filter(isNotNullNorNaN);
       sortedData.sort(d3_ascending);

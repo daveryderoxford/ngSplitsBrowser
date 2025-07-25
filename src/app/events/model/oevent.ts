@@ -3,7 +3,7 @@ import { DocumentSnapshot, Timestamp } from '@angular/fire/firestore';
 export type EventGrade = "IOF" | "International" | "National" | "Regional" | "Club" | "Local";
 
 export class EventGrades {
-   static grades: Array<EventGrade> = ["IOF", "International", "National", "Regional", "Club", "Local"];
+   static grades: EventGrade[] = ["IOF", "International", "National", "Regional", "Club", "Local"];
 
    static indexObject(grade: EventGrade): any {
       const grades = EventGrades.grades.reverse();
@@ -19,17 +19,17 @@ export class EventGrades {
 
 export type EventDiscipline = "Sprint" | "Urban" | "Middle" | "Long" | "Ultralong" | "Other" | "Unknown";
 export class EventDisciplines {
-   static disciplines: Array<EventDiscipline> = ["Sprint", "Urban", "Middle", "Long", "Ultralong", "Other", "Unknown"];
+   static disciplines: EventDiscipline[] = ["Sprint", "Urban", "Middle", "Long", "Ultralong", "Other", "Unknown"];
 }
 
 export type EventType = "Foot" | "Bike" | "Ski" | "Trail" | "Other";
 export class EventTypes {
-   static types: Array<EventType> = ["Foot", "Bike", "Ski", "Trail", "Other"];
+   static types: EventType[] = ["Foot", "Bike", "Ski", "Trail", "Other"];
 }
 
 export type ControlCardType = "SI" | "Emit" | "Other";
 export class ControlCardTypes {
-   static types: Array<ControlCardType> = ["SI", "Emit", "Other"];
+   static types: ControlCardType[] = ["SI", "Emit", "Other"];
 }
 
 export type SplitsFileFormat = "auto" | "IOFv3" | "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML";
@@ -67,7 +67,7 @@ export interface SplitsFileInfo {
 
 export interface EventSummary {
    numcompetitors: number;
-   courses: Array<CourseSummary>;
+   courses: CourseSummary[];
 }
 
 export interface CourseSummary {
@@ -75,5 +75,5 @@ export interface CourseSummary {
    length: number;
    climb: number;
    numcompetitors: number;
-   classes: Array<string>;
+   classes: string[];
 }

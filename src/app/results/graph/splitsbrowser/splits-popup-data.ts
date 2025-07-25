@@ -178,7 +178,7 @@ export class SplitsPopupData {
     * @sb-param {Array} nextControls - Array of next-control information objects.
     * @sb-return {String} Next-control information containing joined-up control names.
     */
-    private tidyNextControlsList(nextControls: Array<any>): NextControlsDataStr[] {
+    private tidyNextControlsList(nextControls: any[]): NextControlsDataStr[] {
         return nextControls.map((nextControlRec) => {
             const codes = nextControlRec.nextControls.slice(0);
             if (codes[codes.length - 1] === Course.FINISH) {

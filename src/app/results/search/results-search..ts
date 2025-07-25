@@ -10,14 +10,13 @@ import { MatOptionModule } from '@angular/material/core';
 
 import { MatIconModule } from '@angular/material/icon';
 import { ResultsDataService } from '../results-data.service ';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { M } from "../../../../node_modules/@angular/material/module.d-D1Ym5Wf2";
+import { MatInputModule } from "@angular/material/input";
 
 type SearchSelectedItem = Competitor | CourseClass | Course;
 
 interface FilterPanelGroup {
   name: string;
-  options: Array<SearchSelectedItem>;
+  options: SearchSelectedItem[];
 }
 
 @UntilDestroy({ checkProperties: true })
@@ -25,7 +24,7 @@ interface FilterPanelGroup {
     selector: 'app-results-search',
     templateUrl: './results-search.html',
     styleUrls: ['./results-search.scss'],
-    imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule, M]
+    imports: [MatAutocompleteModule, ReactiveFormsModule, MatIconModule, MatOptionModule, MatInputModule]
 })
 export class ResultsSearch implements OnInit {
   private rd = inject(ResultsDataService);
@@ -36,7 +35,7 @@ export class ResultsSearch implements OnInit {
   private _autocompleteTrigger = viewChild(MatAutocompleteTrigger);
 
   // Filter panel contents consisting of groups for courses, classes and competitors
-  filterPanelContents: Array<FilterPanelGroup> = [];
+  filterPanelContents: FilterPanelGroup[] = [];
 
   searchControl: FormControl = new FormControl('');
   subscription: any;

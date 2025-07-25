@@ -2,6 +2,7 @@
  * Event service
  */
 import { inject, Injectable, signal } from "@angular/core";
+import { rxResource } from '@angular/core/rxjs-interop';
 import { FirebaseApp } from '@angular/fire/app';
 import { collectionData, getFirestore, orderBy, query, where } from '@angular/fire/firestore';
 import { PaganationService } from "app/shared";
@@ -13,8 +14,6 @@ import { EventInfo, OEvent } from './model/oevent';
 /** Valid properties for Event search order */
 export type EventSearchOrder = "date" | "club" | "grade" | "type" | "name" | "discipline";
 
-const EVENTS_COLLECTION = 'events';
-
 @Injectable({
   providedIn: 'root',
 })
@@ -22,7 +21,7 @@ export class EventService {
   private firestore = getFirestore(inject(FirebaseApp));
   private ps = inject(PaganationService);
 
-  private eventsCollection = mappedCollectionRef<OEvent>(this.firestore, EVENTS_COLLECTION);
+  private eventsCollection = mappedCollectionRef<OEvent>(this.firestore, 'events');
   private clubsCollection = mappedCollectionRef<Club>(this.firestore, 'clubs');
 
   private _loading = new BehaviorSubject<boolean>(false);
@@ -59,23 +58,54 @@ export class EventService {
     return this.ps.done;
   }
 
-  /** Gets all events for a club  */
-  getEventsForClub(club: Club): Observable<OEvent[]> {
+  // Events for specified club
 
-    const q = query(this.eventsCollection,
-      where("club", "==", club.name),
-      where("nationality", "==", club.nationality),
-      orderBy('date', 'desc'));
+  private _selectedClub = signal<Club | undefined>(undefined);
 
-    return collectionData(q);
+  private _eventsForClubResouce = rxResource<OEvent[], Club>({
+    params: () => this._selectedClub(),
+    stream: (data) => {
+      const club = data.params;
+      if (club === undefined) {
+        return of([]);
+      }
+      const q = query(this.eventsCollection,
+        where("club", "==", club.name),
+        where("nationality", "==", club.nationality),
+        orderBy('date', 'desc'));
+
+      return collectionData(q);
+    }
+  });
+
+  setSelectedClub(club: Club | undefined) {
+    this._selectedClub.set(club);
   }
 
+  eventsForClub = this._eventsForClubResouce.value.asReadonly();
+  eventsForClubLoading = this._eventsForClubResouce.isLoading;
+  eventsForClubError = this._eventsForClubResouce.error;
+
   /** Get a list of club namees for all events ordered by name and nationality */
-  getClubs(): Observable<Club[]> {
-    if (!this._clubsRead) {
-      this._clubs$ = collectionData(this.clubsCollection);
-      this._clubsRead = true;
+
+  _loadClubs = signal(false);
+
+  private _clubsResouce = rxResource<Club[], boolean>({
+    params: () => this._loadClubs(),
+    defaultValue: [],
+    stream: (data) => {
+      if (!data.params) {
+        return of([]);
+      }
+      return collectionData(this.clubsCollection);
     }
-    return this._clubs$;
+  });
+
+  clubs = this._clubsResouce.value.asReadonly();
+  clubsLoading = this._clubsResouce.isLoading;
+  clubsError = this._clubsResouce.error;
+
+  loadClubs() {
+    this._loadClubs.set(true);
   }
 }

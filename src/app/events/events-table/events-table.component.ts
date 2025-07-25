@@ -19,9 +19,9 @@ export class EventsTableComponent {
 
   isSmall = toSignal(this.observer.observe(['(max-width: 599px)']));
 
-   currentRow: number;
+   currentRow: number
 
-  events = input<Array<OEvent> | DataSource<OEvent>>();
+  events = input<OEvent[] | DataSource<OEvent>>();
   displayedColumns = input(["date", "name", "nationality", "club", "grade", "discipline", "type", "website", "actions"]);
 
   eventSelected = output<OEvent>();

@@ -79,8 +79,7 @@ function fabricateTripleColumnRow(name: string,
 describe("Input.AlternativeCSV.TripleColumn", () => {
 
     it("Cannot parse an empty string", () => {
-        // TODO needs Jasmine-expect
-      //  expect( () => parseTripleColumnEventData("")) .toThrowErrorOfType("WrongFileFormat", "Should throw an exception for parsing an empty string");
+        expect( () => parseTripleColumnEventData("")) .toThrowErrorOfType("WrongFileFormat", "Should throw an exception for parsing an empty string");
     });
 
     it("Cannot parse a string that contains only the headers", () => {

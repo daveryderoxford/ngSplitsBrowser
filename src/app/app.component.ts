@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
       return null;
    }
 
-   async closeSidenav(target: Array<any>) {
+   async closeSidenav(target: any[]) {
       await this.sidenav().close();
       if (target) {
          await this.router.navigate(target);

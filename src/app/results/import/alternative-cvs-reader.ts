@@ -121,7 +121,7 @@ class TrippleCVSReader {
     * such situations and merge them together.
     * @sb-param {Array} row - The row of data read from the file.
     */
-    private adjustLinePartsForMultipleCompetitors(row: Array<string>) {
+    private adjustLinePartsForMultipleCompetitors(row: string[]) {
         if (this.format.allowMultipleCompetitorNames) {
             while (row.length > this.format.name + 1 && row[this.format.name + 1].match(/^\s\S/)) {
                 row[this.format.name] += "," + row[this.format.name + 1];

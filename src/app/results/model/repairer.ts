@@ -26,7 +26,7 @@ const MAX_FINISH_SPLIT_MINS_ADDED = 5;
  * @sb-return {?Object} Object containing indexes of non-ascending entries, or
  *     null if none found.
  */
-function getFirstNonAscendingIndexes(cumTimes: Array<sbTime>): FirstNonAssendingIndices | null {
+function getFirstNonAscendingIndexes(cumTimes: sbTime[]): FirstNonAssendingIndices | null {
     if (cumTimes.length === 0 || cumTimes[0] !== 0) {
         throw new InvalidData("cumulative times array does not start with a zero cumulative time");
     }
@@ -89,7 +89,7 @@ export class Repairer {
      * previous cumulative time.
      * @sb-param {Array} cumTimes - Array of cumulative times.
      */
-    private removeCumulativeTimesEqualToPrevious(cumTimes: Array<number>) {
+    private removeCumulativeTimesEqualToPrevious(cumTimes: number[]) {
         let lastCumTime = cumTimes[0];
         for (let index = 1; index + 1 < cumTimes.length; index += 1) {
             if (cumTimes[index] !== null && cumTimes[index] === lastCumTime) {
@@ -113,7 +113,7 @@ export class Repairer {
     * @sb-return {Array} Array of cumulaive times with perhaps some cumulative
     *     times taken out.
     */
-    private removeCumulativeTimesCausingNegativeSplits(cumTimes: Array<sbTime>): Array<sbTime> {
+    private removeCumulativeTimesCausingNegativeSplits(cumTimes: sbTime[]): sbTime[] {
 
         let nonAscIndexes = getFirstNonAscendingIndexes(cumTimes);
         while (nonAscIndexes !== null && nonAscIndexes.second + 1 < cumTimes.length) {
@@ -184,7 +184,7 @@ export class Repairer {
     * @sb-param {Array} cumTimes - The cumulative times to perhaps remove the
     *     finish split from.
     */
-    private removeFinishTimeIfAbsurd(cumTimes: Array<sbTime>): void {
+    private removeFinishTimeIfAbsurd(cumTimes: sbTime[]): void {
         const finishTime = cumTimes[cumTimes.length - 1];
         const lastControlTime = cumTimes[cumTimes.length - 2];
         if (isNotNullNorNaN(finishTime) &&

@@ -8,8 +8,8 @@ import { CourseDeatils, Version3Reader } from "./iof-xml-v3-reader";
 type XMLReader = Version2Reader | Version3Reader;
 
 const ALL_READERS = [
-    new Version2Reader(),
-    new Version3Reader()
+   new Version2Reader(),
+   new Version3Reader()
 ];
 
 /**
@@ -20,72 +20,72 @@ const ALL_READERS = [
 */
 export function parseIOFXMLEventData(data: string): Results {
 
-    const reader = determineReader(data);
+   const reader = determineReader(data);
 
-    const xml = parseXml(data);
+   const xml = parseXml(data);
 
-    validateData(xml, reader);
+   validateData(xml, reader);
 
-    const EventElement = $("> Event", $(xml));
-    parseEventDetails(EventElement);
+   const EventElement = $("> Event", $(xml));
+   parseEventDetails(EventElement);
 
-    const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
+   const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
 
-    if (classResultElements.length === 0) {
-        throw new InvalidData("No class result elements found");
-    }
+   if (classResultElements.length === 0) {
+      throw new InvalidData("No class result elements found");
+   }
 
-    const classes: Array<CourseClass> = [];
+   const classes: CourseClass[] = [];
 
-    // Array of all 'temporary' courses, intermediate objects that contain
-    // course data but not yet in a suitable form to return.
-    const tempCourses: Array<CourseDeatils> = [];
+   // Array of all 'temporary' courses, intermediate objects that contain
+   // course data but not yet in a suitable form to return.
+   const tempCourses: CourseDeatils[] = [];
 
-    // d3 map that maps course IDs plus comma-separated lists of controls
-    // to the temporary course with that ID and controls.
-    // (We expect that all classes with the same course ID have consistent
-    // controls, but we don't assume that.)    
-    const coursesMap = new Map<string, CourseDeatils>();
+   // d3 map that maps course IDs plus comma-separated lists of controls
+   // to the temporary course with that ID and controls.
+   // (We expect that all classes with the same course ID have consistent
+   // controls, but we don't assume that.)    
+   const coursesMap = new Map<string, CourseDeatils>();
 
-    const warnings: Array<string> = [];
+   const warnings: string[] = [];
 
-    classResultElements.forEach((classResultElement) => {
-        const parsedClass = parseClassData(classResultElement, reader, warnings);
-        if (parsedClass === null) {
-            // Class could not be parsed.
-            return;
-        }
+   classResultElements.forEach((classResultElement) => {
+      const parsedClass = parseClassData(classResultElement, reader, warnings);
+      if (parsedClass === null) {
+         // Class could not be parsed.
+         return;
+      }
 
-        const courseClass = new CourseClass(parsedClass.name, parsedClass.controls.length, parsedClass.competitors);
-        classes.push(courseClass);
+      const courseClass = new CourseClass(parsedClass.name, parsedClass.controls.length, parsedClass.competitors);
+      classes.push(courseClass);
 
-        // Add to each temporary course object a list of all classes.
-        const tempCourse = parsedClass.course;
-        const courseKey = tempCourse.id + "," + parsedClass.controls.join(",");
+      // Add to each temporary course object a list of all classes.
+      const tempCourse = parsedClass.course;
+      const courseKey = tempCourse.id + "," + parsedClass.controls.join(",");
 
-        if (tempCourse.id !== null && coursesMap.has(courseKey)) {
-            // We've come across this course before, so just add a class to
-            // it.
-            coursesMap.get(courseKey).classes.push(courseClass);
-        } else {
-            // New course.  Add some further details from the class.
-            tempCourse.classes = [courseClass];
-            tempCourse.controls = parsedClass.controls;
-            tempCourses.push(tempCourse);
-            if (tempCourse.id !== null) {
-                coursesMap.set(courseKey, tempCourse);
-            }
-        }
-    });
+      if (tempCourse.id !== null && coursesMap.has(courseKey)) {
+         // We've come across this course before, so just add a class to
+         // it.
+         coursesMap.get(courseKey).classes.push(courseClass);
+      } else {
+         // New course.  Add some further details from the class.
+         tempCourse.classes = [courseClass];
+         tempCourse.controls = parsedClass.controls;
+         tempCourses.push(tempCourse);
+         if (tempCourse.id !== null) {
+            coursesMap.set(courseKey, tempCourse);
+         }
+      }
+   });
 
-    // Now build up the array of courses.
-    const courses = tempCourses.map((tempCourse) => {
-        const course = new Course(tempCourse.name, tempCourse.classes, tempCourse.length, tempCourse.climb, tempCourse.controls);
-        tempCourse.classes.forEach((courseClass) => { courseClass.setCourse(course); });
-        return course;
-    });
+   // Now build up the array of courses.
+   const courses = tempCourses.map((tempCourse) => {
+      const course = new Course(tempCourse.name, tempCourse.classes, tempCourse.length, tempCourse.climb, tempCourse.controls);
+      tempCourse.classes.forEach((courseClass) => { courseClass.setCourse(course); });
+      return course;
+   });
 
-    return new Results(classes, courses, warnings);
+   return new Results(classes, courses, warnings);
 }
 
 // Regexp that matches the year in an ISO-8601 date.
@@ -99,20 +99,20 @@ const yearRegexp = /^\d{4}/;
 * @sb-return {XMLDocument} The parsed XML document.
 */
 function parseXml(xmlString: string): XMLDocument {
-    let xml: XMLDocument;
-    try {
-        xml = $.parseXML(xmlString);
-    } catch (e) {
-        throw new InvalidData("XML data not well-formed");
-    }
+   let xml: XMLDocument;
+   try {
+      xml = $.parseXML(xmlString);
+   } catch (e) {
+      throw new InvalidData("XML data not well-formed");
+   }
 
-    if ($("> *", $(xml)).length === 0) {
-        // PhantomJS doesn't always fail parsing invalid XML; we may be
-        // left with 'xml' just containing the DOCTYPE and no root element.
-        throw new InvalidData("XML data not well-formed: " + xmlString);
-    }
+   if ($("> *", $(xml)).length === 0) {
+      // PhantomJS doesn't always fail parsing invalid XML; we may be
+      // left with 'xml' just containing the DOCTYPE and no root element.
+      throw new InvalidData("XML data not well-formed: " + xmlString);
+   }
 
-    return xml;
+   return xml;
 }
 
 
@@ -130,13 +130,13 @@ function parseXml(xmlString: string): XMLDocument {
 */
 function readCompetitorName(nameElement: JQuery<HTMLElement>): FirstnameSurname {
 
-    const forename = $("> Given", nameElement).text();
-    const surname = $("> Family", nameElement).text();
+   const forename = $("> Given", nameElement).text();
+   const surname = $("> Family", nameElement).text();
 
-    return ({
-        firstname: forename,
-        surname: surname
-    });
+   return ({
+      firstname: forename,
+      surname: surname
+   });
 }
 
 
@@ -150,15 +150,15 @@ function readCompetitorName(nameElement: JQuery<HTMLElement>): FirstnameSurname 
 *     XML reading.
 */
 function validateData(xml: XMLDocument, reader: XMLReader) {
-    const rootElement = $("> *", xml);
-    const rootElementNodeName = rootElement.prop("tagName");
+   const rootElement = $("> *", xml);
+   const rootElementNodeName = rootElement.prop("tagName");
 
-    if (rootElementNodeName !== "ResultList") {
-        throw new WrongFileFormat("Root element of XML document does not have expected name 'ResultList', got '" +
-            rootElementNodeName + "'");
-    }
+   if (rootElementNodeName !== "ResultList") {
+      throw new WrongFileFormat("Root element of XML document does not have expected name 'ResultList', got '" +
+         rootElementNodeName + "'");
+   }
 
-    reader.checkVersion(rootElement);
+   reader.checkVersion(rootElement);
 }
 
 
@@ -173,76 +173,76 @@ function validateData(xml: XMLDocument, reader: XMLReader) {
 * @sb-return {Object?} Object containing the competitor data, or null if no
 *     competitor could be read.
 */
-function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader, warnings: Array<string>) {
-    const jqElement = $(element);
+function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader, warnings: string[]) {
+   const jqElement = $(element);
 
-    const nameElement = reader.getCompetitorNameElement(jqElement);
-    const name = readCompetitorName(nameElement);
+   const nameElement = reader.getCompetitorNameElement(jqElement);
+   const name = readCompetitorName(nameElement);
 
-    if ((name.surname === "") && (name.firstname === "")) {
-        warnings.push("Could not find a name for a competitor");
-        return null;
-    }
+   if ((name.surname === "") && (name.firstname === "")) {
+      warnings.push("Could not find a name for a competitor");
+      return null;
+   }
 
-    const club = reader.readClubName(jqElement);
+   const club = reader.readClubName(jqElement);
 
-    const dateOfBirth = reader.readDateOfBirth(jqElement);
-    const regexResult = yearRegexp.exec(dateOfBirth?.toString());
-    const yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
+   const dateOfBirth = reader.readDateOfBirth(jqElement);
+   const regexResult = yearRegexp.exec(dateOfBirth?.toString());
+   const yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
 
-    const gender = $("> Person", jqElement).attr("sex");
+   const gender = $("> Person", jqElement).attr("sex");
 
-    const resultElement = $("Result", jqElement);
-    if (resultElement.length === 0) {
-        warnings.push("Could not find any result information for competitor '" + name + "'");
-        return null;
-    }
+   const resultElement = $("Result", jqElement);
+   if (resultElement.length === 0) {
+      warnings.push("Could not find any result information for competitor '" + name + "'");
+      return null;
+   }
 
-    const startTime = reader.readStartTime(resultElement);
-    const totalTime = reader.readTotalTime(resultElement);
-    const ecard = reader.readECard(resultElement);
-    const route = reader.readRoute(resultElement);
+   const startTime = reader.readStartTime(resultElement);
+   const totalTime = reader.readTotalTime(resultElement);
+   const ecard = reader.readECard(resultElement);
+   const route = reader.readRoute(resultElement);
 
-    const splitTimes = $("> SplitTime", resultElement).toArray();
-    const splitData = splitTimes.filter((splitTime) => !reader.isAdditional($(splitTime)))
-        .map((splitTime) => reader.readSplitTime($(splitTime)));
+   const splitTimes = $("> SplitTime", resultElement).toArray();
+   const splitData = splitTimes.filter((splitTime) => !reader.isAdditional($(splitTime)))
+      .map((splitTime) => reader.readSplitTime($(splitTime)));
 
-    const controls = splitData.map((datum) => datum.code);
-    const cumTimes = splitData.map((datum) => datum.time);
+   const controls = splitData.map((datum) => datum.code);
+   const cumTimes = splitData.map((datum) => datum.time);
 
-    cumTimes.unshift(0); // Prepend a zero time for the start.
-    cumTimes.push(totalTime);
+   cumTimes.unshift(0); // Prepend a zero time for the start.
+   cumTimes.push(totalTime);
 
-    const competitor = Competitor.fromOriginalCumTimes(number, name, club, startTime, cumTimes, );
+   const competitor = Competitor.fromOriginalCumTimes(number, name, club, startTime, cumTimes,);
 
-    competitor.ecardId = ecard;
-    competitor.route = route;
+   competitor.ecardId = ecard;
+   competitor.route = route;
 
-    if (yearOfBirth !== null) {
-        competitor.setYearOfBirth(yearOfBirth);
-    }
+   if (yearOfBirth !== null) {
+      competitor.setYearOfBirth(yearOfBirth);
+   }
 
-    if (gender === "M" || gender === "F") {
-        competitor.setGender(gender);
-    }
+   if (gender === "M" || gender === "F") {
+      competitor.setGender(gender);
+   }
 
-    const status = reader.getStatus(resultElement);
-    if (status === reader.StatusNonCompetitive) {
-        competitor.setNonCompetitive();
-    } else if (status === reader.StatusNonStarter) {
-        competitor.setNonStarter();
-    } else if (status === reader.StatusNonFinisher) {
-        competitor.setNonFinisher();
-    } else if (status === reader.StatusDisqualified) {
-        competitor.disqualify();
-    } else if (status === reader.StatusOverMaxTime) {
-        competitor.setOverMaxTime();
-    }
+   const status = reader.getStatus(resultElement);
+   if (status === reader.StatusNonCompetitive) {
+      competitor.setNonCompetitive();
+   } else if (status === reader.StatusNonStarter) {
+      competitor.setNonStarter();
+   } else if (status === reader.StatusNonFinisher) {
+      competitor.setNonFinisher();
+   } else if (status === reader.StatusDisqualified) {
+      competitor.disqualify();
+   } else if (status === reader.StatusOverMaxTime) {
+      competitor.setOverMaxTime();
+   }
 
-    return {
-        competitor: competitor,
-        controls: controls
-    };
+   return {
+      competitor: competitor,
+      controls: controls
+   };
 }
 
 /**
@@ -254,83 +254,83 @@ function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader
 * @sb-return {Object} Object containing parsed data.    
 */
 function parseClassData(element: HTMLElement, reader: XMLReader, warnings: string[]) {
-    const jqElement = $(element);
-    const cls = { name: '', competitors: Array<Competitor>(), controls: Array<string>(), course: <CourseDeatils>null };
+   const jqElement = $(element);
+   const cls = { name: '', competitors: Array<Competitor>(), controls: Array<string>(), warnings: Array<string>(), course: <CourseDeatils>null };
 
-    cls.course = reader.readCourseFromClass(jqElement, warnings);
+   cls.course = reader.readCourseFromClass(jqElement, warnings);
 
-    let className = reader.readClassName(jqElement);
+   let className = reader.readClassName(jqElement);
 
-    if (className === "") {
-        className = "<unnamed class>";
-    }
+   if (className === "") {
+      className = "<unnamed class>";
+   }
 
-    cls.name = className;
+   cls.name = className;
 
-    const personResults = $("> PersonResult", jqElement);
-    if (personResults.length === 0) {
-        warnings.push("Class '" + className + "' has no competitors");
-        return null;
-    }
+   const personResults = $("> PersonResult", jqElement);
+   if (personResults.length === 0) {
+      warnings.push("Class '" + className + "' has no competitors");
+      return null;
+   }
 
-    for (let index = 0; index < personResults.length; index += 1) {
-        const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings);
-        if (competitorAndControls !== null) {
-            const competitor = competitorAndControls.competitor;
-            const controls = competitorAndControls.controls;
-            if (cls.competitors.length === 0) {
-                // First competitor.  Record the list of controls.
-                cls.controls = controls;
+   for (let index = 0; index < personResults.length; index += 1) {
+      const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings);
+      if (competitorAndControls !== null) {
+         const competitor = competitorAndControls.competitor;
+         const controls = competitorAndControls.controls;
+         if (cls.competitors.length === 0) {
+            // First competitor.  Record the list of controls.
+            cls.controls = controls;
 
-                // Set the number of controls on the course if we didn't read
-                // it from the XML.  Assume the first competitor's number of
-                // controls is correct.
-                if (cls.course.numberOfControls === null) {
-                    cls.course.numberOfControls = cls.controls.length;
-                }
+            // Set the number of controls on the course if we didn't read
+            // it from the XML.  Assume the first competitor's number of
+            // controls is correct.
+            if (cls.course.numberOfControls === null) {
+               cls.course.numberOfControls = cls.controls.length;
             }
+         }
 
-            // Subtract 2 for the start and finish cumulative times.
-            const actualControlCount = competitor.getAllOriginalCumulativeTimes().length - 2;
-            let warning = null;
-            if (actualControlCount !== cls.course.numberOfControls) {
-                // eslint-disable-next-line max-len
-                warning = "Competitor '" + competitor.name + "' in class '" + className + "' has an unexpected number of controls: expected "
-                    + cls.course.numberOfControls + ", actual " + actualControlCount;
-            } else {
-                for (let controlIndex = 0; controlIndex < actualControlCount; controlIndex += 1) {
-                    if (cls.controls[controlIndex] !== controls[controlIndex]) {
-                        warning = "Competitor '" + competitor.name + "' has an unexpected control code at control " +
-                            (controlIndex + 1) + ": expected '" + cls.controls[controlIndex] + "', actual '" + controls[controlIndex] + "'";
-                        break;
-                    }
-                }
+         // Subtract 2 for the start and finish cumulative times.
+         const actualControlCount = competitor.getAllOriginalCumulativeTimes().length - 2;
+         let warning = null;
+         if (actualControlCount !== cls.course.numberOfControls) {
+            // eslint-disable-next-line max-len
+            warning = "Competitor '" + competitor.name + "' in class '" + className + "' has an unexpected number of controls: expected "
+               + cls.course.numberOfControls + ", actual " + actualControlCount;
+         } else {
+            for (let controlIndex = 0; controlIndex < actualControlCount; controlIndex += 1) {
+               if (cls.controls[controlIndex] !== controls[controlIndex]) {
+                  warning = "Competitor '" + competitor.name + "' has an unexpected control code at control " +
+                     (controlIndex + 1) + ": expected '" + cls.controls[controlIndex] + "', actual '" + controls[controlIndex] + "'";
+                  break;
+               }
             }
+         }
 
-            if (warning === null) {
-                cls.competitors.push(competitor);
-            } else {
-                warnings.push(warning);
-            }
-        }
-    }
+         if (warning === null) {
+            cls.competitors.push(competitor);
+         } else {
+            warnings.push(warning);
+         }
+      }
+   }
 
-    if (cls.course.id === null && cls.controls.length > 0) {
-        // No course ID given, so join the controls together with commas
-        // and use that instead.  Course IDs are only used internally by
-        // this reader in order to merge classes, and the comma-separated
-        // list of controls ought to work as a substitute identifier in
-        // lieu of an 'official' course ID.
-        //
-        // This is intended mainly for IOF XML v2.0.3 files in particular
-        // as they tend not to have course IDs.  However, this can also be
-        // used with IOF XML v3.0 files that happen not to have course IDs.
-        //
-        // Idea thanks to 'dfgeorge' (David George?)
-        cls.course.id = cls.controls.join(",");
-    }
+   if (cls.course.id === null && cls.controls.length > 0) {
+      // No course ID given, so join the controls together with commas
+      // and use that instead.  Course IDs are only used internally by
+      // this reader in order to merge classes, and the comma-separated
+      // list of controls ought to work as a substitute identifier in
+      // lieu of an 'official' course ID.
+      //
+      // This is intended mainly for IOF XML v2.0.3 files in particular
+      // as they tend not to have course IDs.  However, this can also be
+      // used with IOF XML v3.0 files that happen not to have course IDs.
+      //
+      // Idea thanks to 'dfgeorge' (David George?)
+      cls.course.id = cls.controls.join(",");
+   }
 
-    return cls;
+   return cls;
 }
 
 /**
@@ -339,29 +339,27 @@ function parseClassData(element: HTMLElement, reader: XMLReader, warnings: strin
 * @sb-return {Object} XML reader used to read version-specific information.
 */
 function determineReader(data: string) {
-    for (let index = 0; index < ALL_READERS.length; index += 1) {
-        const reader = ALL_READERS[index];
-        if (reader.isOfThisVersion(data)) {
-            return reader;
-        }
-    }
+   for (const reader of ALL_READERS) {
+      if (reader.isOfThisVersion(data)) {
+         return reader;
+      }
+   }
 
-    throw new WrongFileFormat("Data apparently not of any recognised IOF XML format");
+   throw new WrongFileFormat("Data apparently not of any recognised IOF XML format");
 }
-function parseEventDetails(eventElement: JQuery<HTMLElement>): { eventName: string | undefined, eventDate: Date | undefined } {
-    let eventName: string | undefined;
-    let eventDate: Date | undefined;
+function parseEventDetails(eventElement: JQuery<HTMLElement>): { eventName: string | undefined, eventDate: Date | undefined; } {
+   let eventName: string | undefined;
+   let eventDate: Date | undefined;
 
-    const nameElement = $("Name", eventElement);
-    if (nameElement) {
-        eventName = nameElement.text()?.trim();
-    }
+   const nameElement = $("Name", eventElement);
+   if (nameElement) {
+      eventName = nameElement.text()?.trim();
+   }
 
-    const dateElement = $("StartTime > Date", eventElement);
-    if (dateElement) {
-        eventDate = new Date(dateElement.text().trim());
-    }
+   const dateElement = $("StartTime > Date", eventElement);
+   if (dateElement) {
+      eventDate = new Date(dateElement.text().trim());
+   }
 
-    return { eventName, eventDate };
+   return { eventName, eventDate };
 }
-

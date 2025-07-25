@@ -1,4 +1,4 @@
-<app-toolbar title="Results Admin">
+<app-toolbar [title]="title()">
   <mat-form-field appearance="outline" class="dense-form-field" subscriptSizing="dynamic">
     <mat-label>View</mat-label>
     <mat-select [value]="eventAdmin.filter()" (selectionChange)="viewChanged($event)">

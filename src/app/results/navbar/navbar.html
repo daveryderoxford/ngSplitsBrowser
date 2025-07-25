@@ -2,6 +2,8 @@
 
   <app-sidenav-button />
 
+  <ng-content select="[start]"></ng-content>
+
   <app-results-view-button [views]="views()" [selectedView]="pageState.pageDisplayed()" (viewSelected)="viewSelected($event)" />
   
   <ng-content></ng-content>
@@ -11,8 +13,6 @@
   <ng-content select="[end]"></ng-content>
   
   <app-results-search-button/>
-
-  <ng-content select="[settings]"></ng-content>
 
   <mat-icon class="results-navbar-icon">settings</mat-icon>
 

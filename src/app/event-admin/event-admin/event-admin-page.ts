@@ -1,4 +1,4 @@
-import { Component, inject, signal } from "@angular/core";
+import { Component, computed, inject, signal } from "@angular/core";
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { Toolbar } from 'app/shared/components/toolbar';
 import { OEvent } from "../../events/model/oevent";
@@ -44,6 +44,8 @@ export class EventAdminComponent {
     { type: 'invalid-splits', name: 'Failed uploads' },
     { type: 'all', name: 'All events' },
   ];
+
+  title = computed( () => (this.breakpoints.narrowScreen) ? 'Admin' : 'Event Admin');
 
   constructor() {
     this.eventAdmin.loadEvents('invalid-splits');

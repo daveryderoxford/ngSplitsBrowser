@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, viewChild } from '
 import { ChartConfiguration, ChartData, ChartEvent } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { Competitor } from '../model';
+import { FormatTimePipe } from "../model/results-pipes";
 
 type BarChartOptions = ChartConfiguration<'bar'>['options'];
 
@@ -9,18 +10,35 @@ type MixedChartData = ChartData<'bar'> | ChartData<'line'>;
 
 @Component({
    selector: 'app-summary-graph',
-   imports: [BaseChartDirective],
+   imports: [BaseChartDirective, FormatTimePipe],
    template: `
+      <div class=title>
+         @let comp = competitor();
+         <span>{{comp.name}}</span> 
+         <span>{{comp.club}}</span> 
+         <span>Total time: {{comp.totalTime | formatTime}}</span>
+      </div>
       <canvas
         baseChart
         [data]="barChartData()"
         [options]="barChartOptions()"
         type="bar"
         (chartClick)="chartClicked($event)"
-      >
-      </canvas>
+      ></canvas>
   `,
-   styles: ``,
+   styles: `
+   :host {
+      display: flex;
+      flex-direction: column;
+   }
+   .title {
+      display: flex;
+      gap: 20px;
+      font: var(--mat-sys-title-medium);
+      padding-top: 7px;
+      padding-left: 60px;
+   }
+   `,
    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SummaryGraph {

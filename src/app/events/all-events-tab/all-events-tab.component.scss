@@ -8,6 +8,10 @@
     background-color: var(--mat-sys-surface-container-low);
   }
 
+  mat-list {
+    width: minmax(0,500px);
+  }
+
   .filter {
     grid-area: filter;
   }

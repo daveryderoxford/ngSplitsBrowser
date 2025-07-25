@@ -159,7 +159,7 @@ function getSuffix(competitor: Competitor): string {
 * @sb-return {Number} Maximum non-null or NaN value.
 */
 function maxNonNullNorNaNValue(values: (number | null)[]): number {
-   const nonNullNorNaNValues: Array<number> = values.filter(isNotNullNorNaN);
+   const nonNullNorNaNValues: number[] = values.filter(isNotNullNorNaN);
    return (nonNullNorNaNValues.length > 0) ? d3_max(nonNullNorNaNValues) : 0;
 }
 /* 
@@ -302,7 +302,7 @@ export class Chart {
    * @sb-param {Object} chartType - The type of chart being drawn.
    */
    drawChart(data: ChartDisplayData,
-      selectedIndexes: Array<number>,
+      selectedIndexes: number[],
       visibleStatistics: StatsVisibilityFlags,
       chartType: ChartType,
    ) {
@@ -670,7 +670,7 @@ export class Chart {
    * @sb-return {Array} Array of times in seconds that the given competitors are
    *     behind the fastest time.
    */
-   private getTimesBehindFastest(controlIndex: number, indexes: Array<number>): Array<number | null> {
+   private getTimesBehindFastest(controlIndex: number, indexes: number[]): Array<number | null> {
       const selectedCompetitors = indexes.map(index => this.courseClassSet.allCompetitors[index]);
       const fastestSplit = this.fastestCumTimes[controlIndex] - this.fastestCumTimes[controlIndex - 1];
       const timesBehind = selectedCompetitors.map(comp => {
@@ -688,7 +688,7 @@ export class Chart {
    * @sb-return {Array} Array of times in seconds that the given competitors are
    *     deemed to have lost at the given control.
    */
-   private getTimeLosses(controlIndex: number, indexes: Array<number>): Array<number | null> {
+   private getTimeLosses(controlIndex: number, indexes: number[]): Array<number | null> {
       const selectedCompetitors = indexes.map(index => this.courseClassSet.allCompetitors[index]);
       const timeLosses = selectedCompetitors.map(comp => comp.getTimeLossAt(controlIndex));
       return timeLosses;
@@ -876,7 +876,7 @@ export class Chart {
       let minTimeLoss = 0;
       for (let controlIndex = 1; controlIndex <= this.numControls + 1; controlIndex += 1) {
          const timeLosses = this.getTimeLosses(controlIndex, this.selectedIndexes);
-         const nonNullTimeLosses: Array<number> = timeLosses.filter(isNotNullNorNaN);
+         const nonNullTimeLosses: number[] = timeLosses.filter(isNotNullNorNaN);
          if (nonNullTimeLosses.length > 0) {
             maxTimeLoss = Math.max(maxTimeLoss, d3_max(nonNullTimeLosses));
             minTimeLoss = Math.min(minTimeLoss, d3_min(nonNullTimeLosses));
@@ -1004,7 +1004,7 @@ export class Chart {
 
             const yScale = this.yScale;
             return (time, _) => {
-               const yarray: Array<number> = startTimes.map((startTime: number) => {
+               const yarray: number[] = startTimes.map((startTime: number) => {
                   return Math.abs(yScale(startTime) - yScale(time));
                });
                const nearestOffset = d3_min(yarray);

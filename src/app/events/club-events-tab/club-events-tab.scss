@@ -12,6 +12,7 @@
    align-items:center;
    height: 60px;
    padding-left: 10px;
+   padding-top: 5px;
 }
 
 .data-container {
@@ -24,4 +25,12 @@
    box-sizing: border-box;
    flex-grow: 1;
    overflow: scroll;
+}
+
+.nationality-filter {
+   width: 150px;
+}
+
+.name-filter {
+   width: 100px;
 }

@@ -14,7 +14,7 @@ export class Lang {
     private static currentLanguage = "en_gb";
 
     // The list of all languages read in, or null if none.
-    private static allLanguages = null;
+    private static allLanguages: string[] = [];
 
     // Default alerter function, just calls window.alert.
     private static alertFunc = function (message) { window.alert(message); };
@@ -113,7 +113,7 @@ export class Lang {
     * Returns an array of codes of languages that have been loaded.
     * @sb-return {Array} Array of language codes.
     */
-    public static getAllLanguages(): Array<string> {
+    public static getAllLanguages(): string[] {
         return Lang.allLanguages.slice(0);
     }
 
@@ -155,7 +155,7 @@ export class Lang {
     */
     public static initialiseMessages(defaultLanguage?: string) {
 
-        this.allLanguages = [] as Array<string>;
+        this.allLanguages = [];
 
         for (const messageKey in messages) {
             if (messages.hasOwnProperty(messageKey)) {

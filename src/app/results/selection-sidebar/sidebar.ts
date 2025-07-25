@@ -9,12 +9,10 @@ import { ResultsSelectionService } from '../results-selection.service';
 import { ClassList } from './class-list/class-list';
 import { CompetitorList } from './competitor-list/competitor-list';
 import { SelectionSidebarService } from './selection-sidebar.service';
-import { EventTitle } from '../navbar/event-title';
-import { SelectionSidebarButton } from "./selection-sidebar-button";
 
 @Component({
   selector: 'apps-selection-sidebar',
-  imports: [MatTabsModule, MatIconModule, MatButtonModule, CompetitorList, ClassList, EventTitle, SelectionSidebarButton],
+  imports: [MatTabsModule, MatIconModule, MatButtonModule, CompetitorList, ClassList],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
   host: {

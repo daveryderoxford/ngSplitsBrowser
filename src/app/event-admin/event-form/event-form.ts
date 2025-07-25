@@ -70,8 +70,7 @@ export class EventDetailsForm  {
 
    clubFormValue = toSignal(this.form.controls.club.valueChanges, {initialValue: ''});
    natFormValue = toSignal(this.form.controls.nationality.valueChanges, {initialValue: ''});
-   allClubs = toSignal(this.es.getClubs(), {initialValue: []});
-   filteredClubs = computed(() => filterClubs(this.allClubs(), this.clubFormValue(), this.natFormValue()));
+   filteredClubs = computed(() => filterClubs(this.es.clubs(), this.clubFormValue(), this.natFormValue()));
 
    constructor() {
       effect(() => {

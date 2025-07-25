@@ -37,10 +37,10 @@ export class Course {
    */
    // eslint-disable-next-line @typescript-eslint/no-shadow
    constructor(public name: string,
-      public classes: Array<CourseClass>,
+      public classes: CourseClass[],
       public length?: number,
       public climb?: number,
-      public controls?: Array<string>) {
+      public controls?: string[]) {
 
       // Create back link to the course in classes
       for (const courseClass of classes) {
@@ -54,7 +54,7 @@ export class Course {
    *    that should be on this course.
    * @sb-return {Array} Array of other course-classes.
    */
-   public getOtherClasses(courseClass: CourseClass): Array<CourseClass> {
+   public getOtherClasses(courseClass: CourseClass): CourseClass[] {
       const otherClasses = this.classes.filter( (cls) => cls !== courseClass);
       if (otherClasses.length === this.classes.length) {
          // Given class not found.
@@ -208,7 +208,7 @@ export class Course {
    * @sb-return {Array} Array of fastest splits for each course-class using this
    *      course.
    */
-   public getFastestSplitsForLeg(startCode: string, endCode: string): Array<FastestSplitData> {
+   public getFastestSplitsForLeg(startCode: string, endCode: string): FastestSplitData[] {
 
       const legNumber = this.getLegNumber(startCode, endCode);
       if (legNumber < 0) {
@@ -217,7 +217,7 @@ export class Course {
       }
 
       const controlNum = legNumber;
-      const fastestSplits: Array<FastestSplitData> = [];
+      const fastestSplits: FastestSplitData[] = [];
       this.classes.forEach((courseClass) => {
          const classFastest = courseClass.getFastestSplitTo(controlNum);
          if (classFastest !== null) {
@@ -245,7 +245,7 @@ export class Course {
    * @sb-return  {Array} Array of all competitors visiting the given control
    *     within the given time interval.
    */
-   public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): Array<CompetitorSummaryDetails> {
+   public getCompetitorsAtControlInTimeRange(controlCode: string, intervalStart: sbTime, intervalEnd: sbTime): CompetitorSummaryDetails[] {
       if (!this.controls) {
          // No controls means don't return any competitors.
          return [];
@@ -276,8 +276,8 @@ export class Course {
    * @sb-return  {Array} Array of all competitors visiting the given control
    *     within the given time interval.
    */
-   public getCompetitorsAtControlNumInTimeRange(controlNum: number, intervalStart: sbTime, intervalEnd: sbTime): Array<CompetitorSummaryDetails> {
-      const matchingCompetitors: Array<CompetitorSummaryDetails> = [];
+   public getCompetitorsAtControlNumInTimeRange(controlNum: number, intervalStart: sbTime, intervalEnd: sbTime): CompetitorSummaryDetails[] {
+      const matchingCompetitors: CompetitorSummaryDetails[] = [];
       this.classes.forEach((courseClass) => {
          courseClass.getCompetitorsAtControlInTimeRange(controlNum, intervalStart, intervalEnd).forEach((comp) => {
             matchingCompetitors.push({ name: comp.name, time: comp.time, className: courseClass.name });

@@ -6,6 +6,10 @@
    } @else {
 
    <app-results-navbar>
+
+      <div start>
+         <app-selection-sidebar-button />
+      </div>
    
       <app-compare-with [(selected)]="comparisonOptions" />
       @if (comparisonOptions().nameKey === 'CompareWithAnyRunner') {

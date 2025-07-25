@@ -1,7 +1,7 @@
 
 // Results imnput parser.
 
-import { Results } from "../model";
+import { Results, WrongFileFormat } from "../model";
 import { parseTripleColumnEventData } from "./alternative-cvs-reader";
 import { parseCSVEventData } from "./cvs-reader";
 import { parseHTMLEventData } from "./html-reader";
@@ -22,11 +22,11 @@ const PARSERS = [
 * supported formats, or may be invalid.  This function returns the results
 * as an Event object if successful, or null in the event of failure.
 * @sb-param {String} data - The data read.
-* @sb-return {OEvent} Event data read in, or null for failure.
+* @sb-return {OEvent} Results data read in.   
+* Throws WrongFileFormat exception if the file format was not recogmised 
 */
-export function parseEventData(data: string): Results | null {
-    for (let i = 0; i < PARSERS.length; i += 1) {
-        const parser = PARSERS[i];
+export function parseEventData(data: string): Results {
+    for (const parser of PARSERS) {
         try {
             return parser(data);
         } catch (e) {
@@ -36,6 +36,5 @@ export function parseEventData(data: string): Results | null {
         }
     }
 
-    // If we get here, none of the parsers succeeded.
-    return null;
+    throw new WrongFileFormat("File format not recognised");
 }

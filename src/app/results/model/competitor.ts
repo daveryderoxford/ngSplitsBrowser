@@ -39,7 +39,7 @@ function subtractIfNotNull(a: number | null, b: number | null) {
 * @sb-param {Array} cumTimes - Array of cumulative split times.
 * @sb-return {Array} Corresponding array of split times.
 */
-function splitTimesFromCumTimes(cumTimes: Array<number>): Array<number> {
+function splitTimesFromCumTimes(cumTimes: number[]): number[] {
     if (!Array.isArray(cumTimes)) {
         throw new TypeError("Cumulative times must be an array - got " + typeof cumTimes + " instead");
     } else if (cumTimes.length === 0) {
@@ -95,11 +95,11 @@ export class Competitor {
     route: string | null = null;
     nationalID: string | null = null;
 
-    splitTimes: Array<sbTime> | null = null;
-    cumTimes: Array<sbTime> | null = null;
-    splitRanks: Array<sbTime> | null = null;
-    cumRanks: Array<sbTime> | null = null;
-    timeLosses: Array<sbTime> | null = null;
+    splitTimes: sbTime[]| null = null;
+    cumTimes: sbTime[]| null = null;
+    splitRanks: sbTime[]| null = null;
+    cumRanks: sbTime[]| null = null;
+    timeLosses: sbTime[]| null = null;
     totalTime: sbTime = 0;
     color?: string;
 
@@ -130,7 +130,7 @@ export class Competitor {
         name: string | FirstnameSurname,
         club: string,
         startTime: sbTime,
-        cumTimes: Array<sbTime>): Competitor {
+        cumTimes: sbTime[]): Competitor {
         const splitTimes = splitTimesFromCumTimes(cumTimes);
         return new Competitor(order, name, club, startTime, splitTimes, cumTimes);
     }
@@ -159,7 +159,7 @@ export class Competitor {
         name: string | FirstnameSurname,
         club: string,
         startTime: sbTime,
-        cumTimes: Array<sbTime>): Competitor {
+        cumTimes: sbTime[]): Competitor {
         const competitor = Competitor.fromOriginalCumTimes(order, name, club, startTime, cumTimes);
         competitor.splitTimes = competitor.originalSplitTimes;
         competitor.cumTimes = competitor.originalCumTimes;
@@ -198,8 +198,8 @@ export class Competitor {
         name: string | FirstnameSurname,
         public club: string,
         public startTime: number,
-        public originalSplitTimes: Array<sbTime>,
-        public originalCumTimes: Array<sbTime>) {
+        public originalSplitTimes: sbTime[],
+        public originalCumTimes: sbTime[]) {
 
         if (typeof name === "string") {
             // If a single name is provided split the last word as surname and rest as firstname
@@ -303,7 +303,7 @@ export class Competitor {
     * calculates the repaired split times.
     * @sb-param {Array} cumTimes - The 'repaired' cumulative times.
     */
-    public setRepairedCumulativeTimes(cumTimes: Array<sbTime>) {
+    public setRepairedCumulativeTimes(cumTimes: sbTime[]) {
         this.cumTimes = cumTimes;
         this.splitTimes = splitTimesFromCumTimes(cumTimes);
     }
@@ -449,7 +449,7 @@ export class Competitor {
     * Returns all of the competitor's cumulative time splits.
     * @sb-return {Array} The cumulative split times in seconds for the competitor.
     */
-    public getAllCumulativeTimes(): Array<sbTime> {
+    public getAllCumulativeTimes(): sbTime[]{
         return this.cumTimes;
     }
 
@@ -457,7 +457,7 @@ export class Competitor {
     * Returns all of the competitor's cumulative time splits.
     * @sb-return {Array} The cumulative split times in seconds for the competitor.
     */
-    public getAllOriginalCumulativeTimes(): Array<sbTime> {
+    public getAllOriginalCumulativeTimes(): sbTime[]{
         return this.originalCumTimes;
     }
 
@@ -481,7 +481,7 @@ export class Competitor {
     * @sb-param {Array} splitRanks - Array of split ranks for this competitor.
     * @sb-param {Array} cumRanks - Array of cumulative-split ranks for this competitor.
     */
-    public setSplitAndCumulativeRanks(splitRanks: Array<sbTime>, cumRanks: Array<number>) {
+    public setSplitAndCumulativeRanks(splitRanks: sbTime[], cumRanks: number[]) {
         this.splitRanks = splitRanks;
         this.cumRanks = cumRanks;
     }
@@ -491,7 +491,7 @@ export class Competitor {
     * @sb-param {Array} referenceCumTimes - The reference cumulative-split-time data to adjust by.
     * @sb-return {Array} The array of adjusted data.
     */
-    public getCumTimesAdjustedToReference(referenceCumTimes: Array<sbTime>): Array<sbTime> {
+    public getCumTimesAdjustedToReference(referenceCumTimes: sbTime[]): sbTime[]{
         if (referenceCumTimes.length !== this.cumTimes.length) {
             // eslint-disable-next-line max-len
             throw new InvalidData("Cannot adjust competitor times because the numbers of times are different (" + this.cumTimes.length + " and " + referenceCumTimes.length + ")");
@@ -519,7 +519,7 @@ export class Competitor {
     * @sb-param {Array} referenceCumTimes - The reference cumulative-split-time data to adjust by.
     * @sb-return {Array} The array of adjusted data.
     */
-    public getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes: Array<sbTime>): Array<sbTime> {
+    public getCumTimesAdjustedToReferenceWithStartAdded(referenceCumTimes: sbTime[]): sbTime[]{
         const adjustedTimes = this.getCumTimesAdjustedToReference(referenceCumTimes);
         const startTime = this.startTime;
         return adjustedTimes.map((adjTime) => this._addIfNotNull(adjTime, startTime));
@@ -531,7 +531,7 @@ export class Competitor {
     * @sb-param {Array} referenceCumTimes - The reference cumulative split times
     * @sb-return {Array} The array of percentages.
     */
-    public getSplitPercentsBehindReferenceCumTimes(referenceCumTimes: Array<sbTime>): Array<sbTime> {
+    public getSplitPercentsBehindReferenceCumTimes(referenceCumTimes: sbTime[]): sbTime[]{
         if (referenceCumTimes.length !== this.cumTimes.length) {
             // eslint-disable-next-line max-len
             throw new InvalidData("Cannot determine percentages-behind because the numbers of times are different (" + this.cumTimes.length + " and " + referenceCumTimes.length + ")");
@@ -560,7 +560,7 @@ export class Competitor {
     * Determines the time losses for this competitor.
     * @sb-param {Array} fastestSplitTimes - Array of fastest split times.
     */
-    public determineTimeLosses(fastestSplitTimes: Array<sbTime>): void {
+    public determineTimeLosses(fastestSplitTimes: sbTime[]): void {
         if (this.completed()) {
             if (fastestSplitTimes.length !== this.splitTimes.length) {
                 // eslint-disable-next-line max-len
@@ -645,8 +645,8 @@ export class Competitor {
     * @sb-param {Array} times - Array of time values.
     * @sb-return {Array} Array of objects that record indexes around dubious times.
     */
-    private getIndexesAroundDubiousTimes(times: Array<sbTime>): Array<DubiousTimeInfo> {
-        const dubiousTimeInfo = [] as Array<DubiousTimeInfo>;
+    private getIndexesAroundDubiousTimes(times: sbTime[]): DubiousTimeInfo[] {
+        const dubiousTimeInfo = [] as DubiousTimeInfo[];
         let startIndex = 1;
         while (startIndex + 1 < times.length) {
             if (isNaNStrict(times[startIndex])) {
@@ -675,7 +675,7 @@ export class Competitor {
     * @sb-return {Array} Array of objects that detail the start and end indexes
     *     around dubious cumulative times.
     */
-    public getControlIndexesAroundDubiousCumulativeTimes(): Array<DubiousTimeInfo> {
+    public getControlIndexesAroundDubiousCumulativeTimes(): DubiousTimeInfo[] {
         return this.getIndexesAroundDubiousTimes(this.cumTimes);
     }
 
@@ -685,7 +685,7 @@ export class Competitor {
     * @sb-return {Array} Array of objects that detail the start and end indexes
     *     around dubious cumulative times.
     */
-    public getControlIndexesAroundDubiousSplitTimes(): Array<DubiousTimeInfo> {
+    public getControlIndexesAroundDubiousSplitTimes(): DubiousTimeInfo[] {
         return this.getIndexesAroundDubiousTimes([0].concat(this.splitTimes));
     }
 

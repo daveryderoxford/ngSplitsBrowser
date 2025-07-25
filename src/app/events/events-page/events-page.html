@@ -12,7 +12,7 @@
   <mat-tab #tabClub label="Club">
     <ng-template matTabContent>
       @defer {
-       <app-club-events-tab (eventSelected)="eventClicked($event)" />
+        <app-club-events-tab (eventSelected)="eventClicked($event)" />
       } @loading {
         ...Loading
       } @error {

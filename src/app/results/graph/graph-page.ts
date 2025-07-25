@@ -16,6 +16,7 @@ import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
 import { ALL_COMPARISON_OPTIONS } from './splitsbrowser/comparision-options';
+import { SelectionSidebarButton } from "../selection-sidebar/selection-sidebar-button";
 
 interface SplitsBrowserOptions {
    defaultLanguage?: boolean;
@@ -31,8 +32,8 @@ interface SplitsBrowserOptions {
    // These styles will just get appended to the global styles file
    encapsulation: ViewEncapsulation.None,
    changeDetection: ChangeDetectionStrategy.OnPush,
-   imports: [Navbar, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect, 
-       ResultsLoading, ResultsError]
+   imports: [Navbar, CompareWithSelect, LabelFlagSelect, Sidebar, CompareWithCompetitorSelect,
+    ResultsLoading, ResultsError, SelectionSidebarButton]
 })
 export class GraphPage {
    destroyRef = inject(DestroyRef);

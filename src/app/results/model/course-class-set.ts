@@ -25,7 +25,7 @@ export interface FatestSplitsData {
 }
 
 export class CourseClassSet {
-   allCompetitors: Array<Competitor>;
+   allCompetitors: Competitor[];
    numControls: number;
 
    /**
@@ -92,7 +92,7 @@ export class CourseClassSet {
    * classes.  If any cumulatve time is missing then it is linearly interpolated.
    * @sb-return {Array} Array of the winner's cumulative times.
    */
-   public getWinnerCumTimes(): Array<sbTime> {
+   public getWinnerCumTimes(): sbTime[] {
       if (this.allCompetitors.length === 0) {
          return null;
       }
@@ -109,7 +109,7 @@ export class CourseClassSet {
    * @sb-returns {?Array} Cumulative splits of the imaginary competitor with
    *           fastest time, if any.
    */
-   public getFastestCumTimes(): Array<number> | null {
+   public getFastestCumTimes(): number[] | null {
       return this.getFastestCumTimesPlusPercentage(0);
    }
 
@@ -122,7 +122,7 @@ export class CourseClassSet {
    * @sb-returns {?Array} Cumulative splits of the imaginary competitor with
    *           fastest time, if any, after adding a percentage.
    */
-   public getFastestCumTimesPlusPercentage(percent: number): Array<sbTime> | null {
+   public getFastestCumTimesPlusPercentage(percent: number): sbTime[] | null {
       if (this.numControls === null) {
          return null;
       }
@@ -226,7 +226,7 @@ export class CourseClassSet {
    * @sb-param {Number} competitorIndex - The index of the competitor.
    * @sb-return {Array} Array of cumulative times.
    */
-   public getCumulativeTimesForCompetitor(competitorIndex: number): Array<sbTime> {
+   public getCumulativeTimesForCompetitor(competitorIndex: number): sbTime[] {
       return this.fillBlankRangesInCumulativeTimes(this.allCompetitors[competitorIndex].getAllCumulativeTimes());
    }
 
@@ -297,7 +297,7 @@ export class CourseClassSet {
    * @sb-param {Number} controlIdx - Index of the control.
    * @sb-return {Array} Array of the fastest splits to the given control.
    */
-   public getFastestSplitsForControl(numSplits: number, controlIdx: number): Array<FatestSplitsData> {
+   public getFastestSplitsForControl(numSplits: number, controlIdx: number): FatestSplitsData[] {
       if (typeof numSplits !== "number" || numSplits <= 0) {
          throw new InvalidData("The number of splits must be a positive integer");
       } else if (typeof controlIdx !== "number" || controlIdx <= 0 || controlIdx > this.numControls + 1) {
@@ -333,7 +333,7 @@ export class CourseClassSet {
    * @sb-param {Object} chartType - The type of chart to draw.
    * @sb-returns {Object} Array of data.
    */
-   public getChartData(referenceCumTimes: Array<number>, currentIndexes: Array<number>, chartType: ChartType): ChartData {
+   public getChartData(referenceCumTimes: number[], currentIndexes: number[], chartType: ChartType): ChartData {
       if (typeof referenceCumTimes === "undefined") {
          throw new TypeError("referenceCumTimes undefined or missing");
       } else if (typeof currentIndexes === "undefined") {
@@ -406,7 +406,7 @@ export class CourseClassSet {
 * @sb-param {Array} classes - Array of CourseClass objects.
 * @sb-return {Array} Merged array of competitors.
 */
-   private mergeCompetitors(classes: Array<CourseClass>): Competitor[] {
+   private mergeCompetitors(classes: CourseClass[]): Competitor[] {
       if (!classes || classes.length === 0) {
          return [];
       }
@@ -435,7 +435,7 @@ export class CourseClassSet {
    * @sb-param {Array} sourceData - Array of number values.
    * @sb-returns Array of corresponding ranks.
    */
-   private getRanks(sourceData: Array<number>): Array<number> {
+   private getRanks(sourceData: number[]): number[] {
       // First, sort the source data, removing nulls.
       const sortedData = sourceData.filter(isNotNullNorNaN);
       sortedData.sort(d3_ascending);
@@ -465,7 +465,7 @@ export class CourseClassSet {
   * @sb-return {Array} Array of objects that describes when the given array has
   *    ranges of null and/or NaN values.
   */
-   private getBlankRanges(times: Array<sbTime>, includeEnd: boolean): { start: number, end: number }[] {
+   private getBlankRanges(times: sbTime[], includeEnd: boolean): { start: number, end: number }[] {
       const blankRangeInfo = [];
       let startIndex = 1;
       while (startIndex + 1 < times.length) {
@@ -494,7 +494,7 @@ export class CourseClassSet {
    * @sb-param {Array} cumTimes - Array of cumulative times.
    * @sb-return {Array} Array of cumulative times with NaNs replaced.
    */
-   private fillBlankRangesInCumulativeTimes(cumTimes: Array<sbTime>): Array<number> {
+   private fillBlankRangesInCumulativeTimes(cumTimes: sbTime[]): number[] {
       cumTimes = cumTimes.slice(0);
       const blankRanges = this.getBlankRanges(cumTimes, false);
       for (let rangeIndex = 0; rangeIndex < blankRanges.length; rangeIndex += 1) {

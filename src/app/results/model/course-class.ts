@@ -27,7 +27,7 @@ export class CourseClass {
      */
     constructor(public name: string,
         public numControls: number,
-        public competitors: Array<Competitor>) {
+        public competitors: Competitor[]) {
 
         this.competitors.forEach((comp) => {
             comp.setClass(this);

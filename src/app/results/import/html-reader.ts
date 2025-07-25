@@ -42,7 +42,7 @@ function hasNumber(string: string | null ): boolean {
 * @sb-param {String} line - The line to split.
 * @sb-return {Array} Array of whitespace-separated strings.
 */
-function splitByWhitespace(line: string): Array<string> {
+function splitByWhitespace(line: string): string[] {
     return line.split(/\s+/g).filter(isNonEmpty);
 }
 
@@ -67,7 +67,7 @@ function stripHtml(text: string): string {
 * @sb-return {Array} Array of strings representing the HTML-stripped regexp
 *     matches.
 */
-function getHtmlStrippedRegexMatches(regexp: RegExp, text: string): Array<string> {
+function getHtmlStrippedRegexMatches(regexp: RegExp, text: string): string[] {
     const matches = [];
     let match;
     while (true) {
@@ -225,7 +225,7 @@ class CompetitorParseRecord {
         public club: string,
         public className: string,
         public totalTimeStr: string | null,
-        public cumTimes: Array<sbTime>,
+        public cumTimes: sbTime[],
         public competitive: boolean) {}
 
     /**

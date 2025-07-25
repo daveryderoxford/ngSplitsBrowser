@@ -26,7 +26,7 @@
 import { } from "jasmine";
 
 import { parseIOFXMLEventData } from "./iof-xml-reader";
-import { TimeUtilities, Competitor } from "../model";
+import { TimeUtilities, Competitor, CourseClass } from "../model";
 import { TestSupport } from "../test-support.spec";
 
 const formatTime = TimeUtilities.formatTime;
@@ -503,7 +503,7 @@ describe("Input.IOFXml", () => {
     * @param {Object} options - Options object, the contents of which are
     *     described above.
     */
-    function runXmlFormatParseTest(classes: Array<any>, checkFunc, options?: any) {
+    function runXmlFormatParseTest(classes: CourseClass[], checkFunc, options?: any) {
         const formatters = (options && options.formatters) || ALL_FORMATTERS;
         formatters.forEach(function (formatter) {
             let xml = getXmlFromFormatter(formatter, classes);
@@ -579,7 +579,7 @@ describe("Input.IOFXml", () => {
     * @param {Object} options - Options object, the contents of which are
     *     described above.
     */
-    function runFailingXmlFormatParseTest(classes: Array<any>, options?: any) {
+    function runFailingXmlFormatParseTest(classes: CourseClass[], options?: any) {
         const formatters = (options && options.formatters) || ALL_FORMATTERS;
         formatters.forEach(function (formatter) {
             let xml = getXmlFromFormatter(formatter, classes);
