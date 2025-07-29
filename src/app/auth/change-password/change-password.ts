@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Auth, updatePassword } from '@angular/fire/auth';
-import { FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,8 +15,10 @@ import { getFirebaseErrorMessage } from '../firebase-error-messages';
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.html',
+
   styleUrls: ['./change-password.scss'],
-  imports: [FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, Toolbar]
+  imports: [FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, Toolbar],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChangePassword {
   private router = inject(Router);
@@ -27,42 +29,50 @@ export class ChangePassword {
   form = this.formBuilder.group({
     password: ['', [Validators.required, Validators.minLength(6)]],
     confirmPassword: ['', [Validators.required]],
-  }, { validator: this.passwordMissMatch });
+  }, { validators: this.passwordMissMatch });
 
-  passwordMissMatch(g: FormGroup): ValidationErrors | null {
-    const p1 = g.get('password')!;
-    const p2 = g.get('confirmPassword')!;
-    let ret: ValidationErrors = {};
+  passwordMissMatch(control: AbstractControl): ValidationErrors | null {
+    const password = control.get('password');
+    const confirmPassword = control.get('confirmPassword');
 
-    if ((p1.touched || p2.touched) &&
-      (p1.value !== p2.value) &&
-      (p2 !== null)) {
-      ret = { passwordMissMatch: true };
+    if (password?.value !== confirmPassword?.value && 
+       (password?.touched || confirmPassword?.touched)) {
+      return { passwordMissMatch: true };
     }
 
-    return (ret);
+    return null;
   }
 
   async changePassword() {
+    if (this.form.invalid) {
+      return;
+    }
 
-    const user = await this.afAuth.currentUser!;
+    const user = this.afAuth.currentUser;
+    if (!user) {
+      console.error('ChangePassword: User is not authenticated.');
+      this.snackBar.open('You must be logged in to change your password.', 'Close', { duration: 3000 });
+      return;
+    }
+
     const password = this.form.get('password')!.value;
 
     try {
       await updatePassword(user, password);
+      this.snackBar.open('Password updated successfully!', 'Close', { duration: 3000 });
       this.router.navigateByUrl('/');
-
     } catch (e: unknown) {
-      let msg = 'Unexpected error updating passowrd. Please try again.';
+      let msg = 'Unexpected error updating password. Please try again.';
       if (e instanceof FirebaseError) {
         msg = getFirebaseErrorMessage(e);
-        console.log(`SignupComponent: Error updating password  Error code: ${e.code} msg: ${msg}`);
+        console.error(`ChangePassword: Error updating password. Error code: ${e.code}`, e);
       } else if (e instanceof Error) {
-        console.log('SignupComponent: Error updating password:' + msg);
+        msg = e.message;
+        console.error(`ChangePassword: Error updating password:`, e);
       } else {
-        console.log('SignupComponent: Unexpected error updating password');
+        console.error('ChangePassword: Unexpected error updating password', e);
       }
-      this.snackBar.open('Error updating password', 'Close', { duration: 3000 });
+      this.snackBar.open(msg, 'Close', { duration: 5000 });
     }
   }
 }

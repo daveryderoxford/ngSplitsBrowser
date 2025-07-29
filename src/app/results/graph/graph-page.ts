@@ -60,8 +60,6 @@ export class GraphPage {
       timeLoss: true
    });
 
-   queryParams = toSignal(this.activeRoute.queryParams);
-
    // Determine view from URL path
    url = toSignal(this.activeRoute.url);
    view = computed(() =>
@@ -110,7 +108,7 @@ export class GraphPage {
    chartData = computed<ChartDisplayData>(() => {
 
       return {
-         eventData: this.rd.results(),
+         results: this.rd.results(),
          courseClassSet: this.courseClassSet(),
          referenceCumTimes: this.referenceCumTimes(),
          fastestCumTimes: this.courseClassSet().getFastestCumTimes(),

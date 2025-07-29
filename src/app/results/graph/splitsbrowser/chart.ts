@@ -1,8 +1,8 @@
-import { ascending as d3_ascending, bisect as d3_bisect, max as d3_max, min as d3_min, range as d3_range, zip as d3_zip } from "d3-array";
-import { axisBottom as d3_axisBottom, axisLeft as d3_axisLeft, axisTop as d3_axisTop } from "d3-axis";
-import { scaleLinear as d3_scaleLinear, ScaleLinear as d3_ScaleLinear } from "d3-scale";
-import { select as d3_select, selectAll as d3_selectAll, Selection, pointer as d3_pointer } from "d3-selection";
-import { line as d3_line } from "d3-shape";
+import { ascending, bisect, max as d3_max, min as d3_min, range, zip } from "d3-array";
+import { axisBottom, axisLeft, axisTop } from "d3-axis";
+import { scaleLinear, ScaleLinear } from "d3-scale";
+import { select as d3_select, selectAll as d3_selectAll, Selection, pointer } from "d3-selection";
+import { line } from "d3-shape";
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/results_util";
 import { ChartPopup } from "./chart-popup";
@@ -12,24 +12,24 @@ import { FastestSplitsPopupData, NextControlData, SplitsPopupData } from "./spli
 
 export interface ChartDisplayData {
    chartData: ChartData;
-   eventData: Results;
+   results: Results;
    courseClassSet: CourseClassSet;
    referenceCumTimes: sbTime[];
    fastestCumTimes: sbTime[];
 }
 
 export interface ChartData {
-   dataColumns: DataColumn[];
+   dataColumns: Cordinates[];
    competitorNames: string[];
    numControls: number;
    xExtent: number[];
    yExtent: number[];
    dubiousTimesInfo: { start: number, end: number }[][];
 }
-
-export interface DataColumn {
+/** Times for competitor in actual time  */
+export interface Cordinates {
    x: number;
-   ys: number[];
+   ys: number[];  
 }
 
 export interface StatsVisibilityFlags {
@@ -175,12 +175,12 @@ function maxNonNullNorNaNValue(values: (number | null)[]): number {
 }) */
 export class Chart {
    private parent: HTMLElement;
-   private svg: any; // D3 typing is a nightmare so we use 'any' here.
+   private svg: any; // D3 typing of seelction elements is a nightmare so we use 'any' here.
    private svgGroup: any;
    private textSizeElement: Selection<any, {}, null, undefined>;
 
-   private xScale: d3_ScaleLinear<number, number> = null;
-   private yScale: d3_ScaleLinear<number, number> = null;
+   private xScale: ScaleLinear<number, number> = null;
+   private yScale: ScaleLinear<number, number> = null;
    private overallWidth = -1;
    private overallHeight = -1;
    private contentWidth = -1;
@@ -232,7 +232,7 @@ export class Chart {
    private minViewableControl: number;
    private visibleStatistics: StatsVisibilityFlags;
    private currentLeftMargin: number;
-   private xScaleMinutes: d3_ScaleLinear<number, number>;
+   private xScaleMinutes: ScaleLinear<number, number>;
 
    // Event handlers
    selectedLegUpdated: (number: number) => void;
@@ -314,7 +314,7 @@ export class Chart {
       this.selectedIndexes = selectedIndexes;
       this.referenceCumTimes = data.referenceCumTimes;
       this.fastestCumTimes = data.fastestCumTimes;
-      this.eventData = data.eventData;
+      this.eventData = data.results;
       this.courseClassSet = data.courseClassSet;
       this.hasControls = data.courseClassSet.getCourse().hasControls();
       this.isRaceGraph = chartType.isRaceGraph;
@@ -409,7 +409,7 @@ export class Chart {
       const svgNode = this.svg.node() as SVGSVGElement;
       const svgRect = svgNode.getBoundingClientRect();
       const yOffset = event.pageY - (svgRect.top + window.scrollY) - MARGIN.top;
-      const [_, Y2] = d3_pointer(event, svgNode);
+      const [_, Y2] = pointer(event, svgNode);
       console.log(`Y2: ${Y2}, yOffset: ${yOffset} MARGIN.top: ${MARGIN.top}`);
       this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
 
@@ -549,7 +549,7 @@ export class Chart {
    * @sb-param {MouseEvent} event - Standard mouse-move event.
    */
    private updatePopupContents(event: MouseEvent) {
-      const [_, yInSvg] = d3_pointer(event, this.svg.node());
+      const [_, yInSvg] = pointer(event, this.svg.node());
       const showNextControls = this.hasControls && yInSvg < MARGIN.top;
       if (showNextControls) {
          this.updateNextControlInformation();
@@ -602,7 +602,7 @@ export class Chart {
          // In the chart.
          // Get the time offset that the mouse is currently over.
          const chartX = this.xScale.invert(xOffsetInSvg - this.currentLeftMargin);
-         const bisectIndex = d3_bisect(this.referenceCumTimesSorted, chartX);
+         const bisectIndex = bisect(this.referenceCumTimesSorted, chartX);
 
          // bisectIndex is the index at which to insert chartX into
          // referenceCumTimes in order to keep the array sorted.  So if
@@ -705,27 +705,27 @@ export class Chart {
          if (this.visibleStatistics.totalTime) {
             const cumTimes = selectedCompetitors.map(comp => comp.getCumulativeTimeTo(this.currentControlIndex));
             const cumRanks = selectedCompetitors.map(comp => comp.getCumulativeRankTo(this.currentControlIndex));
-            labelTexts = d3_zip<number | string>(labelTexts, cumTimes, cumRanks)
+            labelTexts = zip<number | string>(labelTexts, cumTimes, cumRanks)
                .map(triple => triple[0] + formatTimeAndRank(triple[1] as number, triple[2] as number));
          }
 
          if (this.visibleStatistics.splitTime) {
             const splitTimes = selectedCompetitors.map(comp => comp.getSplitTimeTo(this.currentControlIndex));
             const splitRanks = selectedCompetitors.map(comp => comp.getSplitRankTo(this.currentControlIndex));
-            labelTexts = d3_zip<string | number>(labelTexts, splitTimes, splitRanks)
+            labelTexts = zip<string | number>(labelTexts, splitTimes, splitRanks)
                .map(triple => triple[0] + formatTimeAndRank(triple[1] as number, triple[2] as number));
          }
 
          if (this.visibleStatistics.behindFastest) {
             const timesBehind = this.getTimesBehindFastest(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
-            labelTexts = d3_zip<string | number>(labelTexts, timesBehind)
+            labelTexts = zip<string | number>(labelTexts, timesBehind)
                .map(pair => pair[0] + SPACER + formatTime(pair[1] as number));
 
          }
 
          if (this.visibleStatistics.timeLoss) {
             const timeLosses = this.getTimeLosses(this.currentControlIndex, this.selectedIndexesOrderedByLastYValue);
-            labelTexts = d3_zip<string | number>(labelTexts, timeLosses)
+            labelTexts = zip<string | number>(labelTexts, timeLosses)
                .map(pair => pair[0] + SPACER + formatTime(pair[1] as number));
          }
       }
@@ -817,7 +817,7 @@ export class Chart {
 
       const selectedCompetitors = this.selectedIndexes.map(index => this.courseClassSet.allCompetitors[index]);
 
-      d3_range(1, this.numControls + 2).forEach(controlIndex => {
+      range(1, this.numControls + 2).forEach(controlIndex => {
          const times: number[] = selectedCompetitors.map(comp => timeForControl(comp, controlIndex));
          maxTime = Math.max(maxTime, maxNonNullNorNaNValue(times));
 
@@ -931,9 +931,9 @@ export class Chart {
    * @sb-param {object} chartData - Chart data object.
    */
    private createScales(chartData: ChartData) {
-      this.xScale = d3_scaleLinear().domain(chartData.xExtent).range([0, this.contentWidth]);
-      this.yScale = d3_scaleLinear().domain(chartData.yExtent).range([0, this.contentHeight]);
-      this.xScaleMinutes = d3_scaleLinear().domain([chartData.xExtent[0] / 60, chartData.xExtent[1] / 60]).range([0, this.contentWidth]);
+      this.xScale = scaleLinear().domain(chartData.xExtent).range([0, this.contentWidth]);
+      this.yScale = scaleLinear().domain(chartData.yExtent).range([0, this.contentHeight]);
+      this.xScaleMinutes = scaleLinear().domain([chartData.xExtent[0] / 60, chartData.xExtent[1] / 60]).range([0, this.contentWidth]);
    }
 
    /**
@@ -946,7 +946,7 @@ export class Chart {
       // ascending order, but we need such a list of times in order to draw
       // the rectangles.  So, sort the reference cumulative times.
       const refCumTimesSorted = this.referenceCumTimes.slice(0);
-      refCumTimesSorted.sort(d3_ascending);
+      refCumTimesSorted.sort(ascending);
 
       // Now remove any duplicate times.
       let index = 1;
@@ -960,12 +960,12 @@ export class Chart {
 
 
       let rects = this.svgGroup.selectAll("rect")
-         .data(d3_range(refCumTimesSorted.length - 1));
+         .data(range(refCumTimesSorted.length - 1));
 
       rects.enter().append("rect");
 
       rects = this.svgGroup.selectAll("rect")
-         .data(d3_range(refCumTimesSorted.length - 1));
+         .data(range(refCumTimesSorted.length - 1));
       rects.attr("x", (i: number) => this.xScale(refCumTimesSorted[i]))
          .attr("y", 0)
          .attr("width", (i: number) => this.xScale(refCumTimesSorted[i + 1]) - this.xScale(refCumTimesSorted[i]))
@@ -1026,16 +1026,16 @@ export class Chart {
 
       const tickFormatter = this.determineYAxisTickFormatter(chartData);
 
-      const xAxis = d3_axisTop(d3_scaleLinear())
+      const xAxis = axisTop(scaleLinear())
          .scale(this.xScale)
          .tickFormat(this.getTickFormatter())
          .tickValues(this.referenceCumTimes);
 
-      const yAxis = d3_axisLeft(d3_scaleLinear())
+      const yAxis = axisLeft(scaleLinear())
          .scale(this.yScale)
          .tickFormat(tickFormatter);
 
-      const lowerXAxis = d3_axisBottom(d3_scaleLinear())
+      const lowerXAxis = axisBottom(scaleLinear())
          .scale(this.xScaleMinutes);
 
       this.svgGroup.selectAll("g.axis").remove();
@@ -1079,12 +1079,12 @@ export class Chart {
             // to draw.  WebKit will report an error ('Error parsing d=""')
             // if no points on the line are defined, as will happen in this
             // case, so we substitute a single zero point instead.
-            return d3_line<DataColumn>()
+            return line<Cordinates>()
                .x(0)
                .y(0)
                .defined((_, i) => i === 0);
          } else {
-            return d3_line<DataColumn>()
+            return line<Cordinates>()
                .x(d => this.xScale(d.x))
                .y(d => this.yScale(d.ys[selCompIdx]))
                .defined(d => isNotNullNorNaN(d.ys[selCompIdx]));
@@ -1095,33 +1095,37 @@ export class Chart {
 
       this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
 
-      for (let selCompIdx = 0; selCompIdx < this.numLines; selCompIdx++) {
-         const strokeColour = this.selectedIndexColor(selCompIdx);
-         const highlighter = () => this.highlight(this.selectedIndexes[selCompIdx]);
+      for (let controlIdx = 0; controlIdx < this.numLines; controlIdx++) {
+         const strokeColour = this.selectedIndexColor(controlIdx);
+         const highlighter = () => this.highlight(this.selectedIndexes[controlIdx]);
          const unhighlighter = () => this.unhighlight();
 
          this.svgGroup.append("path")
-            .attr("d", lineFunctionGenerator(selCompIdx)(chartData.dataColumns))
+            .attr("d", lineFunctionGenerator(controlIdx)(chartData.dataColumns))
             .attr("stroke", strokeColour)
-            .attr("class", "graphLine competitor" + this.selectedIndexes[selCompIdx])
+            .attr("class", "graphLine competitor" + this.selectedIndexes[controlIdx])
             .on("mouseenter", highlighter)
             .on("mouseleave", unhighlighter)
             .append("title")
-            .text(chartData.competitorNames[selCompIdx]);
+            .text(chartData.competitorNames[controlIdx]);
+         
+         this.svgGroup.append("labels")
+            .attr("class", "competitorLabel competitor" + this.selectedIndexes[controlIdx])
+            .text(chartData.competitorNames[controlIdx]);
 
-         chartData.dubiousTimesInfo[selCompIdx].forEach(dubiousTimeInfo => {
+         for (const dubiousTimeInfo of chartData.dubiousTimesInfo[controlIdx]) {
             this.svgGroup.append("line")
                .attr("x1", this.xScale(chartData.dataColumns[dubiousTimeInfo.start].x))
-               .attr("y1", this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[selCompIdx]))
+               .attr("y1", this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[controlIdx]))
                .attr("x2", this.xScale(chartData.dataColumns[dubiousTimeInfo.end].x))
-               .attr("y2", this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[selCompIdx]))
+               .attr("y2", this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[controlIdx]))
                .attr("stroke", strokeColour)
-               .attr("class", "aroundDubiousTimes competitor" + this.selectedIndexes[selCompIdx])
+               .attr("class", "aroundDubiousTimes competitor" + this.selectedIndexes[controlIdx])
                .on("mouseenter", highlighter)
                .on("mouseleave", unhighlighter)
                .append("title")
-               .text(chartData.competitorNames[selCompIdx]);
-         });
+               .text(chartData.competitorNames[controlIdx]);
+         }
       }
    }
 
@@ -1153,17 +1157,17 @@ export class Chart {
    * @sb-param {object} chartData - The chart data that contains the start offsets.
    */
    private drawCompetitorStartTimeLabels(chartData: ChartData) {
+
       const startColumn = chartData.dataColumns[0];
 
-      let startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
+      const startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
 
       startLabels.enter().append("text").classed("startLabel", true);
 
-      startLabels = this.svgGroup.selectAll("text.startLabel").data(this.selectedIndexes);
       startLabels.attr("x", -7)
-         .attr("y", (_compIndex: number, selCompIndex: number) => {
-            return this.yScale(startColumn.ys[selCompIndex])
-               + this.getTextHeight(chartData.competitorNames[selCompIndex]) / 4;
+         .attr("y", (_compIndex: number, controlIndex: number) => {
+            return this.yScale(startColumn.ys[controlIndex])
+               + this.getTextHeight(chartData.competitorNames[controlIndex]) / 4;
          })
          .attr("class", (compIndex: number) => "startLabel competitor" + compIndex)
          .on("mouseenter", (compIndex: number) => this.highlight(compIndex))
@@ -1238,7 +1242,7 @@ export class Chart {
          this.currentCompetitorData = [];
       } else {
          const finishColumn = chartData.dataColumns[chartData.dataColumns.length - 1];
-         this.currentCompetitorData = d3_range(this.numLines).map(i => {
+         this.currentCompetitorData = range(this.numLines).map(i => {
             const competitorIndex = this.selectedIndexes[i];
             const name = this.courseClassSet.allCompetitors[competitorIndex].name;
             const textHeight = this.getTextHeight(name);
@@ -1250,7 +1254,7 @@ export class Chart {
                colour: this.competitorIndexColor(competitorIndex),
                index: competitorIndex
             };
-         }, this);
+         });
 
          minLastY -= this.currentCompetitorData[this.numLines - 1].textHeight;
 
@@ -1347,7 +1351,7 @@ export class Chart {
 
       // Sort and deduplicate the reference cumulative times.
       this.referenceCumTimesSorted = this.referenceCumTimes.slice(0);
-      this.referenceCumTimesSorted.sort(d3_ascending);
+      this.referenceCumTimesSorted.sort(ascending);
       for (let index = this.referenceCumTimesSorted.length - 1; index > 0; index -= 1) {
          if (this.referenceCumTimesSorted[index] === this.referenceCumTimesSorted[index - 1]) {
             this.referenceCumTimesSorted.splice(index, 1);
