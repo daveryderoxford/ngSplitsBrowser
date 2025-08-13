@@ -17,7 +17,7 @@ export interface FastestTimeInfo {
 }
 
 export class CourseClass {
-    course: any = null;
+    course: Course | null = null;
     hasDubiousData = false;
     /**
      * Object that represents a collection of competitor data for a class.

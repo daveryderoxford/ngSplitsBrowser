@@ -43,10 +43,6 @@ export class GraphPage {
    protected activeRoute = inject(ActivatedRoute);
    protected ps = inject(ResultsPageState);
 
-   id = input.required<string>();  // Route parameter
-   eventName = input<string>("");  // Route parameter
-   eventDate = input<Date>();   // Route parameter
-
    legIndex = signal(0);
    raceTiime = signal(0);
 
@@ -60,20 +56,11 @@ export class GraphPage {
       timeLoss: true
    });
 
-   // Determine view from URL path
-   url = toSignal(this.activeRoute.url);
-   view = computed(() =>
-      this.url()[0].path.includes('race') ?
-         'race' :
-         'graph'
-   );
-
    chartType = computed(() =>
-      (this.view() === 'race') ?
+      (this.ps.pageDisplayed().type === 'race') ?
          ChartTypeClass.chartTypes.RaceGraph :
          ChartTypeClass.chartTypes.SplitsGraph
    );
-
 
    courseClassSet = computed(() =>
       this.rs.courseOrClass() ?
@@ -132,17 +119,7 @@ export class GraphPage {
    chart: Chart;
    chartElement = viewChild<ElementRef>('chart');
 
-   constructor() {
-
-      // Effect to set the selected event when the component initializes or when the route parameters change.
-      effect(() => {
-         const eventId = this.id();
-         const name = this.eventName();
-         const date = this.eventDate() ? new Date(this.eventDate()) : undefined;
-
-         this.rd.setSelectedEvent(eventId, name, date);
-         this.ps.setDisplayedPage(this.view());
-      });
+   constructor() {  
 
       /** Effect to create and redraw the chart when its data or container becomes available. */
       effect(() => {

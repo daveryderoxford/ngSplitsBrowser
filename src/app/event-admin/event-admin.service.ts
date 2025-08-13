@@ -7,7 +7,7 @@ import { deleteObject, getStorage, ref, uploadString } from '@angular/fire/stora
 import { AuthService } from 'app/auth/auth.service';
 import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
 import { parseEventData } from 'app/results/import';
-import { Results } from 'app/results/model';
+import { Course, Results } from 'app/results/model';
 import { SplitsbrowserException } from 'app/results/model/exception';
 import { mappedCollectionRef } from 'app/shared/utils/firestore-helper';
 import { of } from 'rxjs';
@@ -247,12 +247,12 @@ export class EventAdminService {
    }
 
    /** Creates an object summarising the results */
-   public createCourseSummary(course: any): CourseSummary {
+   public createCourseSummary(course: Course): CourseSummary {
       const summary: CourseSummary = {
          name: course.name,
          length: course.length,
          climb: course.climb,
-         classes: new Array(),
+         classes: [],
          numcompetitors: 0,
       };
       return (summary);

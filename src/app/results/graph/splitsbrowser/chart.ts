@@ -1,7 +1,7 @@
-import { ascending, bisect, max as d3_max, min as d3_min, range, zip } from "d3-array";
+import { ascending, bisect, max, min, range, zip } from "d3-array";
 import { axisBottom, axisLeft, axisTop } from "d3-axis";
 import { scaleLinear, ScaleLinear } from "d3-scale";
-import { select as d3_select, selectAll as d3_selectAll, Selection, pointer } from "d3-selection";
+import { select, selectAll, Selection, pointer } from "d3-selection";
 import { line } from "d3-shape";
 import { Competitor, CourseClassSet, Results, sbTime, TimeUtilities } from "../../model";
 import { isNaNStrict, isNotNullNorNaN } from "../../model/results_util";
@@ -26,9 +26,12 @@ export interface ChartData {
    yExtent: number[];
    dubiousTimesInfo: { start: number, end: number }[][];
 }
-/** Times for competitor in actual time  */
+/** Times associated with a contril
+  */
 export interface Cordinates {
-   x: number;
+   // Time assocaiated with a control
+   x: number;   
+   // Cumulative time - reference time at each competitor at the control
    ys: number[];  
 }
 
@@ -160,7 +163,7 @@ function getSuffix(competitor: Competitor): string {
 */
 function maxNonNullNorNaNValue(values: (number | null)[]): number {
    const nonNullNorNaNValues: number[] = values.filter(isNotNullNorNaN);
-   return (nonNullNorNaNValues.length > 0) ? d3_max(nonNullNorNaNValues) : 0;
+   return (nonNullNorNaNValues.length > 0) ? max(nonNullNorNaNValues) : 0;
 }
 /* 
 @Component({
@@ -246,7 +249,7 @@ export class Chart {
    constructor(parent: HTMLElement) {
       this.parent = parent;
 
-      this.svg = d3_select<HTMLElement, SVGElement>(this.parent).append("svg")
+      this.svg = select<HTMLElement, SVGElement>(this.parent).append("svg")
          .attr("id", CHART_SVG_ID)
          // Disable text selection on the chart
          .style("-webkit-user-select", "none") // Safari
@@ -328,9 +331,9 @@ export class Chart {
       this.adjustContentSize();
       this.createScales(chartData);
       this.drawBackgroundRectangles();
-      this.drawAxes(getMessage(chartType.yAxisLabelKey), chartData);
+      this.drawAxes(getMessage(chartType.yAxisLabelKey), chartData.dataColumns);
       this.drawChartLines(chartData);
-      this.drawCompetitorLegendLabels(chartData);
+      this.drawCompetitorLegendLabels(chartData.dataColumns);
       this.removeControlLine();
       if (this.isRaceGraph) {
          this.drawCompetitorStartTimeLabels(chartData);
@@ -657,7 +660,7 @@ export class Chart {
       this.actualControlIndex = null;
       this.updateCompetitorStatistics();
       if (this.controlLine !== null) {
-         d3_select(this.controlLine).remove();
+         select(this.controlLine).remove();
          this.controlLine = null;
       }
    }
@@ -736,7 +739,7 @@ export class Chart {
       }
 
       // This data is already joined to the labels; just update the text.
-      d3_selectAll("text.competitorLabel").text((data: any) => data.label);
+      selectAll("text.competitorLabel").text((data: any) => data.label);
    }
 
    /**
@@ -797,7 +800,7 @@ export class Chart {
             const comp = this.courseClassSet.allCompetitors[index];
             return this.getTextWidth(formatNameAndSuffix(comp.name, getSuffix(comp)));
          }, this);
-         return d3_max<number>(nameWidths) + this.determineMaxStatisticTextWidth();
+         return max<number>(nameWidths) + this.determineMaxStatisticTextWidth();
       }
    }
 
@@ -878,8 +881,8 @@ export class Chart {
          const timeLosses = this.getTimeLosses(controlIndex, this.selectedIndexes);
          const nonNullTimeLosses: number[] = timeLosses.filter(isNotNullNorNaN);
          if (nonNullTimeLosses.length > 0) {
-            maxTimeLoss = Math.max(maxTimeLoss, d3_max(nonNullTimeLosses));
-            minTimeLoss = Math.min(minTimeLoss, d3_min(nonNullTimeLosses));
+            maxTimeLoss = Math.max(maxTimeLoss, max(nonNullTimeLosses));
+            minTimeLoss = Math.min(minTimeLoss, min(nonNullTimeLosses));
          }
       }
 
@@ -918,7 +921,7 @@ export class Chart {
    private determineMaxStartTimeLabelWidth(chartData: ChartData): number {
       let maxWidth: number;
       if (chartData.competitorNames.length > 0) {
-         maxWidth = d3_max<number>(chartData.competitorNames.map(name => this.getTextWidth("00:00:00 " + name)));
+         maxWidth = max<number>(chartData.competitorNames.map(name => this.getTextWidth("00:00:00 " + name)));
       } else {
          maxWidth = 0;
       }
@@ -990,11 +993,11 @@ export class Chart {
    *     d3 formatter.
    */
 
-   private determineYAxisTickFormatter(chartData: ChartData): TickFormatterFunction {
+   private determineYAxisTickFormatter(dataColumns: Cordinates[]): TickFormatterFunction {
       if (this.isRaceGraph) {
          // Assume column 0 of the data is the start times.
          // However, beware that there might not be any data.
-         const startTimes = (chartData.dataColumns.length === 0) ? [] : chartData.dataColumns[0].ys;
+         const startTimes = (dataColumns.length === 0) ? [] : dataColumns[0].ys;
          if (startTimes.length === 0) {
             // No start times - draw all tick marks.
             return (time, _) => formatTime(time * 60);
@@ -1007,7 +1010,7 @@ export class Chart {
                const yarray: number[] = startTimes.map((startTime: number) => {
                   return Math.abs(yScale(startTime) - yScale(time));
                });
-               const nearestOffset = d3_min(yarray);
+               const nearestOffset = min(yarray);
                return (nearestOffset >= MIN_COMPETITOR_TICK_MARK_DISTANCE) ? formatTime(Math.round(time * 60)) : "";
             };
          }
@@ -1022,9 +1025,9 @@ export class Chart {
    * @sb-param {String} yAxisLabel - The label to use for the Y-axis.
    * @sb-param {object} chartData - The chart data to use.
    */
-   private drawAxes(yAxisLabel: string, chartData: ChartData) {
+   private drawAxes(yAxisLabel: string, dataColumns: Cordinates[]) {
 
-      const tickFormatter = this.determineYAxisTickFormatter(chartData);
+      const tickFormatter = this.determineYAxisTickFormatter(dataColumns);
 
       const xAxis = axisTop(scaleLinear())
          .scale(this.xScale)
@@ -1165,15 +1168,39 @@ export class Chart {
       startLabels.enter().append("text").classed("startLabel", true);
 
       startLabels.attr("x", -7)
-         .attr("y", (_compIndex: number, controlIndex: number) => {
-            return this.yScale(startColumn.ys[controlIndex])
-               + this.getTextHeight(chartData.competitorNames[controlIndex]) / 4;
+         .attr("y", (_compIndex: number, selCompIdx: number) => {
+            return this.yScale(startColumn.ys[selCompIdx])
+               + this.getTextHeight(chartData.competitorNames[selCompIdx]) / 4;
          })
          .attr("class", (compIndex: number) => "startLabel competitor" + compIndex)
          .on("mouseenter", (compIndex: number) => this.highlight(compIndex))
          .on("mouseleave", () => this.unhighlight())
          .text((selCompIndex: number) => {
             return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + " "
+               + chartData.competitorNames[selCompIndex];
+         });
+
+      startLabels.exit().remove();
+   }
+
+   private drawTimeLosses(chartData: ChartData, index: number) {
+
+      const compData = chartData.dataColumns[index];
+
+      const startLabels = this.svgGroup.selectAll("text.timeLosses").data(this.selectedIndexes);
+
+      startLabels.enter().append("text").classed("timeLosses", true);
+
+      startLabels.attr("x", compData.x)
+         .attr("y", (_compIndex: number, controlIndex: number) => {
+            return this.yScale(compData.ys[controlIndex])
+               + this.getTextHeight(chartData.competitorNames[controlIndex]) / 4;
+         })
+         .attr("class", (compIndex: number) => "startLabel competitor" + compIndex)
+         .on("mouseenter", (compIndex: number) => this.highlight(compIndex))
+         .on("mouseleave", () => this.unhighlight())
+         .text((selCompIndex: number) => {
+            return formatTime(Math.round(compData.ys[selCompIndex] * 60)) + " "
                + chartData.competitorNames[selCompIndex];
          });
 
@@ -1235,24 +1262,24 @@ export class Chart {
    * Draw legend labels to the right of the chart.
    * @sb-param {object} chartData - The chart data that contains the final time offsets.
    */
-   private drawCompetitorLegendLabels(chartData: ChartData): void {
+   private drawCompetitorLegendLabels(dataColumns: Cordinates[]): void {
 
       let minLastY = 0;
-      if (chartData.dataColumns.length === 0) {
+      if (dataColumns.length === 0) {
          this.currentCompetitorData = [];
       } else {
-         const finishColumn = chartData.dataColumns[chartData.dataColumns.length - 1];
+         const finishColumn = dataColumns[dataColumns.length - 1];
          this.currentCompetitorData = range(this.numLines).map(i => {
-            const competitorIndex = this.selectedIndexes[i];
-            const name = this.courseClassSet.allCompetitors[competitorIndex].name;
+            const compIndex = this.selectedIndexes[i];
+            const name = this.courseClassSet.allCompetitors[compIndex].name;
             const textHeight = this.getTextHeight(name);
             minLastY += textHeight;
             return {
-               label: formatNameAndSuffix(name, getSuffix(this.courseClassSet.allCompetitors[competitorIndex])),
+               label: formatNameAndSuffix(name, getSuffix(this.courseClassSet.allCompetitors[compIndex])),
                textHeight: textHeight,
                y: (isNotNullNorNaN(finishColumn.ys[i])) ? this.yScale(finishColumn.ys[i]) : null,
-               colour: this.competitorIndexColor(competitorIndex),
-               index: competitorIndex
+               colour: this.competitorIndexColor(compIndex),
+               index: compIndex
             };
          });
 

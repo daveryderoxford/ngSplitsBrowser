@@ -255,7 +255,7 @@ export class CourseClassSet {
          this.allCompetitors.forEach((_comp, idx) => {
             splitRanksByCompetitor[idx].push(splitRanksForThisControl[idx]);
          });
-      }, this);
+      });
 
       d3_range(1, this.numControls + 2).forEach((control) => {
          // We want to null out all subsequent cumulative ranks after a
@@ -275,7 +275,7 @@ export class CourseClassSet {
          });
          const cumRanksForThisControl = this.getRanks(cumSplitsByCompetitor);
          this.allCompetitors.forEach((_comp, idx) => { cumRanksByCompetitor[idx].push(cumRanksForThisControl[idx]); });
-      }, this);
+      });
 
       this.allCompetitors.forEach((comp, idx) => {
          comp.setSplitAndCumulativeRanks(splitRanksByCompetitor[idx], cumRanksByCompetitor[idx]);

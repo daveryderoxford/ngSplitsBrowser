@@ -1,7 +1,7 @@
 'use strict';
 
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { computed, inject, Injectable, linkedSignal, resource, signal } from "@angular/core";
+import { computed, inject, Injectable, resource, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
@@ -9,9 +9,11 @@ import { firstValueFrom, Observable } from "rxjs";
 import { catchError } from 'rxjs/operators';
 import { parseEventData } from "./import";
 import { Competitor, Results } from "./model";
-import { ResultsEventDetails } from './model/event_details';
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
+import { ResultsEventDetails } from './model/event_details';
+
+type ResultsURLType = 'Routegadget | SIOnline | ';
 
 const colours = [
    "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
@@ -36,51 +38,53 @@ export class ResultsDataService {
    private _resultsResource = resource({
       params: () => ({ id: this._key() }),
       loader: async ({ params }) => {
-         const results = await this.loadResults(params.id);
+         const results = await this.loadResultsFile(params.id);
          return results;
       },
    });
 
-   // Ensure thta results always has a value.  Avoids having to managed undefined states in computations
    results = this._resultsResource.value;
-   //   source: this._resultsResource.value,
-  //    computation: (data, previous) => previous?.value ?? data,
- //  });
-
    isLoading = this._resultsResource.isLoading;
    error = this._resultsResource.error;
 
-   setSelectedEvent(key: string, name = "", date?: Date | undefined) {
+   viewStoredEvent(id: string, name = "", date?: Date | undefined) {
       this._event.set({
-         key: key,
+         source: 'stored',
+         key: id,
          name: name,
          date: date
-      });
+      } as ResultsEventDetails);
+   }
+
+   clearEvent() {
+      this._event.set(undefined);
    }
 
    /** Loads results for a specified event returning an observable of the results.
     * This just loads the results file from storage and does not clear any current selections.
     */
-   public async loadResults(key: string): Promise<Results> {
+   public async loadResultsFile(key: string): Promise<Results> {
 
       const text = await this.downloadResultsFile(key);
 
-      const results = this.parseSplits(text);
-      if (results.needsRepair()) {
-         Repairer.repairEventData(results);
-      }
-      results.determineTimeLosses();
-
-      this.computeRanks(results);
-
-      this.computeColors(results);
+      const results = this.processResults(text);
 
       return results;
 
    }
 
+   public async loadResultsUrl(url: string) {
+      const text = await firstValueFrom(
+         this.http.get(url, { responseType: 'text' }).pipe(
+            catchError(error => handleError(error))
+         )
+      );
+      return this.processResults(text);
+   }
+
+
    /** Parse splits file */
-   public parseSplits(text: string): Results {
+   public processResults(text: string): Results {
 
       let results: Results;
       try {
@@ -93,6 +97,15 @@ export class ResultsDataService {
          }
          throw e;
       }
+
+      if (results.needsRepair()) {
+         Repairer.repairEventData(results);
+      }
+      results.determineTimeLosses();
+
+      this.computeRanks(results);
+
+      this.computeColors(results);
 
       return (results);
    }
@@ -153,10 +166,10 @@ export class ResultsDataService {
             return comp.getSplitTimeTo(control);
          });
          const splitRanksForThisControl = this.getRanks(splitsByCompetitor);
-         competitors.forEach((_comp, idx) => {
+         for (let [idx, _comp] of competitors.entries()) {
             splitRanksByCompetitor[idx].push(splitRanksForThisControl[idx]);
-         });
-      }, this);
+         };
+      });
 
       d3_range(1, numControls + 2).forEach((control) => {
          // We want to null out all subsequent cumulative ranks after a

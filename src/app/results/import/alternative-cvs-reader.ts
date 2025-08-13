@@ -23,19 +23,7 @@ interface CourseDetails {
     competitors: Competitor[];
 }
 
-/* eslint-disable max-len */
-
 const parseTime = TimeUtilities.parseTime;
-
-// This reader reads in alternative CSV formats, where each row defines a
-// separate competitor, and includes course details such as name, controls
-// and possibly distance and climb.
-
-// There is presently one variation supported:
-// * one, distinguished by having three columns per control: control code,
-//   cumulative time and 'points'.  (Points is never used.)  Generally,
-//   these formats are quite sparse; many columns (e.g. club, placing,
-//   start time) are blank or are omitted altogether.
 
 const TRIPLE_COLUMN_FORMAT: ColumnFormat = {
     controlsOffset: 38,  // Control data starts in column AM (index 38).
@@ -59,6 +47,17 @@ export function parseTripleColumnEventData(data: string): Results {
 // Supported delimiters.
 const DELIMITERS = [",", ";"];
 
+/** 
+TrippleCVSReader reads in alternative CSV formats, where each row defines a
+separate competitor, and includes course details such as name, controls
+and possibly distance and climb.
+
+There is presently one variation supported:
+ * one, distinguished by having three columns per control: control code,
+   cumulative time and 'points'.  (Points is never used.)  Generally,
+   these formats are quite sparse; many columns (e.g. club, placing,
+   start time) are blank or are omitted altogether.
+*/
 class TrippleCVSReader {
     classes = new Map<string, CourseDetails>();
     delimiter: string = null;

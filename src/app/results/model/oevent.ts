@@ -1,1 +1,0 @@
-export { OEvent } from '../../events/model/oevent';

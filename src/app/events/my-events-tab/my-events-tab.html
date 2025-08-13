@@ -3,9 +3,24 @@
     You need to be logged in to view your events
     <div class=messagebuttons>
       <button mat-button routerLink="/auth/login">Login</button>
-      <button mat-button routerLink="/auth/signup">REgister</button>
+      <button mat-button routerLink="/auth/signup">Register</button>
     </div>
   </div>
 } @else {
-   Add Myevents here
+  @if (us.user().results.length === 0) {
+    <div class="message">
+      You have no results yet.
+    </div>
+  } @else {
+    <mat-table [dataSource]="us.user().results" matSort]>
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let result">{{result.event.name}}</td>
+      </ng-container>
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let result">{{result.event.date | date}}</td>
+      </ng-container>
+    </mat-table>
+  }
 }

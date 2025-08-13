@@ -2,9 +2,7 @@
 
 // file chart-popup.js
 
-
-
-import { select as d3_select, Selection } from "d3-selection";
+import { select, Selection } from "d3-selection";
 
 import { TimeUtilities } from "../../model";
 
@@ -31,7 +29,7 @@ export class ChartPopup {
 
       this._shown = false;
       this._mouseIn = false;
-      this._popupDiv = d3_select( parent ).append( "div" );
+      this._popupDiv = select( parent ).append( "div" );
       this._popupDiv.classed( "chartPopup", true )
          .style( "display", "none" )
          .style( "position", "absolute" );
@@ -43,11 +41,9 @@ export class ChartPopup {
       const tableContainer = this._popupDiv.append( "div" )
          .classed( "chartPopupTableContainer", true );
 
-
       this._dataTable = tableContainer.append( "table" );
 
       this._popupDiv.selectAll( ".nextControls" ).style( "display", "none" );
-
 
       this._popupDiv.node().addEventListener('mouseenter', () => { this._mouseIn = true; });
       this._popupDiv.node().addEventListener('mouseleave', () => { this._mouseIn = false; });

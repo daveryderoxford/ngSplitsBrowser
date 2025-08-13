@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, OnInit, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -33,10 +33,6 @@ export class ResultsTable implements OnInit {
    protected rd = inject(ResultsDataService);
    private ps = inject(ResultsPageState);
 
-   id = input.required<string>();  // Route parameter
-   eventName = input<string>("");  // Route parameter
-   eventDate = input<Date>();   // Route parameter
-
    course = this.rs.course;
    oclass = this.rs.oclass;
 
@@ -59,8 +55,6 @@ export class ResultsTable implements OnInit {
    displayedColumns = computed(() => [...this.staticColumns, ...this.splitsColumns()]);
 
    tableData = computed<Competitor[]>(() => {
-      const r = this.rd.results();
-
       if (this.oclass()) {
          const comps = this.selectedOnly() ?
             this.oclass().competitors.filter((comp) => this.rs.isCompetitorSelected(comp)) :
@@ -71,17 +65,6 @@ export class ResultsTable implements OnInit {
          return [];
       }
    });
-
-   constructor() {
-      effect(() => {
-         const eventId = this.id();
-         const name = this.eventName();
-         const date = this.eventDate() ? new Date(this.eventDate()) : undefined;
-
-         this.rd.setSelectedEvent(eventId, name, date);
-         this.ps.setDisplayedPage('table');
-      });
-   }
 
    ngOnInit() {
       this.courseCheckbox.valueChanges.subscribe((courseDisplayed: boolean) => {
