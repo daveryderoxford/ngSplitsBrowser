@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 import { isNaNStrict } from "../model/results_util";
 
 // Minimum length of a course that is considered to be given in metres as
@@ -49,7 +55,10 @@ export function parseCourseClimb(stringValue: string): number | null {
 * @return {String} String value with the line-endings normalised.
 */
 export function normaliseLineEndings(stringValue: string): string {
-    return stringValue.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+    return stringValue.replace(/
+/g, "
+").replace(//g, "
+");
 }
 
 /**

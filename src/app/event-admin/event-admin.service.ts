@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 import { inject, Injectable, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FirebaseApp } from '@angular/fire/app';
@@ -183,8 +189,11 @@ export class EventAdminService {
 
    private logUploadWarnings(eventname: string, results: Results) {
       if (results.warnings && results.warnings.length > 0) {
-         const msg = results.warnings.reduce((acc = '', warn) => acc + '\n' + warn);
-         console.log(`EventAdminService: Splits uploaded with warnings\n Event key: ${eventname}\n${msg}`);
+         const msg = results.warnings.reduce((acc = '', warn) => acc + '
+' + warn);
+         console.log(`EventAdminService: Splits uploaded with warnings
+ Event key: ${eventname}
+${msg}`);
       }
    }
 

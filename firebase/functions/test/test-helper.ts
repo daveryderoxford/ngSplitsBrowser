@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 // Test helpers to initialise Firebase to use the emulator and never a live database.
 import test from 'firebase-functions-test';
 import { initializeApp, getApps, deleteApp } from 'firebase-admin/app';
@@ -53,7 +59,9 @@ export function setupMochaHooks(): TestContext {
             await db.recursiveDelete(collection);
          }
       } catch (error: any) {
-         console.log('\n ****** afterEach:  Error in aftereach\n', error.toString());
+         console.log('
+ ****** afterEach:  Error in aftereach
+', error.toString());
       }
 	});
 

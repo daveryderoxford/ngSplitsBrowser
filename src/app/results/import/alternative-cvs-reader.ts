@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 
 import { Competitor, Course, CourseClass, Results, TimeUtilities, WrongFileFormat } from "../model";
 import { normaliseLineEndings, parseCourseClimb, parseCourseLength } from "./util";
@@ -304,7 +310,8 @@ class TrippleCVSReader {
         this.warnings = [];
         eventData = normaliseLineEndings(eventData);
 
-        const lines = eventData.split(/\n/);
+        const lines = eventData.split(/
+/);
 
         if (lines.length < 2) {
             throw new WrongFileFormat("Data appears not to be in an alternative CSV format - too few lines");

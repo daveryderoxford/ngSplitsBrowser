@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 // @ts-nocheck
 
 /*
@@ -35,11 +41,14 @@ const parseEventData = parseIOFXMLEventData;
 // The number of feet per kilometre.
 const FEET_PER_KILOMETRE = 3280;
 
-const V2_HEADER = '<?xml version="1.0" ?>\n<!DOCTYPE ResultList SYSTEM "IOFdata.dtd">\n';
+const V2_HEADER = '<?xml version="1.0" ?>
+<!DOCTYPE ResultList SYSTEM "IOFdata.dtd">
+';
 
 const V3_RESULT_LIST_START = '<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0">';
 const V3_RESULT_LIST_END = '</ResultList>';
-const V3_XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n';
+const V3_XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>
+';
 
 
 describe("Input.IOFXml", () => {
@@ -72,7 +81,10 @@ describe("Input.IOFXml", () => {
 
     const Version2Formatter: any = {
         name: "version 2.0.3",
-        header: V2_HEADER + "\n<ResultList>\n<IOFVersion version=\"2.0.3\" />\n",
+        header: V2_HEADER + "
+<ResultList>
+<IOFVersion version=\"2.0.3\" />
+",
     };
 
     /**
@@ -81,7 +93,8 @@ describe("Input.IOFXml", () => {
     * @return {String} XML string containing the class name.
     */
     Version2Formatter.getClassXml = function (className) {
-        return "<ClassShortName>" + className + "</ClassShortName>\n";
+        return "<ClassShortName>" + className + "</ClassShortName>
+";
     };
 
     /**
@@ -143,25 +156,33 @@ describe("Input.IOFXml", () => {
                 personNameXml += ' sex="' + personData.gender + '"';
             }
 
-            personNameXml += '><PersonName>\n';
+            personNameXml += '><PersonName>
+';
             if (exists("forename")) {
-                personNameXml += '<Given>' + personData.forename + "</Given>\n";
+                personNameXml += '<Given>' + personData.forename + "</Given>
+";
             }
             if (exists("surname")) {
-                personNameXml += "<Family>" + personData.surname + "</Family>\n";
+                personNameXml += "<Family>" + personData.surname + "</Family>
+";
             }
             personNameXml += "</PersonName>";
 
             if (exists("birthDate")) {
-                personNameXml += "<BirthDate><Date>" + personData.birthDate + "</Date></BirthDate>\n";
+                personNameXml += "<BirthDate><Date>" + personData.birthDate + "</Date></BirthDate>
+";
             }
 
-            personNameXml += "</Person>\n";
+            personNameXml += "</Person>
+";
         }
 
-        const clubXml = (exists("club")) ? "<Club><ShortName>" + personData.club + "</ShortName></Club>\n" : "";
-        const startTimeXml = (exists("startTime")) ? "<StartTime><Clock>" + formatTime(personData.startTime) + "</Clock></StartTime>\n" : "";
-        const totalTimeXml = (exists("totalTime")) ? "<Time>" + formatTime(personData.totalTime) + "</Time>\n" : "";
+        const clubXml = (exists("club")) ? "<Club><ShortName>" + personData.club + "</ShortName></Club>
+" : "";
+        const startTimeXml = (exists("startTime")) ? "<StartTime><Clock>" + formatTime(personData.startTime) + "</Clock></StartTime>
+" : "";
+        const totalTimeXml = (exists("totalTime")) ? "<Time>" + formatTime(personData.totalTime) + "</Time>
+" : "";
         const ecardXml = (exists("ecardId")) ? '<CCard> <CCardId>' + personData.ecardId + '</CCardId> <PunchingUnitType value="SI" /> </CCard>' : "";
 
         let status;
@@ -181,25 +202,31 @@ describe("Input.IOFXml", () => {
             status = "NotCompeting";
         }
 
-        const statusXml = "<CompetitorStatus value=\"" + status + "\" />\n";
+        const statusXml = "<CompetitorStatus value=\"" + status + "\" />
+";
 
         let courseLengthXml = "";
         if (classData.hasOwnProperty("length")) {
             if (classData.hasOwnProperty("lengthUnit")) {
-                courseLengthXml = "<CourseLength unit=\"" + classData.lengthUnit + "\">" + classData.length + "</CourseLength>\n";
+                courseLengthXml = "<CourseLength unit=\"" + classData.lengthUnit + "\">" + classData.length + "</CourseLength>
+";
             } else {
-                courseLengthXml = "<CourseLength>" + classData.length + "</CourseLength>\n";
+                courseLengthXml = "<CourseLength>" + classData.length + "</CourseLength>
+";
             }
         }
 
         const splitTimesXmls = [];
         for (let index = 0; index < personData.cumTimes.length; index += 1) {
-            splitTimesXmls.push("<SplitTime><ControlCode>" + personData.controls[index] + "</ControlCode><Time>" + formatTime(personData.cumTimes[index]) + "</Time></SplitTime>\n");
+            splitTimesXmls.push("<SplitTime><ControlCode>" + personData.controls[index] + "</ControlCode><Time>" + formatTime(personData.cumTimes[index]) + "</Time></SplitTime>
+");
         }
 
-        const resultXml = exists("result") ? "<Result>" + startTimeXml + totalTimeXml + ecardXml + statusXml + courseLengthXml + splitTimesXmls.join("") + "</Result>\n" : "";
+        const resultXml = exists("result") ? "<Result>" + startTimeXml + totalTimeXml + ecardXml + statusXml + courseLengthXml + splitTimesXmls.join("") + "</Result>
+" : "";
 
-        return "<PersonResult>" + personNameXml + clubXml + resultXml + "</PersonResult>\n";
+        return "<PersonResult>" + personNameXml + clubXml + resultXml + "</PersonResult>
+";
     };
 
     /**
@@ -245,7 +272,8 @@ describe("Input.IOFXml", () => {
 
     const Version3Formatter: any = {
         name: "version 3.0",
-        header: V3_XML_HEADER + V3_RESULT_LIST_START + "<Event><Name>Test event name</Name><StartTime><Date>2023-01-15</Date></StartTime></Event>\n",
+        header: V3_XML_HEADER + V3_RESULT_LIST_START + "<Event><Name>Test event name</Name><StartTime><Date>2023-01-15</Date></StartTime></Event>
+",
     };
 
     /**
@@ -254,7 +282,8 @@ describe("Input.IOFXml", () => {
     * @return {String} XML string containing the class name.
     */
     Version3Formatter.getClassXml = function (className) {
-        return "<Class><Name>" + className + "</Name></Class>\n";
+        return "<Class><Name>" + className + "</Name></Class>
+";
     };
 
     /**
@@ -263,30 +292,38 @@ describe("Input.IOFXml", () => {
     * @returns {String} XML string.
     */
     Version3Formatter.getCourseXml = function (clazz) {
-        let xml = "<Course>\n";
+        let xml = "<Course>
+";
         if (clazz.hasOwnProperty("courseId")) {
-            xml += "<Id>" + clazz.courseId + "</Id>\n";
+            xml += "<Id>" + clazz.courseId + "</Id>
+";
         }
 
         if (clazz.hasOwnProperty("courseName")) {
-            xml += "<Name>" + clazz.courseName + "</Name>\n";
+            xml += "<Name>" + clazz.courseName + "</Name>
+";
         } else if (clazz.hasOwnProperty("name")) {
-            xml += "<Name>" + clazz.name + "</Name>\n";
+            xml += "<Name>" + clazz.name + "</Name>
+";
         }
 
         if (clazz.hasOwnProperty("length")) {
-            xml += "<Length>" + clazz.length + "</Length>\n";
+            xml += "<Length>" + clazz.length + "</Length>
+";
         }
 
         if (clazz.hasOwnProperty("climb")) {
-            xml += "<Climb>" + clazz.climb + "</Climb>\n";
+            xml += "<Climb>" + clazz.climb + "</Climb>
+";
         }
 
         if (clazz.hasOwnProperty("numberOfControls")) {
-            xml += "<NumberOfControls>" + clazz.numberOfControls + "</NumberOfControls>\n";
+            xml += "<NumberOfControls>" + clazz.numberOfControls + "</NumberOfControls>
+";
         }
 
-        xml += "</Course>\n";
+        xml += "</Course>
+";
 
         return xml;
     };
@@ -334,25 +371,31 @@ describe("Input.IOFXml", () => {
                 personNameXml += " sex=\"" + personData.gender + "\"";
             }
 
-            personNameXml += "><Name>\n";
+            personNameXml += "><Name>
+";
 
             if (exists("forename")) {
-                personNameXml += "<Given>" + personData.forename + "</Given>\n";
+                personNameXml += "<Given>" + personData.forename + "</Given>
+";
             }
             if (exists("surname")) {
-                personNameXml += "<Family>" + personData.surname + "</Family>\n";
+                personNameXml += "<Family>" + personData.surname + "</Family>
+";
             }
 
             personNameXml += "</Name>";
 
             if (exists("birthDate")) {
-                personNameXml += "<BirthDate>" + personData.birthDate + "</BirthDate>\n";
+                personNameXml += "<BirthDate>" + personData.birthDate + "</BirthDate>
+";
             }
 
-            personNameXml += "</Person>\n";
+            personNameXml += "</Person>
+";
         }
 
-        const clubXml = (exists("club")) ? "<Organisation><ShortName>" + personData.club + "</ShortName></Organisation>\n" : "";
+        const clubXml = (exists("club")) ? "<Organisation><ShortName>" + personData.club + "</ShortName></Organisation>
+" : "";
 
         let startTimeStr;
         if (personData.startTime === null) {
@@ -365,7 +408,8 @@ describe("Input.IOFXml", () => {
             startTimeStr = formatStartTime(personData.startTime);
         }
 
-        const startTimeXml = (exists("startTime")) ? "<StartTime>" + startTimeStr + "</StartTime>\n" : "";
+        const startTimeXml = (exists("startTime")) ? "<StartTime>" + startTimeStr + "</StartTime>
+" : "";
         const totalTimeXml = (exists("totalTime")) ? "<Time>" + personData.totalTime + "</Time>" : "";
         const ecardXml = (exists("ecardId")) ? "<ControlCard>" + personData.ecardId + "</ControlCard>" : "";
 
@@ -386,21 +430,26 @@ describe("Input.IOFXml", () => {
             status = "NotCompeting";
         }
 
-        const statusXml = "<Status>" + status + "</Status>\n";
+        const statusXml = "<Status>" + status + "</Status>
+";
 
         const splitTimesXmls = [];
         for (let index = 0; index < personData.cumTimes.length; index += 1) {
             const time = personData.cumTimes[index];
             if (time === null) {
-                splitTimesXmls.push("<SplitTime status=\"Missing\"><ControlCode>" + personData.controls[index] + "</ControlCode></SplitTime>\n");
+                splitTimesXmls.push("<SplitTime status=\"Missing\"><ControlCode>" + personData.controls[index] + "</ControlCode></SplitTime>
+");
             } else {
-                splitTimesXmls.push("<SplitTime><ControlCode>" + personData.controls[index] + "</ControlCode><Time>" + time + "</Time></SplitTime>\n");
+                splitTimesXmls.push("<SplitTime><ControlCode>" + personData.controls[index] + "</ControlCode><Time>" + time + "</Time></SplitTime>
+");
             }
         }
 
-        const resultXml = exists("result") ? "<Result>" + startTimeXml + ecardXml + totalTimeXml + statusXml + splitTimesXmls.join("") + "</Result>\n" : "";
+        const resultXml = exists("result") ? "<Result>" + startTimeXml + ecardXml + totalTimeXml + statusXml + splitTimesXmls.join("") + "</Result>
+" : "";
 
-        return "<PersonResult>" + personNameXml + clubXml + resultXml + "</PersonResult>\n";
+        return "<PersonResult>" + personNameXml + clubXml + resultXml + "</PersonResult>
+";
     };
 
 
@@ -415,17 +464,21 @@ describe("Input.IOFXml", () => {
     function getXmlFromFormatter(formatter, classes) {
         let xml = formatter.header;
         classes.forEach(function (clazz) {
-            xml += "<ClassResult>\n";
+            xml += "<ClassResult>
+";
             if (clazz.hasOwnProperty("name")) {
                 xml += formatter.getClassXml(clazz.name);
             }
 
             xml += formatter.getCourseXml(clazz);
 
-            xml += clazz.competitors.map(function (comp) { return formatter.getPersonResultXml(comp, clazz); }).join("\n");
-            xml += "</ClassResult>\n";
+            xml += clazz.competitors.map(function (comp) { return formatter.getPersonResultXml(comp, clazz); }).join("
+");
+            xml += "</ClassResult>
+";
         });
-        if (formatter.name === Version2Formatter.name) { xml += "</ResultList>\n"; } // v2 ends here
+        if (formatter.name === Version2Formatter.name) { xml += "</ResultList>
+"; } // v2 ends here
         else { xml += V3_RESULT_LIST_END; } // v3 needs closing tag if header didn't include it
         return xml;
     }
@@ -611,20 +664,24 @@ describe("Input.IOFXml", () => {
     });
 
     it("Cannot parse a string for the v2.0.3 format that does not contain an IOFVersion element", () => {
-        assertWrongFileFormat(V2_HEADER + "<ResultList><NotTheIOFVersion version=\"1.2.3\" /><ClassResult /></ResultList>\n");
+        assertWrongFileFormat(V2_HEADER + "<ResultList><NotTheIOFVersion version=\"1.2.3\" /><ClassResult /></ResultList>
+");
     });
 
     it("Cannot parse a string for the v2.0.3 format that has an IOFVersion element with no version attribute", () => {
-        assertWrongFileFormat(V2_HEADER + "<ResultList><IOFVersion /><ClassResult /></ResultList>\n");
+        assertWrongFileFormat(V2_HEADER + "<ResultList><IOFVersion /><ClassResult /></ResultList>
+");
     });
 
     it("Cannot parse a string for the v2.0.3 format that has an IOFVersion element with a version other than 2.0.3", () => {
-        assertWrongFileFormat(V2_HEADER + "<ResultList><IOFVersion version=\"wrong\" /><ClassResult /></ResultList>\n");
+        assertWrongFileFormat(V2_HEADER + "<ResultList><IOFVersion version=\"wrong\" /><ClassResult /></ResultList>
+");
     });
 
     it("Cannot parse a string for the v2.0.3 format that has a status of something other than complete", () => {
         assertInvalidData(
-            V2_HEADER + "<ResultList status=\"delta\"><IOFVersion version=\"2.0.3\" /></ResultList>\n",
+            V2_HEADER + "<ResultList status=\"delta\"><IOFVersion version=\"2.0.3\" /></ResultList>
+",
             "Exception should be thrown attempting to parse XML that contains an IOFVersion element with a wrong version");
     });
 
@@ -684,9 +741,12 @@ describe("Input.IOFXml", () => {
               <Name>${eventName}</Name>
               <StartTime><Date>${eventDateStr}</Date></StartTime>
             </Event>`;
-        xml += "<ClassResult>\n" + Version3Formatter.getClassXml(classes[0].name) + Version3Formatter.getCourseXml(classes[0]);
-        xml += classes[0].competitors.map(comp => Version3Formatter.getPersonResultXml(comp, classes[0])).join("\n");
-        xml += "</ClassResult>\n" + V3_RESULT_LIST_END;
+        xml += "<ClassResult>
+" + Version3Formatter.getClassXml(classes[0].name) + Version3Formatter.getCourseXml(classes[0]);
+        xml += classes[0].competitors.map(comp => Version3Formatter.getPersonResultXml(comp, classes[0])).join("
+");
+        xml += "</ClassResult>
+" + V3_RESULT_LIST_END;
 
         const eventData = parseEventData(xml);
         expect(eventData.eventName).toEqual(eventName, "Event name should be parsed correctly");
@@ -1115,7 +1175,9 @@ describe("Input.IOFXml", () => {
                     const timeRegex = /<Time>[^<]+<\/Time>/g;
                     const firstMatch = timeRegex.exec(xml)[0];
                     const firstMatchTime = firstMatch.substring(6, firstMatch.length - 7);
-                    xml = xml.replace(firstMatch, "<Time>\r\n<Clock>" + firstMatchTime + "</Clock>\r\n</Time>");
+                    xml = xml.replace(firstMatch, "<Time>
+<Clock>" + firstMatchTime + "</Clock>
+</Time>");
                     return xml;
                 },
                 formatters: [Version2Formatter]

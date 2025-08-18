@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 
 import { DatePipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, computed, inject, output, signal } from "@angular/core";
@@ -80,4 +86,3 @@ function filterClubs(clubs: Club[], natFilter: string, nameFilter: string) {
       .filter(club => nameFilter === "" || club.name.includes(nameFilter.toUpperCase())
       );
 }
-

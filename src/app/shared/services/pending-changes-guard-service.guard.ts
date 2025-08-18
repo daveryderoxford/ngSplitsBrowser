@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
@@ -19,7 +25,8 @@ export class PendingChangesGuard {
       return true;
     } else {
       return this.ds.confirm(' Unsaved changes',
-        'You have unsaved changes.  \n Press Cancel to go back and save these changes, or OK to lose these changes.');
+        'You have unsaved changes.  
+ Press Cancel to go back and save these changes, or OK to lose these changes.');
     }
   }
 }

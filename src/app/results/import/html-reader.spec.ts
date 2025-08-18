@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 // @ts-nocheck
 
 /*
@@ -158,7 +164,8 @@ describe("Input.Html", () => {
             secondCellContents += climb.toString() + " m";
         }
 
-        header += cellOld(secondCellContents) + "\n";
+        header += cellOld(secondCellContents) + "
+";
         return header;
     }
 
@@ -183,7 +190,8 @@ describe("Input.Html", () => {
             line += "  F  ";
         }
 
-        line += "\n";
+        line += "
+";
 
         return line;
     }
@@ -252,7 +260,9 @@ describe("Input.Html", () => {
             }
         }
 
-        return line1 + "\n" + line2 + "\n";
+        return line1 + "
+" + line2 + "
+";
     }
 
     // New (tabular) format.
@@ -275,11 +285,17 @@ describe("Input.Html", () => {
     * @return {String} The created header line.
     */
     function getCourseHeaderNew(name, length, climb) {
-        const header = '<table width=1105px>\n<tbody>\n<tr>' +
+        const header = '<table width=1105px>
+<tbody>
+<tr>' +
                      cellNew(name + " (21)") +
                      cellNew((length === null) ? "" : length + " Km") +
                      cellNew((climb === null) ? "" : climb + " m") +
-                     '<td id="header" ></td>\n</tr>\n</tbody>\n</table>\n';
+                     '<td id="header" ></td>
+</tr>
+</tbody>
+</table>
+';
         return header;
     }
 
@@ -304,7 +320,8 @@ describe("Input.Html", () => {
             line += cellNew("F");
         }
 
-        line = "<tr>" + line + "</tr>\n";
+        line = "<tr>" + line + "</tr>
+";
 
         return line;
     }
@@ -366,39 +383,92 @@ describe("Input.Html", () => {
             }
         }
 
-        return "<tr>" + line1 + "</tr>\n<tr>" + line2 + "</tr>\n";
+        return "<tr>" + line1 + "</tr>
+<tr>" + line2 + "</tr>
+";
     }
 
-    const NEW_FORMAT_DATA_HEADER = '<body>\n<div id=reporttop>\n<table width=1105px style="table-layout:auto;">\n<tr><td><nobr>Event title</nobr></td><td id=rb><nobr>Sun 01/02/2013 12:34</nobr></td></tr>\n</table>\n<hr>\n</div>\n<table id=ln><tr><td>&nbsp</td></tr></table>\n';
+    const NEW_FORMAT_DATA_HEADER = '<body>
+<div id=reporttop>
+<table width=1105px style="table-layout:auto;">
+<tr><td><nobr>Event title</nobr></td><td id=rb><nobr>Sun 01/02/2013 12:34</nobr></td></tr>
+</table>
+<hr>
+</div>
+<table id=ln><tr><td>&nbsp</td></tr></table>
+';
 
-    const NEW_FORMAT_COURSE_HEADER_TABLE_CLASS = "<table width=1105px>\n<col width=32px>\n<col width=39px>\n<col width=133px>\n<thead>\n<tr><th id=rb>Pl</th><th id=rb>Stno</th><th>Name</th><th>Cl.</th><th id=rb>Time</th><th id=rb></th><th id=rb></th></tr>\n</thead><tbody></tbody></table>\n";
+    const NEW_FORMAT_COURSE_HEADER_TABLE_CLASS = "<table width=1105px>
+<col width=32px>
+<col width=39px>
+<col width=133px>
+<thead>
+<tr><th id=rb>Pl</th><th id=rb>Stno</th><th>Name</th><th>Cl.</th><th id=rb>Time</th><th id=rb></th><th id=rb></th></tr>
+</thead><tbody></tbody></table>
+";
 
-    const NEW_FORMAT_COURSE_HEADER_TABLE_NO_CLASS = "<table width=1105px>\n<col width=32px>\n<col width=39px>\n<col width=133px>\n<thead>\n<tr><th id=rb>Pl</th><th id=rb>Stno</th><th>Name</th><th id=rb>Time</th><th id=rb></th><th id=rb></th></tr>\n</thead><tbody></tbody></table>\n";
+    const NEW_FORMAT_COURSE_HEADER_TABLE_NO_CLASS = "<table width=1105px>
+<col width=32px>
+<col width=39px>
+<col width=133px>
+<thead>
+<tr><th id=rb>Pl</th><th id=rb>Stno</th><th>Name</th><th id=rb>Time</th><th id=rb></th><th id=rb></th></tr>
+</thead><tbody></tbody></table>
+";
 
-    const NEW_FORMAT_COURSE_HEADER_TABLE_NO_CLASS_NO_STARTNO = "<table width=1105px>\n<col width=32px>\n<col width=39px>\n<col width=133px>\n<thead>\n<tr><th id=rb>Pl</th><th>Name</th><th id=rb>Time</th><th id=rb></th><th id=rb></th></tr>\n</thead><tbody></tbody></table>\n";
+    const NEW_FORMAT_COURSE_HEADER_TABLE_NO_CLASS_NO_STARTNO = "<table width=1105px>
+<col width=32px>
+<col width=39px>
+<col width=133px>
+<thead>
+<tr><th id=rb>Pl</th><th>Name</th><th id=rb>Time</th><th id=rb></th><th id=rb></th></tr>
+</thead><tbody></tbody></table>
+";
 
-    const NEW_FORMAT_RESULTS_TABLE_HEADER = "<table width=1105px>\n<col width=32px>\n<col width=39px>\n<col width=133px>\n<tbody>\n";
+    const NEW_FORMAT_RESULTS_TABLE_HEADER = "<table width=1105px>
+<col width=32px>
+<col width=39px>
+<col width=133px>
+<tbody>
+";
 
     // Separator used to separate the competitors that completed the course
     // from those that mispunched.
-    const NEW_FORMAT_MID_TABLE_SEPARATOR = "<tr><td id=c10><nobr>&nbsp</nobr></td></tr>\n";
+    const NEW_FORMAT_MID_TABLE_SEPARATOR = "<tr><td id=c10><nobr>&nbsp</nobr></td></tr>
+";
 
-    const NEW_FORMAT_COURSE_TABLE_FOOTER = NEW_FORMAT_MID_TABLE_SEPARATOR + NEW_FORMAT_MID_TABLE_SEPARATOR + "</tbody>\n</table>\n";
+    const NEW_FORMAT_COURSE_TABLE_FOOTER = NEW_FORMAT_MID_TABLE_SEPARATOR + NEW_FORMAT_MID_TABLE_SEPARATOR + "</tbody>
+</table>
+";
 
-    const NEW_FORMAT_DATA_FOOTER = "</body>\n</html>\n";
+    const NEW_FORMAT_DATA_FOOTER = "</body>
+</html>
+";
 
     //  OEvent tabular format.
 
-    const OEVENT_FORMAT_HEADER = '<html>\n' +
-                               '<head>\n' +
-                               '<META http-equiv="content-type" content="text/html" charset=utf-8>\n' +
-                               '<title>Title</title>\n' +
-                               '<STYLE type="text/css"></STYLE>\n' +
-                               '</head>\n' +
-                               '<body>\n' +
-                               '<table width="100%" class="header">\n<tr><td>Title</td></tr>\n</table>\n' +
-                               "<hr>\n" +
-                               "<table>\n";
+    const OEVENT_FORMAT_HEADER = '<html>
+' +
+                               '<head>
+' +
+                               '<META http-equiv="content-type" content="text/html" charset=utf-8>
+' +
+                               '<title>Title</title>
+' +
+                               '<STYLE type="text/css"></STYLE>
+' +
+                               '</head>
+' +
+                               '<body>
+' +
+                               '<table width="100%" class="header">
+<tr><td>Title</td></tr>
+</table>
+' +
+                               "<hr>
+" +
+                               "<table>
+";
 
     /**
     * Returns a table cell in the OEvent tabular format.
@@ -424,7 +494,8 @@ describe("Input.Html", () => {
             const lengthInMetres = Math.round(length * 1000);
             contents = name + "    (" + lengthInMetres + "m, " + climb + "m)";
         }
-        return "<tr class=\"clubName\"><td colspan=\"24\">" + contents + "</td></tr>\n";
+        return "<tr class=\"clubName\"><td colspan=\"24\">" + contents + "</td></tr>
+";
     }
 
     /**
@@ -446,7 +517,8 @@ describe("Input.Html", () => {
             line += getCellOEventTabular("F") + emptyCell;
         }
 
-        return "<tr>" + line + "</tr>\n";
+        return "<tr>" + line + "</tr>
+";
     }
 
     /**
@@ -512,14 +584,19 @@ describe("Input.Html", () => {
             }
         }
 
-        firstLine += "</tr>\n";
-        secondLine += "</tr>\n";
+        firstLine += "</tr>
+";
+        secondLine += "</tr>
+";
         return firstLine + secondLine;
     }
 
     const OLD_FORMAT = {
         name: "old format (preformatted)",
-        header: "<html><head></head><body>\n<pre>\n<font>Dummy line</font>\n",
+        header: "<html><head></head><body>
+<pre>
+<font>Dummy line</font>
+",
         courseHeaderFunc: getCourseHeaderLineOld,
         tableHeaderNoClass: "",
         tableHeaderWithClass: "",
@@ -539,21 +616,29 @@ describe("Input.Html", () => {
         controlsLineFunc: getControlsLineNew,
         competitorDataFunc: getCompetitorLinesNew,
         mispuncherSeparator: NEW_FORMAT_MID_TABLE_SEPARATOR,
-        tableFooter: NEW_FORMAT_MID_TABLE_SEPARATOR + NEW_FORMAT_MID_TABLE_SEPARATOR + "</tbody>\n</table>\n",
-        footer: "</body>\n</html>\n"
+        tableFooter: NEW_FORMAT_MID_TABLE_SEPARATOR + NEW_FORMAT_MID_TABLE_SEPARATOR + "</tbody>
+</table>
+",
+        footer: "</body>
+</html>
+"
     };
 
     const OEVENT_FORMAT = {
         name: "OEvent tabular format",
         header: OEVENT_FORMAT_HEADER,
         courseHeaderFunc: getCourseHeaderOEventTabular,
-        tableHeaderNoClass: "<tr><td colspan=\"24\">&nbsp;</td></tr>\n",
-        tableHeaderWithClass: "<tr><td colspan=\"25\">&nbsp;</td></tr>\n",
+        tableHeaderNoClass: "<tr><td colspan=\"24\">&nbsp;</td></tr>
+",
+        tableHeaderWithClass: "<tr><td colspan=\"25\">&nbsp;</td></tr>
+",
         controlsLineFunc: getControlsLineOEventTabular,
         competitorDataFunc: getCompetitorLinesOEventTabular,
         mispuncherSeparator: "",
         tableFooter: "",
-        footer: "</table>\n</body>\n</html>"
+        footer: "</table>
+</body>
+</html>"
     };
 
     const ALL_TEMPLATES = [OLD_FORMAT, NEW_FORMAT, OEVENT_FORMAT];
@@ -814,7 +899,14 @@ describe("Input.Html", () => {
                 preprocessor: function (html) {
                     // Six newlines (the length of the closing tag) should be enough
                     // to trigger the bug that caused this.
-                    return html.replace("</pre>", "\n\n\n\n\n\n</pre>\n");
+                    return html.replace("</pre>", "
+
+
+
+
+
+</pre>
+");
                 }
             });
     });
@@ -975,7 +1067,9 @@ describe("Input.Html", () => {
                 expect(eventData.classes[0].competitors.length).toEqual(1);
                 expect(eventData.courses[0].classes.length).toEqual(1);
             },
-            {preprocessor: function (html) { return html.replace(/\n/g, "\r\n"); }});
+            {preprocessor: function (html) { return html.replace(/
+/g, "
+"); }});
     });
 
     it("Can parse event data with a single course and single competitor with doubled line endings in all formats", () => {
@@ -989,7 +1083,10 @@ describe("Input.Html", () => {
                 expect(eventData.classes[0].competitors.length).toEqual(1);
                 expect(eventData.courses[0].classes.length).toEqual(1);
             },
-            {preprocessor: function (html) { return html.replace(/\n/g, "\n\n"); }}
+            {preprocessor: function (html) { return html.replace(/
+/g, "
+
+"); }}
         );
     });
 
@@ -1004,7 +1101,8 @@ describe("Input.Html", () => {
                 expect(eventData.classes[0].competitors.length).toEqual(1);
                 expect(eventData.courses[0].classes.length).toEqual(1);
             },
-            {preprocessor: function (html) { return html.replace(/\n/g, "\r"); }});
+            {preprocessor: function (html) { return html.replace(/
+/g, ""); }});
     });
 
     it("Can parse event data with a single course and single mispunching competitor in all formats", () => {
@@ -1145,7 +1243,10 @@ describe("Input.Html", () => {
     // Format-specific tests.
 
     it("Cannot parse a string that contains an opening pre tag but no closing pre tag", () => {
-        runInvalidDataTest( "<html><head></head><body>\n<pre>\n<font>blah blah blah</font>\n</body></html>", "a string that contains <pre> but not </pre>", "InvalidData");
+        runInvalidDataTest( "<html><head></head><body>
+<pre>
+<font>blah blah blah</font>
+</body></html>", "a string that contains <pre> but not </pre>", "InvalidData");
     });
 
     it("Cannot read event data without any closing table elements", () => {
@@ -1173,11 +1274,29 @@ describe("Input.Html", () => {
 
     // Needs to remain format-specific as the newlines can only be inserted at specific locations.
     it("Can parse event data with a single course and single competitor with extra blank lines in the old format", () => {
-        const html = "<html><head></head><body>\n<pre>\n\n\n" +
-                   getCourseHeaderLineOld("Test course 1", 2.7, 35) + "\n" +
-                   getControlsLineOld(["138", "152", "141"], 0, true) + "\n\n\n\n\n\n" +
-                   getCompetitorLinesOld(1, "165", "Test runner", "TEST", false, "", "09:25", ["01:47", "04:02", "08:13", "09:25"], ["01:47", "02:15", "04:11", "01:12"]) + "\n\n\n" +
-                   "</pre></body></html>\n\n\n\n";
+        const html = "<html><head></head><body>
+<pre>
+
+
+" +
+                   getCourseHeaderLineOld("Test course 1", 2.7, 35) + "
+" +
+                   getControlsLineOld(["138", "152", "141"], 0, true) + "
+
+
+
+
+
+" +
+                   getCompetitorLinesOld(1, "165", "Test runner", "TEST", false, "", "09:25", ["01:47", "04:02", "08:13", "09:25"], ["01:47", "02:15", "04:11", "01:12"]) + "
+
+
+" +
+                   "</pre></body></html>
+
+
+
+";
         const eventData = parseEventData(html);
         expect(eventData.courses.length).toEqual(1,  "One course should have been read");
         expect(eventData.classes.length).toEqual(1,  "One class should have been read");
@@ -1187,10 +1306,20 @@ describe("Input.Html", () => {
 
     it("Can parse event data with a single course and single competitor with extra blank lines in the new format", () => {
         const html = NEW_FORMAT_DATA_HEADER +
-                   getCourseHeaderNew("Test course 1", "2.7", "35") + "\n" +
+                   getCourseHeaderNew("Test course 1", "2.7", "35") + "
+" +
                    NEW_FORMAT_COURSE_HEADER_TABLE_NO_CLASS + NEW_FORMAT_RESULTS_TABLE_HEADER +
-                   getControlsLineNew(["138", "152", "141"], 0, true) + "\n\n\n\n\n\n" +
-                   getCompetitorLinesNew("1", "165", "Test runner", "TEST", false, "", "09:25", ["01:47", "04:02", "08:13", "09:25"], ["01:47", "02:15", "04:11", "01:12"]) + "\n\n\n" +
+                   getControlsLineNew(["138", "152", "141"], 0, true) + "
+
+
+
+
+
+" +
+                   getCompetitorLinesNew("1", "165", "Test runner", "TEST", false, "", "09:25", ["01:47", "04:02", "08:13", "09:25"], ["01:47", "02:15", "04:11", "01:12"]) + "
+
+
+" +
                    NEW_FORMAT_COURSE_TABLE_FOOTER + NEW_FORMAT_DATA_FOOTER;
         const eventData = parseEventData(html);
         expect(eventData.courses.length).toEqual(1,  "One course should have been read");
@@ -1201,14 +1330,18 @@ describe("Input.Html", () => {
 
     // Needs to remain format-specific as the string manipulation is format-specific.
     it("Cannot parse event data in the old format where the second line of a competitor is missing", () => {
-        let html = "<html><head></head><body>\n<pre>\n" +
+        let html = "<html><head></head><body>
+<pre>
+" +
                    getCourseHeaderLineOld("Test course 1", 2.7, 35) +
                    getControlsLineOld(["138", "152", "141"], 0, true) +
                    getCompetitorLinesOld(1, "165", "Test runner", "TEST0123", false, "", "12:12", ["01:47", "04:02", "08:13"], ["01:47", "02:15", "04:11"]);
 
         const clubIndex = html.indexOf("TEST0123");
-        const lastNewlineIndex = html.lastIndexOf("\n", clubIndex);
-        html = html.substring(0, lastNewlineIndex) + "\n</pre></body></html>";
+        const lastNewlineIndex = html.lastIndexOf("
+", clubIndex);
+        html = html.substring(0, lastNewlineIndex) + "
+</pre></body></html>";
         runInvalidDataTest( html, "data with a missing second line of competitor data");
     });
 
@@ -1220,7 +1353,8 @@ describe("Input.Html", () => {
                    getCompetitorLinesNew("1", "165", "Test runner", "TEST0123", false, "", "12:12", ["01:47", "04:02", "08:13"], ["01:47", "02:15", "04:11"]);
 
         const clubIndex = html.indexOf("TEST0123");
-        const lastNewlineIndex = html.lastIndexOf("\n", clubIndex);
+        const lastNewlineIndex = html.lastIndexOf("
+", clubIndex);
         html = html.substring(0, lastNewlineIndex) + NEW_FORMAT_COURSE_TABLE_FOOTER + NEW_FORMAT_DATA_FOOTER;
         runInvalidDataTest( html, "data with a missing second line of competitor data");
     });
@@ -1279,9 +1413,16 @@ describe("Input.Html", () => {
                    getControlsLineNew(["164", "107", "133"], 0, true) +
                    getCompetitorLinesNew("", "165", "Test runner 2", "ABCD", false, "", "09:58", ["01:47", "04:02", "05:27", "09:58"], ["01:47", "02:15", "01:25", "04:31"]) +
                    NEW_FORMAT_COURSE_TABLE_FOOTER +
-                   "<div id=\"navigation\">\n<table>\n" +
-                   "<tr>\n<td>etc. etc. etc.</td>\n</tr>\n" +
-                   "</table>\n</div>\n" +
+                   "<div id=\"navigation\">
+<table>
+" +
+                   "<tr>
+<td>etc. etc. etc.</td>
+</tr>
+" +
+                   "</table>
+</div>
+" +
                    NEW_FORMAT_DATA_FOOTER;
         const eventData = parseEventData(html);
         expect(eventData.courses.length).toEqual(2,  "Two courses should have been read");
@@ -1292,10 +1433,20 @@ describe("Input.Html", () => {
 
     it("Can parse event data in new-format with no start numbers", () => {
         const html = NEW_FORMAT_DATA_HEADER +
-                   getCourseHeaderNew("Test course 1", "2.7", "35") + "\n" +
+                   getCourseHeaderNew("Test course 1", "2.7", "35") + "
+" +
                    NEW_FORMAT_COURSE_HEADER_TABLE_NO_CLASS_NO_STARTNO + NEW_FORMAT_RESULTS_TABLE_HEADER +
-                   getControlsLineNew(["138", "152", "141"], 0, true) + "\n\n\n\n\n\n" +
-                   getCompetitorLinesNew("1", null, "Test runner", "TEST", false, "", "09:25", ["01:47", "04:02", "08:13", "09:25"], ["01:47", "02:15", "04:11", "01:12"]) + "\n\n\n" +
+                   getControlsLineNew(["138", "152", "141"], 0, true) + "
+
+
+
+
+
+" +
+                   getCompetitorLinesNew("1", null, "Test runner", "TEST", false, "", "09:25", ["01:47", "04:02", "08:13", "09:25"], ["01:47", "02:15", "04:11", "01:12"]) + "
+
+
+" +
                    NEW_FORMAT_COURSE_TABLE_FOOTER + NEW_FORMAT_DATA_FOOTER;
         const eventData = parseEventData(html);
         expect(eventData.courses.length).toEqual(1,  "One course should have been read");

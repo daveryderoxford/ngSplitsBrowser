@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 
 import { range as d3_range } from "d3-array";
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
@@ -105,7 +111,8 @@ class OEReader {
 
         this.data = normaliseLineEndings(this.data);
 
-        this.lines = this.data.split(/\n/);
+        this.lines = this.data.split(/
+/);
 
         const delimiter = this.identifyDelimiter();
 
@@ -151,7 +158,7 @@ class OEReader {
     */
     private identifyDelimiter(): string {
 
-        const DELIMITERS = [";", ",", "\t", "\\"];
+        const DELIMITERS = [";", ",", "	", "\"];
 
         if (this.lines.length <= 1) {
             throw new WrongFileFormat("No data found to read");

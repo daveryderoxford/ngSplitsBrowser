@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 import { ascending, bisect, max, min, range, zip } from "d3-array";
 import { axisBottom, axisLeft, axisTop } from "d3-axis";
 import { scaleLinear, ScaleLinear } from "d3-scale";
@@ -89,7 +95,7 @@ const DOM_EVENT_LEFT_BUTTON = 0;
 // The number that identifies the right mouse button in a DOM event.
 const DOM_EVENT_RIGHT_BUTTON = 2;
 
-const SPACER = "\xa0\xa0\xa0\xa0";
+const SPACER = "    ";
 
 // The maximum number of fastest splits to show when the popup is open.
 const MAX_FASTEST_SPLITS = 10;

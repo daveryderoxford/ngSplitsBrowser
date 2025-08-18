@@ -1,3 +1,9 @@
+/*! 
+*  @license
+*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
+*  Use of this source code is governed by an MIT-style license that can be
+*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
+*/
 /*
  *  SplitsBrowser - Alternative CSV Reader tests.
  *
@@ -73,7 +79,8 @@ function fabricateTripleColumnRow(name: string,
         }
     }
 
-    return row.join(",") + "\r\n";
+    return row.join(",") + "
+";
 }
 
 describe("Input.AlternativeCSV.TripleColumn", () => {
@@ -90,24 +97,30 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
 
     it("Cannot parse a string that contains only the headers and blank lines", () => {
         TestSupport.assertException( "WrongFileFormat", () => {
-            parseTripleColumnEventData(TRIPLE_COLUMN_HEADER + "\r\n\r\n\r\n");
+            parseTripleColumnEventData(TRIPLE_COLUMN_HEADER + "
+
+
+");
         }, "Should throw an exception for parsing a string containing only the headers and blank lines");
     });
 
     it("Cannot parse a string that contains only the headers and blank lines 2", () => {
         TestSupport.assertException( "WrongFileFormat", () => {
-            parseTripleColumnEventData(TRIPLE_COLUMN_HEADER + "\r\n1,2,3,4,5");
+            parseTripleColumnEventData(TRIPLE_COLUMN_HEADER + "
+1,2,3,4,5");
         }, "Should throw an exception for parsing a string containing only the headers and a too-short line");
     });
 
     it("Cannot parse a string that contains a line with a non-alphanumeric control code", () => {
         TestSupport.assertException( "WrongFileFormat", () => {
-            parseTripleColumnEventData(TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "IN:VA:LID", "188"], null, [null, null, null]));
+            parseTripleColumnEventData(TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "IN:VA:LID", "188"], null, [null, null, null]));
         }, "Should throw an exception for parsing a string containing a non-alphanumeric control code");
     });
 
     it("Can parse a string that contains a single valid competitor", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
         const eventData = parseTripleColumnEventData(data);
 
         expect(eventData.classes.length).toEqual(1);
@@ -137,23 +150,27 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains a single valid competitor with LF line endings", () => {
-        let data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
-        data = data.replace(/\r/g, "");
+        let data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
+        data = data.replace(//g, "");
         const eventData = parseTripleColumnEventData(data);
         expect(eventData.classes.length).toEqual(1);
         expect(eventData.courses.length).toEqual(1);
     });
 
     it("Can parse a string that contains a single valid competitor with CR line endings", () => {
-        let data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
-        data = data.replace(/\n/g, "");
+        let data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
+        data = data.replace(/
+/g, "");
         const eventData = parseTripleColumnEventData(data);
         expect(eventData.classes.length).toEqual(1);
         expect(eventData.courses.length).toEqual(1);
     });
 
     it("Can parse a string that contains a single valid competitor with data delimited by semicolons", () => {
-        let data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
+        let data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
         data = data.replace(/,/g, ";");
         const eventData = parseTripleColumnEventData(data);
         expect(eventData.classes.length).toEqual(1);
@@ -161,7 +178,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains a single valid competitor with alphanumeric but not numeric control code", () => {
-        let data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "ABC188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
+        let data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "ABC188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
         data = data.replace(/,/g, ";");
         const eventData = parseTripleColumnEventData(data);
         expect(eventData.classes.length).toEqual(1);
@@ -171,7 +189,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains a single valid competitor with two names", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith, Fred Baker", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith, Fred Baker", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
         const eventData = parseTripleColumnEventData(data);
         expect(eventData.classes.length).toEqual(1);
 
@@ -183,7 +202,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains two valid competitors on the same course", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
                                      fabricateTripleColumnRow("Fred Baker", "ABCD", "Course 1", ["152", "188", "163", "F1"], 11 * 3600 + 19 * 60, [84, 139, 199, 217]);
         const eventData = parseTripleColumnEventData(data);
 
@@ -207,7 +227,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains one valid competitor and issue warning for one competitor that contains no times and some other nonsense", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]);
         let secondLine = fabricateTripleColumnRow("Fred Baker", "ABCD", "Course 1", [], null, []);
         const secondLineParts = secondLine.split(",");
         secondLineParts[37] = "10";
@@ -218,7 +239,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains two valid competitors on the same course but in different classes", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Class 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Class 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
                                      fabricateTripleColumnRow("Fred Baker", "ABCD", "Class 2", ["152", "188", "163", "F1"], 11 * 3600 + 19 * 60, [84, 139, 199, 217]);
         const eventData = parseTripleColumnEventData(data);
 
@@ -229,7 +251,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains two valid competitors on different courses and in different classes", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Class 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Class 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
                                      fabricateTripleColumnRow("Fred Baker", "ABCD", "Class 2", ["152", "174", "119", "F1"], 11 * 3600 + 19 * 60, [84, 139, 199, 217]);
         const eventData = parseTripleColumnEventData(data);
 
@@ -238,7 +261,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Issues a warning for a string that contains two competitors on the same course with different numbers of controls", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, 202]) +
                                      fabricateTripleColumnRow("Fred Baker", "ABCD", "Course 1", ["152", "188", "163", "186", "F1"], 11 * 3600 + 19 * 60, [84, 139, 199, 257, 282]);
         const eventData = parseTripleColumnEventData(data);
         expect(eventData.classes.length).toEqual(1);
@@ -248,7 +272,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains a single competitor missing an intermediate control", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, null, 186, 202]);
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, null, 186, 202]);
         const eventData = parseTripleColumnEventData(data);
 
         expect(eventData.classes.length).toEqual(1);
@@ -264,7 +289,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains a single competitor missing the finish control", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, null]);
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [72, 141, 186, null]);
         const eventData = parseTripleColumnEventData(data);
 
         expect(eventData.classes.length).toEqual(1);
@@ -280,7 +306,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
     });
 
     it("Can parse a string that contains a single competitor missing all controls and mark said competitor as a non-starter", () => {
-        const data = TRIPLE_COLUMN_HEADER + "\r\n" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [null, null, null, null]);
+        const data = TRIPLE_COLUMN_HEADER + "
+" + fabricateTripleColumnRow("John Smith", "TEST", "Course 1", ["152", "188", "163", "F1"], 10 * 3600 + 38 * 60, [null, null, null, null]);
         const eventData = parseTripleColumnEventData(data);
 
         expect(eventData.classes.length).toEqual(1);
