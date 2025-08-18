@@ -9,9 +9,9 @@ set -e
 
 # --- Configuration ---
 # The file containing the header text to prepend.
-HEADER_FILE="header.ts.txt"
+HEADER_FILE="./scripts/header.ts.txt"
 # An array of directories to search for .ts files.
-TARGET_DIRS=("../src/app" "../firebase/functions")
+TARGET_DIRS=("./src/app" "./firebase/functions/src" "./firebase/functions/test")
 # ---------------------
 
 # 1. Check if the header file exists.
