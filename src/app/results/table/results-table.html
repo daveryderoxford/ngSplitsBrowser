@@ -5,6 +5,8 @@
 } @else {
   <app-results-navbar>
 
+    <span class="dummy-button" start></span>
+
     <app-class-select [selected]='rs.oclass()' (onSelected)='rs.selectClass($event)' [oclasses]='rd.results().classes' />
 
     @if (course()?.classes.length > 1) {

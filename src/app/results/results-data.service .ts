@@ -49,11 +49,10 @@ export class ResultsDataService {
 
    viewStoredEvent(id: string, name = "", date?: Date | undefined) {
       this._event.set({
-         source: 'stored',
          key: id,
          name: name,
          date: date
-      } as ResultsEventDetails);
+      });
    }
 
    clearEvent() {
