@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 // @ts-nocheck
 
 import { messages } from "./messages";
@@ -107,7 +101,7 @@ export class Lang {
                 // without using regexps.  So we must escape any magic regex
                 // metacharacters first, so that we have a regexp that will
                 // match a single static string.
-                const paramNameRegexEscaped = paramName.replace(/([.+*?|{}()^$\[\]\])/g, "\$1");
+                const paramNameRegexEscaped = paramName.replace(/([.+*?|{}()^$\[\]\\])/g, "\\$1");
                 message = message.replace(new RegExp(paramNameRegexEscaped, "g"), params[paramName]);
             }
         }

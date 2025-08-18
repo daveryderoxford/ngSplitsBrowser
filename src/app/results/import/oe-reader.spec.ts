@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 // @ts-nocheck
 
 /*
@@ -35,8 +29,7 @@ const parseTime = TimeUtilities.parseTime;
 const parseEventData = parseOEEventData;
 
 // Header line when control 1 is in column 46.
-const HEADER_46 = "Stno;SI card;Database Id;Surname;First name;YB;S;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;
-";
+const HEADER_46 = "Stno;SI card;Database Id;Surname;First name;YB;S;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;\r\n";
 
 // Template for the row data that precedes the controls.
 const ROW_TEMPLATE_46 = "0;1;2;surname;forename;yearOfBirth;gender;7;nonComp;startTime;10;time;classifier;13;14;club;16;17;className;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;course;distance;climb;numControls;placing;startPunch;finish";
@@ -44,8 +37,7 @@ const ROW_TEMPLATE_46 = "0;1;2;surname;forename;yearOfBirth;gender;7;nonComp;sta
 // Header line when control 1 is in column 44.
 // Compared to the variant above, this line has no 'S' column and has the
 // 'First name' and 'Surname' columns merged into one.
-const HEADER_44 = "Stno;SI card;Database Id;Name;YB;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;
-";
+const HEADER_44 = "Stno;SI card;Database Id;Name;YB;Block;nc;Start;Finish;Time;Classifier;Club no.;Cl.name;City;Nat;Cl. no.;Short;Long;Num1;Num2;Num3;Text1;Text2;Text3;Adr. name;Street;Line2;Zip;City;Phone;Fax;Email;Id/Club;Rented;Start fee;Paid;Course no.;Course;Km;m;Course controls;Pl;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;\r\n";
 
 // Template for the row data that precedes the controls.
 const ROW_TEMPLATE_44 = "0;1;2;name;yearOfBirth;5;nonComp;startTime;8;time;classifier;11;12;club;14;15;className;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;course;distance;climb;numControls;placing;startPunch;finish";
@@ -53,8 +45,7 @@ const ROW_TEMPLATE_44 = "0;1;2;name;yearOfBirth;5;nonComp;startTime;8;time;class
 // Header line when control 1 is in column 60.
 // This has various new columns.  It also doesn't always have competitor
 // names and total times.
-const HEADER_60 = "OE0014;Stno;XStno;Chipno;Database Id;Surname;First name;YB;S;Block;nc;Start;Finish;Time;Classifier;Credit -;Penalty +;Comment;Club no.;Cl.name;City;Nat;Location;Region;Cl. no.;Short;Long;Entry cl. No;Entry class (short);Entry class (long);Rank;Ranking points;Num1;Num2;Num3;Text1;Text2;Text3;Addr. surname;Addr. first name;Street;Line2;Zip;Addr. city;Phone;Mobile;Fax;EMail;Rented;Start fee;Paid;Team;Course no.;Course;km;m;Course controls;Place;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;
-";
+const HEADER_60 = "OE0014;Stno;XStno;Chipno;Database Id;Surname;First name;YB;S;Block;nc;Start;Finish;Time;Classifier;Credit -;Penalty +;Comment;Club no.;Cl.name;City;Nat;Location;Region;Cl. no.;Short;Long;Entry cl. No;Entry class (short);Entry class (long);Rank;Ranking points;Num1;Num2;Num3;Text1;Text2;Text3;Addr. surname;Addr. first name;Street;Line2;Zip;Addr. city;Phone;Mobile;Fax;EMail;Rented;Start fee;Paid;Team;Course no.;Course;km;m;Course controls;Place;Start punch;Finish punch;Control1;Punch1;Control2;Punch2;Control3;Punch3;Control4;Punch4;\r\n";
 
 // Template for the row data that precedes the controls of the 60-column variation.
 const ROW_TEMPLATE_60 = "0;1;2;compno;4;surname;forename;yearOfBirth;gender;9;nonComp;startTime;12;time;classifier;15;16;17;noOfClub;19;club;21;22;23;24;25;className;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;course;distance;climb;numControls;placing;startPunch;finish";
@@ -100,8 +91,7 @@ function generateRow(data: OECompetitorData, controls: Control[], template: stri
         row += ";" + control.code + ";" + control.time;
     });
 
-    return row + "
-";
+    return row + "\r\n";
 }
 
 interface OECompetitorData {
@@ -330,16 +320,11 @@ describe("Input.OE", () => {
     });
 
     it("Cannot parse a string that contains only the headers and blank lines", () => {
-        runInvalidDataTest(HEADER_46 + "
-
-
-", "data with a header row and blank lines only", "WrongFileFormat");
+        runInvalidDataTest(HEADER_46 + "\r\n\r\n\r\n", "data with a header row and blank lines only", "WrongFileFormat");
     });
 
     it("Cannot parse a string that contains only the headers and a junk line that happens to contain a semicolon", () => {
-        runInvalidDataTest(HEADER_46 + "
-rubbish;more rubbish
-", "data with a junk second line", "WrongFileFormat");
+        runInvalidDataTest(HEADER_46 + "\r\nrubbish;more rubbish\r\n", "data with a junk second line", "WrongFileFormat");
     });
 
     it("Cannot parse a string that is not semicolon-delimited data", () => {
@@ -363,8 +348,7 @@ rubbish;more rubbish
                 row = row.replace("name", comp[0].forename + " " + comp[0].surname);
             }
 
-            text += row + "
-";
+            text += row + "\r\n";
         });
 
         if (preprocessor) {
@@ -632,9 +616,7 @@ rubbish;more rubbish
             expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, 362, 393]);
             expect(eventData.courses.length).toEqual(1, "There should be one course");
         }, function (eventDataStr) {
-            return eventDataStr.replace(/
-/g, "
-");
+            return eventDataStr.replace(/\r\n/g, "\n");
         });
     });
 
@@ -642,8 +624,7 @@ rubbish;more rubbish
         runTestOverAllFormats([[getCompetitor1(), getControls1()]], function (eventData: Results) {
             expect(eventData.courses.length).toEqual(1, "There should be one course");
         }, function (eventDataStr) {
-            return eventDataStr.replace(/
-/g, "");
+            return eventDataStr.replace(/\r\n/g, "\r");
         });
     });
 
@@ -687,7 +668,7 @@ rubbish;more rubbish
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
         }, function (eventDataStr) {
-            return eventDataStr.replace(/;/g, "	");
+            return eventDataStr.replace(/;/g, "\t");
         });
     });
 
@@ -696,7 +677,7 @@ rubbish;more rubbish
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
         }, function (eventDataStr) {
-            return eventDataStr.replace(/;/g, "\");
+            return eventDataStr.replace(/;/g, "\\");
         });
     });
 
@@ -723,9 +704,7 @@ rubbish;more rubbish
     it("Cannot parse a string that contains a single competitor's data followed by a junk line", () => {
         ALL_FORMATS.forEach(function (format) {
             let eventDataStr = format.header + generateRow(getCompetitor1(), getControls1(), format.template);
-            eventDataStr = eventDataStr + "
-rubbish;more rubbish;
-";
+            eventDataStr = eventDataStr + "\r\nrubbish;more rubbish;\r\n";
             runInvalidDataTest(eventDataStr, "data with an unrecognised delimiter", "");
         });
     });
@@ -738,9 +717,7 @@ rubbish;more rubbish;
             line2 += Math.round((1 + Math.sin(i * i)) * 232) + ",";
         }
 
-        const eventDataStr = line1 + "X
-" + line2 + "0
-";
+        const eventDataStr = line1 + "X\n" + line2 + "0\n";
         runInvalidDataTest(eventDataStr, "an empty string", "WrongFileFormat");
     });
 
@@ -1098,3 +1075,4 @@ rubbish;more rubbish;
         });
     });
 });
+

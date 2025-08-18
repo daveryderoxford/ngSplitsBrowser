@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 import { AfterViewInit, Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
@@ -64,19 +58,15 @@ export class AddEvent implements AfterViewInit {
       try {
          const results = await this.eventService.uploadResults(this.oevent(), files[0]);
          if (results.warnings && results.warnings.length > 0) {
-            const msg = results.warnings.reduce((acc = '', warn) => acc + '
-' + warn);
+            const msg = results.warnings.reduce((acc = '', warn) => acc + '\n' + warn);
             await this.dialogsService.message("Warnings uploading splits",
-               "Splits uploaded with the following warning messages
-" + msg);
+               "Splits uploaded with the following warning messages\n" + msg);
          }
          this.stepper().selected.completed = true;
          this.stepper().next();
       } catch (err) {
-         console.log("EventAdminComponnet: Error uploading splits
- " + err);
-         this.dialogsService.message("Error uploading splits", "Error uploading splits
-" + err);
+         console.log("EventAdminComponnet: Error uploading splits\n " + err);
+         this.dialogsService.message("Error uploading splits", "Error uploading splits\n" + err);
       } finally {
          this.busy.set(false);
       }

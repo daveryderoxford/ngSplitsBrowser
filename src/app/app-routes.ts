@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth/guards/auth-guard';
 
@@ -22,3 +16,5 @@ export const APP_ROUTES: Routes = [
    { path: "sys-admin", title: 'System  Admin', loadComponent: () => import('./sys-admin/sys-admin-switchboard').then(c => c.SysAdminSwitchboard) },
 
 ];
+
+

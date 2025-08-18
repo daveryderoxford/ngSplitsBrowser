@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 /* eslint-disable @typescript-eslint/quotes */
 /* eslint-disable max-len */
 
@@ -4021,7 +4015,7 @@ export interface LegacyEvent {
     "nationality": "GBR",
     "club": "DFOK",
     "fileformat": 1,
-    "webpage": "http://http:\\\\www.dfok.co.uk",
+    "webpage": "http://http:\\\\\\\\www.dfok.co.uk",
     "email": "enquiries@dfok.co.uk",
     "type": 0,
     "legacyPassword": "dartford",
@@ -7642,7 +7636,7 @@ export interface LegacyEvent {
   },
   {
     "id": 655,
-    "name": "Rand\\\\\\'O du Castor 2004 - Circuits",
+    "name": "Rand\\\\\\\\\\\\'O du Castor 2004 - Circuits",
     "eventdate": 1100390400,
     "nationality": "FRA",
     "club": "GO78",
@@ -8893,7 +8887,7 @@ export interface LegacyEvent {
     "nationality": "GBR",
     "club": "WMOA",
     "fileformat": 1,
-    "webpage": "http://http:\\\\www.jk2005.org.uk",
+    "webpage": "http://http:\\\\\\\\www.jk2005.org.uk",
     "email": "mnapier@cix.co.uk",
     "type": 3,
     "legacyPassword": "jkday1",
@@ -13662,7 +13656,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1138,
-    "name": "Sprint\\'Orientation Ansouis, Manche 2",
+    "name": "Sprint\\\\'Orientation Ansouis, Manche 2",
     "eventdate": 1132444800,
     "nationality": "FRA",
     "club": "CSP AZIMUT VTT",
@@ -14208,7 +14202,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1186,
-    "name": "Regionale Beringen \Genemeer\\"\"",
+    "name": "Regionale Beringen \\Genemeer\\\"\"",
     "eventdate": 1134259200,
     "nationality": "BEL",
     "club": "HAMOK",
@@ -15132,7 +15126,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1255,
-    "name": "Rand\\'O des Ecureuils",
+    "name": "Rand\\\\'O des Ecureuils",
     "eventdate": 1138492800,
     "nationality": "FRA",
     "club": "ACA",
@@ -15762,7 +15756,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1313,
-    "name": "Trainings-OL \Katerquelle\\"\"",
+    "name": "Trainings-OL \\Katerquelle\\\"\"",
     "eventdate": 1140825600,
     "nationality": "GER",
     "club": "D-KADER HESSEN",
@@ -15776,7 +15770,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1314,
-    "name": "Trainings-OL \Jungfernbrunnen\\"\"",
+    "name": "Trainings-OL \\Jungfernbrunnen\\\"\"",
     "eventdate": 1140912000,
     "nationality": "GER",
     "club": "D-KADER HESSEN",
@@ -18044,7 +18038,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1485,
-    "name": "Challenge d\\'Orientation de l\\'Essonne - MD",
+    "name": "Challenge d\\\\'Orientation de l\\\\'Essonne - MD",
     "eventdate": 1146870000,
     "nationality": "FRA",
     "club": "CD CO 91",
@@ -20004,7 +19998,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1634,
-    "name": "X Trofeu \2 Dies dels Pirineus\\" - dia 2\"",
+    "name": "X Trofeu \\2 Dies dels Pirineus\\\" - dia 2\"",
     "eventdate": 1151794800,
     "nationality": "ESP",
     "club": "XINOXANO",
@@ -20018,7 +20012,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1632,
-    "name": "X Trofeu \2 Dies dels Pirineus\\" - dia 1\"",
+    "name": "X Trofeu \\2 Dies dels Pirineus\\\" - dia 1\"",
     "eventdate": 1151708400,
     "nationality": "ESP",
     "club": "XINOXANO",
@@ -20032,7 +20026,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1633,
-    "name": "X Trofeu \2 Dies dels Pirineus\\" - dia 2\"",
+    "name": "X Trofeu \\2 Dies dels Pirineus\\\" - dia 2\"",
     "eventdate": 1151794800,
     "nationality": "ESP",
     "club": "XINOXANO",
@@ -20989,7 +20983,7 @@ export interface LegacyEvent {
     "nationality": "NED",
     "club": "MINOR",
     "fileformat": 1,
-    "webpage": "http://www.nolb.nl\\~minor",
+    "webpage": "http://www.nolb.nl\\\\~minor",
     "email": "minor@nolb.nl",
     "type": 0,
     "legacyPassword": "Dorine",
@@ -23700,7 +23694,7 @@ export interface LegacyEvent {
   },
   {
     "id": 1908,
-    "name": "Sinterklaascross \Kamp van Beverlo\\"\"",
+    "name": "Sinterklaascross \\Kamp van Beverlo\\\"\"",
     "eventdate": 1165104000,
     "nationality": "BEL",
     "club": "OMEGA",
@@ -24918,7 +24912,7 @@ export interface LegacyEvent {
   },
   {
     "id": 2000,
-    "name": "3a Cursa \Oli de Les Garrigues\\"\"",
+    "name": "3a Cursa \\Oli de Les Garrigues\\\"\"",
     "eventdate": 1170547200,
     "nationality": "BEL",
     "club": "XINOXANO",
@@ -25290,7 +25284,7 @@ export interface LegacyEvent {
     "webpage": "http://www.asope.info",
     "email": "andre.hallouard@freesbee.fr",
     "type": 1,
-    "legacyPassword": "_\\",0\"",
+    "legacyPassword": "_\\\",0\"",
     "HAS_RESULTS": "SIHTML",
     "format": ""
   },
@@ -26732,7 +26726,7 @@ export interface LegacyEvent {
     "webpage": "",
     "email": "andre.hallouard@freesbee.fr",
     "type": 1,
-    "legacyPassword": "?\\",0\"",
+    "legacyPassword": "?\\\",0\"",
     "HAS_RESULTS": "SIHTML",
     "format": ""
   },
@@ -26839,7 +26833,7 @@ export interface LegacyEvent {
     "name": "3-Days of Holland Night OL",
     "eventdate": 1175814000,
     "nationality": "NED",
-    "club": "MINOR / HOC\\'93",
+    "club": "MINOR / HOC\\\\'93",
     "fileformat": 1,
     "webpage": "http://www.3daagsevanholland.nl",
     "email": "info@3daagsevanholland.nl",
@@ -26867,7 +26861,7 @@ export interface LegacyEvent {
     "name": "3-Days of Holland / 3-Daagse van Holland Day 2",
     "eventdate": 1175986800,
     "nationality": "NED",
-    "club": "MINOR / HOC\\'93",
+    "club": "MINOR / HOC\\\\'93",
     "fileformat": 1,
     "webpage": "http://www.3daagsevanholland.nl",
     "email": "info@3daagsevanholland.nl",
@@ -28012,7 +28006,7 @@ export interface LegacyEvent {
   },
   {
     "id": 2233,
-    "name": "championnat d\\'Alsace longue distance",
+    "name": "championnat d\\\\'Alsace longue distance",
     "eventdate": 1178578800,
     "nationality": "FRA",
     "club": "ASOPE",
@@ -29949,7 +29943,7 @@ export interface LegacyEvent {
     "nationality": "GBR",
     "club": "CLOK",
     "fileformat": 1,
-    "webpage": "http://www.clok.org.uk\\Events2007\\070715_CodBeck.htm",
+    "webpage": "http://www.clok.org.uk\\\\Events2007\\\\070715_CodBeck.htm",
     "email": "webmaster@clok.org.uk",
     "type": 0,
     "legacyPassword": "Rickard",
@@ -31890,7 +31884,7 @@ export interface LegacyEvent {
   },
   {
     "id": 2561,
-    "name": "O\\'Castor 2007",
+    "name": "O\\\\'Castor 2007",
     "eventdate": 1195344000,
     "nationality": "FRA",
     "club": "GO78",
@@ -36230,7 +36224,7 @@ export interface LegacyEvent {
   },
   {
     "id": 2879,
-    "name": "I Trof?u \Sentir Penafiel\\" day 1\"",
+    "name": "I Trof?u \\Sentir Penafiel\\\" day 1\"",
     "eventdate": 1210374000,
     "nationality": "POR",
     "club": "ADC",
@@ -36244,7 +36238,7 @@ export interface LegacyEvent {
   },
   {
     "id": 2880,
-    "name": "I Trof?u \Sentir Penafiel\\" day 2\"",
+    "name": "I Trof?u \\Sentir Penafiel\\\" day 2\"",
     "eventdate": 1210460400,
     "nationality": "POR",
     "club": "ADC",
@@ -37182,7 +37176,7 @@ export interface LegacyEvent {
   },
   {
     "id": 2953,
-    "name": "Sprint-OL im Park der \Royals\\"\"",
+    "name": "Sprint-OL im Park der \\Royals\\\"\"",
     "eventdate": 1220569200,
     "nationality": "GER",
     "club": "TV COBURG-NEUSE",
@@ -40710,7 +40704,7 @@ export interface LegacyEvent {
   },
   {
     "id": 3211,
-    "name": "South of Scotland League 7, Norman\\'s Law",
+    "name": "South of Scotland League 7, Norman\\\\'s Law",
     "eventdate": 1234051200,
     "nationality": "GBR",
     "club": "INTERLOPERS",
@@ -43482,7 +43476,7 @@ export interface LegacyEvent {
   },
   {
     "id": 3420,
-    "name": "Championnat d\\'Alsace Long distance 2009",
+    "name": "Championnat d\\\\'Alsace Long distance 2009",
     "eventdate": 1242860400,
     "nationality": "FRA",
     "club": "ASOPE",
@@ -46075,7 +46069,7 @@ export interface LegacyEvent {
     "name": "Veldhuizen",
     "eventdate": 1254006000,
     "nationality": "NED",
-    "club": "HOC\\'93",
+    "club": "HOC\\\\'93",
     "fileformat": 1,
     "webpage": "http://www.hoc93.nl",
     "email": "jurien@lolaan.net",
@@ -46856,7 +46850,7 @@ export interface LegacyEvent {
   },
   {
     "id": 3669,
-    "name": "Campionat de Catalunya\\'09 - Cursa Mitja",
+    "name": "Campionat de Catalunya\\\\'09 - Cursa Mitja",
     "eventdate": 1256425200,
     "nationality": "ESP",
     "club": "COC",
@@ -47836,7 +47830,7 @@ export interface LegacyEvent {
   },
   {
     "id": 3744,
-    "name": "CO ? VTT Bois d\\'Arcy",
+    "name": "CO ? VTT Bois d\\\\'Arcy",
     "eventdate": 1260057600,
     "nationality": "FRA",
     "club": "GO78",
@@ -48427,7 +48421,7 @@ export interface LegacyEvent {
     "name": "1e NC 31-01-2010 Kale Duinen",
     "eventdate": 1264896000,
     "nationality": "NED",
-    "club": "HOC\\'93",
+    "club": "HOC\\\\'93",
     "fileformat": 1,
     "webpage": "",
     "email": "jurien@lolaan.net",
@@ -52680,7 +52674,7 @@ export interface LegacyEvent {
   },
   {
     "id": 4102,
-    "name": "Bishop\\'s Park Race",
+    "name": "Bishop\\\\'s Park Race",
     "eventdate": 1279580400,
     "nationality": "GBR",
     "club": "SLOW",
@@ -57888,7 +57882,7 @@ export interface LegacyEvent {
   },
   {
     "id": 4543,
-    "name": "Chpt de Cote d\\'Or - Ste-Marie-sur-Ouche (21)",
+    "name": "Chpt de Cote d\\\\'Or - Ste-Marie-sur-Ouche (21)",
     "eventdate": 1302390000,
     "nationality": "FRA",
     "club": "2104 VOR",
@@ -65602,7 +65596,7 @@ export interface LegacyEvent {
   },
   {
     "id": 5373,
-    "name": "4�_ ORI \Sentir Penafiel\"",
+    "name": "4�_ ORI \\Sentir Penafiel\"",
     "eventdate": 1328918400,
     "nationality": "POR",
     "club": "A. D. CABROELO",
@@ -77768,7 +77762,7 @@ export interface LegacyEvent {
   },
   {
     "id": 6712,
-    "name": "F�_boda\\Viby",
+    "name": "F�_boda\\\\Viby",
     "eventdate": 1377644400,
     "nationality": "SWE",
     "club": "SAABFRITID",
@@ -78006,7 +78000,7 @@ export interface LegacyEvent {
   },
   {
     "id": 6742,
-    "name": "Nav challenge 2 - Glendalough (\Leg 5\\")\"",
+    "name": "Nav challenge 2 - Glendalough (\\Leg 5\\\")\"",
     "eventdate": 1378594800,
     "nationality": "IRL",
     "club": "IMRA",
@@ -86560,7 +86554,7 @@ export interface LegacyEvent {
   },
   {
     "id": 7567,
-    "name": "MTB WOC 2014 Poland. Long. (Even \True\\" Order)\"",
+    "name": "MTB WOC 2014 Poland. Long. (Even \\True\\\" Order)\"",
     "eventdate": 1409266800,
     "nationality": "POL",
     "club": "POLAND",
@@ -86574,7 +86568,7 @@ export interface LegacyEvent {
   },
   {
     "id": 7568,
-    "name": "MTB WOC 2014 Poland. Long. (Odd \True\\" Order)\"",
+    "name": "MTB WOC 2014 Poland. Long. (Odd \\True\\\" Order)\"",
     "eventdate": 1409266800,
     "nationality": "POL",
     "club": "POLAND",

@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 
 import { Competitor, Course, CourseClass, InvalidData, Results, TimeUtilities, WrongFileFormat } from "../model";
 import { isNotNull, isTrue } from "../model/results_util";
@@ -88,8 +82,7 @@ function parseCompetitors(index: number,
 * @sb-return {CourseClass} Parsed class data.
 */
 function parseCourseClass(courseClass: string, warnings: string[]): CourseClass {
-    const lines = courseClass.split(/?
-/).filter(isTrue);
+    const lines = courseClass.split(/\r?\n/).filter(isTrue);
     if (lines.length === 0) {
         throw new InvalidData("parseCourseClass got an empty list of lines");
     }
@@ -135,13 +128,9 @@ export function parseCSVEventData(data: string): Results {
     data = normaliseLineEndings(data);
 
     // Remove trailing commas.
-    data = data.replace(/,+
-/g, "
-").replace(/,+$/, "");
+    data = data.replace(/,+\n/g, "\n").replace(/,+$/, "");
 
-    const classSections = data.split(/
-
-/).map( (s) => s.trim()).filter(isTrue);
+    const classSections = data.split(/\n\n/).map( (s) => s.trim()).filter(isTrue);
     const warnings: string[] = [];
 
     let classes = classSections.map( (section) => parseCourseClass(section, warnings));

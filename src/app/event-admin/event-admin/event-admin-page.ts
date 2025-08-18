@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 import { Component, computed, inject, signal } from "@angular/core";
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { Toolbar } from 'app/shared/components/toolbar';
@@ -70,14 +64,14 @@ export class EventAdminComponent {
       try {
         const results = await this.eventAdmin.uploadResults(event, splitsFile);
         if (results.warnings && results.warnings.length > 0) {
-          const msg = results.warnings.reduce((acc = '', warn) => acc + ' ' + warn);
-          console.log(`EventAdminComponnet: Splits uploaded with warnings Event key: ${event.key} ${msg}`);
+          const msg = results.warnings.reduce((acc = '', warn) => acc + '\n' + warn);
+          console.log(`EventAdminComponnet: Splits uploaded with warnings\n Event key: ${event.key} \n${msg}`);
           await this.dialogsService.message(`Warnings uploading splits`,
-            `Splits uploaded sucessfully with the following warning messages ${msg}`);
+            `Splits uploaded sucessfully with the following warning messages \n${msg}`);
         }
       } catch (err) {
         console.log(`EventAdminComponnet: Error uploading splits ${err}`);
-        this.dialogsService.message(`Error uploading splits`, `Error uploading splits ${err}`);
+        this.dialogsService.message(`Error uploading splits`, `Error uploading splits \n${err}`);
       } finally {
         this._loading = false;
       }

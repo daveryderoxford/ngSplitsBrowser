@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorHandler, Injectable, Injector, NgZone, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -41,8 +35,7 @@ export class GlobalErrorHandler implements ErrorHandler {
          this.zone.run( () =>
             this.ds.message(
                error?.name,
-               `Message ${error?.message || 'Undefined client error'} 
- ${error?.stack}` ));
+               `Message ${error?.message || 'Undefined client error'} \n ${error?.stack}` ));
       }
    }
 

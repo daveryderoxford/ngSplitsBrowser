@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 /** Componnet to results for club class or */
 /* eslint-disable @typescript-eslint/quotes */
 import { Component, HostBinding, OnInit, viewChild, inject } from '@angular/core';
@@ -137,3 +131,4 @@ export class ResultsSearch implements OnInit {
     this.searchControl.setValue('');
   }
 }
+

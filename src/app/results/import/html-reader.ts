@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 
 import { Competitor, Course, CourseClass, InvalidData, Results, sbTime, TimeUtilities, WrongFileFormat } from "../model";
 import { isNotNull } from "../model/results_util";
@@ -344,22 +338,18 @@ class OldHtmlFormatRecognizer {
             throw new Error("Cannot find opening pre tag");
         }
 
-        let lineEndPos = text.indexOf("
-", prePos);
+        let lineEndPos = text.indexOf("\n", prePos);
         text = text.substring(lineEndPos + 1);
 
         // Replace blank lines.
-        text = text.replace(/
-{2,}/g, "
-");
+        text = text.replace(/\n{2,}/g, "\n");
 
         const closePrePos = text.lastIndexOf("</pre>");
         if (closePrePos === -1) {
             throw new InvalidData("Found opening <pre> but no closing </pre>");
         }
 
-        lineEndPos = text.lastIndexOf("
-", closePrePos);
+        lineEndPos = text.lastIndexOf("\n", closePrePos);
         text = text.substring(0, lineEndPos);
         return text.trim();
     };
@@ -579,13 +569,8 @@ class NewHtmlFormatRecognizer {
         // Rejig the line endings so that each row of competitor data is on its
         // own line, with table and table-row tags starting on new lines,
         // and closing table and table-row tags at the end of lines.
-        text = text.replace(/>
-+</g, "><").replace(/><tr>/g, ">
-<tr>").replace(/<\/tr></g, "</tr>
-<")
-            .replace(/><table/g, ">
-<table").replace(/<\/table></g, "</table>
-<");
+        text = text.replace(/>\n+</g, "><").replace(/><tr>/g, ">\n<tr>").replace(/<\/tr></g, "</tr>\n<")
+            .replace(/><table/g, ">\n<table").replace(/<\/table></g, "</table>\n<");
 
         // Remove all <col> elements.
         text = text.replace(/<\/col[^>]*>/g, "");
@@ -831,9 +816,7 @@ class OEventTabularHtmlFormatRecognizer {
         text = text.replace(/<tr[^>]*><td colspan=[^>]*>&nbsp;<\/td><\/tr>/g, "");
 
         // Replace blank lines.
-        text = text.replace(/
-{2,}/g, "
-");
+        text = text.replace(/\n{2,}/g, "\n");
 
         // Finally, remove the trailing </body> and </html> elements.
         text = text.replace("</body>", "").replace("</html>", "");
@@ -1233,8 +1216,7 @@ class HtmlFormatParser {
     * @sb-return {Event} Event object containing all the parsed data.
     */
     parse(text: string): Results {
-        this.lines = text.split("
-");
+        this.lines = text.split("\n");
         while (true) {
             const line = this.tryGetLine();
             if (line === null) {

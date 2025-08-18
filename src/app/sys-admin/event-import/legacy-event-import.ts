@@ -1,9 +1,3 @@
-/*! 
-*  @license
-*  Copyright (C) 2025 Dave Ryder, Reinhard Balling, Andris Strazdins, Ed Nash, Luke Woodward
-*  Use of this source code is governed by an MIT-style license that can be
-*  found in the LICENSE file at https://github.com/daveryderoxford/ngSplitsBrowser/blob/master/LICENSE
-*/
 
 /** Bulk import of historical data */
 /* eslint-disable no-console */
@@ -75,7 +69,7 @@ export class LegacyEventImport {
   private fixCluNames(events: LegacyEvent[]): LegacyEvent[] {
     return events.map(event => {
       // remove . from club names
-      event.club = event.club.replace(new RegExp('\.', 'g'), '');
+      event.club = event.club.replace(new RegExp('\\.', 'g'), '');
       // make club names all uppercase
       event.club = event.club.toUpperCase();
       return event;
@@ -186,8 +180,7 @@ export class LegacyEventImport {
 
       // Update event object with stored file location
       let valid = true;
-      let reason = results.warnings?.reduce((acc = '', warn) => acc + '
-' + warn, '');
+      let reason = results.warnings?.reduce((acc = '', warn) => acc + '\n' + warn, '');
       if (!results) {
         valid = false;
         reason = 'No results parsed - reason unknown';
