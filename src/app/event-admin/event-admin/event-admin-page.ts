@@ -70,19 +70,14 @@ export class EventAdminComponent {
       try {
         const results = await this.eventAdmin.uploadResults(event, splitsFile);
         if (results.warnings && results.warnings.length > 0) {
-          const msg = results.warnings.reduce((acc = '', warn) => acc + '
-' + warn);
-          console.log(`EventAdminComponnet: Splits uploaded with warnings
- Event key: ${event.key} 
-${msg}`);
+          const msg = results.warnings.reduce((acc = '', warn) => acc + ' ' + warn);
+          console.log(`EventAdminComponnet: Splits uploaded with warnings Event key: ${event.key} ${msg}`);
           await this.dialogsService.message(`Warnings uploading splits`,
-            `Splits uploaded sucessfully with the following warning messages 
-${msg}`);
+            `Splits uploaded sucessfully with the following warning messages ${msg}`);
         }
       } catch (err) {
         console.log(`EventAdminComponnet: Error uploading splits ${err}`);
-        this.dialogsService.message(`Error uploading splits`, `Error uploading splits 
-${err}`);
+        this.dialogsService.message(`Error uploading splits`, `Error uploading splits ${err}`);
       } finally {
         this._loading = false;
       }
