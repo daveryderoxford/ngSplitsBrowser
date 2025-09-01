@@ -1,4 +1,4 @@
-import { Component, input, model, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, model, output } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { Competitor } from '../../model';
@@ -23,7 +23,8 @@ import { Competitor } from '../../model';
       max-width: 180px;  
     }
   `,
-    imports: [MatFormFieldModule, MatSelectModule]
+    imports: [MatFormFieldModule, MatSelectModule],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CompareWithCompetitorSelect
 {

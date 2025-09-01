@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, sendEmailVerification } from '@angular/fire/auth';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,8 @@ import { getFirebaseErrorMessage } from '../firebase-error-messages';
    selector: 'app-signup',
    templateUrl: './signup.html',
    styleUrls: ['./signup.scss'],
-   imports: [MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, Toolbar]
+   imports: [MatToolbarModule, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, Toolbar],
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Signup {
    private router = inject(Router);

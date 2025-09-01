@@ -11,7 +11,6 @@ import { MatProgressBarModule } from "@angular/material/progress-bar";
 import { MatSelectModule } from "@angular/material/select";
 import { Router } from "@angular/router";
 import { FlexModule } from "@ngbracket/ngx-layout/flex";
-import { UntilDestroy } from '@ngneat/until-destroy';
 import { UserData } from 'app/user/user';
 import { UserDataService } from "app/user/user-data.service";
 import { Toolbar } from "../shared/components/toolbar";
@@ -19,7 +18,6 @@ import { Nations } from "app/events/model/nations";
 import { AuthService } from 'app/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-@UntilDestroy()
 @Component({
   selector: "app-user",
   templateUrl: "./user-page.html",

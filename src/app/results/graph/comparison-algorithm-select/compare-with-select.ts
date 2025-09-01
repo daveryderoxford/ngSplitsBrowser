@@ -1,4 +1,4 @@
-import { Component, model } from '@angular/core';
+import { ChangeDetectionStrategy, Component, model } from '@angular/core';
 import { ALL_COMPARISON_OPTIONS, ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,7 +23,9 @@ import { MatSelectModule } from '@angular/material/select';
       max-width: 180px;  
     }
   `,
-    imports: [MatFormFieldModule, MatSelectModule]
+    imports: [MatFormFieldModule, MatSelectModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
+
 })
 export class CompareWithSelect {
 

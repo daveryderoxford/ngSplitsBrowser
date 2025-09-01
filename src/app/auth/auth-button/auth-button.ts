@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -10,6 +10,7 @@ import { AuthService } from '../auth.service';
   standalone: true,
   imports: [MatButtonModule, MatIconModule, MatMenuModule, RouterLink],
   templateUrl: './auth-button.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthButton {
 

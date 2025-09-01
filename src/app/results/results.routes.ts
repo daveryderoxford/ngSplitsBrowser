@@ -21,14 +21,12 @@ export const RESULTS_ROUTES: Routes = [
    },
    {
       path: "table/:id",
-      loadComponent: () => import('./table/results-table').then(c => c.ResultsTable), 
-
+      loadComponent: () => import('./table/results-table').then(c => c.ResultsTable),
       title: 'Splitsbrowser - Results table',
       resolve: {
          results: resultsResolver
       }
    },
-   
    { 
       path: "stats/:id", 
       title: 'Splitsbrowser - Stats', 

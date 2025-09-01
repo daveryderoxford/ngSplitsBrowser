@@ -12,7 +12,6 @@ export class GlobalErrorHandler implements ErrorHandler {
    private ds: DialogsService = this.injector.get( DialogsService );
    private snackBar: MatSnackBar = this.injector.get( MatSnackBar );
 
-
    handleError( error: Error | HttpErrorResponse ) {
 
       // Always log errors

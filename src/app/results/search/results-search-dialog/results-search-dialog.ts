@@ -43,9 +43,9 @@ export class ResultsSearchDialog {
 
    searchControl: FormControl = new FormControl('');
 
-   seachText = toSignal(this.searchControl.valueChanges, { initialValue: '' });
+   searchText = toSignal(this.searchControl.valueChanges, { initialValue: '' });
 
-   protected searchResults = computed(() => this.searchPanelContents(this.seachText()));
+   protected searchResults = computed(() => this.searchPanelContents(this.searchText()));
 
    private searchPanelContents(value: string | SearchSelectedItem | null): FilterPanelGroup[] {
       const results = this.rd.results();

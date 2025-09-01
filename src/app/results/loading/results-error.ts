@@ -12,6 +12,7 @@ import { ResultsLoadingContainer } from './loading-container';
       MatButtonModule,
       MatIconModule
    ],
+   changeDetection: ChangeDetectionStrategy.OnPush,
    template: `
    <app-results-loading-container>
       <span class="message">Error loading results</span>
@@ -39,8 +40,7 @@ import { ResultsLoadingContainer } from './loading-container';
 
     button {
       margin-top: 24px;
-    }`,
-   changeDetection: ChangeDetectionStrategy.OnPush,
+    }`
 })
 export class ResultsError {
    private router = inject(Router);

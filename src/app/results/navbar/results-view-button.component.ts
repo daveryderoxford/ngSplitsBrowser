@@ -1,6 +1,6 @@
 /** Pure component to show button groupto allow results view to be selected */
 
-import { Component, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,7 +11,9 @@ import { ResultsView } from '../model';
 
 @Component({
     selector: 'app-results-view-button',
-    template: `
+  imports: [MatButtonToggleModule, MatMenuModule, MatIconModule, MatSelectModule, MatFormFieldModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
     @if (hs.narrowScreen()) {
       <mat-form-field appearance="outline" subscriptSizing="dynamic" class="dense-form-field set-width">
         <mat-label>View</mat-label>
@@ -39,7 +41,6 @@ import { ResultsView } from '../model';
       min-width: 100px;
       max-width: 100px;
     }`,
-  imports: [MatButtonToggleModule, MatMenuModule, MatIconModule, MatSelectModule, MatFormFieldModule]
 })
 export class ResultsViewButtonComponent {
   protected hs = inject(AppBreakpoints)

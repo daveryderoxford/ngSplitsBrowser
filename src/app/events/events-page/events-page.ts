@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from "@angular/material/tabs";
 import { Router, RouterLink } from "@angular/router";
@@ -11,12 +11,12 @@ import { EventService } from "../event.service";
 import { MyEventsTab } from "../my-events-tab/my-events-tab";
 import { AppBreakpoints } from 'app/shared/services/breakpoints';
 
-
 @Component({
    selector: "app-results",
    templateUrl: "./events-page.html",
    styleUrls: ["./events-page.scss"],
-   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTab, Toolbar, MatButtonModule, RouterLink]
+   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTab, Toolbar, MatButtonModule, RouterLink],
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EventsPage {
    private router = inject(Router);

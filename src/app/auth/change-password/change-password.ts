@@ -15,7 +15,6 @@ import { getFirebaseErrorMessage } from '../firebase-error-messages';
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.html',
-
   styleUrls: ['./change-password.scss'],
   imports: [FlexModule, MatCardModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, Toolbar],
   changeDetection: ChangeDetectionStrategy.OnPush

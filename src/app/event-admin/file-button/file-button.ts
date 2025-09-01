@@ -1,4 +1,4 @@
-import { Component, ElementRef, input, output, viewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, input, output, viewChild } from "@angular/core";
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -19,25 +19,22 @@ import { MatIconModule } from '@angular/material/icon';
         </button>
         }
     </span>`,
-    imports: [MatButtonModule, MatIconModule]
+    imports: [MatButtonModule, MatIconModule],
+    changeDetection: ChangeDetectionStrategy.OnPush 
 })
 
 export class FileButton {
-  accept = input<string>();
+  accept = input<string>('');
   multiple = input(false);
-  label = input("");
+  label = input('');
   disabled = input(false);
   fileSelected = output<File[]>();
 
   nativeInputFile = viewChild.required<ElementRef>("inputFile");
 
-  private _files: File[];
-
-  get fileCount(): number { return this._files && this._files.length || 0; }
-
   onNativeInputFileSelect($event: any) {
-    this._files = $event.srcElement.files;
-    this.fileSelected.emit(this._files);
+    const files = $event.srcElement.files;
+    this.fileSelected.emit(files);
   }
 
   selectFile() {

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DateFnsAdapter, MAT_DATE_FNS_FORMATS, provideDateFnsAdapter } from '@angular/material-date-fns-adapter';
@@ -43,6 +43,7 @@ import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/
       { provide: MAT_DATE_FORMATS, useValue: MAT_DATE_FNS_FORMATS },
       provideDateFnsAdapter(),
    ],
+   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventDetailsForm  {
    private es = inject(EventService);

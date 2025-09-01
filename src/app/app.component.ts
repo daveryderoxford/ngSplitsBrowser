@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -10,7 +10,8 @@ import { SidenavService } from './shared/services/sidenav.service';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['app.component.scss'],
-    imports: [MatSidenavModule, MatListModule, RouterOutlet]
+    imports: [MatSidenavModule, MatListModule, RouterOutlet],
+    changeDetection:  ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
    auth = inject(AuthService);

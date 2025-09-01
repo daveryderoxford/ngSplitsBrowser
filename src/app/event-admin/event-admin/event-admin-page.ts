@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { Toolbar } from 'app/shared/components/toolbar';
 import { OEvent } from "../../events/model/oevent";
@@ -25,7 +25,8 @@ interface SplitsUpload {
   templateUrl: "./event-admin-page.html",
   styleUrls: ["./event-admin-page.scss"],
   imports: [Toolbar, EventList, MatButtonModule, RouterLink, MatIconModule, MatProgressBar, EventDetailsPanel, MatInputModule, MatSelectModule],
-  providers: [provideNativeDateAdapter()]
+  providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.OnPush 
 })
 export class EventAdminComponent {
   protected eventAdmin = inject(EventAdminService);

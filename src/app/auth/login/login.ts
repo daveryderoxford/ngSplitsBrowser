@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { FirebaseError } from '@angular/fire/app';
 import {
    Auth,
@@ -30,7 +30,8 @@ const isInStandaloneMode = () =>
    selector: 'app-login',
    templateUrl: './login.html',
    styleUrls: ['./login.scss'],
-   imports: [MatCardModule, Toolbar, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink]
+   imports: [MatCardModule, Toolbar, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink],
+   changeDetection:  ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
    private router = inject(Router);

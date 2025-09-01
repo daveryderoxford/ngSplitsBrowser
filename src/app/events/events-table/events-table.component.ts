@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, input, output } from '@angular/core';
 import { DataSource } from '@angular/cdk/table';
 import { MatIconModule } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
@@ -12,7 +12,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
     selector: 'app-events-table',
     templateUrl: './events-table.component.html',
     styleUrls: ['./events-table.component.scss'],
-    imports: [MatTableModule, MatIconModule, DatePipe, MatListModule]
+    imports: [MatTableModule, MatIconModule, DatePipe, MatListModule],
+    changeDetection:  ChangeDetectionStrategy.OnPush,
 })
 export class EventsTableComponent {
   private observer = inject(BreakpointObserver);

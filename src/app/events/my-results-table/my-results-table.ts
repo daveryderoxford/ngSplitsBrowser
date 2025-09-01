@@ -1,4 +1,4 @@
-import { Component, OnInit, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, input, output } from '@angular/core';
 import { TimeUtilities, sbTime } from 'app/results/model';
 import { DatePipe } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
@@ -9,8 +9,8 @@ import { OEvent } from '../model/oevent';
     selector: 'app-my-results-table',
     templateUrl: './my-results-table.html',
     styleUrls: ['./my-results-table.scss'],
-    standalone: true,
-    imports: [MatTableModule, DatePipe]
+    imports: [MatTableModule, DatePipe],
+    changeDetection:  ChangeDetectionStrategy.OnPush,
 })
 export class MyResultsTable implements OnInit {
 

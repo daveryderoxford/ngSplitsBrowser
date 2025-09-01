@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
 import { DialogsService } from 'app/shared';
@@ -14,7 +14,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
    selector: 'app-add-event',
    templateUrl: 'add-event.html',
    styleUrl: 'add-event.scss',
-   imports: [EventDetailsForm, FileButton, Toolbar, EventDetailsForm, MatStepperModule, MatButtonModule, MatTooltipModule]
+   imports: [EventDetailsForm, FileButton, Toolbar, EventDetailsForm, MatStepperModule, MatButtonModule, MatTooltipModule],
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddEvent implements AfterViewInit {
    router = inject(Router);

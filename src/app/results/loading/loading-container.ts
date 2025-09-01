@@ -3,10 +3,10 @@ import { Toolbar } from 'app/shared/components/toolbar';
 
 @Component({
   selector: 'app-results-loading-container',
-  standalone: true,
   imports: [
     Toolbar
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-toolbar title=""/>
     <div class="loading-container">
@@ -40,6 +40,5 @@ import { Toolbar } from 'app/shared/components/toolbar';
       background-color: white;
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResultsLoadingContainer {}

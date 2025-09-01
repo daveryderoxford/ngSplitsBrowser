@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { Auth, sendPasswordResetEmail } from '@angular/fire/auth';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,7 +13,9 @@ import { Toolbar } from 'app/shared/components/toolbar';
   selector: 'app-recover',
   templateUrl: './recover-password.html',
   styleUrls: ['./recover-password.scss'],
-  imports: [FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, Toolbar]
+  imports: [FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink, Toolbar],
+ changeDetection:  ChangeDetectionStrategy.OnPush,
+
 })
 export class RecoverComponent {
   private router = inject(Router);

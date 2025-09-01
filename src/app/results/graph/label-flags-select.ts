@@ -1,7 +1,5 @@
 // @ts-nocheck
-
-import { Component, computed, model } from '@angular/core';
-
+import { ChangeDetectionStrategy, Component, computed, model } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { StatsVisibilityFlags } from './splitsbrowser/chart';
@@ -9,6 +7,7 @@ import { StatsVisibilityFlags } from './splitsbrowser/chart';
 @Component({
     selector: 'app-label-flags-select',
     imports: [MatSelectModule, MatFormFieldModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     template: `
    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="dense-form-field">
       <mat-label>Display</mat-label>

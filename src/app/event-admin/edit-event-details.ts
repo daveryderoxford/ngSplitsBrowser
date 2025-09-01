@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, signal, viewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal, viewChild } from "@angular/core";
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
 import { Toolbar } from 'app/shared/components/toolbar';
@@ -8,6 +8,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
    selector: "app-edit-event-details",
+   changeDetection:  ChangeDetectionStrategy.OnPush,
    template: `
          <app-toolbar title="Edit Event Details"/>
          <app-event-form [oevent]="event()" (submitted)="save($event)"/>

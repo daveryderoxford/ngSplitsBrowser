@@ -10,11 +10,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectChange, MatSelectModule } from "@angular/material/select";
 import { AppBreakpoints } from 'app/shared/services/breakpoints';
-import { Observable } from "rxjs";
 import { EventListItem } from "../event-list-item";
 import { EventService } from "../event.service";
 import { Club } from '../model/club';
-import { Nation, Nations } from '../model/nations';
+import { Nations } from '../model/nations';
 import { EventGrades, OEvent } from '../model/oevent';
 
 @Component({
@@ -47,8 +46,6 @@ export class ClubEventsTabComponent {
       this.natFilter(),
       this.nameFilter()));
 
-   clubEvents: OEvent[] = [];
-
    grades = EventGrades.grades;
    nations = Nations.getNations();
 
@@ -80,4 +77,3 @@ function filterClubs(clubs: Club[], natFilter: string, nameFilter: string) {
       .filter(club => nameFilter === "" || club.name.includes(nameFilter.toUpperCase())
       );
 }
-

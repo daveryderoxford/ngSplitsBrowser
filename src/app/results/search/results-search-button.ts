@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,7 @@ import { ResultsSearchDialog, SearchSelectedItem } from './results-search-dialog
   selector: 'app-results-search-button',
   standalone: true,
   imports: [CommonModule, MatIconModule, MatButtonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button mat-icon-button (click)="openSearchDialog()" aria-label="Open search dialog">
       <mat-icon>search</mat-icon>

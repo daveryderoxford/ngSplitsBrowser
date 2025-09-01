@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, TemplateRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, input, TemplateRef } from "@angular/core";
 import { MatIconModule } from "@angular/material/icon";
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { ComparisionOption } from 'app/results/graph/splitsbrowser/comparision-options';
@@ -14,7 +14,8 @@ import { SearchIconButton } from "../search/results-search-button";
     selector: "app-results-navbar",
     templateUrl: "./navbar.html",
     styleUrls: ["./navbar.scss"],
-    imports: [MatToolbarModule, MatIconModule, ResultsViewButtonComponent, SidenavButton, SearchIconButton]
+    imports: [MatToolbarModule, MatIconModule, ResultsViewButtonComponent, SidenavButton, SearchIconButton],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Navbar {
   public rs = inject(ResultsSelectionService);

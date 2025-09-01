@@ -5,7 +5,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { Toolbar } from 'app/shared/components/toolbar';
 import { LegacyEventImport } from './event-import/legacy-event-import';
 
-
 @Component({
   selector: 'app-sys-admin-switchboard',
   imports: [MatButtonModule, Toolbar],

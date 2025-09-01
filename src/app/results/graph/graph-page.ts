@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewEncapsulation, computed, effect, inject, input, signal, viewChild } from "@angular/core";
-import { toSignal } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostListener, ViewEncapsulation, computed, effect, inject, signal, viewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, debounceTime } from 'rxjs';
 import { ResultsError } from '../loading/results-error';
@@ -9,6 +8,7 @@ import { Navbar } from "../navbar/navbar";
 import { ResultsDataService } from '../results-data.service ';
 import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from "../results-selection.service";
+import { SelectionSidebarButton } from "../selection-sidebar/selection-sidebar-button";
 import { Sidebar } from '../selection-sidebar/sidebar';
 import { CompareWithCompetitorSelect } from "./comparison-algorithm-select/compare-with-competitor-select";
 import { CompareWithSelect } from './comparison-algorithm-select/compare-with-select';
@@ -16,7 +16,6 @@ import { LabelFlagSelect } from './label-flags-select';
 import { Chart, ChartDisplayData, StatsVisibilityFlags } from './splitsbrowser/chart';
 import { ChartTypeClass } from './splitsbrowser/chart-types';
 import { ALL_COMPARISON_OPTIONS } from './splitsbrowser/comparision-options';
-import { SelectionSidebarButton } from "../selection-sidebar/selection-sidebar-button";
 
 interface SplitsBrowserOptions {
    defaultLanguage?: boolean;

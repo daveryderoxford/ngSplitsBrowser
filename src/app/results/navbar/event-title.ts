@@ -4,6 +4,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 @Component({
   selector: 'app-event-title',
   imports: [DatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span class="oclass">
       {{ courseClassName()}}
@@ -41,7 +42,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
     }
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EventTitle {
 
