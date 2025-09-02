@@ -35,17 +35,15 @@ export class EventAdminComponent {
   private router = inject(Router);
   protected breakpoints = inject(AppBreakpoints);
 
-  protected detailEvent = signal<OEvent | undefined>(undefined);
-
-  private _loading = false;
-
   protected resultsViews: { type: EventFilter, name: string; }[] = [
-    { type: 'unset', name: '' },
     { type: 'recent', name: 'Recent events' },
     { type: 'invalid-splits', name: 'Failed uploads' },
     { type: 'all', name: 'All events' },
   ];
 
+  protected detailEvent = signal<OEvent | undefined>(undefined);
+
+  loading = this.eventAdmin.loading;
   title = computed( () => (this.breakpoints.narrowScreen) ? 'Admin' : 'Event Admin');
 
   constructor() {
@@ -60,7 +58,6 @@ export class EventAdminComponent {
       confirm = await this.dialogsService.confirm("Confirm Dialog", "Are you sure you want to overwrite splits?");
     }
     if (confirm) {
-      this._loading = true;
       const splitsFile = upload.files[0];
       try {
         const results = await this.eventAdmin.uploadResults(event, splitsFile);
@@ -73,9 +70,7 @@ export class EventAdminComponent {
       } catch (err) {
         console.log(`EventAdminComponnet: Error uploading splits ${err}`);
         this.dialogsService.message(`Error uploading splits`, `Error uploading splits \n${err}`);
-      } finally {
-        this._loading = false;
-      }
+      } 
     }
   }
 
@@ -87,13 +82,10 @@ export class EventAdminComponent {
     const confirm = await this.dialogsService.confirm("Confirm Dialog", "Are you sure you want to delete is event?");
     if (confirm) {
       try {
-        this._loading = true;
         await this.eventAdmin.delete(event);
       } catch (err) {
         console.log("EventAdminComponnet: Error deleting event" + err);
-      } finally {
-        this._loading = false;
-      }
+      } 
     }
   }
 
