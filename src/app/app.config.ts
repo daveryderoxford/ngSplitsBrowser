@@ -1,5 +1,5 @@
 import { provideHttpClient } from '@angular/common/http';
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection, provideCheckNoChangesConfig } from '@angular/core';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
 import { getAuth, provideAuth } from '@angular/fire/auth';
@@ -9,6 +9,8 @@ import { firebaseConfig } from './app.firebase-config';
 
 export const appConfig: ApplicationConfig = {
    providers: [
+      provideZonelessChangeDetection(),
+      provideCheckNoChangesConfig({exhaustive: true, interval: 1000}),
       provideFirebaseApp(() => initializeApp(firebaseConfig)),
       provideAuth(() => getAuth()),
       provideAppCheck(() =>

@@ -122,13 +122,15 @@ export class GraphPage {
 
       /** Effect to create and redraw the chart when its data or container becomes available. */
       effect(() => {
+
          const chartContainer = this.chartElement();
-         const chartDisplayData = this.chartData();
 
          // Exit if the chart container isn't ready or if results are still loading.
          if (!chartContainer || this.rd.isLoading()) {
             return;
          }
+
+         const chartDisplayData = this.chartData();
 
          // One-time initialization of the chart instance.
          if (!this.chart) {
