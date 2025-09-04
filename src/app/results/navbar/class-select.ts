@@ -7,7 +7,6 @@ import { CourseClass } from 'app/results/model';
 
 @Component({
   selector: 'app-class-select',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [CommonModule, MatSelectModule, MatFormFieldModule, FormsModule],
   template: ` 

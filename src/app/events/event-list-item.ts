@@ -9,7 +9,6 @@ import { EllipsisPipe } from "../shared/pipes/ellipsis-pipe";
 
 @Component({
   selector: 'app-event-list-item',
-  standalone: true,
   imports: [
     MatListModule,
     MatIconModule,

@@ -10,7 +10,6 @@ import { MatButtonModule } from '@angular/material/button';
 
 @Component({
    selector: 'app-event-details-panel',
-   standalone: true,
    imports: [DatePipe, MatCardModule, MatListModule, MatIconModule, MatButtonModule],
    styles: `
       mat-card {

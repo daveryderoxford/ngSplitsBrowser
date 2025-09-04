@@ -10,9 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { FlexModule } from '@ngbracket/ngx-layout';
-import { UntilDestroy } from '@ngneat/until-destroy';
 import { Club } from 'app/events/model/club';
 import { Nations } from 'app/events/model/nations';
 import { startOfDay } from 'date-fns';
@@ -20,7 +18,6 @@ import { enGB } from 'date-fns/locale';
 import { EventService } from '../../events/event.service';
 import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/model/oevent';
 
-@UntilDestroy()
 @Component({
    selector: 'app-event-form',
    templateUrl: './event-form.html',
@@ -45,7 +42,7 @@ import { EventDisciplines, EventGrades, EventTypes, OEvent } from '../../events/
    ],
    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventDetailsForm  {
+export class EventDetailsForm {
    private es = inject(EventService);
 
    oevent = input<OEvent | null>();
@@ -69,8 +66,8 @@ export class EventDetailsForm  {
       webpage: new FormControl('', Validators.pattern(/((?:https?\:\/\/|www\.)(?:[-a-z0-9]+\.)*[-a-z0-9]+.*)/i))
    });
 
-   clubFormValue = toSignal(this.form.controls.club.valueChanges, {initialValue: ''});
-   natFormValue = toSignal(this.form.controls.nationality.valueChanges, {initialValue: ''});
+   clubFormValue = toSignal(this.form.controls.club.valueChanges, { initialValue: '' });
+   natFormValue = toSignal(this.form.controls.nationality.valueChanges, { initialValue: '' });
    filteredClubs = computed(() => filterClubs(this.es.clubs(), this.clubFormValue(), this.natFormValue()));
 
    constructor() {

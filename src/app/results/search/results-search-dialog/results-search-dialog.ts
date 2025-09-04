@@ -21,7 +21,6 @@ interface FilterPanelGroup {
 
 @Component({
    selector: 'app-results-search-dialog',
-   standalone: true,
    changeDetection: ChangeDetectionStrategy.OnPush,
    imports: [
       CommonModule,

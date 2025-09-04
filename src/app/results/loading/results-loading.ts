@@ -7,7 +7,6 @@ import { ResultsLoadingContainer } from './loading-container';
 
 @Component({
    selector: 'app-results-loading',
-   standalone: true,
    imports: [
       ResultsLoadingContainer,
       MatProgressSpinnerModule,

@@ -4,7 +4,6 @@ import { isNotNullNorNaN } from './results_util';
 
 @Pipe({
    name: 'formatTime',
-   standalone: true
 })
 export class FormatTimePipe implements PipeTransform {
    transform(time: sbTime, hoursOnly: boolean = false): string {
@@ -14,7 +13,6 @@ export class FormatTimePipe implements PipeTransform {
 
 @Pipe({
    name: 'bracketed',
-   standalone: true
 })
 export class BracketedPipe implements PipeTransform {
    transform(pos: number): string {

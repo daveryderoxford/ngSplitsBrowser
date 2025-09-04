@@ -4,8 +4,9 @@
   "license": "MIT",
   "scripts": {
     "serve": "ng serve --configuration development",
-    "build": " git.version.ts && ng build --configuration development",
-    "prod": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts && ng build --configuration production",
+    "dev": "ng build --configuration development --watch",
+    "stats": "ng build --stats-json --named-chunks && npx @angular-experts/hawkeye dist/splitsbrowser/stats.json",
+    "prod": "ng build --configuration production",
     "deploy": "npm run prod && firebase deploy",
     "test": "ng test",
     "lint": "ng lint",
@@ -33,8 +34,7 @@
     "jquery": "^3.2.1",
     "ng2-charts": "^8.0.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.2.0",
-    "zone.js": "~0.15.0"
+    "tslib": "^2.2.0"
   },
   "devDependencies": {
     "@angular-devkit/architect": "0.2002.1",

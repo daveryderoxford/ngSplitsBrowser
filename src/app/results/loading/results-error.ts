@@ -6,7 +6,6 @@ import { ResultsLoadingContainer } from './loading-container';
 
 @Component({
    selector: 'app-results-error',
-   standalone: true,
    imports: [
       ResultsLoadingContainer,
       MatButtonModule,

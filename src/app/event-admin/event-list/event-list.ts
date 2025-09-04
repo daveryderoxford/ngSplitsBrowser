@@ -38,7 +38,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
    </mat-list>
    `,
    styleUrl: 'event-list.scss',
-   standalone: true,
    changeDetection: ChangeDetectionStrategy.OnPush,
    imports: [MatListModule, DatePipe, MatIconModule, MatButtonModule, FileButton, MatTooltipModule],
 })

@@ -9,7 +9,6 @@ import { ResultsSearchDialog, SearchSelectedItem } from './results-search-dialog
 
 @Component({
   selector: 'app-results-search-button',
-  standalone: true,
   imports: [CommonModule, MatIconModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
