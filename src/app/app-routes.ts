@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './auth/guards/auth-guard';
+import { authGuard } from './auth/guards/auth-guard';
 
 export const APP_ROUTES: Routes = [
    { path: "", redirectTo: "events", pathMatch: 'full' },
@@ -8,7 +8,7 @@ export const APP_ROUTES: Routes = [
    { path: "auth", loadChildren: () => import( './auth/auth.routes' ).then( r => r.AUTH_ROUTES ) },
    { 
       path: "admin",
-      canActivate: [AuthGuard],
+      canActivate: [authGuard],
       loadChildren: () => import('./event-admin/event-admin.routes').then(r => r.EVENT_ADMIN_ROUTES )
    },
    { path: "user", loadChildren: () => import( './user/user.routes' ).then( r => r.USER_ROUTES ) },

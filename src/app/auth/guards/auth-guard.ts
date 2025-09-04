@@ -1,31 +1,23 @@
-
-import { Injectable, inject } from '@angular/core';
+import { inject } from '@angular/core';
 import { Auth, authState } from '@angular/fire/auth';
-import { Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, take, tap } from 'rxjs/operators';
+import { ActivatedRouteSnapshot, CanActivateFn, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { map, Observable, take } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthGuard {
-  private afAuth = inject(Auth);
-  private router = inject(Router);
-
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-    return authState(this.afAuth).pipe(
-      take(1),
-      map(user => !!user),
-      tap(authenticated => {
-        if (!authenticated) {
-          // set query parameter returnUrl to redirect to the target url
-          const redirectQueryParame = {
-            queryParams: { returnUrl: state.url }
-          };
-          this.router.navigate(['/auth/login'], redirectQueryParame);
-
-        }
+/** Authentication guard
+ * Checks if logged in as Firebase users 
+ * Redirects to login if user is not authenticated including returnUrlquery parameter with the 
+ * original URL
+ */
+export const authGuard: CanActivateFn = (route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<true | UrlTree> => {
+  const afAuth = inject(Auth);
+  const router = inject(Router);
+  return authState(afAuth).pipe(
+    take(1),
+    map(user =>
+      !!user ||
+      router.createUrlTree(['/auth/login'], {
+        queryParams: { returnUrl: state.url },
       })
-    );
-  }
-}
+    )
+  );
+};
