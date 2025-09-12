@@ -28,10 +28,10 @@ export class UserDataService {
   /** Update the user info.  */
   async updateDetails(details: Partial<UserData>): Promise<void> {
     if (this.user()) {
-      console.log('UserDataService: Saving user' + this.user()!.key);
-      details.key = this.user()!.key;
-      const doc = this._doc(this.user()!.key)
-      return setDoc(doc, details, {merge: true});
+      const key = this.user()!.key;
+      console.log('UserDataService: Saving user' + key);
+      details.key = key;
+      return setDoc(this._doc(key), details, {merge: true});
     } else {
       console.log('UserDataService: Saving user: Unexpectly null');
       throw Error('UserDataService: Saving user: Unexpectly null');

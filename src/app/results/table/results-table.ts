@@ -151,7 +151,7 @@ export class ResultsTable implements OnInit {
       }
 
       if (!sortState.direction || sortState.active == 'position)') {
-         competitors.sort((c1, c2) => Competitor.compareCompetitors(c1, c2));
+         competitors.sort(Competitor.compareCompetitors);
       } else {
          const index = parseInt(sortState.active);
          if (sortState.direction == 'asc') {

@@ -12,11 +12,15 @@
 
    <div class="content">
       @for (comp of rs.selectedCompetitors(); track comp.key) {
+         @if (comp.completed()) {
          <app-summary-graph 
              [competitor]="comp" 
              [maxCompetitors]="rs.displayedCompetitors().length" 
              [maxSplits]="4"
              class="panel"/>
+         } @else {
+            <div class="panel center">{{comp.name}} incomplete.</div>
+         }
       } @empty {
          <div class="no-competitors">
             Select a competitor to display graph

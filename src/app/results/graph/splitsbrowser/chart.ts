@@ -413,7 +413,7 @@ export class Chart {
       const svgRect = svgNode.getBoundingClientRect();
       const yOffset = event.pageY - (svgRect.top + window.scrollY) - MARGIN.top;
       const [_, Y2] = pointer(event, svgNode);
-      console.log(`Y2: ${Y2}, yOffset: ${yOffset} MARGIN.top: ${MARGIN.top}`);
+      // console.log(`Y2: ${Y2}, yOffset: ${yOffset} MARGIN.top: ${MARGIN.top}`);
       this.currentChartTime = Math.round(this.yScale.invert(yOffset) * 60) + this.referenceCumTimes[this.currentControlIndex];
 
    }

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, linkedSignal, signal } from "@angular/core";
+import { computed, effect, inject, Injectable, linkedSignal, signal } from "@angular/core";
 import { Competitor, Course, CourseClass, Results } from "./model";
 import { ResultsDataService } from './results-data.service ';
 
@@ -17,6 +17,14 @@ export class ResultsSelectionService {
       source: this.rd.results,
       computation: () => [] as Competitor[],
    });
+
+   /* private debug = effect(() => {
+      const competitors = this._competitors();
+      console.log('\nCompetitors selected: ', competitors.length);
+      for (const comp of competitors) {
+         console.log('Competitor selected', comp.name, ' ', comp.club, ' ', comp.courseClass.name);
+      }
+   }); */
 
    // When results change set default class to the first class
    private _oclass = linkedSignal<CourseClass | undefined>( () => 
@@ -53,9 +61,11 @@ export class ResultsSelectionService {
    );
 
    /** Select a competitor or array of competitors */
-   selectCompetitors(...comp: Competitor[]) {
-      let competitors = this._competitors().concat(comp);
-      competitors = competitors.sort((a, b) => a.totalTime - b.totalTime);
+   selectCompetitors(...comps: Competitor[]) {
+      let unique = comps.filter(c => 
+          !this._competitors().some(s => s.key === c.key)); 
+      let competitors = this._competitors().concat(unique);
+      competitors = competitors.sort(Competitor.compareCompetitors);
       this._competitors.set(competitors);
    }
 

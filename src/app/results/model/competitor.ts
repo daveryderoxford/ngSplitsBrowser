@@ -194,7 +194,7 @@ export class Competitor {
         }
     }
 
-    constructor(public order: number,
+   private constructor(public order: number,
         name: string | FirstnameSurname,
         public club: string,
         public startTime: number,
@@ -222,7 +222,7 @@ export class Competitor {
     }
 
     /** Returns a key to uniquly identify a competitor
-     * This is the ecardId if present or class and position concateranted if not
+     * This is the ecardId if present or class and order number concateranted if not
      */
     get key(): string {
         if (this.ecardId) {

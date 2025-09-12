@@ -346,15 +346,7 @@ export class Course {
          for (const courseClass of this.classes) {
             this._competitors = this._competitors.concat(courseClass.competitors);
          }
-         this._competitors.sort( (a: Competitor, b: Competitor) => {
-            if (a.completed() && b.completed()) {
-            return a.totalTime - b.totalTime;
-            } else if (a.completed()) {
-               return 1;
-            } else {
-               return -1;
-            }
-         });
+         this._competitors.sort(Competitor.compareCompetitors);
       }
       return this._competitors!;
    }

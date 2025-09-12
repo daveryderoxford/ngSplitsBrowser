@@ -77,13 +77,14 @@ export class SummaryGraph {
    timeLoss = computed(() => this.competitor().timeLosses.map(loss => loss > 0 ? loss/60 : 0));
    timeGain = computed(() => this.competitor().timeLosses.map(loss => loss < 0 ? -loss/60 : 0));
 
+
    barChartData = computed<MixedChartData>(() => ({
       labels: this.labels(),
       datasets: [
          { data: this.timeLoss(), label: 'Time loss', yAxisID: 'y' },
          { data: this.timeGain(), label: 'Time Gain', yAxisID: 'y' },
-         { data: this.competitor().splitRanks, label: 'Position', type: 'line', yAxisID: 'y1' },
-         { data: this.competitor().cumRanks, label: 'Cumulative Position', type: 'line', yAxisID: 'y1' }
+         { data: this.competitor().splitRanks.map(pos => pos ?? 0), label: 'Position', type: 'line', yAxisID: 'y1' },
+         { data: this.competitor().cumRanks.map(pos => pos ?? 0), label: 'Cumulative Position', type: 'line', yAxisID: 'y1' }
       ],
    })) as any;  //cast way type information to avoid typing issue with mixed charts in ng-chart
 
