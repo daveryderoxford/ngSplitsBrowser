@@ -313,7 +313,7 @@ export class Chart {
       const chartData: ChartData = data.chartData;
 
       this.numControls = chartData.numControls;
-      this.numLines = chartData.competitorNames.length;
+      this.numLines = selectedIndexes.length;
       this.selectedIndexes = selectedIndexes;
       this.referenceCumTimes = data.referenceCumTimes;
       this.fastestCumTimes = data.fastestCumTimes;
@@ -1098,36 +1098,36 @@ export class Chart {
 
       this.svgGroup.selectAll("line.aroundDubiousTimes").remove();
 
-      for (let controlIdx = 0; controlIdx < this.numLines; controlIdx++) {
-         const strokeColour = this.selectedIndexColor(controlIdx);
-         const highlighter = () => this.highlight(this.selectedIndexes[controlIdx]);
+      for (let selCompIdx = 0; selCompIdx < this.numLines; selCompIdx++) {
+         const strokeColour = this.selectedIndexColor(selCompIdx);
+         const highlighter = () => this.highlight(this.selectedIndexes[selCompIdx]);
          const unhighlighter = () => this.unhighlight();
 
          this.svgGroup.append("path")
-            .attr("d", lineFunctionGenerator(controlIdx)(chartData.dataColumns))
+            .attr("d", lineFunctionGenerator(selCompIdx)(chartData.dataColumns))
             .attr("stroke", strokeColour)
-            .attr("class", "graphLine competitor" + this.selectedIndexes[controlIdx])
+            .attr("class", "graphLine competitor" + this.selectedIndexes[selCompIdx])
             .on("mouseenter", highlighter)
             .on("mouseleave", unhighlighter)
             .append("title")
-            .text(chartData.competitorNames[controlIdx]);
+            .text(chartData.competitorNames[selCompIdx]);
          
          this.svgGroup.append("labels")
-            .attr("class", "competitorLabel competitor" + this.selectedIndexes[controlIdx])
-            .text(chartData.competitorNames[controlIdx]);
+            .attr("class", "competitorLabel competitor" + this.selectedIndexes[selCompIdx])
+            .text(chartData.competitorNames[selCompIdx]);
 
-         for (const dubiousTimeInfo of chartData.dubiousTimesInfo[controlIdx]) {
+         for (const dubiousTimeInfo of chartData.dubiousTimesInfo[selCompIdx]) {
             this.svgGroup.append("line")
                .attr("x1", this.xScale(chartData.dataColumns[dubiousTimeInfo.start].x))
-               .attr("y1", this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[controlIdx]))
+               .attr("y1", this.yScale(chartData.dataColumns[dubiousTimeInfo.start].ys[selCompIdx]))
                .attr("x2", this.xScale(chartData.dataColumns[dubiousTimeInfo.end].x))
-               .attr("y2", this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[controlIdx]))
+               .attr("y2", this.yScale(chartData.dataColumns[dubiousTimeInfo.end].ys[selCompIdx]))
                .attr("stroke", strokeColour)
-               .attr("class", "aroundDubiousTimes competitor" + this.selectedIndexes[controlIdx])
+               .attr("class", "aroundDubiousTimes competitor" + this.selectedIndexes[selCompIdx])
                .on("mouseenter", highlighter)
                .on("mouseleave", unhighlighter)
                .append("title")
-               .text(chartData.competitorNames[controlIdx]);
+               .text(chartData.competitorNames[selCompIdx]);
          }
       }
    }
@@ -1173,35 +1173,11 @@ export class Chart {
                + this.getTextHeight(chartData.competitorNames[selCompIdx]) / 4;
          })
          .attr("class", (compIndex: number) => "startLabel competitor" + compIndex)
-         .on("mouseenter", (compIndex: number) => this.highlight(compIndex))
-         .on("mouseleave", () => this.unhighlight())
-         .text((selCompIndex: number) => {
-            return formatTime(Math.round(startColumn.ys[selCompIndex] * 60)) + " "
-               + chartData.competitorNames[selCompIndex];
-         });
-
-      startLabels.exit().remove();
-   }
-
-   private drawTimeLosses(chartData: ChartData, index: number) {
-
-      const compData = chartData.dataColumns[index];
-
-      const startLabels = this.svgGroup.selectAll("text.timeLosses").data(this.selectedIndexes);
-
-      startLabels.enter().append("text").classed("timeLosses", true);
-
-      startLabels.attr("x", compData.x)
-         .attr("y", (_compIndex: number, controlIndex: number) => {
-            return this.yScale(compData.ys[controlIndex])
-               + this.getTextHeight(chartData.competitorNames[controlIndex]) / 4;
-         })
-         .attr("class", (compIndex: number) => "startLabel competitor" + compIndex)
-         .on("mouseenter", (compIndex: number) => this.highlight(compIndex))
-         .on("mouseleave", () => this.unhighlight())
-         .text((selCompIndex: number) => {
-            return formatTime(Math.round(compData.ys[selCompIndex] * 60)) + " "
-               + chartData.competitorNames[selCompIndex];
+         .on("mouseenter", (_: MouseEvent, compIndex: number) => this.highlight(compIndex))
+         .on("mouseleave", (_: MouseEvent) => this.unhighlight())
+         .text((_compIndex: number, selCompIdx: number) => {
+            return formatTime(Math.round(startColumn.ys[selCompIdx] * 60)) + " "
+               + chartData.competitorNames[selCompIdx];
          });
 
       startLabels.exit().remove();
@@ -1317,8 +1293,8 @@ export class Chart {
          .attr("y2", (data: CurrentCompetitorData) => data.y)
          .attr("stroke", (data: CurrentCompetitorData) => data.colour)
          .attr("class", (data: CurrentCompetitorData) => "competitorLegendLine competitor" + data.index)
-         .on("mouseenter", (data: CurrentCompetitorData) => this.highlight(data.index))
-         .on("mouseleave", () => this.unhighlight());
+         .on("mouseenter", (_: MouseEvent, data: CurrentCompetitorData) => this.highlight(data.index))
+         .on("mouseleave", (_: MouseEvent) => this.unhighlight());
 
       legendLines.exit().remove();
 
@@ -1329,8 +1305,8 @@ export class Chart {
       labels.attr("x", this.contentWidth + LEGEND_LINE_WIDTH + 2)
          .attr("y", (data: CurrentCompetitorData) => data.y + data.textHeight / 4)
          .attr("class", (data: CurrentCompetitorData) => "competitorLabel competitor" + data.index)
-         .on("mouseenter", (data: CurrentCompetitorData) => this.highlight(data.index))
-         .on("mouseleave", () => this.unhighlight())
+         .on("mouseenter", (_: MouseEvent, data: CurrentCompetitorData) => this.highlight(data.index))
+         .on("mouseleave", (_: MouseEvent) => this.unhighlight())
          .text((data: CurrentCompetitorData) => data.label);
 
       labels.exit().remove();
