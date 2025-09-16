@@ -10,7 +10,7 @@
     <app-class-select [selected]='rs.oclass()' (onSelected)='rs.selectClass($event)' [oclasses]='rd.results().classes' />
 
     @if (course()?.classes.length > 1) {
-        <app-course-or-class />
+      <app-course-or-class />
     }
 
     <mat-checkbox labelPosition="after" [formControl]="colorCheckbox">Color</mat-checkbox>
@@ -47,19 +47,21 @@
       </ng-container>
 
       <!-- Splits times columns -->
-      @for (split of splitsColumns(); track split; let i = $index) {
+      @for (split of splitsColumns(); track split; let count = $index) {
+      @let i = count + 1;
       <ng-container [matColumnDef]="split">
         <th mat-header-cell class="splitcolumn" *matHeaderCellDef mat-sort-header> {{ splitTitle(i) }}</th>
         <td mat-cell [style.background]="cellColor(colorCheckbox.value, i, competitor)" *matCellDef="let competitor">
-          <span [class.fastest]="competitor.splitRanks[i]===1" [class.second]="competitor.splitRanks[i]===2"
-            [class.third]="competitor.splitRanks[i]===3">
-            {{ competitor.splitTimes[i] | formatTime:true }}
-            {{competitor.splitRanks[i] | bracketed}}
+          @let rank = competitor.getSplitRankTo(i);
+          <span [class.fastest]="rank===1" [class.second]="rank===2" [class.third]="rank===3">
+            {{ competitor.getSplitTimeTo(i) | formatTime:true }} {{rank | bracketed}}
           </span>
           <br>
           @if (i !== 0) {
-          <span [class.fastest]="competitor?.cumRanks[i]===1">{{ competitor.cumTimes[i] | formatTime:true }}
-            {{competitor.cumRanks[i] | bracketed }}</span>
+            @let rank = competitor.getCumulativeRankTo(i);
+            <span [class.fastest]="rank===1" [class.second]="rank===2" [class.third]="rank===3">
+              {{ competitor.getCumulativeTimeTo(i) | formatTime:true }} {{rank | bracketed }}
+            </span>
           }
           <br>
         </td>

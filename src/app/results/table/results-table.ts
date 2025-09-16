@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from "@angular/core";
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from "@angular/forms";
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -21,14 +21,14 @@ import { ColoredCircle } from '../selection-sidebar/competitor-list/colored-circ
 import { CourseOrClassCheckbox } from '../selection-sidebar/competitor-list/course-or-class';
 
 @Component({
-    selector: "app-splits-grid",
-    templateUrl: "./results-table.html",
-    styleUrls: ["./results-table.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe, 
+   selector: "app-splits-grid",
+   templateUrl: "./results-table.html",
+   styleUrls: ["./results-table.scss"],
+   changeDetection: ChangeDetectionStrategy.OnPush,
+   imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe,
       BracketedPipe, ClassSelect, CourseOrClassCheckbox, MatCheckboxModule, ColoredCircle, ResultsLoading, ResultsError]
 })
-export class ResultsTable implements OnInit {
+export class ResultsTable {
    protected rs = inject(ResultsSelectionService);
    protected rd = inject(ResultsDataService);
    private ps = inject(ResultsPageState);
@@ -41,7 +41,6 @@ export class ResultsTable implements OnInit {
    /** Column definitions columns */
    staticColumns = ["position", "name", "total"];
 
-   courseCheckbox = new FormControl<boolean>(true);
    colorCheckbox = new FormControl<boolean>(true);
    selectedCheckbox = new FormControl<boolean>(false);
 
@@ -49,7 +48,7 @@ export class ResultsTable implements OnInit {
 
    splitsColumns = computed(() =>
       this.course() ?
-         Array.from({ length: this.course().numSplits }, (x, i) => i.toString()) : []
+         Array.from({ length: this.course().numSplits }, (_, i) => i.toString()) : []
    );
 
    displayedColumns = computed(() => [...this.staticColumns, ...this.splitsColumns()]);
@@ -65,12 +64,6 @@ export class ResultsTable implements OnInit {
          return [];
       }
    });
-
-   ngOnInit() {
-      this.courseCheckbox.valueChanges.subscribe((courseDisplayed: boolean) => {
-         this.rs.setCourseOrClass(courseDisplayed);
-      });
-   }
 
    /** Returns color om a red/green color scale for a given percentage along the scale */
    private _colorScale(percent: number): string {
@@ -97,7 +90,7 @@ export class ResultsTable implements OnInit {
       const maxGain = 100;
 
       if (enabled && competitor.timeLosses) {
-         let percent = (maxLoss - competitor.timeLosses[control]) * 100 / (maxLoss + maxGain);
+         let percent = (maxLoss - competitor.getTimeLossAt(control)) * 100 / (maxLoss + maxGain);
          percent = Math.min(percent, 100);
          percent = Math.max(percent, 0);
          ret = this._colorScale(percent);
@@ -113,17 +106,18 @@ export class ResultsTable implements OnInit {
 
    /** Format title for split time */
    protected splitTitle(index: number): string {
-      if (index === 0) {
-         return 'S-1';
-      } else if (index === this.course().numSplits) {
-         return (index.toString() + '-F');
+      let ret = '';
+
+      if (index === this.course().numSplits) {
+         ret = (index - 1).toString() + '-F';
       } else {
-         let ret = (index + 1).toString();
+         ret = (index).toString();
          if (this.course()?.hasControls) {
-            ret = ret + ' (' + this.course().controls[index].toString() + ')';
+            ret = ret + ' (' + this.course().getControlCode(index) + ')';
          }
-         return ret;
       }
+
+      return ret;
    }
 
    protected getTimeOrStatus(competitor: Competitor): string {
