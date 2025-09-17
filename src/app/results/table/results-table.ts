@@ -19,13 +19,14 @@ import { ResultsPageState } from '../results-page-state';
 import { ResultsSelectionService } from "../results-selection.service";
 import { ColoredCircle } from '../selection-sidebar/competitor-list/colored-circle';
 import { CourseOrClassCheckbox } from '../selection-sidebar/competitor-list/course-or-class';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
    selector: "app-splits-grid",
    templateUrl: "./results-table.html",
    styleUrls: ["./results-table.scss"],
    changeDetection: ChangeDetectionStrategy.OnPush,
-   imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, Navbar, FormatTimePipe,
+   imports: [MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatSlideToggleModule, MatTableModule, MatSortModule, MatTooltipModule, Navbar, FormatTimePipe,
       BracketedPipe, ClassSelect, CourseOrClassCheckbox, MatCheckboxModule, ColoredCircle, ResultsLoading, ResultsError]
 })
 export class ResultsTable {
@@ -155,4 +156,14 @@ export class ResultsTable {
          }
       }
    }
+
+   toolTipText(index: number, competitor: Competitor): string {
+      const loss = competitor.getTimeLossAt(index);
+      if (loss > 0) {
+         return 'Time loss: ' + TimeUtilities.formatTime(competitor.getTimeLossAt(index));
+      } else {
+         return '';
+      }
+   }
+
 }
