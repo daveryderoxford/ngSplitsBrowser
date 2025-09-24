@@ -18,7 +18,7 @@ import { EllipsisPipe } from "../shared/pipes/ellipsis-pipe";
     EllipsisPipe
 ],
   template: `
-    <mat-list-item class="event-list-item">
+    <mat-list-item class="event-list-item" [class.selected]="selected()">
       @if (truncateTitle()) {
         <span matListItemTitle>{{ event().name | ellipsis:29 }}</span>
     } @else {
@@ -34,7 +34,11 @@ import { EllipsisPipe } from "../shared/pipes/ellipsis-pipe";
     </mat-list-item>
     <mat-divider/>
   `,
-  styles: ``,  
+  styles: `
+     .selected {
+         background-color: var(--mat-sys-primary-container);
+     }
+  `,  
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventListItem {
@@ -42,9 +46,9 @@ export class EventListItem {
   // Workaround where titles are not trancated with ellipsis 
   // inside a cdkVirtualFor
   readonly truncateTitle = input(false);
+  readonly selected = input(false);
   readonly eventClicked = output<OEvent>();
   
-
   itemClicked(): void {
     this.eventClicked.emit(this.event());
   }

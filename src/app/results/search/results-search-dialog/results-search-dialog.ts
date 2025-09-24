@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { Competitor, Course, CourseClass } from 'app/results/model';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ResultsDataService } from 'app/results/results-data.service ';
 
 export type SearchSelectedItem = Competitor | CourseClass | Course;
@@ -36,13 +37,17 @@ interface FilterPanelGroup {
    templateUrl: './results-search-dialog.html',
    styleUrl: './results-search-dialog.scss'
 })
-export class ResultsSearchDialog {
+export class ResultsSearchDialog implements OnInit {
    private rd = inject(ResultsDataService);
    protected dialogRef = inject(MatDialogRef<ResultsSearchDialog>);
+   protected data = inject(MAT_DIALOG_DATA);
 
    searchControl: FormControl = new FormControl('');
 
    searchText = toSignal(this.searchControl.valueChanges, { initialValue: '' });
+
+   competitorsOnly = false;
+   title = signal("Results Search");
 
    protected searchResults = computed(() => this.searchPanelContents(this.searchText()));
 
@@ -60,7 +65,10 @@ export class ResultsSearchDialog {
       }
       // If value is null or an unexpected type, filterText remains ''
 
-      const classes = results.findCourseClasss(filterText);
+      let classes: CourseClass[] = [];
+      if (!this.competitorsOnly) {
+         classes = results.findCourseClasss(filterText);
+      }
       const competitors = results.findCompetitors(filterText);
 
       let filterPanelContents = [];
@@ -87,4 +95,10 @@ export class ResultsSearchDialog {
    isCompetitor = (option: SearchSelectedItem): boolean => (option instanceof Competitor);
    asCompetitor = (option: SearchSelectedItem): Competitor => (option as Competitor);
 
+   ngOnInit() {
+      this.competitorsOnly = this.data.competitorsOnly;
+      if (this.data.title) {
+         this.title.set(this.data.title);
+      }
+   }
 }

@@ -5,12 +5,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterOutlet } from "@angular/router";
 import { AuthService } from './auth/auth.service';
 import { SidenavService } from './shared/services/sidenav.service';
+import { UserResultButton } from "./user-results/user-result-button";
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['app.component.scss'],
-    imports: [MatSidenavModule, MatListModule, RouterOutlet],
+    imports: [MatSidenavModule, MatListModule, RouterOutlet, UserResultButton],
     changeDetection:  ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {

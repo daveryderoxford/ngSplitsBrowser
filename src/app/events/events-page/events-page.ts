@@ -32,6 +32,7 @@ export class EventsPage {
       if (!event.splits || event.splits.valid === false) {
          this.ds.message("No valid splits avaliable for event", "Press OK to select another event");
       } else {
+         this.es.setSelectedEvent(event);
          this.router.navigate(["results", "graph", event.key], {
             queryParams: {
                eventName: event.name,

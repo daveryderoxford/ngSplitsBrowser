@@ -6,21 +6,17 @@
       <button mat-button routerLink="/auth/signup">Register</button>
     </div>
   </div>
+} @else if (us.user().results.length === 0) {
+  <div class="message">
+    You have not added any results yet.
+    @if (!es.selectedEvent()) {
+      Select an event to add.
+    } @else {
+      <div class=messagebuttons>
+        <app-user-result-button appearance="text" />
+      </div>
+    }
+  </div>
 } @else {
-  @if (us.user().results.length === 0) {
-    <div class="message">
-      You have no results yet.
-    </div>
-  } @else {
-    <mat-table [dataSource]="us.user().results" matSort]>
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let result">{{result.event.name}}</td>
-      </ng-container>
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef>Date</th>
-        <td mat-cell *matCellDef="let result">{{result.event.date | date}}</td>
-      </ng-container>
-    </mat-table>
-  }
+  <app-user-results-table [userResults]="us.user().results" />
 }

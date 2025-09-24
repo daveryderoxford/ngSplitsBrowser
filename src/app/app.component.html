@@ -6,6 +6,12 @@
 
       <button mat-list-item (click)='closeSidenav(["/events"])'>Events</button>
 
+      @defer () {
+        <app-user-result-button/>
+      } @placeholder {
+        <button mat-list-item>Add user result</button>
+      }
+
       <button mat-list-item (click)='closeSidenav(["/admin"])'>Administer results</button>
 
       <mat-divider  />

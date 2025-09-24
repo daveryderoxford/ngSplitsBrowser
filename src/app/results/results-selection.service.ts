@@ -1,7 +1,6 @@
-import { computed, effect, inject, Injectable, linkedSignal, signal } from "@angular/core";
+import { computed, inject, Injectable, linkedSignal, signal } from "@angular/core";
 import { Competitor, Course, CourseClass, Results } from "./model";
 import { ResultsDataService } from './results-data.service ';
-
 
 /** 
  * Selected competitorss, control and courses

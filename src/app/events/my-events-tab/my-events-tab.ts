@@ -1,23 +1,26 @@
 
-import { ChangeDetectionStrategy, Component, computed, inject, output } from "@angular/core";
-import { MatButtonModule } from "@angular/material/button";
+import { ChangeDetectionStrategy, Component, inject, output } from "@angular/core";
 import { MatListModule } from "@angular/material/list";
 import { RouterLink } from "@angular/router";
 import { AuthService } from 'app/auth/auth.service';
 import { UserDataService } from "app/user/user-data.service";
 import { OEvent } from '../model/oevent';
-import { MatTableModule } from "@angular/material/table";
-import { DatePipe } from '@angular/common';
+import { MatButtonModule } from "@angular/material/button";
+import { UserResultButton } from "app/user-results/user-result-button";
+import { UserResultsTableComponent } from "app/user-results/user-results-table/user-results-table";
+import { EventService } from '../event.service';
 
 @Component({
    selector: "app-my-events-tab",
    templateUrl: "./my-events-tab.html",
    styleUrls: ["./my-events-tab.scss"],
-   imports: [MatButtonModule, RouterLink, MatListModule, MatTableModule, DatePipe],
+   imports: [MatButtonModule, RouterLink, MatListModule, UserResultButton, UserResultsTableComponent],
    changeDetection: ChangeDetectionStrategy.OnPush,
+   standalone: true,
 })
 export class MyEventsTab {
    protected us = inject(UserDataService);
+   protected es = inject(EventService);
    protected auth = inject(AuthService);
 
    eventSelected = output<OEvent>();

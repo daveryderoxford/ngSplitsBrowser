@@ -30,7 +30,7 @@ import { AppBreakpoints } from 'app/shared/services/breakpoints';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AllEventsTabComponent {
-  private es = inject(EventService);
+  protected es = inject(EventService);
   protected breakpoints = inject(AppBreakpoints);
   
   eventSelected = output<OEvent>();
