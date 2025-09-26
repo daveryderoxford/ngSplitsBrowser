@@ -3,7 +3,7 @@ import { MatDialog as MatDialog, MatDialogRef as MatDialogRef } from '@angular/m
 import { ConfirmDialog } from './confirm-dialog';
 import { MessageDialog } from "./message-dialog";
 import { inject, Injectable } from '@angular/core';
-import { lastValueFrom } from 'rxjs';
+import { firstValueFrom, lastValueFrom } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -32,6 +32,6 @@ export class DialogsService {
         dialogRef.componentInstance.title = title;
         dialogRef.componentInstance.message = message;
 
-        return dialogRef.afterClosed().toPromise();
+        return firstValueFrom(dialogRef.afterClosed());
     }
 }

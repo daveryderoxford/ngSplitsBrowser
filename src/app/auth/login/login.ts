@@ -14,6 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router, RouterLink } from '@angular/router';
 import { FlexModule } from '@ngbracket/ngx-layout/flex';
 import { Toolbar } from 'app/shared/components/toolbar';
+import { DialogsService } from 'app/shared/dialogs/dialogs.service';
 import { getFirebaseErrorMessage } from '../firebase-error-messages';
 
 export type AuthType = "EmailAndPassword" | "Google" | "Facebook";
@@ -31,13 +32,14 @@ const isInStandaloneMode = () =>
    templateUrl: './login.html',
    styleUrls: ['./login.scss'],
    imports: [MatCardModule, Toolbar, FlexModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, RouterLink],
-   changeDetection:  ChangeDetectionStrategy.OnPush
+   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LoginComponent {
    private router = inject(Router);
    private formBuilder = inject(NonNullableFormBuilder);
    private afAuth = inject(Auth);
    private snackBar = inject(MatSnackBar);
+   private dialogs = inject(DialogsService);
 
    loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -59,18 +61,20 @@ export class LoginComponent {
       try {
          this.loading.set(true);
 
+         let userDetails: UserCredential;
+
          switch (provider) {
 
             case "EmailAndPassword":
-               await signInWithEmailAndPassword(this.afAuth, credentials!.email, credentials!.password);
+               userDetails = await signInWithEmailAndPassword(this.afAuth, credentials!.email, credentials!.password);
                break;
-
+               
             case "Google":
-               await this._thirdPartySignIn(googleAuthProvider);
+               userDetails = await this._thirdPartySignIn(googleAuthProvider);
                break;
 
             case "Facebook":
-               await this._thirdPartySignIn(facebookAuthProvider);
+               userDetails = await this._thirdPartySignIn(facebookAuthProvider);
                break;
          }
          this._handleSignInSuccess();
@@ -104,9 +108,18 @@ export class LoginComponent {
       if (err instanceof FirebaseError) {
          errorMessage = getFirebaseErrorMessage(err);
          console.log(`LoginComponent: Firebase error code: ${err.code} message: ${errorMessage}`);
+
+         // Show dialog to highlight duplicate crdentials to highlight this error 
+         if (err.code === 'auth/account-exists-with-different-credential') {
+            const email = this.loginForm.get('email')!.value;
+            this.dialogs.message('Account Exists',
+               `An account already exists for ${email} but with a different sign-in method.
+                Please sign in using the method you originally used.`);
+            return;
+         }
       } else if (err instanceof Error) {
          console.log(`LoginComponent: Error logging in:${err.message}`);
-         errorMessage = `An unexpected error occurred. ${err.message}`;
+         errorMessage = `An unexpected error occurred. ${err.message}.  Please try again.`;
       } else {
          console.log('LoginComponent: unexpected error');
       }

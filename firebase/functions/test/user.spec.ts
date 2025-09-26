@@ -30,21 +30,18 @@ describe('User Cloud Functions', function () {
 
    describe('createUser', () => {
       it('should create a new user data document when a user is created', async () => {
-         // Create a mock user object.
+
          const user = testEnv.auth.makeUserRecord({
             uid: 'test-uid-create',
             email: 'create@example.com',
          });
 
-         // 2. Wrap the function.
          const wrapped = testEnv.wrap(context.myFunctions.createUser);
          // For v1 Auth triggers, the user record is passed directly.
          await wrapped(user);
 
-         // 4. Read the user data from Firestore.
          const userData = await readUser(context.db, user.uid);
 
-         // 5. Assertions.
          expect(userData).to.not.be.undefined;
          if (userData) {
             expect(userData.key).to.equal(user.uid);
@@ -75,7 +72,6 @@ describe('User Cloud Functions', function () {
          };
          await saveUser(context.db, initialUserData);
 
-         // Call function
          const wrapped = testEnv.wrap(context.myFunctions.deleteUser);
          // For v1 Auth triggers, the user record is passed directly.
          await wrapped(user);
