@@ -1,7 +1,7 @@
 import { provideHttpClient } from '@angular/common/http';
 import { ApplicationConfig, provideZonelessChangeDetection, provideCheckNoChangesConfig } from '@angular/core';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider } from '@angular/fire/app-check';
+import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider, ReCaptchaEnterpriseProvider } from '@angular/fire/app-check';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading } from '@angular/router';
 import { APP_ROUTES } from './app-routes';
@@ -15,7 +15,7 @@ export const appConfig: ApplicationConfig = {
       provideAuth(() => getAuth()),
       provideAppCheck(() =>
          initializeAppCheck(getApp(), {
-            provider: new ReCaptchaV3Provider('6LfV98YrAAAAAEvsWjkkfj8Qk9n4TUBNc9XAGfzM'), isTokenAutoRefreshEnabled: true
+            provider: new ReCaptchaEnterpriseProvider('6LfC1dUrAAAAAH6_S3uOuk--gDUsbLivZ4lDEgH0'), isTokenAutoRefreshEnabled: true
          })),
       provideHttpClient(),
       provideRouter(APP_ROUTES, 
