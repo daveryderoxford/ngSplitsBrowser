@@ -9,6 +9,7 @@ import { Sidebar } from 'app/results/selection-sidebar/sidebar';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { SelectionSidebarButton } from "../../selection-sidebar/selection-sidebar-button";
 import { SummaryGraph } from '../summary-graph';
+import { SettingsService } from 'app/settings/settings.service';
 
 @Component({
    selector: 'app-stats-page',
@@ -31,5 +32,5 @@ import { SummaryGraph } from '../summary-graph';
 export class StatsPage {
    protected rs = inject(ResultsSelectionService);
    protected rd = inject(ResultsDataService);
-
+   protected settings = inject(SettingsService);
 }

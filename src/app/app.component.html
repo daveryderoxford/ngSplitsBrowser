@@ -15,9 +15,10 @@
       <button mat-list-item (click)='closeSidenav(["/admin"])'>Administer results</button>
 
       <mat-divider  />
+      <button mat-list-item (click)='closeSidenav(["/settings"])'>Settings</button>
+      <mat-divider />
 
       @if (auth.user()) {
-        <button mat-list-item (click)='closeSidenav(["/user"])'>User settings</button>
         <button mat-list-item (click)='closeSidenav(["/auth/change-password"])'>Change password</button>
         <button mat-list-item (click)="logout()">Logout</button>
       } @else {

@@ -33,7 +33,7 @@
       grid-template-rows: auto auto 1fr;
       grid-template-areas:
          "toolbar toolbar toolbar"
-         "  ...     form    ... " 
+         "  ...   content    ... " 
          " ...       ...    ...  ";
       background-color: var(--mat-sys-surface-container-high);
    }
@@ -43,7 +43,7 @@
    }
 
    #{$form-element} {
-      grid-area: form;
+      grid-area: content;
       background-color: white;
       padding: 20px;
       margin: 16px;
