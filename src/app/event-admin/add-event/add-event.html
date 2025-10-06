@@ -3,7 +3,7 @@
 <mat-stepper orientation="horizontal" [linear]="true" class="steps">
 
    <mat-step label="Details">
-      <app-event-form #eventform (submitted)="saveEventDetails($event)" />
+      <app-event-form (submitted)="saveEventDetails($event)" />
    </mat-step>
 
    <mat-step label="Upload results">

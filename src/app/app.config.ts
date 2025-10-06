@@ -1,11 +1,16 @@
 import { provideHttpClient } from '@angular/common/http';
-import { ApplicationConfig, provideZonelessChangeDetection, provideCheckNoChangesConfig } from '@angular/core';
+import { ApplicationConfig, provideZonelessChangeDetection, provideCheckNoChangesConfig, isDevMode } from '@angular/core';
 import { getApp, initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { provideAppCheck, initializeAppCheck, ReCaptchaV3Provider, ReCaptchaEnterpriseProvider } from '@angular/fire/app-check';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading } from '@angular/router';
 import { APP_ROUTES } from './app-routes';
 import { firebaseConfig } from './app.firebase-config';
+
+if  (isDevMode()) {
+   (<any>window).FIREBASE_APPCHECK_DEBUG_TOKEN = true;
+   console.log('AppCheck configured in debug mode')
+}
 
 export const appConfig: ApplicationConfig = {
    providers: [

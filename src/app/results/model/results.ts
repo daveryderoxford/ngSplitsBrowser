@@ -206,7 +206,7 @@ export class Results {
         const found = this.courses.filter((course) => {
             const name = course.name.toLowerCase();
             return name.startsWith(ss);
-        }).sort((a, b) => this.sortByDistance(a, b));
+        }).sort(this.sortByDistance);
 
         return (found);
     }

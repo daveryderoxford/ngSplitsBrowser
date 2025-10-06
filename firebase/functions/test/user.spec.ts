@@ -4,7 +4,7 @@ import { Firestore } from 'firebase-admin/firestore';
 import { describe, it } from 'mocha';
 import { userConverter } from '../src/model/user-firebase-converters.js';
 import { UserData } from '../src/model/user.js';
-import { setupMochaHooks, testEnv } from './test-helper.js';
+import { setupMochaHooks, testEnv } from './firebase-test-helper.js';
 
 /* UTILITY FUNCTIONS */
 

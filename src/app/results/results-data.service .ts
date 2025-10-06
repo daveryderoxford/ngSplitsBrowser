@@ -143,7 +143,7 @@ export class ResultsDataService {
       }
    }
 
-   /**
+  /**
    * Compute the ranks of each competitor within their class.
    */
    private computeCompetitorRanks(competitors: Competitor[], numControls: number) {

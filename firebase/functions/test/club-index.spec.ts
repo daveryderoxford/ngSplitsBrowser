@@ -7,7 +7,7 @@ import { makeClubKey } from '../src/club/club-index.js';
 import { Club, createClub } from '../src/model/club.js';
 import { clubConverter, eventConverter } from '../src/model/event-firebase-converters.js';
 import { OEvent, createEvent } from '../src/model/oevent.js';
-import { setupMochaHooks, testEnv } from './test-helper.js';
+import { setupMochaHooks, testEnv } from './firebase-test-helper.js';
 
 /* UTILITY FUNCTIONS */
 

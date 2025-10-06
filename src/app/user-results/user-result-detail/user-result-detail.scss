@@ -1,3 +1,5 @@
+@use '@angular/material' as mat;
+
 :host {
   display: block;
 }
@@ -8,7 +10,7 @@
   gap: 16px;
 }
 
-.header, .results-details {
+.header {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px 24px;
@@ -22,7 +24,11 @@
   flex-direction: row;
 }
 
-.header-item {
+.results-details {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 12px 24px;
+  align-items: center;
 }
 
 .detail-item {
@@ -37,10 +43,14 @@
   color: var(--mat-secondary-text-color, rgba(0, 0, 0, 0.6));
 }
 
-.header-icons {
+.actions {
   display: flex;
-  gap: 12px;
-  justify-self: end;
-  align-items: center;
-  grid-column: -1;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: end;
+}
+
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
+.delete {
+  @include mat.button-overrides((filled-container-color: var()    ));
 }

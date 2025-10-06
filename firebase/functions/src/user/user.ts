@@ -1,3 +1,8 @@
+/** User administration cloud functions
+ * Note that currently user onAuthCreate and onAuthDelete triggers 
+ * are not support for Firebase v2 functions so we are limited to using Node version 20.
+ * https://github.com/firebase/firebase-functions/issues/1383#issuecomment-3352900566
+ */
 import { getFirestore } from 'firebase-admin/firestore';
 import * as functions from 'firebase-functions';
 import * as logger from "firebase-functions/logger";
@@ -56,5 +61,3 @@ function getNames(displayName: string | undefined): [string, string] {
     return [firstname, lastname];
   }
 }
-
-

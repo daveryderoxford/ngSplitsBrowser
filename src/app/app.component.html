@@ -13,10 +13,12 @@
       }
 
       <button mat-list-item (click)='closeSidenav(["/admin"])'>Administer results</button>
-
       <mat-divider  />
+
+      <!--  TODO Enable settings once effects implamented 
       <button mat-list-item (click)='closeSidenav(["/settings"])'>Settings</button>
       <mat-divider />
+      -->
 
       @if (auth.user()) {
         <button mat-list-item (click)='closeSidenav(["/auth/change-password"])'>Change password</button>

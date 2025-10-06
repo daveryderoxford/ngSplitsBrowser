@@ -1,30 +1,27 @@
+@let res = userResult();
+
 <div class="detail-container">
   <div class="header">
-    <span class="header-item">{{ userResult().event.name }}</span>
-    <span class="header-item">{{ userResult().event.date | date }}</span>
-    <span class="header-item">{{ userResult().event.club }}</span>
-    <span class="header-item">{{ courseLength() }}km</span>
-    <span class="header-item">{{ totalTime() }}</span>
-    <span>{{ minsPerKm() }}</span>
-  </div>
+    <span class="header-item">{{ res.event.name }}</span>
+    <span class="header-item">{{ res.event.date | date }}</span>
+    <span class="header-item">{{ res.event.club }}</span>
+    </div>
+    <div class="header">
+      <span  class="header-item">{{ res.course.name }}</span>
+      <span class="header-item">{{ courseLength() }}km</span>
+      <span class="header-item">{{ totalTime() }}</span>
+      <span>{{ minsPerKm() }}</span>
+    </div>
 
-  <div class="header-icons">
-      <mat-icon [matTooltip]="'Grade: ' + (userResult().event.grade || 'Unknown')">{{ gradeIcon() }}</mat-icon>
-      <mat-icon [matTooltip]="'Type: ' + (userResult().event.type || 'Unknown')">{{ typeIcon() }}</mat-icon>
-  </div>
-
+  @let data = userResult().course;
   <div class="results-details">
-    <div class="detail-item">
-      <span class="label">Course / Class</span>
-      <span>{{ userResult().course.name }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="label">Position</span>
-      <span>{{ userResult().oclass.position }}</span>
-    </div>
-    <div class="detail-item">
-      <span class="label">Time Behind</span>
-      <span>{{ behind() }}</span>
-    </div>
+    <span>{{ data.position }} / {{ data.numCompetitors }}</span>
+    <span>{{ behind() }}</span>
+    <span>{{ data.winner }}</span>
+    <span>{{ formatTime(data.winningTime) }}</span>
+  </div>
+  <div class="actions">
+    <button matButton="tonal" (click)="viewResults()">View</button>
+    <button matButton="filled" class="delete" (click)="deleteResult()">Delete</button>
   </div>
 </div>

@@ -1,8 +1,9 @@
-import { CourseSummary, EventInfo, OEvent } from 'app/events/model/oevent';
+import { EventInfo, OEvent } from 'app/events/model/oevent';
 import { Competitor } from 'app/results/model';
 
 export interface UserResult {
    key: string;
+   eventKey: string;
    event: EventInfo;
    ecardId: string;
    firstname: string;
@@ -38,6 +39,7 @@ export function createUserResult(oevent: OEvent,
    return {
       key: `${oevent.key}-${competitor.key}`,
       ecardId: competitor.ecardId || '',
+      eventKey: oevent.key,
       event: eventInfo(oevent),
       firstname: competitor.firstname,
       surname: competitor.surname,

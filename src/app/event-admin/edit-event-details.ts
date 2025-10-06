@@ -25,7 +25,7 @@ export class EditEventDetails {
    router = inject(Router);
    public snackBar = inject(MatSnackBar);
 
-   eventId = input.required<string>(); // Route parametyer
+   eventId = input.required<string>(); // Route parameter
    event = computed(() => this.ea.events().find(e => e.key === this.eventId()));
 
    busy = signal(false);

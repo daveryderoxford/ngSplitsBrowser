@@ -43,7 +43,8 @@ export function setupMochaHooks(): TestContext {
 	});
 
 	afterEach(async () => {
-		// Use the recommended method for clearing the emulator, is faster but has been found to casuse intermittenmt failure of tests
+		// Using the recommended method for clearing the emulator, 
+		// is faster but has been found to casuse intermittenmt failure of tests
       // TODO Maybe look into using this later
 		// testEnv.clearFirestore();
       try {
