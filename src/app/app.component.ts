@@ -6,6 +6,7 @@ import { Router, RouterOutlet } from "@angular/router";
 import { AuthService } from './auth/auth.service';
 import { SidenavService } from './shared/services/sidenav.service';
 import { UserResultButton } from "./user-results/user-result-button";
+import { SelectedEventService } from './events/selected-event-state.service';
 
 @Component({
     selector: 'app-root',
@@ -16,6 +17,7 @@ import { UserResultButton } from "./user-results/user-result-button";
 })
 export class AppComponent implements OnInit {
    auth = inject(AuthService);
+   ses = inject(SelectedEventService);
    sidebarService = inject(SidenavService);
    snackbar = inject(MatSnackBar);
    router = inject(Router);

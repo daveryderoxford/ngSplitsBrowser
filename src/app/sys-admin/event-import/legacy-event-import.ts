@@ -8,7 +8,7 @@ import { doc, getDocs, getFirestore, limit, orderBy, query, setDoc } from '@angu
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { EventAdminService } from "app/event-admin/event-admin.service";
 import { EventGrade, EventGrades, OEvent, SplitsFileFormat } from 'app/events/model/oevent';
-import { mappedCollectionRef } from 'app/shared/utils/firestore-helper';
+import { mappedCollectionRef } from 'app/shared/firebase/firestore-helper';
 import { firstValueFrom, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { LegacyEvent, legacyEvents } from "./legacy-event-data";

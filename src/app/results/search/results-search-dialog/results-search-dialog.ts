@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -99,6 +99,9 @@ export class ResultsSearchDialog implements OnInit {
       this.competitorsOnly = this.data.competitorsOnly;
       if (this.data.title) {
          this.title.set(this.data.title);
+      }
+      if (this.data.initialSearch) {
+         this.searchControl.setValue(this.data.initialSearch);
       }
    }
 }

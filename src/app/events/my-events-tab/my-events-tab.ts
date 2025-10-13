@@ -8,7 +8,7 @@ import { OEvent } from '../model/oevent';
 import { MatButtonModule } from "@angular/material/button";
 import { UserResultButton } from "app/user-results/user-result-button";
 import { UserResultsTableComponent } from "app/user-results/user-results-table/user-results-table";
-import { EventService } from '../event.service';
+import { SelectedEventService } from '../selected-event-state.service';
 
 @Component({
    selector: "app-my-events-tab",
@@ -16,11 +16,10 @@ import { EventService } from '../event.service';
    styleUrls: ["./my-events-tab.scss"],
    imports: [MatButtonModule, RouterLink, MatListModule, UserResultButton, UserResultsTableComponent],
    changeDetection: ChangeDetectionStrategy.OnPush,
-   standalone: true,
 })
 export class MyEventsTab {
    protected us = inject(UserDataService);
-   protected es = inject(EventService);
+   protected ses = inject(SelectedEventService);
    protected auth = inject(AuthService);
 
    eventSelected = output<OEvent>();

@@ -10,6 +10,7 @@ import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab";
 import { EventService } from "../event.service";
 import { MyEventsTab } from "../my-events-tab/my-events-tab";
 import { AppBreakpoints } from 'app/shared/services/breakpoints';
+import { SelectedEventService } from '../selected-event-state.service';
 
 @Component({
    selector: "app-results",
@@ -21,6 +22,7 @@ import { AppBreakpoints } from 'app/shared/services/breakpoints';
 export class EventsPage {
    private router = inject(Router);
    public es = inject(EventService);
+   public ses = inject(SelectedEventService);
    private ds = inject(DialogsService);
    private breakpoints = inject(AppBreakpoints);
 
@@ -32,8 +34,8 @@ export class EventsPage {
       if (!event.splits || event.splits.valid === false) {
          this.ds.message("No valid splits avaliable for event", "Press OK to select another event");
       } else {
-         this.es.setSelectedEvent(event);
-         this.router.navigate(["results", "graph", event.key], {
+         this.ses.setSelectedEvent(event);
+         this.router.navigate(["results", "graph", event.userId, event.key], {
             queryParams: {
                eventName: event.name,
                eventDate: event.date ? event.date.toISOString() : undefined

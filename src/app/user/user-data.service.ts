@@ -4,7 +4,7 @@ import { FirebaseApp } from '@angular/fire/app';
 import { Auth, User } from "@angular/fire/auth";
 import { DocumentReference, doc, docData, getFirestore, setDoc, updateDoc, arrayUnion, arrayRemove } from "@angular/fire/firestore";
 import { AuthService } from 'app/auth/auth.service';
-import { mappedCollectionRef } from 'app/shared/utils/firestore-helper';
+import { mappedCollectionRef } from 'app/shared/firebase/firestore-helper';
 import { of } from 'rxjs';
 import { UserData } from './user';
 import { UserResult } from '../user-results/user-result';

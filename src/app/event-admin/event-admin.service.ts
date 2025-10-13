@@ -9,7 +9,8 @@ import { CourseSummary, EventGrades, EventSummary, OEvent, SplitsFileFormat } fr
 import { parseEventData } from 'app/results/import';
 import { Course, Results } from 'app/results/model';
 import { SplitsbrowserException } from 'app/results/model/exception';
-import { mappedCollectionRef } from 'app/shared/utils/firestore-helper';
+import { mappedCollectionRef } from 'app/shared/firebase/firestore-helper';
+import { resultsPath } from 'app/shared/firebase/storage-paths';
 import { of } from 'rxjs';
 
 const EVENTS_COLLECTION = 'events';
@@ -152,7 +153,8 @@ export class EventAdminService {
          event.summary = this.populateSummary(results);
 
          // Save file to users area on Google Clould  Storage
-         const path = `results/${this.auth.user().uid}/${event.key}-results`;
+
+         const path = resultsPath(this.auth.user().uid, event.key);
          await this._uploadToGoogle(text, path);
 
          // Update event object with stored file location

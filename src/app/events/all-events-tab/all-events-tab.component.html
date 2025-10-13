@@ -11,7 +11,7 @@
     <app-event-list-item 
          *cdkVirtualFor="let event of events(); trackBy: trackByEventId" 
          [event]="event"
-         [selected]="event.key === es.selectedEvent()?.key"
+         [selected]="event.key === ses.selectedEvent()?.key"
          [truncateTitle] ="this.breakpoints.narrowScreen()"
          (eventClicked)="eventClicked(event)" />
   </mat-list>

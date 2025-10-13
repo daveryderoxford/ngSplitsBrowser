@@ -1,12 +1,12 @@
 /**
  * Event service
  */
-import { inject, Injectable, Resource, signal } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 import { rxResource } from '@angular/core/rxjs-interop';
 import { FirebaseApp } from '@angular/fire/app';
-import { collectionData, doc, docData, getFirestore, orderBy, query, where } from '@angular/fire/firestore';
+import { collectionData, getFirestore, orderBy, query, where } from '@angular/fire/firestore';
 import { PaganationService } from "app/shared";
-import { mappedCollectionRef, mappedConverter } from 'app/shared/utils/firestore-helper';
+import { mappedCollectionRef, mappedConverter } from 'app/shared/firebase/firestore-helper';
 import { BehaviorSubject, merge, Observable, of } from "rxjs";
 import { Club } from './model/club';
 import { EventInfo, OEvent } from './model/oevent';
@@ -28,14 +28,6 @@ export class EventService {
 
   private _filter = signal("");
   private _page = signal(1);
-
-  private _selectedEvent = signal<OEvent | undefined>(undefined);
-
-  readonly selectedEvent = this._selectedEvent.asReadonly();
-
-  setSelectedEvent(event: OEvent | undefined) {
-    this._selectedEvent.set(event);
-  }
 
   /** Sets search critera to use events list
    * @param orderby order the results by specified paremeter name.

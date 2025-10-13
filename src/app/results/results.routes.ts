@@ -4,7 +4,7 @@ import { resultsResolver } from './results-resolver';
 
 export const RESULTS_ROUTES: Routes = [
    {
-      path: "graph/:id",
+      path: "graph/:uid/:id",
       component: GraphPage,
       title: 'Splitsbrowser - Graph',
       resolve: {
@@ -12,7 +12,7 @@ export const RESULTS_ROUTES: Routes = [
       }
    },
    {
-      path: "race/:id",
+      path: "race/:uid/:id",
       component: GraphPage,
       title: 'Splitsbrowser - Race',
       resolve: {
@@ -20,7 +20,7 @@ export const RESULTS_ROUTES: Routes = [
       }
    },
    {
-      path: "table/:id",
+      path: "table/:uid/:id",
       loadComponent: () => import('./table/results-table').then(c => c.ResultsTable),
       title: 'Splitsbrowser - Results table',
       resolve: {
@@ -28,7 +28,7 @@ export const RESULTS_ROUTES: Routes = [
       }
    },
    { 
-      path: "stats/:id", 
+      path: "stats/:uid/:id", 
       title: 'Splitsbrowser - Stats', 
       resolve: {
          results: resultsResolver

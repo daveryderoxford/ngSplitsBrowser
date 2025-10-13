@@ -12,8 +12,9 @@ import { Competitor, Results } from "./model";
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
 import { ResultsEventDetails } from './model/event_details';
+import { resultsPath } from 'app/shared/firebase/storage-paths';
 
-type ResultsURLType = 'Routegadget | SIOnline | ';
+type ResultsURLType = 'Routegadget' | 'SIOnline';
 
 const colours = [
    "#FF0000", "#4444FF", "#00FF00", "#000000", "#CC0066", "#000099",
@@ -30,15 +31,18 @@ export class ResultsDataService {
    private storage = getStorage(inject(FirebaseApp));
    private http = inject(HttpClient);
 
-   _event = signal<ResultsEventDetails | undefined>(undefined);
+   private _event = signal<ResultsEventDetails | undefined>(undefined,
+      { equal: (a, b) => a?.key === b?.key && a?.uid === b?.uid }
+   );
+
    event = this._event.asReadonly();
 
-   private _key = computed(() => this._event()?.key);  // Computed signal for key property only
+   private _resourceParams = computed(() => ({ uid: this.event().uid, key: this.event().key }));
 
    private _resultsResource = resource({
-      params: () => ({ id: this._key() }),
+      params: () => this._event(),
       loader: async ({ params }) => {
-         const results = await this.loadResultsFile(params.id);
+         const results = await this.loadResultsFile(params.uid, params.key);
          return results;
       },
    });
@@ -47,9 +51,10 @@ export class ResultsDataService {
    isLoading = this._resultsResource.isLoading;
    error = this._resultsResource.error;
 
-   viewStoredEvent(id: string, name = "", date?: Date | undefined) {
+   viewStoredEvent(uid: string, id: string, name = "", date?: Date | undefined) {
       this._event.set({
          key: id,
+         uid: uid,
          name: name,
          date: date
       });
@@ -62,9 +67,9 @@ export class ResultsDataService {
    /** Loads results for a specified event returning an observable of the results.
     * This just loads the results file from storage and does not clear any current selections.
     */
-   public async loadResultsFile(key: string): Promise<Results> {
+   public async loadResultsFile(uid: string, key: string): Promise<Results> {
 
-      const text = await this.downloadResultsFile(key);
+      const text = await this.downloadResultsFile(uid, key);
 
       const results = this.processResults(text);
 
@@ -102,7 +107,7 @@ export class ResultsDataService {
       }
       results.setDerivedData();
 
-    //  this.computeRanks(results);
+      this.computeRanks(results);
 
       this.computeColors(results);
 
@@ -110,11 +115,9 @@ export class ResultsDataService {
    }
 
    /** Downloads results for an event from google storage */
-   public async downloadResultsFile(key: string): Promise<string> {
+   public async downloadResultsFile(uid: string, key: string): Promise<string> {
 
-      const path = isNaN(parseInt(key)) ?
-         `results /${key} ` :
-         `results/legacy/${key}`;
+      const path = resultsPath(uid, key);
 
       const r = ref(this.storage, path);
 
@@ -143,9 +146,9 @@ export class ResultsDataService {
       }
    }
 
-  /**
-   * Compute the ranks of each competitor within their class.
-   */
+   /**
+    * Compute the ranks of each competitor within their class.
+    */
    private computeCompetitorRanks(competitors: Competitor[], numControls: number) {
 
       if (competitors.length === 0) {
@@ -222,6 +225,8 @@ export class ResultsDataService {
       return ranks;
    }
 }
+
+
 
 function deepFreeze(o: any) {
    Object.freeze(o);

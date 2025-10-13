@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
-import { MatButtonAppearance, MatButtonModule } from '@angular/material/button';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { EventService } from 'app/events/event.service';
@@ -10,6 +10,7 @@ import { createUserResult } from 'app/user-results/user-result';
 import { firstValueFrom } from 'rxjs';
 import { ResultsSearchDialog, SearchSelectedItem } from '../results/search/results-search-dialog/results-search-dialog';
 import { DialogsService } from 'app/shared';
+import { SelectedEventService } from 'app/events/selected-event-state.service';
 
 export type SearchButtonAppearance = 'list' | 'text' | 'icon';
 
@@ -33,12 +34,12 @@ export class UserResultButton {
    private dialog = inject(MatDialog);
    private ds = inject(DialogsService);
    private usd = inject(UserDataService);
-   private es = inject(EventService);
+   private ses = inject(SelectedEventService);
 
    appearance = input<SearchButtonAppearance>('list');
 
    async openSearchDialog(): Promise<void> {
-      if (!this.es.selectedEvent()) {
+      if (!this.ses.selectedEvent()) {
          await this.ds.message(" Select event", "First load an event to add result from using the 'Events' menu");
          return;
       }
@@ -48,7 +49,8 @@ export class UserResultButton {
          autoFocus: true,
          data: {
             competitorsOnly: true,
-            title: 'Search result to add'
+            title: 'Search result to add',
+            initialSearch: `${this.usd.user().firstname} ${this.usd.user().surname}` 
          }
       });
 
@@ -56,7 +58,7 @@ export class UserResultButton {
 
       if (comp && (comp instanceof Competitor)) {
          console.log('Add Result: Selected competitor: ', comp.name);
-         const userResult = createUserResult(this.es.selectedEvent(), comp);
+         const userResult = createUserResult(this.ses.selectedEvent(), comp);
          await this.usd.addResult(userResult);
       }
    }
