@@ -15,7 +15,6 @@ import { AppBreakpoints } from 'app/shared/services/breakpoints';
 
 @Component({
   selector: 'app-all-events-tab',
-
   templateUrl: './all-events-tab.component.html',
   styleUrls: ['./all-events-tab.component.scss'],
   imports: [MatProgressBarModule, 
@@ -59,8 +58,8 @@ export class AllEventsTabComponent {
 
   protected scrollPositionChanged(currentIndex: number): void {
     // Load more if the current scroll index is within the buffer zone from the end of the list
-    console.log(`Current index: ${currentIndex}, Total events: ${this.events().length}, Scroll buffer: ${this.scrollBuffer}`);
     if (currentIndex >= this.events().length - this.scrollBuffer) {
+      console.log(`Current index: ${currentIndex}, Total events: ${this.events().length}, Scroll buffer: ${this.scrollBuffer}`);
       this.es.extendSearch();
     }
   }

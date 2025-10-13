@@ -17,10 +17,11 @@
 <ol>
    @for (comp of rs.displayedCompetitors(); track comp.key; let index= $index ) {
    <li (click)="toggleSelected(comp)">
+      @let pos = position(comp);
       @if (rs.isCompetitorSelected(comp)) {
-      <app-colored-circle class="circle" [text]="(index+1).toString()" [color]="comp.color" />
+        <app-colored-circle class="circle" [text]="pos" [color]="comp.color" />
       } @else {
-      <span class="position">{{(index+1).toString()}}</span>
+        <span class="position">{{pos}}</span>
       }
       <span class="name">{{comp.name}}</span>
       <span class="club">{{comp.club}}</span>

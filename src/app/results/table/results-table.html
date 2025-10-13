@@ -25,11 +25,11 @@
       <!-- Initial columns -->
       <ng-container matColumnDef="position" sticky>
         <th mat-header-cell class="positioncolumn" *matHeaderCellDef mat-sort-header>Pos</th>
-        <td mat-cell *matCellDef="let competitor" (click)="updateSelectedCompetitor(competitor)">
+        <td mat-cell  class="positioncolumn" *matCellDef="let competitor" (click)="updateSelectedCompetitor(competitor)">
           @if (rs.isCompetitorSelected(competitor)) {
-            <app-colored-circle class="circle" [text]="competitor.order.toString()" [color]="competitor.color" />
+            <app-colored-circle class="circle" [text]="position(competitor)" [color]="competitor.color" />
           } @else {
-          <span>{{competitor.order.toString()}}</span>}
+          <span>{{position(competitor)}}</span>}
         </td>
       </ng-container>
 

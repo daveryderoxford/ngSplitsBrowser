@@ -100,9 +100,9 @@ export class ResultsDataService {
       if (results.needsRepair()) {
          Repairer.repairEventData(results);
       }
-      results.determineTimeLosses();
+      results.setDerivedData();
 
-      this.computeRanks(results);
+    //  this.computeRanks(results);
 
       this.computeColors(results);
 

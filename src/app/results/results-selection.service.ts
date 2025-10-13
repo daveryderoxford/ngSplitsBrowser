@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, linkedSignal, signal } from "@angular/core";
-import { Competitor, Course, CourseClass, Results } from "./model";
+import { Competitor, Course, CourseClass, CourseClassSet, Results } from "./model";
 import { ResultsDataService } from './results-data.service ';
 
 /** 
@@ -33,6 +33,17 @@ export class ResultsSelectionService {
 
    course = computed<Course | undefined>(() => this._oclass()?.course);
 
+   courseClassSet = computed<CourseClassSet | undefined>( () => {
+      const oclass = this._oclass();
+      const course = this.course();
+
+      if (this.courseOrClass()) {
+         return new CourseClassSet(course.classes)
+      } else {
+         return new CourseClassSet([oclass])
+      }
+   });
+
    private _control = linkedSignal<Course, string | undefined>({
       source: this.course,
       computation: () => undefined
@@ -45,7 +56,7 @@ export class ResultsSelectionService {
    public oclass = this._oclass.asReadonly();
    public courseOrClass = this._courseOrClass.asReadonly();
 
-   /** Competitors currently selected for the selected course/class*/
+   /** Competitors currently selected for the selected course/class */
    selectedCompetitors = computed(() =>
       this.competitors().filter(comp =>
          this.courseOrClass() ?

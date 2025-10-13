@@ -4,6 +4,7 @@ import { Competitor } from "./competitor";
 import { CompetitorSummaryDetails, Course, FastestSplitData } from "./course";
 import { CourseClass } from "./course-class";
 import { sbTime } from "./time";
+import { calculatePositions } from './ranking';
 
 export class Results {
 
@@ -41,6 +42,12 @@ export class Results {
         return this.allCompetitorsList;
     }
 
+    public setDerivedData() {
+        this.determineTimeLosses();
+        this.setClassPositions();
+        this.setCoursePositions();
+    }
+
     /**
     * Determines time losses for each competitor in each class.
     *
@@ -51,6 +58,18 @@ export class Results {
         this.classes.forEach((courseClass) => {
             courseClass.determineTimeLosses();
         });
+    }
+
+    private setClassPositions() {
+        for (const courseClass of this.classes) {
+            calculatePositions(courseClass.competitors, (comp, pos) => comp.classPosition = pos);
+        }
+    }
+
+    private setCoursePositions() {
+        for (const course of this.courses) {
+            calculatePositions(course.competitors, (comp, pos) => comp.coursePosition = pos);
+        }
     }
 
     /**

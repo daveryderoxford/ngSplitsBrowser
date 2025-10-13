@@ -37,8 +37,16 @@ li {
    padding-top: 5px;
 }
 
+.position {
+   grid-area: left;
+   text-align: center;
+   align-self: center;
+   font: var(--mat-sys-body-small);
+}
+
 .circle {
    grid-area: left;
+   align-self: center;
 }
 
 .name {
@@ -49,11 +57,6 @@ li {
 .time {
    font: var(--mat-sys-body-medium);
    grid-area: time;
-}
-
-.position {
-   grid-area: left;
-   text-align: center;
 }
 
 .club {

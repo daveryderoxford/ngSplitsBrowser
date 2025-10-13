@@ -8,6 +8,7 @@ import { ColoredCircle } from "./colored-circle";
 import { Competitor } from 'app/results/model';
 import { CourseOrClassCheckbox } from './course-or-class';
 import { MatButtonModule } from '@angular/material/button';
+import { UNRANKED_VALUE } from 'app/results/model/ranking';
 
 @Component({
   selector: 'app-competitor-list',
@@ -33,7 +34,11 @@ export class CompetitorList {
 
       this.rs.selectCrossingRunners(comp);
     }
+  }
 
+  protected position(comp: Competitor): string {
+    const pos = this.rs.courseOrClass() ? comp.coursePosition : comp.classPosition;
+    return (pos === UNRANKED_VALUE) ? '' : pos.toString();
   }
 
   timeBehind( comp: Competitor): number{

@@ -20,6 +20,7 @@ import { ResultsSelectionService } from "../results-selection.service";
 import { ColoredCircle } from '../selection-sidebar/competitor-list/colored-circle';
 import { CourseOrClassCheckbox } from '../selection-sidebar/competitor-list/course-or-class';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { UNRANKED_VALUE } from '../model/ranking';
 
 @Component({
    selector: "app-splits-grid",
@@ -120,6 +121,12 @@ export class ResultsTable {
 
       return ret;
    }
+   
+
+  protected position(comp: Competitor): string {
+    const pos = this.rs.courseOrClass() ? comp.coursePosition : comp.classPosition;
+    return (pos === UNRANKED_VALUE) ? '' : pos.toString();
+  }
 
    protected getTimeOrStatus(competitor: Competitor): string {
       if (competitor.isNonStarter) {

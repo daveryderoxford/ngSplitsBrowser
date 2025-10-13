@@ -2,7 +2,7 @@
 /** Service to paganate Firebase queries */
 import { inject, Injectable } from '@angular/core';
 import { FirebaseApp } from '@angular/fire/app';
-import { collection, CollectionReference, collectionSnapshots, DocumentSnapshot, FirestoreDataConverter, getFirestore, limit, orderBy, Query, query, startAfter } from '@angular/fire/firestore';
+import { collection, CollectionReference, collectionSnapshots, DocumentData, DocumentSnapshot, FirestoreDataConverter, getFirestore, limit, orderBy, Query, query, startAfter } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { shareReplay, take, tap } from 'rxjs/operators';
 
@@ -32,6 +32,8 @@ export class PaganationService<T> {
   done: Observable<boolean> = this._done.asObservable();
   loading: Observable<boolean> = this._loading.asObservable();
 
+  collection: CollectionReference<T, DocumentData>; 
+
   private _cursor: DocumentSnapshot | null = null;
   // Initial query sets options and defines the Observable
   // passing opts will override the defaults
@@ -50,11 +52,11 @@ export class PaganationService<T> {
       ...opts
     };
 
-    const c = (converter) ?  
+     this.collection = (converter) ?  
          collection(this.firestore, this.query.path).withConverter(converter) :
          collection(this.firestore, this.query.path) as CollectionReference<T>;
 
-    const first = query(c,
+    const first = query(this.collection,
       orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
       limit(this.query.limit)
     );
@@ -70,8 +72,7 @@ export class PaganationService<T> {
   more() {
     const cursor = this._cursor;
 
-    const col = collection(this.firestore, this.query.path) as CollectionReference<T>;
-    const more = query(col,
+    const more = query(this.collection,
       orderBy(this.query.field, this.query.reverse ? 'desc' : 'asc'),
       limit(this.query.limit),
       startAfter(cursor)
@@ -108,7 +109,7 @@ export class PaganationService<T> {
         console.log('PaganationService: Total number of values loaded: ' + allValues.length);
 
         // update source with new values, done loading
-        this._data.next(allValues);
+        this._data.next([...allValues]);
         this._loading.next(false);
 
         // no more values, mark done
