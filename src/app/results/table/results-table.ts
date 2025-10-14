@@ -56,10 +56,12 @@ export class ResultsTable {
    displayedColumns = computed(() => [...this.staticColumns, ...this.splitsColumns()]);
 
    tableData = computed<Competitor[]>(() => {
-      if (this.oclass()) {
+      const competitors = this.rs.displayedCompetitors();
+
+      if (competitors) {
          const comps = this.selectedOnly() ?
-            this.oclass().competitors.filter((comp) => this.rs.isCompetitorSelected(comp)) :
-            [...this.oclass().competitors];
+            competitors.filter((comp) => this.rs.isCompetitorSelected(comp)) :
+            [...competitors];
          this.applySort(this.sortState(), comps);
          return comps;
       } else {
@@ -173,4 +175,7 @@ export class ResultsTable {
       }
    }
 
+   tackByKey(_: number, comp: Competitor) {
+      return comp.key;
+   }
 }

@@ -5,6 +5,7 @@
 } @else {
   <app-results-navbar>
 
+    <!-- Dummey button to avlid layout shift when switching views -->
     <span class="dummy-button" start></span>
 
     <app-class-select [selected]='rs.oclass()' (onSelected)='rs.selectClass($event)' [oclasses]='rd.results().classes' />
@@ -20,7 +21,7 @@
   </app-results-navbar>
 
   <div class="table-container">
-    <table mat-table class="table" [dataSource]="tableData()" matSort (matSortChange)="this.sortState.set($event)">
+    <table mat-table class="table" [dataSource]="tableData()" [trackBy]="tackByKey" matSort (matSortChange)="this.sortState.set($event)">
 
       <!-- Initial columns -->
       <ng-container matColumnDef="position" sticky>

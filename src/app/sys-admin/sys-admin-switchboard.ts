@@ -4,14 +4,18 @@ import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import { MatButtonModule } from '@angular/material/button';
 import { Toolbar } from 'app/shared/components/toolbar';
 import { LegacyEventImport } from './event-import/legacy-event-import';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-sys-admin-switchboard',
-  imports: [MatButtonModule, Toolbar],
+  imports: [MatButtonModule, Toolbar, RouterLink],
   template: `
     <app-toolbar title="System admin"/>
     <div class=container>
       <div class=buttons>
+        <a matButton='tonal' routerLink="/sys-admin/users">
+            User administration
+        </a>
         <button matButton='tonal' (click)="eventImport()" [disabled]="busy()">
           Upload Legacy Events
         </button>

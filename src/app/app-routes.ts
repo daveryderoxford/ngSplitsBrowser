@@ -14,8 +14,7 @@ export const APP_ROUTES: Routes = [
    { path: "user", loadChildren: () => import( './user/user.routes' ).then( r => r.USER_ROUTES ) },
    { path: "settings", title: 'Settings', loadComponent: () => import('./settings/settings-page').then(c => c.SettingsPage) },
    { path: "about", title: 'About Splitsbrowser', loadComponent: () => import( './about/about-page' ).then( c => c.AboutComponent ) },
-   { path: "sys-admin", title: 'System  Admin', loadComponent: () => import('./sys-admin/sys-admin-switchboard').then(c => c.SysAdminSwitchboard) },
-
-];
+   { path: "sys-admin", loadChildren: () => import('./sys-admin/sys-admin.routes').then(r => r.SYS_ADMIN_ROUTES) },
+]; 
 
 
