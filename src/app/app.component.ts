@@ -6,7 +6,7 @@ import { Router, RouterOutlet } from "@angular/router";
 import { AuthService } from './auth/auth.service';
 import { SidenavService } from './shared/services/sidenav.service';
 import { UserResultButton } from "./user-results/user-result-button";
-import { SelectedEventService } from './events/selected-event-state.service';
+import { SelectedEventService } from './events/selected-event.service';
 
 @Component({
     selector: 'app-root',
@@ -66,6 +66,11 @@ export class AppComponent implements OnInit {
       if (target) {
          await this.router.navigate(target);
       }
+   }
+
+   async navigateToEvent() {
+      await this.sidenav().close();
+      await this.ses.navigateToEvent(this.ses.selectedEvent());
    }
 
    async contact() {

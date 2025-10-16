@@ -3,6 +3,7 @@ import test from 'firebase-functions-test';
 import { initializeApp, getApps, deleteApp } from 'firebase-admin/app';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { before, after, afterEach } from 'mocha';
+import { getStorage, Storage} from 'firebase-admin/storage';
 
 // Set environment variables to use emulators.
 // This ensures that tests do not interact with live production data.
@@ -17,6 +18,7 @@ type FunctionsModule = typeof import('../src/index.js');
 
 export interface TestContext {
 	db: Firestore;
+	storage: Storage;
 	myFunctions: FunctionsModule;
 }
 
@@ -30,6 +32,7 @@ export function setupMochaHooks(): TestContext {
 	before(async () => {
 		initializeApp({ projectId });
 		context.db = getFirestore();
+		context.storage = getStorage();
 		// Dynamically import functions only after the app is initialized. Avoids initialisation function being called
 		context.myFunctions = await import('../src/index.js');
 	});

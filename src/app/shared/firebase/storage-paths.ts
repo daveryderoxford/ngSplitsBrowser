@@ -1,6 +1,5 @@
 
-import type {User} from '@firebase/auth';
-
+/** Path to the results file in googler storage */
 export function resultsPath( userId: string, key: string) {
 
    const path = isInteger(key) ? 

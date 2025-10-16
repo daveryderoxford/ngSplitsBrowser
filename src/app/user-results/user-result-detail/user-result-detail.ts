@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
 import { DialogsService } from 'app/shared/dialogs/dialogs.service';
 import { UserDataService } from 'app/user/user-data.service';
+import { SelectedEventService } from 'app/events/selected-event.service';
 
 @Component({
   selector: 'app-user-result-detail',
@@ -22,6 +23,7 @@ export class UserResultDetailComponent {
   private router = inject(Router);
   private dialogs = inject(DialogsService);
   private userService = inject(UserDataService);
+  private ses = inject(SelectedEventService);
 
   userResult = input.required<UserResult>();
 
@@ -68,8 +70,10 @@ export class UserResultDetailComponent {
   });
 
   async viewResults(): Promise<void> {
-    const eventKey = this.userResult().eventKey;
-    await this.router.navigate(['/results', 'graph', eventKey]);
+    // TODO Ideally we would load the full event data and use 
+    // ses to set the selected event and navigate here.
+    const us = this.userResult();
+    await this.router.navigate(['/results', 'graph', us.eventKey]);
   }
 
   async deleteResult(): Promise<void> {

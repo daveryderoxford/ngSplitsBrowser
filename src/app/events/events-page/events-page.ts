@@ -10,7 +10,7 @@ import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab";
 import { EventService } from "../event.service";
 import { MyEventsTab } from "../my-events-tab/my-events-tab";
 import { AppBreakpoints } from 'app/shared/services/breakpoints';
-import { SelectedEventService } from '../selected-event-state.service';
+import { SelectedEventService } from '../selected-event.service';
 
 @Component({
    selector: "app-results",
@@ -35,12 +35,7 @@ export class EventsPage {
          this.ds.message("No valid splits avaliable for event", "Press OK to select another event");
       } else {
          this.ses.setSelectedEvent(event);
-         this.router.navigate(["results", "graph", event.userId, event.key], {
-            queryParams: {
-               eventName: event.name,
-               eventDate: event.date ? event.date.toISOString() : undefined
-            }
-         });
+         await this.ses.navigateToEvent(event);
       }
    }
 }

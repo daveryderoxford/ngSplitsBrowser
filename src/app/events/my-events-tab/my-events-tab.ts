@@ -8,7 +8,7 @@ import { OEvent } from '../model/oevent';
 import { MatButtonModule } from "@angular/material/button";
 import { UserResultButton } from "app/user-results/user-result-button";
 import { UserResultsTableComponent } from "app/user-results/user-results-table/user-results-table";
-import { SelectedEventService } from '../selected-event-state.service';
+import { SelectedEventService } from '../selected-event.service';
 
 @Component({
    selector: "app-my-events-tab",

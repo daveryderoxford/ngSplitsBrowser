@@ -3,14 +3,13 @@ import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angu
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
-import { EventService } from 'app/events/event.service';
 import { Competitor } from 'app/results/model';
 import { UserDataService } from 'app/user/user-data.service';
 import { createUserResult } from 'app/user-results/user-result';
 import { firstValueFrom } from 'rxjs';
 import { ResultsSearchDialog, SearchSelectedItem } from '../results/search/results-search-dialog/results-search-dialog';
 import { DialogsService } from 'app/shared';
-import { SelectedEventService } from 'app/events/selected-event-state.service';
+import { SelectedEventService } from 'app/events/selected-event.service';
 
 export type SearchButtonAppearance = 'list' | 'text' | 'icon';
 

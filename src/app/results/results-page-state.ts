@@ -17,9 +17,9 @@ export class ResultsPageState {
       this._pageDisplayed.set(resultsViews.find(v => v.type === view));
    }
 
-   navigateToPage(view: ResultsView, uid: string, key: string) {
+   navigateToPage(view: ResultsView, key: string) {
 
-      this.router.navigate(["results", view.type, uid, key]).catch((err) => {
+      this.router.navigate(["results", view.type, key]).catch((err) => {
          console.log('Errror in navigating to page ' + key + ' ' + err.toString());
          this.ds.message('Error loading results', 'Errror in navigating to page');
       });

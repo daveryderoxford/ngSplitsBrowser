@@ -7,7 +7,7 @@
       <button mat-list-item (click)='closeSidenav(["/events"])'>Events</button>
 
       @if (ses.selectedEvent()) {
-         <button mat-list-item (click)='closeSidenav(["/results"])'>Current results</button>
+         <button mat-list-item (click)='navigateToEvent()'>Selected results</button>
       }
       <mat-divider />
 

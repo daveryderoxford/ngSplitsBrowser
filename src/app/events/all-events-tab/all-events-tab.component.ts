@@ -8,7 +8,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EventSearchOrder, EventService } from 'app/events/event.service';
-import { SelectedEventService } from 'app/events/selected-event-state.service';
+import { SelectedEventService } from 'app/events/selected-event.service';
 import { EventListItem } from '../event-list-item';
 import { Nations } from '../model/nations';
 import { EventGrades, OEvent } from '../model/oevent';

@@ -19,3 +19,8 @@ export {
    createUser, 
    deleteUser 
 } from "./user/user.js";
+
+export {
+   getResultsFile,
+   saveResultsFile,
+} from "./results/results.js"

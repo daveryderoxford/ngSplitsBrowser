@@ -60,12 +60,12 @@ export class Signup {
          // User is automatically signed in so get the current user and send verification email
          const user = await this.afAuth.currentUser;
          if (user) {
-            sendEmailVerification(user);
+            await sendEmailVerification(user);
          } else {
-            console.log('User enexpectely null');
+            console.log('Signup:  User enexpectely null');
          }
 
-         this.router.navigateByUrl('/user');
+         await this.router.navigateByUrl('/user');
 
       } catch (error) {
          this.handleError(error);

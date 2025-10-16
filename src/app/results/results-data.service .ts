@@ -12,7 +12,11 @@ import { Competitor, Results } from "./model";
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
 import { ResultsEventDetails } from './model/event_details';
-import { resultsPath } from 'app/shared/firebase/storage-paths';
+import { getFunctions, httpsCallable } from '@angular/fire/functions';
+
+export interface GetResultsFileData {
+   eventKey: string;
+}
 
 type ResultsURLType = 'Routegadget' | 'SIOnline';
 
@@ -29,20 +33,22 @@ const colours = [
 export class ResultsDataService {
 
    private storage = getStorage(inject(FirebaseApp));
+   private functions = getFunctions(inject(FirebaseApp));
+
    private http = inject(HttpClient);
 
    private _event = signal<ResultsEventDetails | undefined>(undefined,
-      { equal: (a, b) => a?.key === b?.key && a?.uid === b?.uid }
+      { equal: (a, b) => a?.key === b?.key }
    );
 
    event = this._event.asReadonly();
 
-   private _resourceParams = computed(() => ({ uid: this.event().uid, key: this.event().key }));
+   private _resourceParams = computed(() => ({ key: this.event().key }));
 
    private _resultsResource = resource({
       params: () => this._event(),
       loader: async ({ params }) => {
-         const results = await this.loadResultsFile(params.uid, params.key);
+         const results = await this.loadResultsFile(params.key);
          return results;
       },
    });
@@ -51,10 +57,9 @@ export class ResultsDataService {
    isLoading = this._resultsResource.isLoading;
    error = this._resultsResource.error;
 
-   viewStoredEvent(uid: string, id: string, name = "", date?: Date | undefined) {
+   viewStoredEvent(id: string, name = "", date?: Date | undefined) {
       this._event.set({
          key: id,
-         uid: uid,
          name: name,
          date: date
       });
@@ -67,25 +72,15 @@ export class ResultsDataService {
    /** Loads results for a specified event returning an observable of the results.
     * This just loads the results file from storage and does not clear any current selections.
     */
-   public async loadResultsFile(uid: string, key: string): Promise<Results> {
+   public async loadResultsFile(key: string): Promise<Results> {
 
-      const text = await this.downloadResultsFile(uid, key);
+      const text = await this.downloadResultsFile(key);
 
       const results = this.processResults(text);
 
       return results;
 
    }
-
-   public async loadResultsUrl(url: string) {
-      const text = await firstValueFrom(
-         this.http.get(url, { responseType: 'text' }).pipe(
-            catchError(error => handleError(error))
-         )
-      );
-      return this.processResults(text);
-   }
-
 
    /** Parse splits file */
    public processResults(text: string): Results {
@@ -114,22 +109,17 @@ export class ResultsDataService {
       return (results);
    }
 
-   /** Downloads results for an event from google storage */
-   public async downloadResultsFile(uid: string, key: string): Promise<string> {
+   /** Downloads results for an event from Google Storage */
+   public async downloadResultsFile(key: string): Promise<string> {
 
-      const path = resultsPath(uid, key);
-
-      const r = ref(this.storage, path);
-
-      const url = await getDownloadURL(r);
-
-      const text = await firstValueFrom(
-         this.http.get(url, { responseType: 'text' }).pipe(
-            catchError(error => handleError(error))
-         )
-      );
-
-      return text;
+      const loadResults = httpsCallable<GetResultsFileData, string>(this.functions, 'getResultsFile');
+      try {
+         const result = await loadResults({ eventKey: key });
+         return result.data;
+      } catch (err: any) {
+         logError(err);
+         throw (err);
+      }
    }
 
    private computeRanks(results: Results) {
@@ -226,8 +216,6 @@ export class ResultsDataService {
    }
 }
 
-
-
 function deepFreeze(o: any) {
    Object.freeze(o);
    if (o === undefined) {
@@ -246,7 +234,7 @@ function deepFreeze(o: any) {
 };
 
 
-function handleError(error: Error | HttpErrorResponse): Observable<string> {
+function logError(error: Error | HttpErrorResponse) {
 
    if (error instanceof HttpErrorResponse) {
       if (error.status === 0) {
@@ -261,6 +249,4 @@ function handleError(error: Error | HttpErrorResponse): Observable<string> {
    } else {
       console.error(`ResultsDataService: Unexpected Error occurred ${error.toString()}`);
    }
-
-   throw (error);
 }

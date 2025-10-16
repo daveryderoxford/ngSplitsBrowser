@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { OEvent } from 'app/events/model/oevent';
 import { DialogsService } from 'app/shared';
@@ -9,23 +9,44 @@ import { EventDetailsForm } from '../event-form/event-form';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+import { SelectedEventService } from 'app/events/selected-event.service';
 
 @Component({
    selector: 'app-add-event',
    templateUrl: 'add-event.html',
    styleUrl: 'add-event.scss',
-   imports: [EventDetailsForm, FileButton, Toolbar, EventDetailsForm, MatStepperModule, MatButtonModule, MatTooltipModule],
+   imports: [
+      EventDetailsForm, 
+      FileButton, 
+      Toolbar, 
+      EventDetailsForm, 
+      MatStepperModule, 
+      MatButtonModule, 
+      MatTooltipModule,
+      MatIconModule
+   ],
    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddEvent implements AfterViewInit {
    router = inject(Router);
    eventService = inject(EventAdminService);
+   ses = inject(SelectedEventService);
    dialogsService = inject(DialogsService);
 
    oevent = signal<OEvent | undefined>(undefined);
 
    eventForm = viewChild.required(EventDetailsForm);
    stepper = viewChild.required(MatStepper);
+
+   resultsUrl = computed(() => {
+      const evt = this.oevent();
+      if (evt) {
+         return (`https://www.splitsbrowser.org.uk/results/graph/${evt.key}`);
+      } else {
+         return "";
+      }
+   });
 
    busy = signal(false);
 
@@ -85,4 +106,8 @@ export class AddEvent implements AfterViewInit {
       navigator.clipboard.writeText(s);
    }
 
+   async navigateToEvent(event: OEvent): Promise<boolean> {
+      this.ses.setSelectedEvent(event);
+      return await this.ses.navigateToEvent(event);
+   }
 }

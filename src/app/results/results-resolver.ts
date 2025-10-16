@@ -10,12 +10,11 @@ export const resultsResolver: ResolveFn<void> = (route: ActivatedRouteSnapshot, 
    const ps = inject(ResultsPageState);
 
    const id = route.paramMap.get('id');
-   const uid = route.paramMap.get('uid');
    const name = route.paramMap.get('name') ?? '';
    const dateStr = route.paramMap.get('date');
    const date = dateStr ? new Date(dateStr) : undefined;
    
-   if (!id || !uid) {
+   if (!id) {
       console.log(`ResultsResolver: Error URL parameters.  Missing id, uid or url. Parameters ${route.paramMap.toString()} }`);
       return;
    }
@@ -24,9 +23,5 @@ export const resultsResolver: ResolveFn<void> = (route: ActivatedRouteSnapshot, 
    const segments = route.url.map(x => x.path);
    console.log(`ResultsResolver: Setting page view to ${segments[0]}`);
    ps.setDisplayedPage(segments[0] as ResultsViewType);
-   rd.viewStoredEvent(uid, id, name, date);
+   rd.viewStoredEvent(id, name, date);
 };
-
-export function navigateToResult() {
-   
-}
