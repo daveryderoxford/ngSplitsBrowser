@@ -11,6 +11,7 @@ import { Club, createClub } from '../model/club.js';
 import { clubConverter, eventConverter } from '../model/event-firebase-converters.js';
 import { OEvent } from '../model/oevent.js';
 import { error, log, warn } from 'firebase-functions/logger';
+import { isAdmin } from '../auth.js';
 
 interface ClubKeyData {
   name: string,
@@ -75,8 +76,8 @@ export const clubsEventDeleted = onDocumentDeleted('events/{eventId}', async (ev
 export const rebuildClubs = onCall(async (request): Promise<void> => {
   log('rebuildClubs: Rebuilding clubs list...');
 
-  // Check user is at least logged on
-  if (!request.auth) {
+  // Check user is an admin user
+  if (!request.auth || !isAdmin(request.auth.uid)) {
     log('rebuildClubs: Error: Not authorised to run function');
     throw new HttpsError('permission-denied', 'rebuildClubs: Error: Not authorised to run function');
   }
@@ -124,7 +125,6 @@ export const rebuildClubs = onCall(async (request): Promise<void> => {
   }
   await batch.commit();
 });
-
 
 // eslint-disable-next-line no-undef 
 // @ts-ignore 

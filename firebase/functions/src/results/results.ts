@@ -9,6 +9,7 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { error, log } from 'firebase-functions/logger';
 import { OEvent } from '../model/oevent.js';
 import { eventConverter } from '../model/event-firebase-converters.js';
+import { isAuthorised } from '../auth.js';
 
 export interface GetResultsFileData {
   eventKey: string;
@@ -71,7 +72,7 @@ export const saveResultsFile = onCall<SaveResultsFileData>(async (request) => {
   try {
     const eventData = await readEventData(eventKey);
 
-    if (eventData.userId !== request.auth.uid) {
+    if ( !isAuthorised(eventData.userId, request) ) {
       throw new HttpsError('permission-denied', `saveResultsFile: You do not have permission to save results for event ${eventKey}.`);
     }
 
