@@ -41,8 +41,8 @@ export class AllEventsTabComponent {
   
   // Configuration for data fetching
   private defaultOrderBy: EventSearchOrder = 'date';
-  private defaultPageSize = 30; // Number of events to fetch per page
-  private scrollBuffer = 10; // Load more when X items from the end are reached
+  private defaultPageSize = 18; // Number of events to fetch per page
+  private scrollBuffer = 9; // Load more when X items from the end are reached
 
   isLoading = toSignal(this.es.loading, { initialValue: false });
   isDone = toSignal(this.es.done, { initialValue: false });

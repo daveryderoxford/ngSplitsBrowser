@@ -2,7 +2,6 @@ import { Injectable, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Auth, authState, signOut } from '@angular/fire/auth';
 import { map } from 'rxjs';
-import { SUPER_USER_UID } from './auth.constants';
 
 @Injectable({
    providedIn: 'root'
@@ -20,7 +19,7 @@ export class AuthService {
 
    // TODO could implement with secure firestore collection or custom claim at some point
    isAdmin = computed <boolean>( () => {
-      return this.user() ? this.user().uid === SUPER_USER_UID : false;
+      return this.user() ? this.user().uid === 'l8Rex76EDGTME2i44gbpcF7EKOH2' : false;
    });
    
    async signOut(): Promise<void> {
