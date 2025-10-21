@@ -47,11 +47,17 @@ export class ClubEventsTabComponent {
       this.nameFilter()));
 
    grades = EventGrades.grades;
-   nations = Nations.getNations();
+
+   /** A list of nation objects filtered to those that have results */
+   nations = computed( () => {
+      const clubNats = this.es.clubs().map(c => c.nationality);
+      const nats = Nations.getNations().filter(nat => clubNats.includes(nat.abrievation));
+      nats.unshift(Nations.nullNation);
+      return(nats)
+   }) 
 
    constructor() {
       this.es.loadClubs();
-      this.nations.unshift(Nations.nullNation);
    }
 
    clubNationalFilterChange(event: MatSelectChange) {

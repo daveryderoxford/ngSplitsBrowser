@@ -8,6 +8,14 @@
 
       @if (ses.selectedEvent()) {
          <button mat-list-item (click)='navigateToEvent()'>Selected results</button>
+      
+          @if (auth.user()) {
+            @defer () {
+              <app-user-result-button />
+            } @placeholder {
+              <button mat-list-item>Add user result</button>
+            }
+        }
       }
       <mat-divider />
 
@@ -17,11 +25,7 @@
       -->
 
       @if (auth.user()) {
-        @defer () {
-          <app-user-result-button />
-        } @placeholder {
-          <button mat-list-item>Add user result</button>
-        }
+        <button mat-list-item (click)='closeSidenav(["/admin/add-event"])'>Upload results</button>
         <button mat-list-item (click)='closeSidenav(["/admin"])'>Administer results</button>
         <mat-divider />
         <button mat-list-item (click)='closeSidenav(["/user"])'>User details</button>

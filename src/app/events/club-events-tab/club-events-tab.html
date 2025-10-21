@@ -4,7 +4,7 @@
     <mat-form-field appearance="outline" class="dense-form-field nationality-filter" subscriptSizing="dynamic">
       <mat-label>Nationality</mat-label>
       <mat-select (selectionChange)="clubNationalFilterChange($event)">
-        @for (nation of nations; track nation) {
+        @for (nation of nations(); track nation) {
         <mat-option [value]="nation.abrievation">
           {{ nation.fullname }}
         </mat-option>
