@@ -120,8 +120,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
         expect(competitor.name).toEqual("John Smith");
         expect(competitor.club).toEqual("TEST");
         expect(competitor.startTime).toEqual(10 * 3600 + 38 * 60);
-        expect(competitor.getAllOriginalCumulativeTimes()).toEqual( [0, 72, 141, 186, 202]);
-        expect(competitor.completed()).toBe(true);
+        expect(competitor.allOriginalCumulativeTimes).toEqual( [0, 72, 141, 186, 202]);
+        expect(competitor.completed).toBe(true);
         expect(!competitor.isNonCompetitive).toBe(true);
         expect(!competitor.isNonStarter).toBe(true);
         expect(!competitor.isNonFinisher).toBe(true);
@@ -195,13 +195,13 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
         expect(competitor1.name).toEqual("John Smith");
         expect(competitor1.club).toEqual("TEST");
         expect(competitor1.startTime).toEqual(10 * 3600 + 38 * 60);
-        expect(competitor1.getAllOriginalCumulativeTimes()).toEqual( [0, 72, 141, 186, 202]);
+        expect(competitor1.allOriginalCumulativeTimes).toEqual( [0, 72, 141, 186, 202]);
 
         const competitor2 = courseClass.competitors[1];
         expect(competitor2.name).toEqual("Fred Baker");
         expect(competitor2.club).toEqual("ABCD");
         expect(competitor2.startTime).toEqual(11 * 3600 + 19 * 60);
-        expect(competitor2.getAllOriginalCumulativeTimes()).toEqual( [0, 84, 139, 199, 217]);
+        expect(competitor2.allOriginalCumulativeTimes).toEqual( [0, 84, 139, 199, 217]);
 
         expect(eventData.courses.length).toEqual(1);
     });
@@ -256,8 +256,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
 
         expect(courseClass.competitors.length).toEqual(1);
         const competitor = courseClass.competitors[0];
-        expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 72, null, 186, 202]);
-        expect(!competitor.completed()).toBe(true);
+        expect(competitor.allOriginalCumulativeTimes).toEqual([0, 72, null, 186, 202]);
+        expect(!competitor.completed).toBe(true);
         expect(!competitor.isNonStarter).toBe(true);
         expect(!competitor.isNonFinisher).toBe(true);
         expect(!competitor.isDisqualified).toBe(true);
@@ -272,8 +272,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
 
         expect(courseClass.competitors.length).toEqual(1);
         const competitor = courseClass.competitors[0];
-        expect(competitor.getAllOriginalCumulativeTimes()).toEqual( [0, 72, 141, 186, null]);
-        expect(!competitor.completed()).toBe(true);
+        expect(competitor.allOriginalCumulativeTimes).toEqual( [0, 72, 141, 186, null]);
+        expect(!competitor.completed).toBe(true);
         expect(!competitor.isNonStarter).toBe(true);
         expect(!competitor.isNonFinisher).toBe(true);
         expect(!competitor.isDisqualified).toBe(true);
@@ -288,8 +288,8 @@ describe("Input.AlternativeCSV.TripleColumn", () => {
 
         expect(courseClass.competitors.length).toEqual(1);
         const competitor = courseClass.competitors[0];
-        expect(competitor.getAllOriginalCumulativeTimes()).toEqual( [0, null, null, null, null]);
-        expect(!competitor.completed()).toBe(true);
+        expect(competitor.allOriginalCumulativeTimes).toEqual( [0, null, null, null, null]);
+        expect(!competitor.completed).toBe(true);
         expect(competitor.isNonStarter).toBe(true);
         expect(!competitor.isNonFinisher).toBe(true);
         expect(!competitor.isDisqualified).toBe(true);

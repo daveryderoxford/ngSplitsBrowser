@@ -421,7 +421,7 @@ class OEReader {
 
         const order = this.classes.get(className).competitors.length + 1;
         const competitor = Competitor.fromOriginalCumTimes(order, name, club, startTime, cumTimes);
-        if ((row[this.columnIndexes.nonCompetitive] === "1" || isPlacingNonNumeric) && competitor.completed()) {
+        if ((row[this.columnIndexes.nonCompetitive] === "1" || isPlacingNonNumeric) && competitor.completed) {
             // Competitor either marked as non-competitive, or has completed
             // the course but has a non-numeric placing.  In the latter case,
             // assume that they are non-competitive.
@@ -439,7 +439,7 @@ class OEReader {
             } else if (classifier === "5") {
                 competitor.setOverMaxTime();
             }
-        } else if (!competitor.hasAnyTimes()) {
+        } else if (!competitor.hasAnyTimes) {
             competitor.setNonStarter();
         }
 

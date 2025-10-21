@@ -73,7 +73,7 @@ export class Repairer {
     static transferCompetitorData(resultsData: Results): void {
         for ( const courseClass of resultsData.classes ) {
             for (const competitor of courseClass.competitors ) {
-                competitor.setRepairedCumulativeTimes(competitor.getAllOriginalCumulativeTimes());
+                competitor.setRepairedCumulativeTimes(competitor.allOriginalCumulativeTimes);
             }
         }
     }
@@ -209,7 +209,7 @@ export class Repairer {
 
         cumTimes = this.removeCumulativeTimesCausingNegativeSplits(cumTimes);
 
-        if (!competitor.completed()) {
+        if (!competitor.completed) {
             this.removeFinishTimeIfAbsurd(cumTimes);
         }
 
@@ -244,5 +244,3 @@ export class Repairer {
         }
     }
 }
-
-

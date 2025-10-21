@@ -139,7 +139,7 @@ function formatNameAndSuffix(name: string, suffix: string): string {
 function getSuffix(competitor: Competitor): string {
    // Non-starters are not catered for here, as this is intended to only
    // be used on the chart and non-starters shouldn't appear on the chart.
-   if (competitor.completed() && competitor.isNonCompetitive) {
+   if (competitor.completed && competitor.isNonCompetitive) {
       return getMessage("NonCompetitiveShort");
    } else if (competitor.isNonFinisher) {
       return getMessage("DidNotFinishShort");
@@ -147,7 +147,7 @@ function getSuffix(competitor: Competitor): string {
       return getMessage("DisqualifiedShort");
    } else if (competitor.isOverMaxTime) {
       return getMessage("OverMaxTimeShort");
-   } else if (competitor.completed()) {
+   } else if (competitor.completed) {
       return "";
    } else {
       return getMessage("MispunchedShort");
@@ -319,7 +319,7 @@ export class Chart {
       this.fastestCumTimes = data.fastestCumTimes;
       this.eventData = data.results;
       this.courseClassSet = data.courseClassSet;
-      this.hasControls = data.courseClassSet.getCourse().hasControls();
+      this.hasControls = data.courseClassSet.getCourse().hasControls;
       this.isRaceGraph = chartType.isRaceGraph;
       this.minViewableControl = chartType.minViewableControl;
       this.visibleStatistics = visibleStatistics;

@@ -84,7 +84,7 @@ export class Results {
     public needsRepair(): boolean {
         return this.classes.some((courseClass) => {
             return courseClass.competitors.some((competitor) => {
-                return (competitor.getAllCumulativeTimes() === null);
+                return (competitor.allCumulativeTimes === null);
             });
         });
     }
@@ -150,7 +150,7 @@ export class Results {
     public getNextControlsAfter(controlCode: string): NextControlsDataArr[] {
         let courses = this.courses;
         if (controlCode !== Course.START) {
-            courses = courses.filter((course) => course.hasControl(controlCode));
+            courses = courses.filter((course) => course.hasControls && course.hasControl(controlCode));
         }
 
         return courses.map((course) => {

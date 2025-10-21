@@ -58,12 +58,12 @@ describe("Course-class", () => {
 
     it("Empty course-class is empty", () => {
         const courseClass = new CourseClass("Test class name", 3, []);
-        expect(courseClass.isEmpty()).toBe(true, "Empty course-class should be empty");
+        expect(courseClass.isEmpty).toBe(true, "Empty course-class should be empty");
     });
 
     it("Non-empty course-class is not empty", () => {
         const courseClass = new CourseClass("Test class name", 3, [getCompetitor1()]);
-        expect(!courseClass.isEmpty()).toBe(true, "Non-empty course-class should not be empty");
+        expect(!courseClass.isEmpty).toBe(true, "Non-empty course-class should not be empty");
     });
 
     it("Course-class initially created without any competitor data considered as dubious", () => {
@@ -196,4 +196,3 @@ describe("Course-class", () => {
         });
     });
 });
-

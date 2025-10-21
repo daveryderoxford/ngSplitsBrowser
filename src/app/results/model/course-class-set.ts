@@ -83,7 +83,7 @@ export class CourseClassSet {
    * @sb-return {boolean} True if any of the classes within this set contain
    *     dubious data, false if none of them do.
    */
-   public hasDubiousData(): boolean {
+   public get hasDubiousData(): boolean {
       return this.classes.some((courseClass) => courseClass.hasDubiousData);
    }
 
@@ -98,7 +98,7 @@ export class CourseClassSet {
       }
 
       const firstCompetitor = this.allCompetitors[0];
-      return (firstCompetitor.completed()) ? this.fillBlankRangesInCumulativeTimes(firstCompetitor.cumTimes) : null;
+      return (firstCompetitor.completed) ? this.fillBlankRangesInCumulativeTimes(firstCompetitor.cumTimes) : null;
    }
 
    /**
@@ -157,7 +157,7 @@ export class CourseClassSet {
          // Find all blank-ranges of competitors.
          const allCompetitorBlankRanges: { start: number; end: number; size: number; overallSplit: number; }[] = [];
          this.allCompetitors.forEach((competitor) => {
-            const competitorBlankRanges = this.getBlankRanges(competitor.getAllCumulativeTimes(), false);
+            const competitorBlankRanges = this.getBlankRanges(competitor.allCumulativeTimes, false);
             competitorBlankRanges.forEach((range) => {
                allCompetitorBlankRanges.push({
                   start: range.start,
@@ -227,7 +227,7 @@ export class CourseClassSet {
    * @sb-return {Array} Array of cumulative times.
    */
    public getCumulativeTimesForCompetitor(competitorIndex: number): sbTime[] {
-      return this.fillBlankRangesInCumulativeTimes(this.allCompetitors[competitorIndex].getAllCumulativeTimes());
+      return this.fillBlankRangesInCumulativeTimes(this.allCompetitors[competitorIndex].allCumulativeTimes);
    }
 
    /**
@@ -312,7 +312,7 @@ export class CourseClassSet {
          };
 
          const competitors = this.allCompetitors.filter((comp) => {
-            return comp.completed() && !isNaNStrict(comp.getSplitTimeTo(controlIdx));
+            return comp.completed && !isNaNStrict(comp.getSplitTimeTo(controlIdx));
          });
          competitors.sort(comparator);
          const results = [];

@@ -25,7 +25,7 @@ export class Navbar {
   oevent = input<string>();
   settings = input<TemplateRef<any>>;
 
-  hasStartTimes = computed(() => this.rs.oclass().competitors.some(comp => comp.hasStartTime() ));
+  hasStartTimes = computed(() => this.rs.oclass().competitors.some(comp => comp.hasStartTime ));
 
   views = computed(() => resultsViews.filter(view => view.type !== 'race' || this.hasStartTimes()));
 

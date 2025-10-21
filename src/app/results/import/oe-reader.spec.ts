@@ -409,7 +409,7 @@ describe("Input.OE", () => {
             if (format.hasGender) {
                 expect(competitor.gender).toEqual("M", "Should read correct gender");
             }
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, 362, 393], "Should read correct cumulative times");
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, 218, 362, 393], "Should read correct cumulative times");
             expect(!competitor.isNonCompetitive).toBe(true, "Competitor should not be marked as non-competitive");
             expect(!competitor.isNonStarter).toBe(true, "Competitor should not be marked as a non-starter");
             expect(!competitor.isNonFinisher).toBe(true, "Competitor should not be marked as a non-finisher");
@@ -491,8 +491,8 @@ describe("Input.OE", () => {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
-            expect(!competitor.completed()).toBe(true);
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, null, null, 393]);
+            expect(!competitor.completed).toBe(true);
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, null, null, 393]);
         }, function (eventDataStr) {
             for (let i = 0; i < 4; i += 1) {
                 eventDataStr = eventDataStr.substring(0, eventDataStr.lastIndexOf(";"));
@@ -508,8 +508,8 @@ describe("Input.OE", () => {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
-            expect(!competitor.completed()).toBe(true);
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, null, 393]);
+            expect(!competitor.completed).toBe(true);
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, 218, null, 393]);
         });
     });
 
@@ -520,7 +520,7 @@ describe("Input.OE", () => {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, 362, 393]);
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, 218, 362, 393]);
         });
     });
 
@@ -531,7 +531,7 @@ describe("Input.OE", () => {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, 362, 393]);
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, 218, 362, 393]);
         });
     });
 
@@ -542,7 +542,7 @@ describe("Input.OE", () => {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, 362, 393]);
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, 218, 362, 393]);
         });
     });
 
@@ -613,7 +613,7 @@ describe("Input.OE", () => {
             expect(eventData.classes.length).toEqual(1, "There should be one class");
             expect(eventData.classes[0].competitors.length).toEqual(1, "There should be one competitor");
             const competitor = eventData.classes[0].competitors[0];
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, 362, 393]);
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, 218, 362, 393]);
             expect(eventData.courses.length).toEqual(1, "There should be one course");
         }, function (eventDataStr) {
             return eventDataStr.replace(/\r\n/g, "\n");
@@ -732,7 +732,7 @@ describe("Input.OE", () => {
             expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read");
 
             const competitor = eventData.classes[0].competitors[0];
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, null, 362, 393], "Should read correct cumulative times");
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, null, 362, 393], "Should read correct cumulative times");
         });
     });
 
@@ -768,7 +768,7 @@ describe("Input.OE", () => {
 
             const competitor = eventData.classes[0].competitors[0];
             expect(competitor.name).toEqual("John Smith", "Should read correct name without 'mp' suffix");
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, null, 362, 393], "Should read correct cumulative times");
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, null, 362, 393], "Should read correct cumulative times");
         });
     });
 
@@ -783,7 +783,7 @@ describe("Input.OE", () => {
 
             const competitor = eventData.classes[0].competitors[0];
             expect(competitor.name).toEqual("John Smith", "Should read correct name without 'n/c' suffix");
-            expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0, 110, 218, 362, 393], "Should read correct cumulative times");
+            expect(competitor.allOriginalCumulativeTimes).toEqual([0, 110, 218, 362, 393], "Should read correct cumulative times");
             expect(competitor.isNonCompetitive).toBe(true, "Competitor should be marked as non-competitive");
             expect(!competitor.isNonStarter).toBe(true, "Competitor should not be marked as a non-starter");
             expect(!competitor.isNonFinisher).toBe(true, "Competitor should not be marked as a non-finisher");

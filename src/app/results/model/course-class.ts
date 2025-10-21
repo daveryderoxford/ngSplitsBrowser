@@ -60,7 +60,7 @@ export class CourseClass {
     * Returns whether this course-class is empty, i.e. has no competitors.
     * Returns True if this course-class has no competitors, false if it has at least one competitor.
     */
-    public isEmpty(): boolean {
+    public get isEmpty(): boolean {
         return (this.competitors.length === 0);
     }
 

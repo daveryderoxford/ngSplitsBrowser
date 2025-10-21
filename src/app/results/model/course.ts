@@ -99,8 +99,8 @@ export class Course {
    * @sb-return {boolean} true if this course has control codes, false if it does
    *     not.
    */
-   public hasControls(): boolean {
-      return (this.controls !== null);
+   public get hasControls(): boolean {
+      return (this.controls !== undefined && this.controls !== null);
    }
 
    /**
@@ -132,6 +132,15 @@ export class Course {
       } else {
          throw new InvalidData("Cannot get control code of control " + controlNum + " because it is out of range");
       }
+   }
+
+
+   /** Determine if a course is a score course
+    * This is determined by if any competitors have completed the 
+    * course (that is determined by the control of the first competitor)  
+    */
+   get isScoreCourse() {
+      return this._competitors.some( comp => comp.completed);
    }
 
    /**

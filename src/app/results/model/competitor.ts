@@ -194,7 +194,7 @@ export class Competitor {
         }
     }
 
-   private constructor(public order: number,
+    constructor(public order: number,
         name: string | FirstnameSurname,
         public club: string,
         public startTime: number,
@@ -315,7 +315,7 @@ export class Competitor {
     *     get disqualified, false if the competitor did not complete the course
     *     or got disqualified.
     */
-    public completed(): boolean {
+    public get completed(): boolean {
         return this.totalTime !== null && !this.isDisqualified && !this.isOverMaxTime;
     }
 
@@ -324,7 +324,7 @@ export class Competitor {
     * @sb-return {boolean} True if the competitor has recorded at least one time,
     *     false if the competitor has recorded no times.
     */
-    public hasAnyTimes(): boolean {
+    public get hasAnyTimes(): boolean {
         // Trim the leading zero
         return this.originalCumTimes.slice(1).some(isNotNull);
     }
@@ -449,7 +449,7 @@ export class Competitor {
     * Returns all of the competitor's cumulative time splits.
     * @sb-return {Array} The cumulative split times in seconds for the competitor.
     */
-    public getAllCumulativeTimes(): sbTime[]{
+    public get allCumulativeTimes(): sbTime[]{
         return this.cumTimes;
     }
 
@@ -457,22 +457,22 @@ export class Competitor {
     * Returns all of the competitor's cumulative time splits.
     * @sb-return {Array} The cumulative split times in seconds for the competitor.
     */
-    public getAllOriginalCumulativeTimes(): sbTime[]{
+    public get allOriginalCumulativeTimes(): sbTime[]{
         return this.originalCumTimes;
     }
 
     /**
     * Returns whether this competitor is has a start time.
     */
-    public hasStartTime() {
-       return this.startTime !== null && this.started();
+    public get hasStartTime(): boolean {
+       return this.startTime !== null && this.started;
     }
     
     /**
     * Returns whether this competitor has started
     * The competitor has starts if they have at least one split
     */
-    public started() {
+    public get started(): boolean {
        return this.splitTimes.some(isNotNull);
     }
   
@@ -561,7 +561,7 @@ export class Competitor {
     * @sb-param {Array} fastestSplitTimes - Array of fastest split times.
     */
     public determineTimeLosses(fastestSplitTimes: sbTime[]): void {
-        if (this.completed()) {
+        if (this.completed) {
             if (fastestSplitTimes.length !== this.splitTimes.length) {
                 // eslint-disable-next-line max-len
                 throw new InvalidData("Cannot determine time loss of competitor with " + this.splitTimes.length + " split times using " + fastestSplitTimes.length + " fastest splits");

@@ -26,8 +26,8 @@ export function parseIOFXMLEventData(data: string): Results {
 
    validateData(xml, reader);
 
-   const EventElement = $("> Event", $(xml));
-   parseEventDetails(EventElement);
+   const eventElement = $("ResultList > Event", $(xml));
+   const { eventName, eventDate } = parseEventDetails(eventElement);
 
    const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
 
@@ -85,7 +85,13 @@ export function parseIOFXMLEventData(data: string): Results {
       return course;
    });
 
-   return new Results(classes, courses, warnings);
+   return new Results(
+      classes,
+      courses,
+      warnings,
+      eventName,
+      eventDate,
+   );
 }
 
 // Regexp that matches the year in an ISO-8601 date.
@@ -291,7 +297,7 @@ function parseClassData(element: HTMLElement, reader: XMLReader, warnings: strin
          }
 
          // Subtract 2 for the start and finish cumulative times.
-         const actualControlCount = competitor.getAllOriginalCumulativeTimes().length - 2;
+         const actualControlCount = competitor.allOriginalCumulativeTimes.length - 2;
          let warning = null;
          if (actualControlCount !== cls.course.numberOfControls) {
             // eslint-disable-next-line max-len

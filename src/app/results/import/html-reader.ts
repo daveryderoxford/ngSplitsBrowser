@@ -265,11 +265,11 @@ class CompetitorParseRecord {
 
         // The null is for the start time.
         const competitor = Competitor.fromOriginalCumTimes(order, this.name, this.club, null, cumTimes);
-        if (competitor.completed() && !this.competitive) {
+        if (competitor.completed && !this.competitive) {
             competitor.setNonCompetitive();
         }
 
-        if (!competitor.hasAnyTimes()) {
+        if (!competitor.hasAnyTimes) {
             competitor.setNonStarter();
         }
 

@@ -41,6 +41,19 @@ const V3_RESULT_LIST_START = '<ResultList xmlns="http://www.orienteering.org/dat
 const V3_RESULT_LIST_END = '</ResultList>';
 const V3_XML_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n';
 
+interface Person {
+    forename: string;
+    surname: string;
+    club: string;
+    gender: string;
+    birthDate: string;
+    startTime: number;
+    totalTime: number;
+    controls: string[];
+    cumTimes: string[];
+    result: boolean;
+    ecardId: string;
+}
 
 describe("Input.IOFXml", () => {
 
@@ -49,7 +62,7 @@ describe("Input.IOFXml", () => {
     * totalTime, courseLength, controls and cumTimes properties set.
     * @return {Object} Person object.
     */
-    function getPerson(): any {
+    function getPerson(): Person {
         return {
             forename: "John",
             surname: "Smith",
@@ -629,11 +642,11 @@ describe("Input.IOFXml", () => {
     });
 
     it("Cannot parse a string for the v3.0 format that mentions the IOF XSD but is not well-formed XML", () => {
-        assertInvalidData(V3_XML_HEADER + V3_RESULT_LIST_START.replace("<ResultList", "<ResultList <<<") + V3_RESULT_LIST_END);
+        assertInvalidData((V3_XML_HEADER + V3_RESULT_LIST_START).replace("<ResultList", "<ResultList <<<") + V3_RESULT_LIST_END);
     });
 
     it("Cannot parse a string for the v3.0 format that uses the wrong root element name", () => {
-        assertWrongFileFormat(V3_XML_HEADER + V3_RESULT_LIST_START.replace("<ResultList", "<Wrong") + "</Wrong>");
+        assertWrongFileFormat((V3_XML_HEADER + V3_RESULT_LIST_START).replace("<ResultList", "<Wrong") + "</Wrong>");
     });
 
     it("Cannot parse a string for the v3.0 format that contains no iofVersion attribute", () => {
@@ -646,10 +659,10 @@ describe("Input.IOFXml", () => {
 
     it("Cannot parse a string for the v3.0 format that has a status of something other than complete", () => {
         assertInvalidData(
-            V3_HEADER.replace("<ResultList", "<ResultList status=\"Delta\"") + "</ResultList>",
+            V3_XML_HEADER + V3_RESULT_LIST_START.replace("<ResultList", "<ResultList status=\"Delta\"") + "</ResultList>",
             "Exception should be thrown attempting to parse XML that contains an IOFVersion element with a wrong version");
     });
-    
+
     it("Cannot parse a string that has no class results in it", () => {
         runFailingXmlFormatParseTest([]);
     });
@@ -679,11 +692,12 @@ describe("Input.IOFXml", () => {
         const classes = [{ name: "Test Class", length: 2300, competitors: [person] }];
 
         // Construct XML with specific Event details
-        let xml = V3_XML_HEADER + V3_RESULT_LIST_START +
-            `<Event>
+        let xml = V3_XML_HEADER + V3_RESULT_LIST_START.replace('>', `>
+            <Event>
               <Name>${eventName}</Name>
               <StartTime><Date>${eventDateStr}</Date></StartTime>
-            </Event>`;
+            </Event>
+        `);
         xml += "<ClassResult>\n" + Version3Formatter.getClassXml(classes[0].name) + Version3Formatter.getCourseXml(classes[0]);
         xml += classes[0].competitors.map(comp => Version3Formatter.getPersonResultXml(comp, classes[0])).join("\n");
         xml += "</ClassResult>\n" + V3_RESULT_LIST_END;
@@ -715,8 +729,8 @@ describe("Input.IOFXml", () => {
                         expect(competitor.gender).toEqual("M");
                         expect(competitor.yearOfBirth).toEqual(1976);
                         expect(competitor.ecardId).toEqual("12345", "ECard incorrect");
-                        expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0].concat(person.cumTimes).concat(person.totalTime));
-                        expect(competitor.completed()).toBe(true);
+                        expect(competitor.allOriginalCumulativeTimes).toEqual([0].concat(person.cumTimes).concat(person.totalTime));
+                        expect(competitor.completed).toBe(true);
                         expect(!competitor.isNonCompetitive).toBe(true);
                     }
 
@@ -759,7 +773,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that has a single class with a single competitor with forename only", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;
         delete person.surname;
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
@@ -768,7 +782,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that has a single class with a single competitor with surname only", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;;
         delete person.forename;
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
@@ -777,7 +791,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse with warnings a string that contains a competitor with no name", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;
         delete person.forename;
         delete person.surname;
         runXmlFormatParseTest(
@@ -790,7 +804,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that contains a competitor with missing club", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;;
         delete person.club;
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
@@ -799,7 +813,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that contains a competitor with no year of birth", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;
         delete person.birthDate;
         runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [person] }],
             function (eventData, formatterName) {
@@ -833,7 +847,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that contains a competitor with no gender specified", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;;
         delete person.gender;
         runXmlFormatParseTest([{ name: "Test Class", length: 2300, competitors: [person] }],
             function (eventData, formatterName) {
@@ -855,7 +869,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse with warnings a string that contains a competitor with no Result", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;
         delete person.result;
         runXmlFormatParseTest(
             [{ name: "Test Class", length: 2300, courseId: 1, competitors: [person] }],
@@ -866,7 +880,7 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that contains a competitor with missing start time", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;;
         delete person.startTime;
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
@@ -904,22 +918,22 @@ describe("Input.IOFXml", () => {
     });
 
     it("Can parse a string that contains a competitor with missing total time", () => {
-        const person = getPerson();
+        const person = getPerson() as Partial<Person>;;
         delete person.totalTime;
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.totalTime).toEqual(null);
-                expect(!competitor.completed()).toBe(true);
+                expect(competitor.completed).toBe(false);
             });
     });
 
     it("Can parse a string that contains a competitor with invalid total time", () => {
-        const person = getPerson();
+        const person = getPerson() as any;
         person.totalTime = null;
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
                 expect(competitor.totalTime).toEqual(null);
-                expect(!competitor.completed()).toBe(true);
+                expect(competitor.completed).toBe(false);
             });
     });
 
@@ -928,7 +942,7 @@ describe("Input.IOFXml", () => {
         person.cumTimes = [65.7, 65.7 + 221.4, 65.7 + 221.4 + 184.6];
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
-                expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0].concat(person.cumTimes).concat(person.totalTime));
+                expect(competitor.allOriginalCumulativeTimes).toEqual([0].concat(person.cumTimes).concat(person.totalTime));
             },
             { formatters: [Version3Formatter] });
     });
@@ -1127,8 +1141,8 @@ describe("Input.IOFXml", () => {
         person.cumTimes[1] = null;
         runSingleCompetitorXmlFormatParseTest({ name: "Test Class", length: 2300, courseId: 1, competitors: [person] },
             function (competitor) {
-                expect(competitor.getAllOriginalCumulativeTimes()).toEqual([0].concat(person.cumTimes).concat([person.totalTime]));
-                expect(!competitor.completed()).toBe(true);
+                expect(competitor.allOriginalCumulativeTimes).toEqual([0].concat(person.cumTimes).concat([person.totalTime]));
+                expect(competitor.completed).toBe(false);
             });
     });
 
@@ -1149,7 +1163,7 @@ describe("Input.IOFXml", () => {
                 expect(eventData.classes[0].competitors.length).toEqual(1, "One competitor should have been read - " + formatterName);
                 expect(eventData.warnings.length).toEqual(1, "One warning should have been issued - " + formatterName);
                 // TODO This should be OK but generates an erro concerning the number of controls for fred is 4 not 3!
-           //     expect(eventData.warnings[0].match(/number of controls/)).toBe(true);
+                //     expect(eventData.warnings[0].match(/number of controls/)).toBe(true);
             }
         );
     });

@@ -107,7 +107,7 @@ describe("Input.Html", () => {
         });
 
         if (expectedDetails.hasOwnProperty("completed")) {
-            expect(actualCompetitor.completed()).toEqual(expectedDetails.completed);
+            expect(actualCompetitor.completed).toEqual(expectedDetails.completed);
         }
     }
 

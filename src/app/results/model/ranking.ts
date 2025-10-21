@@ -21,7 +21,7 @@ export function calculatePositions(competitors: Competitor[],
   let previousTime: sbTime = -1;
 
   for (const [index, comp] of sorted.entries()) {
-    if (comp.completed()) {
+    if (comp.completed) {
       if (comp.totalTime !== previousTime) {
         currentPosition = index + 1;
       }

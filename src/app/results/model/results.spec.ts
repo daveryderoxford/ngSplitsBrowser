@@ -182,7 +182,7 @@ describe("Results", () => {
         const course = new Course("Test course", [courseClass], null, null, ["235", "212", "189"]);
 
         const event = new Results([courseClass], [course]);
-        expect(!event.needsRepair()).toBe(true);
+        expect(!event.needsRepair()).toBe(true, "Event should not need repair");
     });
 
     it("Event that does need repairing reports that it does", () => {
@@ -280,4 +280,3 @@ describe("Results", () => {
         expect(res.length).toBe(2);
     });
 });
-

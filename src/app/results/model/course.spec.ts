@@ -75,17 +75,17 @@ describe("Course", () => {
 
     it("Course created without controls does not contain controls", () => {
         const course = new Course("Test course", [new CourseClass("Test class", 3, [])], null, null, null);
-        expect(!course.hasControls()).toBe(true);
+        expect(!course.hasControls).toBe(true);
     });
 
     it("Course created with controls does contain controls", () => {
         const course = new Course("Test course", [new CourseClass("Test class", 3, [])], null, null, ["208", "227", "212"]);
-        expect(course.hasControls()).toBe(true);
+        expect(course.hasControls).toBe(true);
     });
 
     it("Course created with controls does contain controls", () => {
         const course = new Course("Test course", [new CourseClass("Test class", 3, [])], null, null, ["208", "227", "212"]);
-        expect(course.hasControls()).toBe(true);
+        expect(course.hasControls).toBe(true);
     });
 
     it("Cannot get the code of a control with negative number", () => {

@@ -161,7 +161,7 @@ class TrippleCVSReader {
     private addCompetitorToCourse(competitor: Competitor, courseName: string, row: string[]) {
         if (this.classes.has(courseName)) {
             const cls = this.classes.get(courseName);
-            const cumTimes = competitor.getAllOriginalCumulativeTimes();
+            const cumTimes = competitor.allOriginalCumulativeTimes;
             // Subtract one from the list of cumulative times for the
             // cumulative time at the start (always 0), and add one on to
             // the count of controls in the class to cater for the finish.
@@ -235,14 +235,14 @@ class TrippleCVSReader {
         const order = (this.classes.has(courseName)) ? this.classes.get(courseName).competitors.length + 1 : 1;
 
         const competitor = Competitor.fromOriginalCumTimes(order, competitorName, club, startTime, cumTimes);
-        if (this.format.placing !== null && competitor.completed()) {
+        if (this.format.placing !== null && competitor.completed) {
             const placing = row[this.format.placing];
             if (!placing.match(/^\d*$/)) {
                 competitor.setNonCompetitive();
             }
         }
 
-        if (!competitor.hasAnyTimes()) {
+        if (!competitor.hasAnyTimes) {
             competitor.setNonStarter();
         }
 

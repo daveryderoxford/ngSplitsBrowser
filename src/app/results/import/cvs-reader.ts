@@ -135,7 +135,7 @@ export function parseCSVEventData(data: string): Results {
 
     let classes = classSections.map( (section) => parseCourseClass(section, warnings));
 
-    classes = classes.filter( (courseClass) => !courseClass.isEmpty());
+    classes = classes.filter( (courseClass) => !courseClass.isEmpty);
 
     if (classes.length === 0) {
         throw new InvalidData("No competitor data was found");

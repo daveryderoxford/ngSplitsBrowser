@@ -116,7 +116,7 @@ export class ResultsTable {
          ret = (index - 1).toString() + '-F';
       } else {
          ret = (index).toString();
-         if (this.course()?.hasControls()) {
+         if (this.course()?.hasControls) {
             ret = ret + ' (' + this.course().getControlCode(index) + ')';
          }
       }
@@ -139,7 +139,7 @@ export class ResultsTable {
          return 'DSQ';
       } else if (competitor.isOverMaxTime) {
          return 'Over time';
-      } else if (competitor.completed()) {
+      } else if (competitor.completed) {
          return TimeUtilities.formatTime(competitor.totalTime);
       } else {
          return 'mp';

@@ -82,9 +82,9 @@ describe("Competitor", () => {
         const cumTimes = [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100];
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, cumTimes);
         assertCumulativeTimes(competitor, cumTimes);
-        expect(competitor.getAllCumulativeTimes()).toEqual(cumTimes);
+        expect(competitor.allCumulativeTimes).toEqual(cumTimes);
         assertSplitTimes(competitor, [65, 221, 184, 100]);
-        expect(competitor.completed()).toBe(true, "Competitor should be marked as completing the course");
+        expect(competitor.completed).toBe(true, "Competitor should be marked as completing the course");
         expect(!competitor.isNonCompetitive).toBe(true, "Competitor should not be marked as non-competitive");
         expect(!competitor.isNonStarter).toBe(true, "Competitor should not be a non-starter");
         expect(!competitor.isNonFinisher).toBe(true, "Competitor should not be a non-finisher");
@@ -96,9 +96,9 @@ describe("Competitor", () => {
         const cumTimes = [0, 65, null, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100];
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, cumTimes);
         assertCumulativeTimes(competitor, cumTimes);
-        expect(competitor.getAllCumulativeTimes()).toEqual(cumTimes);
+        expect(competitor.allCumulativeTimes).toEqual(cumTimes);
         assertSplitTimes(competitor, [65, null, null, 184, 100]);
-        expect(!competitor.completed()).toBe(true, "Competitor should be marked as not completing the course");
+        expect(!competitor.completed).toBe(true, "Competitor should be marked as not completing the course");
     });
 
     it("Can create a competitor from cumulative times and determine split times when competitor has missed multiple consecutive controls", () => {
@@ -106,7 +106,7 @@ describe("Competitor", () => {
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, cumTimes);
         assertCumulativeTimes(competitor, cumTimes);
         assertSplitTimes(competitor, [65, null, null, null, null, 184, 100]);
-        expect(!competitor.completed()).toBe(true, "Competitor should be marked as not completing the course");
+        expect(!competitor.completed).toBe(true, "Competitor should be marked as not completing the course");
     });
 
     it("Can create a non-competitive competitor from cumulative times", () => {
@@ -142,7 +142,7 @@ describe("Competitor", () => {
     it("Can create a disqualified competitor from cumulative times", () => {
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         competitor.disqualify();
-        expect(!competitor.completed()).toBe(true, "Disqualified competitor should not be marked as completing the course");
+        expect(!competitor.completed).toBe(true, "Disqualified competitor should not be marked as completing the course");
         expect(!competitor.isNonCompetitive).toBe(true, "Competitor should not be marked as non-competitive");
         expect(!competitor.isNonStarter).toBe(true, "Competitor should not be a non-starter");
         expect(!competitor.isNonFinisher).toBe(true, "Competitor should not be a non-finisher");
@@ -153,7 +153,7 @@ describe("Competitor", () => {
     it("Can create an over-max-time competitor from cumulative times", () => {
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
         competitor.setOverMaxTime();
-        expect(!competitor.completed()).toBe(true, "Over-max-time competitor should not be marked as completing the course");
+        expect(!competitor.completed).toBe(true, "Over-max-time competitor should not be marked as completing the course");
         expect(!competitor.isNonCompetitive).toBe(true, "Competitor should not be marked as non-competitive");
         expect(!competitor.isNonStarter).toBe(true, "Competitor should not be a non-starter");
         expect(!competitor.isNonFinisher).toBe(true, "Competitor should not be a non-finisher");
@@ -176,7 +176,7 @@ describe("Competitor", () => {
         assertOriginalSplitTimes(competitor, [65, 221, 184, 100]);
         expect(competitor.cumTimes).toEqual(null);
         expect(competitor.splitTimes).toEqual(null);
-        expect(competitor.getAllOriginalCumulativeTimes()).toEqual(cumTimes);
+        expect(competitor.allOriginalCumulativeTimes).toEqual(cumTimes);
     });
 
     it("Can create a competitor from original cumulative times and set repaired times with NaNs replacing dubious splits", () => {
@@ -321,17 +321,17 @@ describe("Competitor", () => {
 
     it("Competitor with no times missing has times", () => {
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, 65 + 221, 65 + 221 + 184, 65 + 221 + 184 + 100]);
-        expect(competitor.hasAnyTimes()).toBe(true, "Competitor with no times missing should have times");
+        expect(competitor.hasAnyTimes).toBe(true, "Competitor with no times missing should have times");
     });
 
     it("Competitor with some but not all times missing has times", () => {
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, 65, null, null, 65 + 221 + 184 + 100]);
-        expect(competitor.hasAnyTimes()).toBe(true, "Competitor with some but not all times missing should have times");
+        expect(competitor.hasAnyTimes).toBe(true, "Competitor with some but not all times missing should have times");
     });
 
     it("Competitor with all times missing does not have times", () => {
         const competitor = fromCumTimes(1, "John Smith", "ABC", 10 * 3600, [0, null, null, null, null]);
-        expect(!competitor.hasAnyTimes()).toBe(true, "Competitor with all times missing should not have times");
+        expect(!competitor.hasAnyTimes).toBe(true, "Competitor with all times missing should not have times");
     });
 
     it("Can adjust a competitor's cumulative times by reference data with all valid times and same number of controls", () => {
@@ -781,4 +781,3 @@ describe("Competitor", () => {
         expect(competitor.ecardId).toEqual("1234567");
     });
 });
-
