@@ -1,11 +1,11 @@
 <div class="top-controls">
-   <button matButton="outlined" class="dense-button" (click)="rs.clearCompetitors()">
-      Clear
-   </button>
+   
+   <app-colored-circle [text]="selectedText()" [color]="selectedColor()" (click)="selectOrClear()"></app-colored-circle>
 
    @if (rs.oclass().course.classes.length > 1) {
       <app-course-or-class />
    }
+   <app-results-search-button class="search-button"/>
 </div>
 
 @if (showCrossing()) {

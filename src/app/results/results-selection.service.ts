@@ -94,6 +94,10 @@ export class ResultsSelectionService {
       this._competitors.set([]);
    }
 
+   selectAll() {
+      this.selectCompetitors(...this.displayedCompetitors());
+   }
+
    /** Toggle selected cometitor */
    toggleCompetitor(comp: Competitor) {
       const competitors = this._competitors();

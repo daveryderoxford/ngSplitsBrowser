@@ -3,16 +3,14 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { computed, inject, Injectable, resource, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
-import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
+import { getFunctions, httpsCallable } from '@angular/fire/functions';
+import { getStorage } from '@angular/fire/storage';
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
-import { firstValueFrom, Observable } from "rxjs";
-import { catchError } from 'rxjs/operators';
 import { parseEventData } from "./import";
 import { Competitor, Results } from "./model";
+import { ResultsEventDetails } from './model/event_details';
 import { Repairer } from './model/repairer';
 import { isNotNullNorNaN } from './model/results_util';
-import { ResultsEventDetails } from './model/event_details';
-import { getFunctions, httpsCallable } from '@angular/fire/functions';
 
 export interface GetResultsFileData {
    eventKey: string;

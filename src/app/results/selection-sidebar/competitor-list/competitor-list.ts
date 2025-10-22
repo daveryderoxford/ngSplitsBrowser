@@ -9,11 +9,18 @@ import { Competitor } from 'app/results/model';
 import { CourseOrClassCheckbox } from './course-or-class';
 import { MatButtonModule } from '@angular/material/button';
 import { UNRANKED_VALUE } from 'app/results/model/ranking';
+import { SearchIconButton } from "app/results/search/results-search-button";
 
 @Component({
   selector: 'app-competitor-list',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MatListModule, FormatTimePipe, MatButtonModule, MatIconModule, ColoredCircle, CourseOrClassCheckbox],
+  imports: [MatListModule,
+    FormatTimePipe,
+    MatButtonModule,
+    MatIconModule,
+    ColoredCircle,
+    CourseOrClassCheckbox,
+    SearchIconButton],
   templateUrl: './competitor-list.html',
   styleUrl: './competitor-list.scss'
 })
@@ -24,12 +31,25 @@ export class CompetitorList {
 
   showCrossing = input.required<boolean>();
 
+  compSelected = computed(() => this.rs.selectedCompetitors().length > 0);
+
+  selectedColor = computed( () => this.compSelected() ? '#000000' : '#FF0000');
+  selectedText = computed( () => this.compSelected() ? 'X' : String.fromCharCode(0x2713));
+
+  selectOrClear() {
+    if (this.compSelected()) {
+      this.rs.clearCompetitors()
+    } else {
+      this.rs.selectAll()
+    }
+  }
+
   toggleSelected(comp: Competitor) {
     this.rs.toggleCompetitor(comp);
   }
 
   selectCrossingRunners() {
-    if (this.rs.selectedCompetitors().length> 0) {
+    if (this.compSelected()) {
       const comp = this.rs.selectedCompetitors()[0];
 
       this.rs.selectCrossingRunners(comp);
@@ -41,7 +61,7 @@ export class CompetitorList {
     return (pos === UNRANKED_VALUE) ? '' : pos.toString();
   }
 
-  timeBehind( comp: Competitor): number{
+  timeBehind(comp: Competitor): number {
     if (this.rs.displayedCompetitors().length === 0) {
       return 0;
     } else {

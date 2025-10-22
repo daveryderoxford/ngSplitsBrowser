@@ -136,11 +136,11 @@ export class Course {
 
 
    /** Determine if a course is a score course
-    * This is determined by if any competitors have completed the 
-    * course (that is determined by the control of the first competitor)  
+    * This is determined by if these are more than two competitors and no competitors have completd the course have completed the 
+    * We maybe could check the controls competitors have visited to  determine if it is score.
     */
    get isScoreCourse() {
-      return this._competitors.some( comp => comp.completed);
+      return this.competitors.length > 2 && !this.competitors.some( comp => comp.completed);
    }
 
    /**
