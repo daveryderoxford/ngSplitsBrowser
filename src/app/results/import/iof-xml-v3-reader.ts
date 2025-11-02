@@ -1,8 +1,8 @@
 
-import $ from 'jquery';
 import { isUndefined } from "./util";
 import { CourseClass, InvalidData, sbTime, WrongFileFormat } from "../model";
 import { isNaNStrict } from "../model/results_util";
+import { XmlQuery } from "./xml-query";
 
 export interface CourseDeatils {
     id: string;
@@ -17,19 +17,19 @@ export interface CourseDeatils {
 /** interface implemented by IOF XML reader classes */
 export interface IOFXMLReader {
     isOfThisVersion(data: string): boolean;
-    checkVersion(rootElement: JQuery<HTMLElement>): void;
-    readClassName(classResultElement: JQuery<HTMLElement>): string;
-    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: string[]): CourseDeatils;
-    getCompetitorNameElement(element: JQuery<HTMLElement>): void;
-    readClubName(element: JQuery<HTMLElement>): string;
-    readDateOfBirth(element: JQuery<HTMLElement>): number | null;
-    readStartTime(resultElement: JQuery<HTMLElement>): sbTime | null;
-    readTotalTime(resultElement: JQuery<HTMLElement>): sbTime | null;
-    readECard(resultElement: JQuery<HTMLElement>): string;
-    readRoute(resultElement: JQuery<HTMLElement>): string | null;
-    getStatus(resultElement: JQuery<HTMLElement>): string;
-    isAdditional(splitTimeElement: JQuery<HTMLElement>): boolean;
-    readSplitTime(splitTimeElement: JQuery<HTMLElement>): void;
+    checkVersion(rootElement: XmlQuery): void;
+    readClassName(classResultElement: XmlQuery): string;
+    readCourseFromClass(classResultElement: XmlQuery, warnings: string[]): CourseDeatils;
+    getCompetitorNameElement(element: XmlQuery): XmlQuery;
+    readClubName(element: XmlQuery): string;
+    readDateOfBirth(element: XmlQuery): number | null;
+    readStartTime(resultElement: XmlQuery): sbTime | null;
+    readTotalTime(resultElement: XmlQuery): sbTime | null;
+    readECard(resultElement: XmlQuery): string;
+    readRoute(resultElement: XmlQuery): string | null;
+    getStatus(resultElement: XmlQuery): string;
+    isAdditional(splitTimeElement: XmlQuery): boolean;
+    readSplitTime(splitTimeElement: XmlQuery): { code: string; time: number; };
 }
 
 
@@ -75,7 +75,7 @@ export class Version3Reader implements IOFXMLReader {
     * the v2.0.3 format.  If not, a WrongFileFormat exception is thrown.
     * @sb-param {jQuery.selection} rootElement - The root element.
     */
-    checkVersion(rootElement: JQuery<HTMLElement>): void {
+    checkVersion(rootElement: XmlQuery): void {
         const iofVersion = rootElement.attr("iofVersion");
         if (isUndefined(iofVersion)) {
             throw new WrongFileFormat("Could not find IOF version number");
@@ -95,8 +95,8 @@ export class Version3Reader implements IOFXMLReader {
     *     containing the course details.
     * @sb-return {String} Class name.
     */
-    readClassName(classResultElement: JQuery<HTMLElement>) {
-        return $("> Class > Name", classResultElement).text();
+    readClassName(classResultElement: XmlQuery) {
+        return classResultElement.find("> Class > Name").text();
     }
 
     /**
@@ -106,11 +106,11 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {Object} Course details: id, name, length, climb and number of
     *     controls.
     */
-    readCourseFromClass(classResultElement: JQuery<HTMLElement>, warnings: string[]): CourseDeatils {
-        const courseElement = $("> Course", classResultElement);
-        const id = $("> Id", courseElement).text() || null;
-        const name = $("> Name", courseElement).text();
-        const lengthStr = $("> Length", courseElement).text();
+    readCourseFromClass(classResultElement: XmlQuery, warnings: string[]): CourseDeatils {
+        const courseElement = classResultElement.find("> Course");
+        const id = courseElement.find("> Id").text() || null;
+        const name = courseElement.find("> Name").text();
+        const lengthStr = courseElement.find("> Length").text();
         let length;
         if (lengthStr === "") {
             length = null;
@@ -125,13 +125,13 @@ export class Version3Reader implements IOFXMLReader {
             }
         }
 
-        const numberOfControlsStr = $("> NumberOfControls", courseElement).text();
+        const numberOfControlsStr = courseElement.find("> NumberOfControls").text();
         let numberOfControls = parseInt(numberOfControlsStr, 10);
         if (isNaNStrict(numberOfControls)) {
             numberOfControls = null;
         }
 
-        const climbStr = $("> Climb", courseElement).text();
+        const climbStr = courseElement.find("> Climb").text();
         let climb = parseInt(climbStr, 10);
         if (isNaNStrict(climb)) {
             climb = null;
@@ -148,8 +148,8 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {jQuery.selection} jQuery selection containing any child 'Name'
     *     element.
     */
-    getCompetitorNameElement(element: JQuery<HTMLElement>) {
-        return $("> Person > Name", element);
+    getCompetitorNameElement(element: XmlQuery) {
+        return element.find("> Person > Name");
     }
 
     /**
@@ -158,8 +158,8 @@ export class Version3Reader implements IOFXMLReader {
     *     PersonResult element.
     * @sb-return {String} Competitor's club name.
     */
-    readClubName(element: JQuery<HTMLElement>): string {
-        return $("> Organisation > ShortName", element).text();
+    readClubName(element: XmlQuery): string {
+        return element.find("> Organisation > ShortName").text();
     }
 
     /**
@@ -168,8 +168,8 @@ export class Version3Reader implements IOFXMLReader {
     *     PersonResult element.
     * @sb-return {String} The competitor's date of birth
     */
-    readDateOfBirth(element: JQuery<HTMLElement>): number | null {
-        const birthDate = $("> Person > BirthDate", element).text();
+    readDateOfBirth(element: XmlQuery): number | null {
+        const birthDate = element.find("> Person > BirthDate").text();
         const regexResult = this.yearRegexp.exec(birthDate);
         return (regexResult === null) ? null : parseInt(regexResult[0], 10);
     }
@@ -181,8 +181,8 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {?Number} Competitor's start time, in seconds since midnight,
     *     or null if not known.
     */
-    readStartTime(resultElement: JQuery<HTMLElement>): sbTime | null {
-        const startTimeStr = $("> StartTime", resultElement).text();
+    readStartTime(resultElement: XmlQuery): sbTime | null {
+        const startTimeStr = resultElement.find("> StartTime").text();
         const result = this.ISO_8601_RE.exec(startTimeStr);
         if (result === null) {
             return null;
@@ -214,8 +214,8 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-return {?Number} Competitor's total time, in seconds, or null if a time
     *     was not found or was invalid.
     */
-    readTotalTime(resultElement: JQuery<HTMLElement>): sbTime | null {
-        const totalTimeStr = $("> Time", resultElement).text();
+    readTotalTime(resultElement: XmlQuery): sbTime | null {
+        const totalTimeStr = resultElement.find("> Time").text();
         return this.readTime(totalTimeStr);
     }
 
@@ -224,8 +224,8 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
     * @sb-return {string} ECard
     */
-    readECard(resultElement: JQuery<HTMLElement>): string {
-        return $("> ControlCard", resultElement).text();
+    readECard(resultElement: XmlQuery): string {
+        return resultElement.find("> ControlCard").text();
     }
 
     /**
@@ -233,8 +233,8 @@ export class Version3Reader implements IOFXMLReader {
     * @sb-param {jQuery.selection} element - jQuery selection containing a Result element.
     * @sb-return {string | null} Base64-encoded binary route data
     */
-    readRoute(resultElement: JQuery<HTMLElement>): string | null {
-        return $("> Route", resultElement).text();
+    readRoute(resultElement: XmlQuery): string | null {
+        return resultElement.find("> Route").text();
     }
 
     /**
@@ -243,8 +243,8 @@ export class Version3Reader implements IOFXMLReader {
     *     Result element.
     * @sb-return {String} Status of the competitor.
     */
-    getStatus(resultElement: JQuery<HTMLElement>): string {
-        return $("> Status", resultElement).text();
+    getStatus(resultElement: XmlQuery): string {
+        return resultElement.find("> Status").text();
     }
 
     /**
@@ -254,7 +254,7 @@ export class Version3Reader implements IOFXMLReader {
     *     a SplitTime element.
     * @sb-return {boolean} True if the control is additional, false if not.
     */
-    isAdditional(splitTimeElement: JQuery<HTMLElement>): boolean {
+    isAdditional(splitTimeElement: XmlQuery): boolean {
         return (splitTimeElement.attr("status") === "Additional");
     }
 
@@ -264,18 +264,18 @@ export class Version3Reader implements IOFXMLReader {
     *     a SplitTime element.
     * @sb-return {Object} Object containing code and time.
     */
-    readSplitTime(splitTimeElement: JQuery<HTMLElement>) {
-        const code = $("> ControlCode", splitTimeElement).text();
+    readSplitTime(splitTimeElement: XmlQuery) {
+        const code = splitTimeElement.find("> ControlCode").text();
         if (code === "") {
             throw new InvalidData("Control code missing for control");
         }
 
-        let time;
+        let time: number;
         if (splitTimeElement.attr("status") === "Missing") {
             // Missed controls have their time omitted.
             time = null;
         } else {
-            const timeStr = $("> Time", splitTimeElement).text();
+            const timeStr = splitTimeElement.find("> Time").text();
             time = (timeStr === "") ? null : this.readTime(timeStr);
         }
 
