@@ -1,16 +1,12 @@
 
 import $ from 'jquery';
-import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
-import { FirstnameSurname } from "../model/competitor";
-import { FirstnameSurname, XmlElement, XmlQuery } from "@ng-splits-browser/shared";
-import { Version2Reader } from "./iof-xml-v2-reader";
-import { CourseDeatils, Version3Reader } from "./iof-xml-v3-reader";
+import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../index.js";
+import { FirstnameSurname } from "../competitor.js";
+import { CourseDeatils, Version3Reader } from "./iof-xml-v3-reader.js";
 
-
-type XMLReader = Version2Reader | Version3Reader;
+type XMLReader = Version3Reader;
 
 const ALL_READERS = [
-   new Version2Reader(),
    new Version3Reader()
 ];
 
@@ -29,11 +25,9 @@ export function parseIOFXMLEventData(data: string): Results {
    validateData(xml, reader);
 
    const eventElement = $("ResultList > Event", $(xml));
-   const eventElement = $(xml).find("ResultList > Event");
    const { eventName, eventDate } = parseEventDetails(eventElement);
 
    const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
-   const classResultElements = $(xml).find("> ResultList > ClassResult").toArray();
 
    if (classResultElements.length === 0) {
       throw new InvalidData("No class result elements found");
@@ -117,7 +111,6 @@ function parseXml(xmlString: string): XMLDocument {
    }
 
    if ($("> *", $(xml)).length === 0) {
-   if ($(xml).find("> *").length === 0) {
       // PhantomJS doesn't always fail parsing invalid XML; we may be
       // left with 'xml' just containing the DOCTYPE and no root element.
       throw new InvalidData("XML data not well-formed: " + xmlString);
@@ -140,12 +133,9 @@ function parseXml(xmlString: string): XMLDocument {
 * @sb-return {Name object} Name read from the element.
 */
 function readCompetitorName(nameElement: JQuery<HTMLElement>): FirstnameSurname {
-function readCompetitorName(nameElement: XmlQuery): FirstnameSurname {
 
    const forename = $("> Given", nameElement).text();
    const surname = $("> Family", nameElement).text();
-   const forename = nameElement.find("> Given").text();
-   const surname = nameElement.find("> Family").text();
 
    return ({
       firstname: forename,
@@ -165,7 +155,6 @@ function readCompetitorName(nameElement: XmlQuery): FirstnameSurname {
 */
 function validateData(xml: XMLDocument, reader: XMLReader) {
    const rootElement = $("> *", xml);
-   const rootElement = $(xml).find("> *");
    const rootElementNodeName = rootElement.prop("tagName");
 
    if (rootElementNodeName !== "ResultList") {
@@ -189,7 +178,6 @@ function validateData(xml: XMLDocument, reader: XMLReader) {
 *     competitor could be read.
 */
 function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader, warnings: string[]) {
-function parseCompetitor(element: XmlElement, number: number, reader: XMLReader, warnings: string[]) {
    const jqElement = $(element);
 
    const nameElement = reader.getCompetitorNameElement(jqElement);
@@ -207,10 +195,8 @@ function parseCompetitor(element: XmlElement, number: number, reader: XMLReader,
    const yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
 
    const gender = $("> Person", jqElement).attr("sex");
-   const gender = jqElement.find("> Person").attr("sex");
 
    const resultElement = $("Result", jqElement);
-   const resultElement = jqElement.find("Result");
    if (resultElement.length === 0) {
       warnings.push("Could not find any result information for competitor '" + name + "'");
       return null;
@@ -222,7 +208,6 @@ function parseCompetitor(element: XmlElement, number: number, reader: XMLReader,
    const route = reader.readRoute(resultElement);
 
    const splitTimes = $("> SplitTime", resultElement).toArray();
-   const splitTimes = resultElement.find("> SplitTime").toArray();
    const splitData = splitTimes.filter((splitTime) => !reader.isAdditional($(splitTime)))
       .map((splitTime) => reader.readSplitTime($(splitTime)));
 
@@ -273,7 +258,6 @@ function parseCompetitor(element: XmlElement, number: number, reader: XMLReader,
 * @sb-return {Object} Object containing parsed data.    
 */
 function parseClassData(element: HTMLElement, reader: XMLReader, warnings: string[]) {
-function parseClassData(element: XmlElement, reader: XMLReader, warnings: string[]) {
    const jqElement = $(element);
    const cls = { name: '', competitors: Array<Competitor>(), controls: Array<string>(), warnings: Array<string>(), course: <CourseDeatils>null };
 
@@ -288,7 +272,6 @@ function parseClassData(element: XmlElement, reader: XMLReader, warnings: string
    cls.name = className;
 
    const personResults = $("> PersonResult", jqElement);
-   const personResults = jqElement.find("> PersonResult");
    if (personResults.length === 0) {
       warnings.push("Class '" + className + "' has no competitors");
       return null;
@@ -369,18 +352,15 @@ function determineReader(data: string) {
    throw new WrongFileFormat("Data apparently not of any recognised IOF XML format");
 }
 function parseEventDetails(eventElement: JQuery<HTMLElement>): { eventName: string | undefined, eventDate: Date | undefined; } {
-function parseEventDetails(eventElement: XmlQuery): { eventName: string | undefined, eventDate: Date | undefined; } {
    let eventName: string | undefined;
    let eventDate: Date | undefined;
 
    const nameElement = $("Name", eventElement);
-   const nameElement = eventElement.find("Name");
    if (nameElement) {
       eventName = nameElement.text()?.trim();
    }
 
    const dateElement = $("StartTime > Date", eventElement);
-   const dateElement = eventElement.find("StartTime > Date");
    if (dateElement) {
       eventDate = new Date(dateElement.text().trim());
    }

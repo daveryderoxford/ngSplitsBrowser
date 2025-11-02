@@ -23,4 +23,5 @@ export {
 export {
    getResultsFile,
    saveResultsFile,
+   createEventWithResults
 } from "./results/results.js"

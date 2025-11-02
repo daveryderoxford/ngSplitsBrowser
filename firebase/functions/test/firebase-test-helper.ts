@@ -3,7 +3,9 @@ import test from 'firebase-functions-test';
 import { initializeApp, getApps, deleteApp } from 'firebase-admin/app';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { before, after, afterEach } from 'mocha';
-import { getStorage, Storage} from 'firebase-admin/storage';
+import { getStorage, Storage } from 'firebase-admin/storage';
+import { CallableRequest } from 'firebase-functions/v2/https';
+import { DecodedIdToken } from 'firebase-admin/auth';
 
 // Set environment variables to use emulators.
 // This ensures that tests do not interact with live production data.
@@ -29,11 +31,18 @@ export interface TestContext {
 export function setupMochaHooks(): TestContext {
 	const context: Partial<TestContext> = {};
 
+	gs://splitsbrowser-b5948.appspot.com
+
+
 	before(async () => {
-		initializeApp({ projectId });
+		initializeApp({ 
+			projectId, 
+			storageBucket: `splitsbrowser-b5948.appspot.com`
+		});
 		context.db = getFirestore();
 		context.storage = getStorage();
-		// Dynamically import functions only after the app is initialized. Avoids initialisation function being called
+		// Dynamically import functions only after the app is initialized. 
+		// Avoids initialisation function being called
 		context.myFunctions = await import('../src/index.js');
 	});
 
@@ -48,18 +57,26 @@ export function setupMochaHooks(): TestContext {
 	afterEach(async () => {
 		// Using the recommended method for clearing the emulator, 
 		// is faster but has been found to casuse intermittenmt failure of tests
-      // TODO Maybe look into using this later
+		// TODO Maybe look into using this later
 		// testEnv.clearFirestore();
-      try {
-         const db = context.db!;
-         const collections = await db.listCollections();
-         for (const collection of collections) {
-            await db.recursiveDelete(collection);
-         }
-      } catch (error: any) {
-         console.log('\n ****** afterEach:  Error in aftereach\n', error.toString());
-      }
+		try {
+			const db = context.db!;
+			const collections = await db.listCollections();
+			for (const collection of collections) {
+				await db.recursiveDelete(collection);
+			}
+		} catch (error: any) {
+			console.log('\n ****** afterEach:  Error in aftereach\n', error.toString());
+		}
 	});
 
 	return context as TestContext;
+}
+
+export function v2Request<T>(data: T, uid = 'auth-user-id'): CallableRequest<T> {
+	const request: CallableRequest<T> = {
+		data: data,
+		auth: { uid: uid, token: {} as DecodedIdToken },
+	} as CallableRequest<T>;
+	return request
 }

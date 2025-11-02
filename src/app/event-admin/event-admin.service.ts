@@ -237,11 +237,11 @@ export class EventAdminService {
       for (const course of results.courses) {
          const courseSummary = this.createCourseSummary(course);
 
-         course.classes.forEach((eclass) => {
+         for (const eclass of course.classes) {
             courseSummary.numcompetitors = courseSummary.numcompetitors + eclass.competitors.length;
             summary.numcompetitors = summary.numcompetitors + eclass.competitors.length;
             courseSummary.classes.push(eclass.name);
-         });
+         }
          summary.courses.push(courseSummary);
       }
 

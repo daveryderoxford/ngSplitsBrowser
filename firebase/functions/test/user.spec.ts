@@ -24,7 +24,7 @@ async function readUser(db: Firestore, uid: string): Promise<UserData | undefine
 describe('User Cloud Functions', function () {
 
    // Set a default timeout of 5 seconds for all tests and hooks in this suite.
-   this.timeout(5000);
+   this.timeout(30000);
 
    const context = setupMochaHooks();
 

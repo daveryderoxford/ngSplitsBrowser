@@ -8,6 +8,7 @@ import { Club, createClub } from '../src/model/club.js';
 import { clubConverter, eventConverter } from '../src/model/event-firebase-converters.js';
 import { OEvent, createEvent } from '../src/model/oevent.js';
 import { setupMochaHooks, testEnv } from './firebase-test-helper.js';
+import { SUPER_USER_UID } from '../src/auth.js';
 
 /* UTILITY FUNCTIONS */
 
@@ -193,7 +194,7 @@ describe('Club Index Cloud Functions', function () {
          const wrapped = testEnv.wrap(context.myFunctions.rebuildClubs);
 
          await wrapped({
-            auth: { uid: 'test-uid' } as any,
+            auth: { uid: SUPER_USER_UID } as any,
             data: null,
             rawRequest: {} as any,
          });
