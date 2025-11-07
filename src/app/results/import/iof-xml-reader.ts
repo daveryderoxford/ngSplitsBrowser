@@ -1,11 +1,9 @@
 
-import $ from 'jquery';
 import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../model";
 import { FirstnameSurname } from "../model/competitor";
-import { XmlElement, XmlQuery } from "./xml-query";
+import { XmlDoc, XmlElement, XmlQuery, parseXml, queryElement } from "./xml-query";
 import { Version2Reader } from "./iof-xml-v2-reader";
 import { CourseDeatils, Version3Reader } from "./iof-xml-v3-reader";
-
 
 type XMLReader = Version2Reader | Version3Reader;
 
@@ -26,12 +24,14 @@ export function parseIOFXMLEventData(data: string): Results {
 
    const xml = parseXml(data);
 
+  // console.log(xml.html());
+
    validateData(xml, reader);
 
-   const eventElement = $(xml).find("ResultList > Event");
+   const eventElement = xml.find("ResultList > Event");
    const { eventName, eventDate } = parseEventDetails(eventElement);
 
-   const classResultElements = $(xml).find("> ResultList > ClassResult").toArray();
+   const classResultElements = xml.find("> ResultList > ClassResult").toArray();
 
    if (classResultElements.length === 0) {
       throw new InvalidData("No class result elements found");
@@ -43,7 +43,7 @@ export function parseIOFXMLEventData(data: string): Results {
    // course data but not yet in a suitable form to return.
    const tempCourses: CourseDeatils[] = [];
 
-   // d3 map that maps course IDs plus comma-separated lists of controls
+   // Map that maps course IDs plus comma-separated lists of controls
    // to the temporary course with that ID and controls.
    // (We expect that all classes with the same course ID have consistent
    // controls, but we don't assume that.)    
@@ -52,7 +52,7 @@ export function parseIOFXMLEventData(data: string): Results {
    const warnings: string[] = [];
 
    classResultElements.forEach((classResultElement) => {
-      const parsedClass = parseClassData(classResultElement, reader, warnings);
+      const parsedClass = parseClassData(classResultElement, reader, warnings, xml);
       if (parsedClass === null) {
          // Class could not be parsed.
          return;
@@ -101,29 +101,6 @@ export function parseIOFXMLEventData(data: string): Results {
 // fortunately straightforward.
 const yearRegexp = /^\d{4}/;
 
-/**
-* Parses the given XML string and returns the parsed XML.
-* @sb-param {String} xmlString - The XML string to parse.
-* @sb-return {XMLDocument} The parsed XML document.
-*/
-function parseXml(xmlString: string): XMLDocument {
-   let xml: XMLDocument;
-   try {
-      xml = $.parseXML(xmlString);
-   } catch (e) {
-      throw new InvalidData("XML data not well-formed");
-   }
-
-   if ($(xml).find("> *").length === 0) {
-      // PhantomJS doesn't always fail parsing invalid XML; we may be
-      // left with 'xml' just containing the DOCTYPE and no root element.
-      throw new InvalidData("XML data not well-formed: " + xmlString);
-   }
-
-   return xml;
-}
-
-
 
 /**
 * Parses and returns a competitor name from the given XML element.
@@ -157,8 +134,8 @@ function readCompetitorName(nameElement: XmlQuery): FirstnameSurname {
 * @sb-param {Object} reader - XML reader used to assist with format-specific
 *     XML reading.
 */
-function validateData(xml: XMLDocument, reader: XMLReader) {
-   const rootElement = $(xml).find("> *");
+function validateData(xml: XmlDoc, reader: XMLReader) {
+   const rootElement = xml.find("> *");
    const rootElementNodeName = rootElement.prop("tagName");
 
    if (rootElementNodeName !== "ResultList") {
@@ -181,8 +158,8 @@ function validateData(xml: XMLDocument, reader: XMLReader) {
 * @sb-return {Object?} Object containing the competitor data, or null if no
 *     competitor could be read.
 */
-function parseCompetitor(element: XmlElement, number: number, reader: XMLReader, warnings: string[]) {
-   const jqElement = $(element);
+function parseCompetitor(element: XmlElement, number: number, reader: XMLReader, warnings: string[], xml: XmlDoc) {
+   const jqElement = queryElement(element);
 
    const nameElement = reader.getCompetitorNameElement(jqElement);
    const name = readCompetitorName(nameElement);
@@ -212,8 +189,8 @@ function parseCompetitor(element: XmlElement, number: number, reader: XMLReader,
    const route = reader.readRoute(resultElement);
 
    const splitTimes = resultElement.find("> SplitTime").toArray();
-   const splitData = splitTimes.filter((splitTime) => !reader.isAdditional($(splitTime)))
-      .map((splitTime) => reader.readSplitTime($(splitTime)));
+   const splitData = splitTimes.filter((splitTime) => !reader.isAdditional(queryElement(splitTime)))
+      .map((splitTime) => reader.readSplitTime(queryElement(splitTime)));
 
    const controls = splitData.map((datum) => datum.code);
    const cumTimes = splitData.map((datum) => datum.time);
@@ -261,8 +238,8 @@ function parseCompetitor(element: XmlElement, number: number, reader: XMLReader,
 * @sb-param {Array} warnings - Array to accumulate any warning messages within.
 * @sb-return {Object} Object containing parsed data.    
 */
-function parseClassData(element: XmlElement, reader: XMLReader, warnings: string[]) {
-   const jqElement = $(element);
+function parseClassData(element: XmlElement, reader: XMLReader, warnings: string[], xml: XmlDoc) {
+   const jqElement = queryElement(element);
    const cls = { name: '', competitors: Array<Competitor>(), controls: Array<string>(), warnings: Array<string>(), course: <CourseDeatils>null };
 
    cls.course = reader.readCourseFromClass(jqElement, warnings);
@@ -282,7 +259,7 @@ function parseClassData(element: XmlElement, reader: XMLReader, warnings: string
    }
 
    for (let index = 0; index < personResults.length; index += 1) {
-      const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings);
+      const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings, xml);
       if (competitorAndControls !== null) {
          const competitor = competitorAndControls.competitor;
          const controls = competitorAndControls.controls;

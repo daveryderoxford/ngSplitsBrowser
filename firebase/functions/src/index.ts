@@ -23,5 +23,8 @@ export {
 export {
    getResultsFile,
    saveResultsFile,
-   createEventWithResults
 } from "./results/results.js"
+
+export {
+   uploadResults
+} from "./results/uploadResultsHttp.js";

@@ -9,11 +9,6 @@ import { calculatePositions } from './ranking';
 export class Results {
 
   private allCompetitorsList: Competitor[] | undefined = undefined;
-  
-  readonly courses = this.allCourses.filter(c => !c.isScoreCourse);
-  readonly classes = this.allClasses.filter(c => !c.course.isScoreCourse);
-
-  warnings: string[] = [];
 
   /**
   * Contains all of the data for an event.
@@ -24,34 +19,42 @@ export class Results {
   * @sb-param {Array} warnings - Array of strings containing warning messages
   *     encountered when reading in the event data.
   */
-  constructor(public allClasses: CourseClass[],
+  constructor(
+    public allClasses: CourseClass[],
     public allCourses: Course[],
-    warnings?: string[],
+    public warnings: string[] = [],
     public eventName?: string,
-    public eventDate?: Date) {
-    if (warnings) {
-      this.warnings = warnings;
-    }
+    public eventDate?: Date) { }
+
+  /** Courses excluding any score courses */
+  public get courses() {
+    return this.allCourses.filter(c => !c.isScoreCourse);
   }
 
+  /** Classes excluding any score classes */
+  public get classes() {
+    return this.allClasses.filter(c => !c.course.isScoreCourse);
+  }
+
+  /** All competitors on non-score classes */
   get allCompetitors(): Competitor[] {
     if (!this.allCompetitorsList) {
-      const nonScoreClasses = this.classes.filter( c => !c.course.isScoreCourse);
+      const nonScoreClasses = this.classes.filter(c => !c.course.isScoreCourse);
       this.allCompetitorsList = [];
-      
-      nonScoreClasses.forEach((courseClass) => {
+
+      for (const courseClass of nonScoreClasses) {
         this.allCompetitorsList = this.allCompetitorsList.concat(courseClass.competitors);
-      });
+      }
     }
     return this.allCompetitorsList;
   }
 
-/**
-* Sets derived data for each competitor in each class.
-*
-* This method should be called after reading in the event data but before
-* attempting to plot it.
-*/
+  /**
+  * Sets derived data for each competitor in each class.
+  *
+  * This method should be called after reading in the event data but before
+  * attempting to plot it.
+  */
   public setDerivedData() {
     this.determineTimeLosses();
     this.determineClassPositions();

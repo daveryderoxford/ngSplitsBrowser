@@ -1,12 +1,17 @@
 
-import $ from 'jquery';
-import { Competitor, Course, CourseClass, InvalidData, Results, WrongFileFormat } from "../index.js";
-import { FirstnameSurname } from "../competitor.js";
-import { CourseDeatils, Version3Reader } from "./iof-xml-v3-reader.js";
+import { Competitor, FirstnameSurname } from "../model/competitor.js";
+import { CourseClass } from '../model/course-class.js';
+import { Course } from '../model/course.js';
+import { InvalidData, WrongFileFormat } from '../model/exception.js';
+import { Results } from '../model/results.js';
+import { Version2Reader } from "./server-iof-xml-v2-reader.js";
+import { CourseDeatils, Version3Reader } from './server-iof-xml-v3-reader.js';
+import { XmlDoc, XmlElement, XmlQuery, parseXml, queryElement } from "./xml-query.js";
 
-type XMLReader = Version3Reader;
+type XMLReader = Version2Reader | Version3Reader;
 
 const ALL_READERS = [
+   new Version2Reader(),
    new Version3Reader()
 ];
 
@@ -24,11 +29,11 @@ export function parseIOFXMLEventData(data: string): Results {
 
    validateData(xml, reader);
 
-   const eventElement = $("ResultList > Event", $(xml));
+   const rootElement = xml.root().find("*").first();
+   const eventElement = rootElement.find("> Event");
    const { eventName, eventDate } = parseEventDetails(eventElement);
 
-   const classResultElements = $("> ResultList > ClassResult", $(xml)).toArray();
-
+   const classResultElements: XmlElement[] = rootElement.find("> ClassResult").toArray();
    if (classResultElements.length === 0) {
       throw new InvalidData("No class result elements found");
    }
@@ -48,9 +53,10 @@ export function parseIOFXMLEventData(data: string): Results {
    const warnings: string[] = [];
 
    classResultElements.forEach((classResultElement) => {
-      const parsedClass = parseClassData(classResultElement, reader, warnings);
+      const parsedClass = parseClassData(classResultElement, reader, warnings, xml);
       if (parsedClass === null) {
          // Class could not be parsed.
+         console.log("iof-xml-reader:  Warning: Class data could not be parsed");
          return;
       }
 
@@ -58,13 +64,13 @@ export function parseIOFXMLEventData(data: string): Results {
       classes.push(courseClass);
 
       // Add to each temporary course object a list of all classes.
-      const tempCourse = parsedClass.course;
+      const tempCourse = parsedClass.course!;
       const courseKey = tempCourse.id + "," + parsedClass.controls.join(",");
 
       if (tempCourse.id !== null && coursesMap.has(courseKey)) {
          // We've come across this course before, so just add a class to
          // it.
-         coursesMap.get(courseKey).classes.push(courseClass);
+         coursesMap.get(courseKey)!.classes!.push(courseClass);
       } else {
          // New course.  Add some further details from the class.
          tempCourse.classes = [courseClass];
@@ -89,36 +95,13 @@ export function parseIOFXMLEventData(data: string): Results {
       warnings,
       eventName,
       eventDate,
-   );
+   ) 
 }
 
 // Regexp that matches the year in an ISO-8601 date.
 // Both XML formats use ISO-8601 (YYYY-MM-DD) dates, so parsing is
 // fortunately straightforward.
 const yearRegexp = /^\d{4}/;
-
-/**
-* Parses the given XML string and returns the parsed XML.
-* @sb-param {String} xmlString - The XML string to parse.
-* @sb-return {XMLDocument} The parsed XML document.
-*/
-function parseXml(xmlString: string): XMLDocument {
-   let xml: XMLDocument;
-   try {
-      xml = $.parseXML(xmlString);
-   } catch (e) {
-      throw new InvalidData("XML data not well-formed");
-   }
-
-   if ($("> *", $(xml)).length === 0) {
-      // PhantomJS doesn't always fail parsing invalid XML; we may be
-      // left with 'xml' just containing the DOCTYPE and no root element.
-      throw new InvalidData("XML data not well-formed: " + xmlString);
-   }
-
-   return xml;
-}
-
 
 
 /**
@@ -132,10 +115,10 @@ function parseXml(xmlString: string): XMLDocument {
 *     PersonName or Name element.
 * @sb-return {Name object} Name read from the element.
 */
-function readCompetitorName(nameElement: JQuery<HTMLElement>): FirstnameSurname {
+function readCompetitorName(nameElement: XmlQuery): FirstnameSurname {
 
-   const forename = $("> Given", nameElement).text();
-   const surname = $("> Family", nameElement).text();
+   const forename = nameElement.find("> Given").text();
+   const surname = nameElement.find("> Family").text();
 
    return ({
       firstname: forename,
@@ -153,11 +136,11 @@ function readCompetitorName(nameElement: JQuery<HTMLElement>): FirstnameSurname 
 * @sb-param {Object} reader - XML reader used to assist with format-specific
 *     XML reading.
 */
-function validateData(xml: XMLDocument, reader: XMLReader) {
-   const rootElement = $("> *", xml);
-   const rootElementNodeName = rootElement.prop("tagName");
+function validateData(xml: XmlDoc, reader: XMLReader) {
+   const rootElement = xml.root().find("*").first(); // Cheerio requires .root() to query from the document root
+   const rootElementNodeName = rootElement.prop("tagName")?.toLowerCase();
 
-   if (rootElementNodeName !== "ResultList") {
+   if (rootElementNodeName !== "resultlist") {
       throw new WrongFileFormat("Root element of XML document does not have expected name 'ResultList', got '" +
          rootElementNodeName + "'");
    }
@@ -177,14 +160,14 @@ function validateData(xml: XMLDocument, reader: XMLReader) {
 * @sb-return {Object?} Object containing the competitor data, or null if no
 *     competitor could be read.
 */
-function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader, warnings: string[]) {
-   const jqElement = $(element);
+function parseCompetitor(element: XmlElement, number: number, reader: XMLReader, warnings: string[], xml: XmlDoc) {
+   const jqElement = queryElement(element, xml); // Cheerio's query function requires the xml document context
 
    const nameElement = reader.getCompetitorNameElement(jqElement);
    const name = readCompetitorName(nameElement);
 
    if ((name.surname === "") && (name.firstname === "")) {
-      warnings.push("Could not find a name for a competitor");
+      addWarning(warnings, "Could not find a name for a competitor");
       return null;
    }
 
@@ -194,11 +177,11 @@ function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader
    const regexResult = yearRegexp.exec(dateOfBirth?.toString());
    const yearOfBirth = (regexResult === null) ? null : parseInt(regexResult[0], 10);
 
-   const gender = $("> Person", jqElement).attr("sex");
+   const gender = jqElement.find("> Person").attr("sex");
 
-   const resultElement = $("Result", jqElement);
+   const resultElement = jqElement.find("Result");
    if (resultElement.length === 0) {
-      warnings.push("Could not find any result information for competitor '" + name + "'");
+      addWarning(warnings, "Could not find any result information for competitor '" + name + "'");
       return null;
    }
 
@@ -207,9 +190,9 @@ function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader
    const ecard = reader.readECard(resultElement);
    const route = reader.readRoute(resultElement);
 
-   const splitTimes = $("> SplitTime", resultElement).toArray();
-   const splitData = splitTimes.filter((splitTime) => !reader.isAdditional($(splitTime)))
-      .map((splitTime) => reader.readSplitTime($(splitTime)));
+   const splitTimes: XmlElement[] = resultElement.find("> SplitTime").toArray();
+   const splitData = splitTimes.filter((splitTime) => !reader.isAdditional(queryElement(splitTime, xml))) // Cheerio's query function requires the xml document context
+      .map((splitTime) => reader.readSplitTime(queryElement(splitTime, xml))); // Cheerio's query function requires the xml document context
 
    const controls = splitData.map((datum) => datum.code);
    const cumTimes = splitData.map((datum) => datum.time);
@@ -257,9 +240,15 @@ function parseCompetitor(element: HTMLElement, number: number, reader: XMLReader
 * @sb-param {Array} warnings - Array to accumulate any warning messages within.
 * @sb-return {Object} Object containing parsed data.    
 */
-function parseClassData(element: HTMLElement, reader: XMLReader, warnings: string[]) {
-   const jqElement = $(element);
-   const cls = { name: '', competitors: Array<Competitor>(), controls: Array<string>(), warnings: Array<string>(), course: <CourseDeatils>null };
+function parseClassData(element: XmlElement, reader: XMLReader, warnings: string[], xml: XmlDoc) {
+   const jqElement = queryElement(element, xml); // Cheerio's query function requires the xml document context
+   const cls = { 
+      name: '', 
+      competitors: Array<Competitor>(), 
+      controls: Array<string>(), 
+      warnings: Array<string>(), 
+      course: <CourseDeatils | null>null 
+   };
 
    cls.course = reader.readCourseFromClass(jqElement, warnings);
 
@@ -271,14 +260,14 @@ function parseClassData(element: HTMLElement, reader: XMLReader, warnings: strin
 
    cls.name = className;
 
-   const personResults = $("> PersonResult", jqElement);
+   const personResults = jqElement.find("> PersonResult");
    if (personResults.length === 0) {
-      warnings.push("Class '" + className + "' has no competitors");
+      addWarning(warnings, "Class '" + className + "' has no competitors");
       return null;
    }
 
    for (let index = 0; index < personResults.length; index += 1) {
-      const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings);
+      const competitorAndControls = parseCompetitor(personResults[index], index + 1, reader, warnings, xml);
       if (competitorAndControls !== null) {
          const competitor = competitorAndControls.competitor;
          const controls = competitorAndControls.controls;
@@ -314,7 +303,7 @@ function parseClassData(element: HTMLElement, reader: XMLReader, warnings: strin
          if (warning === null) {
             cls.competitors.push(competitor);
          } else {
-            warnings.push(warning);
+            addWarning(warnings, warning);
          }
       }
    }
@@ -351,19 +340,23 @@ function determineReader(data: string) {
 
    throw new WrongFileFormat("Data apparently not of any recognised IOF XML format");
 }
-function parseEventDetails(eventElement: JQuery<HTMLElement>): { eventName: string | undefined, eventDate: Date | undefined; } {
+function parseEventDetails(eventElement: XmlQuery): { eventName: string | undefined, eventDate: Date | undefined; } {
    let eventName: string | undefined;
    let eventDate: Date | undefined;
 
-   const nameElement = $("Name", eventElement);
+   const nameElement = eventElement.find("Name");
    if (nameElement) {
       eventName = nameElement.text()?.trim();
    }
 
-   const dateElement = $("StartTime > Date", eventElement);
+   const dateElement = eventElement.find("StartTime > Date");
    if (dateElement) {
       eventDate = new Date(dateElement.text().trim());
    }
 
    return { eventName, eventDate };
+}
+
+function addWarning( warnings: string[], msg: string) {
+   addWarning(warnings, msg);
 }

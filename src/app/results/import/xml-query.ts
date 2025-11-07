@@ -1,12 +1,32 @@
-//import { Cheerio, Element } from 'cheerio';
 import $ from 'jquery';
-/**
- * This type alias represents either a jQuery object on the client
- * or a Cheerio selection on the server. Since their APIs for what we
- * are using (.find, .attr, .text) are identical, we can use one type.
- */
-//export type XmlQuery = Cheerio<Element>;
-//export type XmlElement = Element;
+import { InvalidData } from '../model';
 
-export type XmlQuery = JQuery<Element>
+export type XmlDoc = JQuery<XMLDocument | Document>;
+export type XmlQuery = JQuery<Element>;
 export type XmlElement = HTMLElement;
+
+/**
+* Parses the given XML string and returns the parsed XML.
+* @param xmlString - The XML string to parse.
+* @returns The parsed XML document, wrapped in a jQuery object.
+*/
+export function parseXml(xmlString: string): XmlDoc {
+   let xml: XMLDocument;
+   try {
+      xml = $.parseXML(xmlString);
+   } catch (e) {
+      throw new InvalidData("XML data not well-formed");
+   }
+
+   if ($(xml).find("> *").length === 0) {
+      // PhantomJS doesn't always fail parsing invalid XML; we may be
+      // left with 'xml' just containing the DOCTYPE and no root element.
+      throw new InvalidData("XML data not well-formed: " + xmlString);
+   }
+
+   return $(xml);
+}
+
+export function queryElement(element: XmlElement): XmlQuery {
+   return $(element);
+}

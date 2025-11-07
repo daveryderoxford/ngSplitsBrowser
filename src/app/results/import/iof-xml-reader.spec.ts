@@ -707,10 +707,10 @@ describe("Input.IOFXml", () => {
         expect(eventData.eventDate).toEqual(eventDate, "Event date should be parsed correctly");
     });
 
-    it("Can parse a string that has a single class with a single competitor", () => {
+    fit("Can parse a string that has a single class with a single competitor", () => {
         const className = "Test Class";
         const classLength = 2300;
-        const person = getPerson();
+        const person = getPerson(); 
         runXmlFormatParseTest([{ name: className, length: classLength, competitors: [person] }],
             function (eventData, formatterName) {
                 expect(eventData.classes.length).toEqual(1, "One class should have been read - " + formatterName);

@@ -21,6 +21,7 @@
     "@types/node": "^20.10.5",
     "@types/request": "^2.48.12",
     "@types/request-promise": "^4.1.51",
+    "cheerio": "^1.1.2",
     "date-fns": "^3.1.0",
     "firebase-admin": "^12.1.0",
     "firebase-functions": "^5.0.1",
@@ -42,8 +43,8 @@
     "firebase-functions-test": "^3.4.1",
     "mocha": "^10.8.2",
     "sinon": "^21.0.0",
-    "typescript": "^5.3.3",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "private": true
 }

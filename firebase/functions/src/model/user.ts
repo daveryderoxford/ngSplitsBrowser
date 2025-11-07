@@ -1,7 +1,6 @@
 
 /** data associated with a user */
 import { OEvent } from './oevent.js';
-import { sbTime } from './time.js';
 
 /** All the user data stored for the user */
 export interface UserData {
@@ -30,12 +29,12 @@ export interface UserResult {
         courseclass: string;
         coursePosition: number;
         classPosition: number;
-        totalTime: sbTime;
+        totalTime: number;
         distance: number;
         climb: number;
         courseWinner: string;
-        courseWinningTime: sbTime;
+        courseWinningTime: Number;
         classWinner: string;
-        classWinningTime: sbTime;
+        classWinningTime: number;
     };
 }

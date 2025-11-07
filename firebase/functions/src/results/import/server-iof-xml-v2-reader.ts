@@ -1,7 +1,8 @@
-import { isUndefined } from "./util";
-import { InvalidData, TimeUtilities, WrongFileFormat } from "../model";
-import { CourseDeatils, IOFXMLReader } from "./iof-xml-v3-reader";
-import { XmlQuery } from './xml-query';
+import { isUndefined } from "./util.js";
+import { CourseDeatils, IOFXMLReader } from "./server-iof-xml-v3-reader.js";
+import { InvalidData, WrongFileFormat } from '../model/exception.js';
+import { XmlQuery } from './xml-query.js';
+import { TimeUtilities } from '../model/time.js';
 
 // Object that contains various functions for parsing bits of data from
 // IOF v2.0.3 XML event data.
@@ -133,7 +134,7 @@ export class Version2Reader implements IOFXMLReader {
     *     PersonResult element.
     * @sb-return {String} Competitor's club name.
     */
-    readClubName(element: XmlQuery): string {
+    readClubName(element: XmlQuery) {
         return element.find("> Club > ShortName").text();
     }
 
@@ -168,7 +169,7 @@ export class Version2Reader implements IOFXMLReader {
     * @sb-return {?Number} - The competitor's total time in seconds, or
     *     null if a valid time was not found.
     */
-    readTotalTime(resultElement: XmlQuery): number | null {
+    readTotalTime(resultElement: XmlQuery) {
         const totalTimeStr = resultElement.find("> Time").text();
         const totalTime = (totalTimeStr === "") ? null : TimeUtilities.parseTime(totalTimeStr);
         return totalTime;

@@ -7,11 +7,6 @@ export class Results {
 
   private allCompetitorsList: Competitor[] | undefined = undefined;
   
-  readonly courses = this.allCourses.filter(c => !c.isScoreCourse);
-  readonly classes = this.allClasses.filter(c => !c.course.isScoreCourse);
-
-  warnings: string[] = [];
-
   /**
   * Contains all of the data for an event.
   * @sb-param {Array} classes - Array of CourseClass objects representing all of
@@ -23,12 +18,16 @@ export class Results {
   */
   constructor(public allClasses: CourseClass[],
     public allCourses: Course[],
-    warnings?: string[],
+    public warnings: string[] = [],
     public eventName?: string,
-    public eventDate?: Date) {
-    if (warnings) {
-      this.warnings = warnings;
-    }
+    public eventDate?: Date) {}
+
+  public get courses() {
+    return this.allCourses.filter(c => !c.isScoreCourse);
+  }
+
+  public get classes() {
+    return this.allClasses.filter(c => !c.course.isScoreCourse);
   }
 
   get allCompetitors(): Competitor[] {
@@ -40,7 +39,7 @@ export class Results {
         this.allCompetitorsList = this.allCompetitorsList.concat(courseClass.competitors);
       });
     }
-    return this.allCompetitorsList;
+    return this.allCompetitorsList!;
   }
 
 /**

@@ -1,20 +1,12 @@
 
 // Results imnput parser.
 
-import { WrongFileFormat } from '../exception.js';
-import { Results } from '../results.js';
-import { parseTripleColumnEventData } from "./alternative-cvs-reader.js";
-import { parseCSVEventData } from "./cvs-reader.js";
-import { parseHTMLEventData } from "./html-reader.js";
-import { parseIOFXMLEventData } from "./iof-xml-reader.js";
-import { parseOEEventData } from "./oe-reader.js";
+import { WrongFileFormat } from '../model/exception.js';
+import { Results } from '../model/results.js';
+import { parseIOFXMLEventData } from "./server-iof-xml-reader.js";
 
 // All the parsers for parsing event data that are known about.
 const PARSERS = [
-   parseCSVEventData,
-   parseOEEventData,
-   parseHTMLEventData,
-   parseTripleColumnEventData,
    parseIOFXMLEventData
 ];
 

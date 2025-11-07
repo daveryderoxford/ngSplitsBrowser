@@ -2,6 +2,7 @@ import { ascending as d3_ascending } from "d3-array";
 import { CourseClass } from "./course-class.js";
 import { sbTime } from "./time.js";
 import { InvalidData } from './exception.js';
+import { isNaNStrict, isNotNull } from './results_util.js';
 
 export type Genre = "M" | "F";
 
@@ -14,8 +15,6 @@ export interface FirstnameSurname {
     firstname: string;
     surname: string;
 }
-
-const NUMBER_TYPE = typeof 0;
 
 /**
 * Returns the difference of two numbers, or null if either is null.

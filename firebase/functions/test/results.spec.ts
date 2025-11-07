@@ -192,7 +192,7 @@ describe('Results Cloud Functions', function () {
   });
 
   // For onRequest functions, call the handler directly with mock req and res.
-  describe.only('createEventWithResults', () => {
+  describe('uploadResults', () => {
     const VALID_API_KEY = 'test-api-key';
 
     before(() => {
@@ -203,22 +203,48 @@ describe('Results Cloud Functions', function () {
       delete process.env['UPLOAD_API_KEY'];
     });
 
-    it('should create an event and save results for a valid POST request', async () => {
+    it('should create an event, parse results, generate summary and save results for a valid POST request', async () => {
       const eventData: Partial<OEvent> = {
         name: 'API Created Event',
         club: 'API Club',
         date: new Date(),
       };
-      const resultsData = 'col1;col2\nval1;val2';
+     // const resultsData = 'col1;col2\nval1;val2';
+
+      const testResultsData = `<?xml version="1.0" encoding="UTF-8"?>
+<ResultList ioaVersion="3.0" status="Complete" creator="testing">
+  <Event>
+    <Name>Test Event</Name>
+    <StartTime>
+      <Date>2025-11-03</Date>
+    </StartTime>
+  </Event>
+  <ClassResult>
+    <Class>
+      <Name>M21</Name>
+    </Class>
+    <PersonResult>
+      <Person>
+        <Name>
+          <Family>Doe</Family>
+          <Given>John</Given>
+        </Name>
+      </Person>
+      <Result>
+        <Time>600</Time>
+        <Status>OK</Status>
+      </Result>
+    </PersonResult>
+  </ClassResult>
+</ResultList>`;
 
       const { req, res } = mockHttpRequest('POST', {
         eventData,
-        resultsData,
+        resultsData: testResultsData,
         apiKey: VALID_API_KEY,
       });
 
-      // For onRequest functions, call the handler directly with mock req and res.
-      await context.myFunctions.createEventWithResults(req as any, res as any);
+      await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
 
@@ -235,11 +261,16 @@ describe('Results Cloud Functions', function () {
       expect(savedEvent).to.exist;
       expect(savedEvent!.name).to.equal(eventData.name);
       expect(savedEvent!.club).to.equal(eventData.club);
+      expect(savedEvent!.summary).to.exist;
+      expect(savedEvent!.summary!.numcompetitors).to.equal(1);
+      expect(savedEvent!.summary!.courses).to.have.lengthOf(1);
+      expect(savedEvent!.summary!.courses[0].name).to.equal('M21');
+      expect(savedEvent!.summary!.courses[0].numcompetitors).to.equal(1);
 
       // 3. Assert Storage file creation
-      const expectedPath = `results/third-party/${eventKey}-results`;
+      const expectedPath = `results/Third/${eventKey}-results`;
       const savedContent = await readFile(context.storage.bucket(), expectedPath);
-      expect(savedContent).to.equal(resultsData);
+      expect(savedContent).to.equal(testResultsData);
     });
 
     it('should return 401 Unauthorized for an invalid API key', async () => {
@@ -249,7 +280,7 @@ describe('Results Cloud Functions', function () {
         apiKey: 'invalid-key',
       });
 
-      await context.myFunctions.createEventWithResults(req as any, res as any);
+      await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
       expect(status).to.equal(401);
@@ -262,17 +293,36 @@ describe('Results Cloud Functions', function () {
         apiKey: VALID_API_KEY,
       });
 
-      await context.myFunctions.createEventWithResults(req as any, res as any);
+      await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
       expect(status).to.equal(400);
       expect(body.error).to.contain('must be called with "eventData" and "resultsData"');
     });
 
+    it('should return 500 Internal Server Error for invalid resultsData', async () => {
+      const eventData: Partial<OEvent> = {
+        name: 'Invalid Results Event',
+        club: 'Test Club',
+        date: new Date(),
+      };
+      const { req, res } = mockHttpRequest('POST', {
+        eventData,
+        resultsData: 'this is not valid xml or any other format',
+        apiKey: VALID_API_KEY,
+      });
+
+      await context.myFunctions.uploadResults(req as any, res as any);
+
+      const { status, body } = res.getSent();
+      expect(status).to.equal(500);
+      expect(body.error).to.equal('Error parsing results file');
+    });
+
     it('should return 405 Method Not Allowed for non-POST requests', async () => {
       const { req, res } = mockHttpRequest('GET', {});
 
-      await context.myFunctions.createEventWithResults(req as any, res as any);
+      await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
       expect(status).to.equal(405);
@@ -282,7 +332,7 @@ describe('Results Cloud Functions', function () {
     it('should handle OPTIONS preflight request', async () => {
       const { req, res } = mockHttpRequest('OPTIONS', {});
       // For onRequest functions, call the handler directly with mock req and res.
-      await context.myFunctions.createEventWithResults(req as any, res as any);
+      await context.myFunctions.uploadResults(req as any, res as any);
       const { status} = res.getSent();
       expect(status).to.equal(204);
     });
