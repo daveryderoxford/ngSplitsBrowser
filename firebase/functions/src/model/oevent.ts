@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
-export type EventGrade = "IOF" | "International" | "National" | "Regional" | "Club" | "Local";
+export type EventGrade = "IOF" | "International" | "National" | "Regional" | "Club" | "Local" | "Unknown";
 
 export class EventGrades {
     static grades: Array<EventGrade> = ["IOF", "International", "National", "Regional", "Club", "Local"];
@@ -27,9 +27,9 @@ export class EventTypes {
     static types: Array<EventType> = ["Foot", "Bike", "Ski", "Trail", "Other"];
 }
 
-export type ControlCardType = "SI" | "Emit" | "Other";
+export type ControlCardType = "SI" | "Emit" | "Unknown";
 export class ControlCardTypes {
-    static types: Array<ControlCardType> = ["SI", "Emit", "Other"];
+    static types: Array<ControlCardType> = ["SI", "Emit", "Unknown"];
 }
 
 export type SplitsFileFormat = "auto" | "IOFv3" | "IOFv2" | "SICSV" | "SBCSV" | "SIHTML" | "ABMHTML";
@@ -79,24 +79,38 @@ export interface CourseSummary {
     classes: Array<string>;
 }
 
+
 /** Helper function to create a complete OEvent object for tests. */
-export function createEvent(partialEvent: Partial<OEvent>): OEvent {
+export function createEvent(
+    key: string,
+    userId: string,
+    partialEvent: Partial<EventInfo>): OEvent {
+    
     const now = new Date();
-    const defaults: OEvent = {
-        key: 'test-key',
-        name: 'Test Event',
-        club: 'TESTCLUB',
+
+    const defaults: Partial<EventInfo> = {
+        name: 'Unknown',
+        club: 'UNKNOWN',
         nationality: 'GBR',
         date: now,
-        discipline: 'Long',
+        discipline: 'Unknown',
         type: 'Foot',
-        userId: 'test-user-id',
-        grade: 'Regional',
-        webpage: 'http://example.com',
-        email: 'test@example.com',
-        controlCardType: 'SI',
-        yearIndex: now.getFullYear(),
-        gradeIndex: EventGrades.indexObject('Regional'),
+        grade: 'Unknown',
+        webpage: '',
+        email: '',
+        controlCardType: 'Unknown',
     };
-    return { ...defaults, ...partialEvent };
+
+    const evt = { 
+        ...defaults, 
+        ...partialEvent,
+        key: key,
+        userId: userId
+    } as OEvent;
+
+    //Derived fields
+    evt.yearIndex = evt.date.getFullYear();
+    evt.gradeIndex = EventGrades.indexObject(evt.grade);
+
+    return evt;
 }

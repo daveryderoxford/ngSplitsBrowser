@@ -50,11 +50,7 @@ describe('Club Index Cloud Functions', function () {
 
    describe('clubsEventCreated', () => {
       it('should create a new club if one does not exist', async () => {
-         const eventData = createEvent({
-            key: 'evt1',
-            club: 'TEST',
-            nationality: 'GBR',
-         });
+         const eventData = createEvent('evt1', SUPER_USER_UID, { club: 'TEST', nationality: 'GBR' });
 
          await saveEvent(context.db, eventData);
 
@@ -69,9 +65,9 @@ describe('Club Index Cloud Functions', function () {
       it('should update event count if club already exists', async () => {
          // Arrange: The database contains three events for the same club.
          // The function should correctly count all of them when triggered.
-         const evt1 = createEvent({ key: 'evt1', name: 'Event 1', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-01') });
-         const evt2 = createEvent({ key: 'evt2', name: 'Event 2', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-02') });
-         const evt3 = createEvent({ key: 'evt3', name: 'Event 3', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-03') });
+         const evt1 = createEvent('evt1', SUPER_USER_UID, { name: 'Event 1', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-01') });
+         const evt2 = createEvent('evt2', SUPER_USER_UID, { name: 'Event 2', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-02') });
+         const evt3 = createEvent('evt3', SUPER_USER_UID, { name: 'Event 3', club: 'EXIST', nationality: 'USA', date: new Date('2023-01-03') });
 
          await saveEvent(context.db, evt1);
          await saveEvent(context.db, evt2);
@@ -93,8 +89,8 @@ describe('Club Index Cloud Functions', function () {
       it('should decrement event count and update club if count is greater than zero', async () => {
 
          // Setup: A club with two events. We will delete the newer one.
-         const olderEvent = createEvent({ key: 'evtOlder', club: 'MULTI', nationality: 'AUS', date: new Date('2023-01-01') });
-         const newerEvent = createEvent({ key: 'evtNewer', club: 'MULTI', nationality: 'AUS', date: new Date('2023-02-01') });
+         const olderEvent = createEvent('evtOlder', SUPER_USER_UID, { club: 'MULTI', nationality: 'AUS', date: new Date('2023-01-01') });
+         const newerEvent = createEvent('evtNewer', SUPER_USER_UID, { club: 'MULTI', nationality: 'AUS', date: new Date('2023-02-01') });
 
          // set database state when trigger is fired
          // newer event is not saved as it will have been deleted before clubsEventDeleted is called
@@ -113,12 +109,7 @@ describe('Club Index Cloud Functions', function () {
       });
 
       it('should Delete club if count reaches zero', async () => {
-         const eventData = createEvent({
-            key: 'evt3',
-            name: 'Event to Delete',
-            club: 'SOLO',
-            nationality: 'CAN',
-         });
+         const eventData = createEvent('evt3', SUPER_USER_UID, { name: 'Event to Delete', club: 'SOLO', nationality: 'CAN' });
          const existingClub = createClub({ name: 'SOLO', nationality: 'CAN', numEvents: 1 });
 
          // Set database state prior to event being triggered.  Event not saved for delete trigger. 
@@ -139,13 +130,13 @@ describe('Club Index Cloud Functions', function () {
       it('should update club counts when an event changes club', async () => {
          // Arrange: Define the state of the database *after* the update.
          // oldClub will have 2 events remaining.
-         const oldClubEvent1 = createEvent({ key: 'evtOld1', club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-03-01') });
-         const oldClubEvent2 = createEvent({ key: 'evtOld2', club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-01-01') });
+         const oldClubEvent1 = createEvent('evtOld1', SUPER_USER_UID, { club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-03-01') });
+         const oldClubEvent2 = createEvent('evtOld2', SUPER_USER_UID, { club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-01-01') });
          // newClub will have 2 events, including the one that was moved.
-         const newClubEvent1 = createEvent({ key: 'evtNew1', club: 'NEWCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
+         const newClubEvent1 = createEvent('evtNew1', SUPER_USER_UID, { club: 'NEWCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
 
-         const beforeEvent = createEvent({ key: 'evtOld3', club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
-         const afterEvent = {...beforeEvent, club: 'NEWCLUB'};
+         const beforeEvent = createEvent('evtOld3', SUPER_USER_UID, { club: 'OLDCLUB', nationality: 'GBR', date: new Date('2023-02-01') });
+         const afterEvent = { ...beforeEvent, club: 'NEWCLUB' };
 
          // The function under test recalculates club stats from scratch based on the
          // events in the database. Therefore, we don't need to save initial club
@@ -182,9 +173,9 @@ describe('Club Index Cloud Functions', function () {
          const existingClub = createClub({ name: 'MULTI', nationality: 'AUS', numEvents: 5, lastEvent: new Date() });
          await saveClub(context.db, existingClub); // This club should be deleted
 
-         const evt1 = createEvent({ key: 'evt1', club: 'TEST', nationality: 'GBR', date: new Date('2023-01-01') });
-         const evt2 = createEvent({ key: 'evt2', club: 'TEST', nationality: 'GBR', date: new Date('2023-02-01') });
-         const evt3 = createEvent({ key: 'evt3', club: 'MULTI', nationality: 'AUS' });
+         const evt1 = createEvent('evt1', SUPER_USER_UID, { club: 'TEST', nationality: 'GBR', date: new Date('2023-01-01') });
+         const evt2 = createEvent('evt2', SUPER_USER_UID, { club: 'TEST', nationality: 'GBR', date: new Date('2023-02-01') });
+         const evt3 = createEvent('evt3', SUPER_USER_UID, { club: 'MULTI', nationality: 'AUS' });
 
          await saveEvent(context.db, evt1);
          await saveEvent(context.db, evt2);

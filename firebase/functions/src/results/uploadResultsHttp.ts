@@ -2,7 +2,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { log, error } from 'firebase-functions/logger';
 import { onRequest } from 'firebase-functions/v2/https';
 import { eventConverter } from '../model/event-firebase-converters.js';
-import { CourseSummary, EventSummary, OEvent } from '../model/oevent.js';
+import { CourseSummary, createEvent, EventInfo, EventSummary } from '../model/oevent.js';
 import { getStorageFile } from './results.js';
 import { parseEventData } from './import/import.js';
 import { Repairer } from './model/repairer.js';
@@ -10,7 +10,8 @@ import { Results } from './model/results.js';
 import { Course } from './model/course.js';
 
 export interface addResultsHttp {
-  eventData: Partial<OEvent>;
+  eventData: Partial<EventInfo>;
+  userId: string;
   resultsData: string;
   apiKey: string;
 }
@@ -25,6 +26,7 @@ export interface addResultsHttp {
 -H "Content-Type: application/json" \
 -d '{
       "apiKey": "YOUR_API_KEY",
+      "userId": "abecd23456",
       "eventData": {
         "name": "My Awesome Event",
         "date": "2024-07-29T10:00:00.000Z",
@@ -58,31 +60,36 @@ export const uploadResults = onRequest(async (request, response) => {
 
   log(`createEventWithResults: Creating event and uploading results for: ${request.body.eventData?.name}`);
 
-  const { eventData, resultsData, apiKey } = request.body as addResultsHttp;
+  const { eventData, userId, resultsData, apiKey } = request.body as addResultsHttp;
 
   if (!isValidApiKey(apiKey)) {
     response.status(401).json({ error: 'A valid API key is required.' });
     return;
   }
 
-  if (!eventData || !resultsData) {
-    response.status(400).json({ error: 'The function must be called with "eventData" and "resultsData".' });
+  if (!eventData || !userId || !resultsData) {
+    response.status(400).json({ error: 'The function must be called with "eventData", "resultsData" and "userId".' });
     return;
   }
 
-  const newEvent = {
-    ...eventData,
-    userId: 'Third'
-  } as OEvent;
+  const requiredFields: Array<keyof EventInfo> = ['name', 'date', 'club', 'nationality'];
+  const missingFields = requiredFields.filter(field => !eventData[field]);
+
+  if (missingFields.length > 0) {
+    response.status(400).json({
+      error: `Missing required fields in eventData: ${missingFields.join(', ')}`
+    });
+    return;
+  }
 
   // Validate results file ancd create event summary
+  let results: Results = null;
   try {
-    const results = parseEventData(resultsData);
+    results = parseEventData(resultsData);
     if (results.needsRepair) {
       Repairer.repairEventData(results);
     }
 
-    newEvent.summary = populateSummary(results);
   } catch (err: any) {
     error(`createEventWithResults: Error parsing results data ${eventData.name}.`, err);
     response.status(500).json({ error: 'Error parsing results file' });
@@ -92,7 +99,9 @@ export const uploadResults = onRequest(async (request, response) => {
   // Generate firestore Id
   const db = getFirestore();
   const newEventRef = db.collection('events').doc().withConverter(eventConverter);
-  newEvent.key = newEventRef.id;
+
+  const newEvent = createEvent(newEventRef.id, userId, eventData as EventInfo);
+  newEvent.summary = populateSummary(results);
 
   try {
     // Upload results to storage

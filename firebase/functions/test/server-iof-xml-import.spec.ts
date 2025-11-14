@@ -10,7 +10,7 @@ const V3_FOOTER = '</ResultList>';
 const V2_HEADER = '<?xml version="1.0" ?>\n<!DOCTYPE RESULTLIST SYSTEM "IOFdata.dtd">\n<ResultList> <IOFVersion version="2.0.3" />';
 const V2_FOOTER = '</ResultList>';
 
-describe.only('IOF XML Reader (Server-Side)', () => {
+describe('IOF XML Reader (Server-Side)', () => {
 
    describe('Format Recognition', () => {
       it('should throw WrongFileFormat for empty string', () => {
@@ -24,8 +24,6 @@ describe.only('IOF XML Reader (Server-Side)', () => {
       it('should throw WrongFileFormat for XML that is not an IOF format', () => {
          expect(() => parseIOFXMLEventData("<root><item>1</item></root>")).to.throw().instanceOf(WrongFileFormat);
       });
-
-      
 
       it('should correctly identify and parse a valid v3.0 file', () => {
          const xml = `${V3_HEADER}
