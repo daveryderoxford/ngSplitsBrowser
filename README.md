@@ -1,9 +1,9 @@
 # Splitsbrowser
 
-Dsiplay and analysis of orienteering results split times.
+Display and analysis of orienteering results split times.
 
-Supports upload of event results by organisers and from other results repositories in a variabey of formats. 
+Supports upload of event results by organisers and from other results repositories in a variety of formats. 
 
-Further information on [https://github.com/daveryderoxford/ngSplitsBrowser/wiki](Wiki)
+Live website: [https://www.splitsbrowser.org.uk](www.splitsbrowser.org.uk)
 
-
+See [https://github.com/daveryderoxford/ngSplitsBrowser/wiki](Wiki) for further information.
