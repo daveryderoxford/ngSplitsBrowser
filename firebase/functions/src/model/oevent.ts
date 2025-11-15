@@ -1,4 +1,3 @@
-import { Timestamp } from 'firebase-admin/firestore';
 
 export type EventGrade = "IOF" | "International" | "National" | "Regional" | "Club" | "Local" | "Unknown";
 
@@ -58,7 +57,6 @@ export interface EventInfo {
 }
 
 export interface SplitsFileInfo {
-    date: Timestamp;
     uploadDate: Date;
     splitsFilename: string;
     splitsFileFormat: SplitsFileFormat;

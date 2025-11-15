@@ -1,5 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 import { log, error } from 'firebase-functions/logger';
+import { defineSecret } from 'firebase-functions/params';
 import { onRequest } from 'firebase-functions/v2/https';
 import { eventConverter } from '../model/event-firebase-converters.js';
 import { CourseSummary, createEvent, EventInfo, EventSummary } from '../model/oevent.js';
@@ -15,33 +17,31 @@ export interface addResultsHttp {
   resultsData: string;
   apiKey: string;
 }
+
+const uploadApiKeySecret = defineSecret('UPLOAD_API_KEY');
+
 /**
  * Creates an event and uploads a results file. This function is intended for use by trusted third parties
  * and requires an API key for authentication.
  *
  * Example usage:
  *
- 
- curl -X POST "YOUR_FUNCTION_URL" \
+curl -X POST "https://us-central1-splitsbrowser-b5948.cloudfunctions.net/uploadResults" \
 -H "Content-Type: application/json" \
 -d '{
-      "apiKey": "YOUR_API_KEY",
-      "userId": "abecd23456",
-      "eventData": {
-        "name": "My Awesome Event",
-        "date": "2024-07-29T10:00:00.000Z",
-        "club": "My Club",
-        "nationality": "GBR",
-        "grade": "National",
-        "discipline": "Long",
-        "type": "Foot",
-        "webpage": "http://example.com",
-        "controlCardType": "SI"
-      },
-      "resultsData": "Stno;Name;Time;\\n1;First Runner;12:34;\\n2;Second Runner;15:01;"
-    }'
+   "apiKey": "MY_API_KEY",
+   "userId": "f8HlxQcl0AZBPrd4IHvTEGFH4Uv2",
+   "eventData": {
+      "name": "Forest Challenge",
+      "date": "2024-08-15T11:00:00.000Z",
+      "club": "FOREST",
+      "nationality": "SWE",
+      "discipline": "Long"
+   },
+   "resultsData": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><ResultList xmlns=\"http://www.orienteering.org/datastandard/3.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" iofVersion=\"3.0\"><ClassResult><Class><Name>Blue</Name></Class><PersonResult><Person><Name><Family>Smith</Family><Given>John</Given></Name></Person><Result><FinishTime>2024-08-15T11:47:32+02:00</FinishTime><Time>2552.0</Time><Status>OK</Status></Result></PersonResult></ClassResult></ResultList>"
+}'
  */
-export const uploadResults = onRequest(async (request, response) => {
+export const uploadResults = onRequest({ secrets: [uploadApiKeySecret] }, async (request, response) => {
   // Set CORS headers for preflight and actual requests
   response.set('Access-Control-Allow-Origin', '*');
   response.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -63,12 +63,31 @@ export const uploadResults = onRequest(async (request, response) => {
   const { eventData, userId, resultsData, apiKey } = request.body as addResultsHttp;
 
   if (!isValidApiKey(apiKey)) {
-    response.status(401).json({ error: 'A valid API key is required.' });
+    const msg = 'A valid API key is required.';
+    log('Request failed' + msg);
+    response.status(401).json({ error: msg });
     return;
   }
 
   if (!eventData || !userId || !resultsData) {
-    response.status(400).json({ error: 'The function must be called with "eventData", "resultsData" and "userId".' });
+    const msg = 'The function must be called with "eventData", "resultsData" and "userId".';
+    log('Request failed' + msg);
+    response.status(400).json({ error: msg });
+    return;
+  }
+
+  // Verify that the user exists
+  try {
+    await getAuth().getUser(userId);
+  } catch (err: any) {
+    if (err.code === 'auth/user-not-found') {
+      const msg = `The specified userId "${userId}" does not exist.`;
+      log('Request failed: ' + msg);
+      response.status(400).json({ error: msg });
+    } else {
+      error(`An unexpected error occurred while verifying userId "${userId}".`, err);
+      response.status(500).json({ error: 'An unexpected error occurred during user validation.' });
+    }
     return;
   }
 
@@ -76,12 +95,11 @@ export const uploadResults = onRequest(async (request, response) => {
   const missingFields = requiredFields.filter(field => !eventData[field]);
 
   if (missingFields.length > 0) {
-    response.status(400).json({
-      error: `Missing required fields in eventData: ${missingFields.join(', ')}`
-    });
+    const msg = `Missing required fields in eventData: ${missingFields.join(', ')}`;
+    log('Request failed' + msg);
+    response.status(400).json({ error: msg });
     return;
   }
-
   // Validate results file ancd create event summary
   let results: Results = null;
   try {
@@ -100,6 +118,9 @@ export const uploadResults = onRequest(async (request, response) => {
   const db = getFirestore();
   const newEventRef = db.collection('events').doc().withConverter(eventConverter);
 
+  // JSON does not support dates 
+  eventData.date = new Date(eventData.date);
+
   const newEvent = createEvent(newEventRef.id, userId, eventData as EventInfo);
   newEvent.summary = populateSummary(results);
 
@@ -110,6 +131,13 @@ export const uploadResults = onRequest(async (request, response) => {
       contentType: 'text/plain; charset=utf-8',
     });
     log(`createEventWithResults: Successfully saved results to ${filePath}`);
+
+    newEvent.splits = {
+      splitsFilename: filePath,
+      splitsFileFormat: 'auto',
+      valid: true,
+      uploadDate: new Date(),
+    };
 
     // Create event document in Firestore
     await newEventRef.set(newEvent);
@@ -127,8 +155,8 @@ export function isValidApiKey(apiKey?: string): boolean {
   if (!apiKey) {
     return false;
   }
-  const validApiKey = process.env.UPLOAD_API_KEY;
-  return apiKey === validApiKey;
+  const result = (apiKey.trim() === uploadApiKeySecret.value().trim());
+  return result;
 }
 
 /** Populate the event summary based on a Results object */

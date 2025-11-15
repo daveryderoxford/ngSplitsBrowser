@@ -24,8 +24,6 @@ export function parseIOFXMLEventData(data: string): Results {
 
    const xml = parseXml(data);
 
-  // console.log(xml.html());
-
    validateData(xml, reader);
 
    const eventElement = xml.find("ResultList > Event");
@@ -135,10 +133,10 @@ function readCompetitorName(nameElement: XmlQuery): FirstnameSurname {
 *     XML reading.
 */
 function validateData(xml: XmlDoc, reader: XMLReader) {
-   const rootElement = xml.find("> *");
-   const rootElementNodeName = rootElement.prop("tagName");
+   const rootElement = xml.find("*").first();
+   const rootElementNodeName = rootElement.prop("tagName")?.toLowerCase();
 
-   if (rootElementNodeName !== "ResultList") {
+   if (rootElementNodeName !== "resultlist") {
       throw new WrongFileFormat("Root element of XML document does not have expected name 'ResultList', got '" +
          rootElementNodeName + "'");
    }

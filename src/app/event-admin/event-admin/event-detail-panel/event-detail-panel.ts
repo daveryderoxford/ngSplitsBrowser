@@ -7,6 +7,7 @@ import { OEvent } from 'app/events/model/oevent';
 import { getDownloadURL, getStorage, ref } from '@angular/fire/storage';
 import { FirebaseApp } from '@angular/fire/app';
 import { MatButtonModule } from '@angular/material/button';
+import { resultsPath } from 'app/shared/firebase/storage-paths';
 
 @Component({
    selector: 'app-event-details-panel',
@@ -49,7 +50,7 @@ export class EventDetailsPanel {
    event = input<OEvent>();
 
    async downloadSplits(event: OEvent) {
-      const url = await this.downloadLink(event.key);
+      const url = await this.downloadLink(event);
       if (url) {
          console.log(`EventDetailsPanel: Downloading splits for event ${event.key} from ${url}`);
          window.open(url, '_blank');
@@ -57,11 +58,9 @@ export class EventDetailsPanel {
    }
 
    /** Get link to results file in google storage */
-   public async downloadLink(key: string): Promise<string> {
+   public async downloadLink(evt: OEvent): Promise<string> {
 
-      const path = isNaN(parseInt(key)) ?
-         `results /${key} ` :
-         `results/legacy/${key}`;
+      const path = resultsPath(evt.userId, evt.key);
 
       const r = ref(this.storage, path);
 

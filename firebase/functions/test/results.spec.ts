@@ -207,7 +207,7 @@ describe('Results Cloud Functions', function () {
       };
 
     const testResultsData = `<?xml version="1.0" encoding="UTF-8"?>
-<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns: xsi = "http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0" >
+<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0">
   <Event>
     <Name>Test Event</Name>
     <StartTime>

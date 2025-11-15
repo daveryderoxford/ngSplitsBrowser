@@ -707,7 +707,7 @@ describe("Input.IOFXml", () => {
         expect(eventData.eventDate).toEqual(eventDate, "Event date should be parsed correctly");
     });
 
-    fit("Can parse a string that has a single class with a single competitor", () => {
+    it("Can parse a string that has a single class with a single competitor", () => {
         const className = "Test Class";
         const classLength = 2300;
         const person = getPerson(); 

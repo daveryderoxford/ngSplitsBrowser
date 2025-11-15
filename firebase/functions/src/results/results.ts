@@ -1,5 +1,3 @@
-/* eslint-disable require-jsdoc */
-
 /**
  * Cloud functions for creating events, and reading and writing splits files.
  */
@@ -21,17 +19,8 @@ export interface SaveResultsFileData {
   apiKey?: string;
 }
 
-export interface SaveResultsFileResponse {
-  success: boolean;
-}
-
-export interface CreateEventWithResultsResponse {
-  success: boolean;
-  eventKey: string;
-}
-
 /**
- * Gets the content of a results file from Google Cloud Storage.
+ * Gets the content of a results file given an event Id from google storage.
  */
 export const getResultsFile = onCall<GetResultsFileData>(async (request) => {
   log(`getResultsFile: eventKey: ${request.data.eventKey}`);
@@ -74,7 +63,7 @@ export const saveResultsFile = onCall<SaveResultsFileData>(async (request) => {
   }
 
   if (!request.auth) {
-    throw new HttpsError('unauthenticated', 'saveResultsFile: You either need to be logged on or supply an API key to execute this function".');
+    throw new HttpsError('unauthenticated', 'saveResultsFile: You either need to be logged on to execute this function".');
   }
 
   try {
@@ -115,7 +104,6 @@ async function readEventData(eventKey: string): Promise<OEvent> {
 
 }
 
-
 export function getStorageFile(eventData: OEvent) {
   const bucket = getStorage().bucket();
   let filePath: string;
@@ -125,7 +113,7 @@ export function getStorageFile(eventData: OEvent) {
   } else if (eventData.userId) {
     filePath = `results/${eventData.userId}/${eventData.key}-results`;
   } else {
-    filePath = `results/third-party/${eventData.key}-results`;
+    throw(Error('Failed to get storage file location.  UserId not specified in event data '))
   }
   log(`ResultsFile: Reading file from ${filePath}`);
 
