@@ -15,6 +15,12 @@ import { ResultsDataService } from 'app/results/results-data.service ';
 
 export type SearchSelectedItem = Competitor | CourseClass | Course;
 
+export interface SearchDialogParams {
+   title?: string;
+   competitorsOnly?: boolean;
+   initialSearch?: string;
+}
+
 interface FilterPanelGroup {
    name: string;
    options: SearchSelectedItem[];
@@ -37,17 +43,17 @@ interface FilterPanelGroup {
    templateUrl: './results-search-dialog.html',
    styleUrl: './results-search-dialog.scss'
 })
-export class ResultsSearchDialog implements OnInit {
+export class ResultsSearchDialog {
    private rd = inject(ResultsDataService);
    protected dialogRef = inject(MatDialogRef<ResultsSearchDialog>);
-   protected data = inject(MAT_DIALOG_DATA);
 
-   searchControl: FormControl = new FormControl('');
+   injectedData = inject<SearchDialogParams>(MAT_DIALOG_DATA);
+   private data = { competitorsOnly: false, title: 'Results Search', initialSearch: '', ...this.injectedData };
 
-   searchText = toSignal(this.searchControl.valueChanges, { initialValue: '' });
+   title = signal(this.data.title);
 
-   competitorsOnly = false;
-   title = signal("Results Search");
+   searchControl: FormControl = new FormControl(this.data.initialSearch);
+   searchText = toSignal(this.searchControl.valueChanges, { initialValue: this.searchControl.value });
 
    protected searchResults = computed(() => this.searchPanelContents(this.searchText()));
 
@@ -66,7 +72,7 @@ export class ResultsSearchDialog implements OnInit {
       // If value is null or an unexpected type, filterText remains ''
 
       let classes: CourseClass[] = [];
-      if (!this.competitorsOnly) {
+      if (!this.data.competitorsOnly) {
          classes = results.findCourseClasss(filterText);
       }
       const competitors = results.findCompetitors(filterText);
@@ -95,13 +101,4 @@ export class ResultsSearchDialog implements OnInit {
    isCompetitor = (option: SearchSelectedItem): boolean => (option instanceof Competitor);
    asCompetitor = (option: SearchSelectedItem): Competitor => (option as Competitor);
 
-   ngOnInit() {
-      this.competitorsOnly = this.data.competitorsOnly;
-      if (this.data.title) {
-         this.title.set(this.data.title);
-      }
-      if (this.data.initialSearch) {
-         this.searchControl.setValue(this.data.initialSearch);
-      }
-   }
 }
