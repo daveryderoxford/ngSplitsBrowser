@@ -562,7 +562,7 @@ export class Competitor {
         if (this.completed) {
             if (fastestSplitTimes.length !== this.splitTimes.length) {
                 // eslint-disable-next-line max-len
-                throw new InvalidData("Cannot determine time loss of competitor with " + this.splitTimes.length + " split times using " + fastestSplitTimes.length + " fastest splits");
+                throw new InvalidData(`Cannot determine time loss of competitor with ${this.splitTimes.length} split times using ${fastestSplitTimes.length} fastest splits.  Class: ${this.courseClass.name}. Competitor: ${this.surname}`);
             } else if (fastestSplitTimes.some(isNaNStrict)) {
                 throw new InvalidData("Cannot determine time loss of competitor when there is a NaN value in the fastest splits");
             }

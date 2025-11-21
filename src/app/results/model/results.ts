@@ -28,12 +28,15 @@ export class Results {
 
   /** Courses excluding any score courses */
   public get courses() {
-    return this.allCourses.filter(c => !c.isScoreCourse);
+    return this.allCourses;
+   // return this.allCourses.filter(c => !c.isScoreCourse);
   }
 
   /** Classes excluding any score classes */
   public get classes() {
-    return this.allClasses.filter(c => !c.course.isScoreCourse);
+    // return this.allClasses.filter(c => !c.course.isScoreCourse);
+    return this.allClasses;
+   // return this.allClasses.filter(c => !c.course.isScoreCourse);
   }
 
   /** All competitors on non-score classes */
