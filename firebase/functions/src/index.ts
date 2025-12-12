@@ -26,5 +26,9 @@ export {
 } from "./results/results.js"
 
 export {
+   resultsProxy
+} from "./proxy.js";
+
+export {
    uploadResults
 } from "./results/uploadResultsHttp.js";

@@ -9,19 +9,26 @@ export const resultsResolver: ResolveFn<void> = (route: ActivatedRouteSnapshot, 
    const rd = inject(ResultsDataService);
    const ps = inject(ResultsPageState);
 
-   const id = route.paramMap.get('id');
-   const name = route.paramMap.get('name') ?? '';
-   const dateStr = route.paramMap.get('date');
-   const date = dateStr ? new Date(dateStr) : undefined;
-   
-   if (!id) {
-      console.log(`ResultsResolver: Error URL parameters.  Missing id, uid or url. Parameters ${route.paramMap.toString()} }`);
+   const dateStr = route.queryParamMap.get('date');
+
+   const eventDetails = {
+      key: route.paramMap.get('id'),
+      date: dateStr ? new Date(dateStr) : undefined,
+      name: route.queryParamMap.get('name') ?? '',
+      url: route.queryParamMap.get('url')
+   };
+
+   if (!eventDetails.key) {
+      console.log(`ResultsResolver: Error in URL parameters.  Missing id, Parameters ${JSON.stringify(route.paramMap.toString())} }`);
+      return;
+   } else if (eventDetails.key === 'online' && !eventDetails.url) {
+      console.log(`ResultsResolver: Error in URL parameters. Missing url for online event, Parameters ${JSON.stringify(route.paramMap)} }`);
       return;
    }
-   
+
    // Set the page view to the currently 
    const segments = route.url.map(x => x.path);
    console.log(`ResultsResolver: Setting page view to ${segments[0]}`);
    ps.setDisplayedPage(segments[0] as ResultsViewType);
-   rd.viewStoredEvent(id, name, date);
+   rd.viewEvent(eventDetails);
 };

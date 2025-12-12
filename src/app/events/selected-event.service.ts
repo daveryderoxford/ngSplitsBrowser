@@ -22,6 +22,7 @@ export class SelectedEventService {
       queryParams: {
         eventName: event.name,
         eventDate: event.date ? event.date.toISOString() : undefined,
+        url: event.url,
       },
     });
   }

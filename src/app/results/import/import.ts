@@ -7,14 +7,16 @@ import { parseCSVEventData } from "./cvs-reader";
 import { parseHTMLEventData } from "./html-reader";
 import { parseIOFXMLEventData } from "./iof-xml-reader";
 import { parseOEEventData } from "./oe-reader";
+import { parseSIHTMLData } from './si-html-reader';
 
 // All the parsers for parsing event data that are known about.
-const PARSERS = [
+const PARSERS: ((data: string) => Results)[] = [
    parseCSVEventData,
    parseOEEventData,
    parseHTMLEventData,
    parseTripleColumnEventData,
-   parseIOFXMLEventData
+   parseIOFXMLEventData,
+   parseSIHTMLData,
 ];
 
 /**

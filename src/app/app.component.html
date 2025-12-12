@@ -5,6 +5,7 @@
     <mat-action-list>
 
       <button mat-list-item (click)='closeSidenav(["/events"])'>Events</button>
+      <button mat-list-item (click)='loadFromUrl()'>Load from URL</button>
 
       @if (ses.selectedEvent()) {
          <button mat-list-item (click)='navigateToEvent()'>Selected results</button>

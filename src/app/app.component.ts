@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -7,12 +8,13 @@ import { AuthService } from './auth/auth.service';
 import { SidenavService } from './shared/services/sidenav.service';
 import { UserResultButton } from "./user-results/user-result-button";
 import { SelectedEventService } from './events/selected-event.service';
+import { UrlDialogComponent } from './shared/dialogs/url-dialog/url-dialog.component';
 
 @Component({
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['app.component.scss'],
-    imports: [MatSidenavModule, MatListModule, RouterOutlet, UserResultButton],
+    imports: [MatSidenavModule, MatListModule, RouterOutlet, UserResultButton, MatDialogModule],
     changeDetection:  ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
@@ -21,6 +23,7 @@ export class AppComponent implements OnInit {
    sidebarService = inject(SidenavService);
    snackbar = inject(MatSnackBar);
    router = inject(Router);
+   dialog = inject(MatDialog);
 
    sidenav = viewChild.required(MatSidenav);
 
@@ -28,6 +31,19 @@ export class AppComponent implements OnInit {
       this.sidebarService.setSidenav(this.sidenav());
       this.cookieConsent();
    }
+
+   async loadFromUrl(): Promise<void> {
+      await this.sidenav().close();
+      const dialogRef = this.dialog.open(UrlDialogComponent);
+  
+      dialogRef.afterClosed().subscribe(async (url: string) => {
+        if (url) {
+          await this.router.navigate(['/results', 'graph', 'online'], {
+            queryParams: { url: url },
+          });
+        }
+      });
+    }
 
    async logout() {
       // navigate away from protected pages

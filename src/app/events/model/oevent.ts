@@ -55,6 +55,7 @@ export interface EventInfo {
    webpage: string;
    email: string;
    controlCardType: ControlCardType;
+   url?: string;
 }
 
 export interface SplitsFileInfo {

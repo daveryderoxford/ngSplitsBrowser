@@ -108,7 +108,7 @@ export class GraphPage {
    );
 
    sizeChange$ = this.size$.pipe(debounceTime(100)).subscribe(rect => {
-      if (this.chart) {
+      if (this.chart && this.chartElement()) {
          const element = this.chartElement().nativeElement;
          this.chart.setSize(element.clientWidth, element.clientHeight);
          this.redrawChart();

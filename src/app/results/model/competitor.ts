@@ -123,7 +123,8 @@ export class Competitor {
     * @sb-param {String} name - The name of the competitor.  Either the fullname or firstname/surname
     * @sb-param {String} club - The name of the competitor's club.
     * @sb-param {Number} startTime - The competitor's start time, as seconds past midnight.
-    * @sb-param {Array} cumTimes - Array of cumulative split times, as numbers, with nulls for missed controls.
+    * @sb-param {Array} cumTimes - Array of cumulative split times, as numbers, with nulls for missed controls.  
+    * * The input array should begin with a zero, for the cumulative time to the start.
     * @sb-return {Competitor} Created competitor.
     */
     public static fromOriginalCumTimes(order: number,
@@ -494,7 +495,7 @@ export class Competitor {
     public getCumTimesAdjustedToReference(referenceCumTimes: sbTime[]): sbTime[]{
         if (referenceCumTimes.length !== this.cumTimes.length) {
             // eslint-disable-next-line max-len
-            throw new InvalidData("Cannot adjust competitor times because the numbers of times are different (" + this.cumTimes.length + " and " + referenceCumTimes.length + ")");
+            throw new InvalidData(`Cannot adjust competitor times because the numbers of times are different (${this.cumTimes.length} and ${referenceCumTimes.length})`);
         } else if (referenceCumTimes.indexOf(null) > -1) {
             throw new InvalidData("Cannot adjust competitor times because a null value is in the reference data");
         }

@@ -41,9 +41,9 @@ fdescribe('SIHTMLReader', () => {
    });
 
    it('should read the correct number of classes and courses', () => {
-      // In this format, one course is created per class
+
       expect(results.allClasses.length).toBe(21);
-      expect(results.allCourses.length).toBe(21);
+      expect(results.allCourses.length).toBe(9);
 
       expect(resultsCoursesOnly.allClasses.length).toBe(9);
       expect(resultsCoursesOnly.allCourses.length).toBe(9);

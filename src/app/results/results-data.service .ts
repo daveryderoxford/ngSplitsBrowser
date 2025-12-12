@@ -1,11 +1,12 @@
 'use strict';
 
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
-import { computed, inject, Injectable, resource, signal } from "@angular/core";
+import { inject, Injectable, resource, signal } from "@angular/core";
 import { FirebaseApp } from '@angular/fire/app';
 import { getFunctions, httpsCallable } from '@angular/fire/functions';
 import { getStorage } from '@angular/fire/storage';
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
+import { firstValueFrom } from 'rxjs';
 import { parseEventData } from "./import";
 import { Competitor, Results } from "./model";
 import { ResultsEventDetails } from './model/event_details';
@@ -41,12 +42,10 @@ export class ResultsDataService {
 
    event = this._event.asReadonly();
 
-   private _resourceParams = computed(() => ({ key: this.event().key }));
-
    private _resultsResource = resource({
       params: () => this._event(),
       loader: async ({ params }) => {
-         const results = await this.loadResultsFile(params.key);
+         const results = await this.loadResults(params.key, params.url);
          return results;
       },
    });
@@ -55,29 +54,38 @@ export class ResultsDataService {
    isLoading = this._resultsResource.isLoading;
    error = this._resultsResource.error;
 
-   viewStoredEvent(id: string, name = "", date?: Date | undefined) {
-      this._event.set({
-         key: id,
-         name: name,
-         date: date
-      });
+   viewEvent(eventDetails: ResultsEventDetails) {
+      this._event.set(eventDetails);
    }
 
    clearEvent() {
       this._event.set(undefined);
    }
 
+
    /** Loads results for a specified event returning an observable of the results.
     * This just loads the results file from storage and does not clear any current selections.
     */
-   public async loadResultsFile(key: string): Promise<Results> {
+   public async loadResults(key: string, url?: string): Promise<Results> {
 
-      const text = await this.downloadResultsFile(key);
-
+      let text: string;
+      if (key==='online') {
+         text = await this.loadResultsFromURL(url);
+      } else {
+         text = await this.loadResultsFromStorage(key);
+      }
       const results = this.processResults(text);
 
       return results;
 
+   }
+
+   public async loadResultsFromURL(url: string): Promise<string> {
+      // Proxy request to HTTP callable Firebase function to avoid CORS issues. 
+      const proxyUrl = ` https://us-central1-splitsbrowser-b5948.cloudfunctions.net/resultsProxy?url=${encodeURIComponent(url)}`;
+    //  const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}`;
+      const text = await firstValueFrom(this.http.get(proxyUrl, { responseType: 'text' }));
+      return text;
    }
 
    /** Parse splits file */
@@ -108,7 +116,7 @@ export class ResultsDataService {
    }
 
    /** Downloads results for an event from Google Storage */
-   public async downloadResultsFile(key: string): Promise<string> {
+   public async loadResultsFromStorage(key: string): Promise<string> {
 
       const loadResults = httpsCallable<GetResultsFileData, string>(this.functions, 'getResultsFile');
       try {
