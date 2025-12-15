@@ -163,13 +163,14 @@ class SIHTMLReader {
 
       const { timeIndex, startTimeIndex, splitsStartIndex, splitsIncrement } = this.determineColumnIndices(classIndex);
 
-       console.log(`Column indices.  Time index: ${timeIndex}. First split: ${splitsStartIndex} Split increment ${splitsIncrement}`)
       if (timeIndex === -1 || splitsStartIndex === -1) {
         continue; // Skip if we can't determine columns for this class
       }
 
       for (const compData of competitorData) {
-        const name = compData[nameIndex];
+        const rawName = compData[nameIndex];
+        // Strip social media links from names
+        const name = typeof rawName === 'string' ? rawName.replace(/<[^>]*>/g, '').trim() : '';
         const club = (compData[clubIndex] || '').trim();
         const timeStr = compData[timeIndex];
 
@@ -211,10 +212,6 @@ class SIHTMLReader {
 
         competitor.setClass(oclass);
         oclass.competitors.push(competitor);
-
-        if (competitorOrder == 1) {
-          printCompetitor(competitor);
-        }
 
         competitorOrder++;
       }

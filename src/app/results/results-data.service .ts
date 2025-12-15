@@ -31,14 +31,25 @@ const colours = [
 })
 export class ResultsDataService {
 
-   private storage = getStorage(inject(FirebaseApp));
    private functions = getFunctions(inject(FirebaseApp));
 
    private http = inject(HttpClient);
-
+   
    private _event = signal<ResultsEventDetails | undefined>(undefined,
-      { equal: (a, b) => a?.key === b?.key }
-   );
+      { equal: (a, b) => {
+         const result = (() => {
+            // If either a or b is undefiend return false unless both are undefined
+            if (!a || !b) return a === b;
+
+            if (a.key === b.key) {
+               return (a.key == 'online') ? a.url === b.url : true;
+            } else {
+              return false
+            }
+         })();
+         return result;
+      }
+   });
 
    event = this._event.asReadonly();
 
@@ -61,7 +72,6 @@ export class ResultsDataService {
    clearEvent() {
       this._event.set(undefined);
    }
-
 
    /** Loads results for a specified event returning an observable of the results.
     * This just loads the results file from storage and does not clear any current selections.

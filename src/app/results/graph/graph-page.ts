@@ -122,11 +122,19 @@ export class GraphPage {
 
       /** Effect to create and redraw the chart when its data or container becomes available. */
       effect(() => {
-
          const chartContainer = this.chartElement();
 
-         // Exit if the chart container isn't ready or if results are still loading.
-         if (!chartContainer || this.rd.isLoading()) {
+         // If the chart container is removed from the DOM (e.g., by *ngIf),
+         // destroy the chart instance and its observer.
+         if (!chartContainer) {
+            if (this.chart) {
+               this.observer.disconnect();
+               this.chart = undefined;
+            }
+            return;
+         }
+
+         if (this.rd.isLoading()) {
             return;
          }
 
@@ -142,7 +150,7 @@ export class GraphPage {
             this.observer.observe(this.chartElement().nativeElement);
          }
 
-         if (chartDisplayData) {
+         if (chartDisplayData && this.chart) {
             // Redraw the chart with the latest data.
             const element = chartContainer.nativeElement;
             this.chart.setSize(element.clientWidth, element.clientHeight);
@@ -161,10 +169,10 @@ export class GraphPage {
    }
 
    ngOnDestroy() {
-      if (this.chartElement()) {
-         this.observer.unobserve(this.chartElement().nativeElement);
-         this.size$.unsubscribe();
-      }
+      // Disconnect the observer and cancel the subscription to prevent memory leaks.
+      this.observer.disconnect();
+      this.sizeChange$.unsubscribe();
+      this.chart = undefined;
    }
 
    @HostListener('document:mouseup')

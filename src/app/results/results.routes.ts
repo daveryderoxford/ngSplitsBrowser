@@ -9,7 +9,8 @@ export const RESULTS_ROUTES: Routes = [
       title: 'Splitsbrowser - Graph',
       resolve: {
          results: resultsResolver
-      }
+      },
+      runGuardsAndResolvers: 'paramsOrQueryParamsChange'
    },
    {
       path: "race/:id",
@@ -17,7 +18,8 @@ export const RESULTS_ROUTES: Routes = [
       title: 'Splitsbrowser - Race',
       resolve: {
          results: resultsResolver
-      }
+      },
+      runGuardsAndResolvers: 'paramsOrQueryParamsChange'
    },
    {
       path: "table/:id",
@@ -25,14 +27,16 @@ export const RESULTS_ROUTES: Routes = [
       title: 'Splitsbrowser - Results table',
       resolve: {
          results: resultsResolver
-      }
+      },
+      runGuardsAndResolvers: 'paramsOrQueryParamsChange'
    },
-   { 
-      path: "stats/:id", 
-      title: 'Splitsbrowser - Stats', 
+   {
+      path: "stats/:id",
+      title: 'Splitsbrowser - Stats',
       resolve: {
          results: resultsResolver
       },
-      loadComponent: () => import('./stats/stats-page/stats-page').then(c => c.StatsPage) 
+      runGuardsAndResolvers: 'paramsOrQueryParamsChange',
+      loadComponent: () => import('./stats/stats-page/stats-page').then(c => c.StatsPage)
    },
 ];

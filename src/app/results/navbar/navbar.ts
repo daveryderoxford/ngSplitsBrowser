@@ -33,6 +33,6 @@ export class Navbar {
 
   viewSelected(view: ResultsView) {
     console.log('Results navbar.  view seleted ' + view.name);
-    this.pageState.navigateToPage(view, this.rd.event().key);
+    this.pageState.navigateToPage(view, this.rd.event());
   }
 }

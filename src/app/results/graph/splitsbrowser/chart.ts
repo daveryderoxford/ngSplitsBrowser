@@ -330,6 +330,9 @@ export class Chart {
       this.sortReferenceCumTimes();
       this.adjustContentSize();
       this.createScales(chartData);
+
+      // Clear previous chart elements
+      this.svgGroup.selectAll("*").remove();
       this.drawBackgroundRectangles();
       this.drawAxes(getMessage(chartType.yAxisLabelKey), chartData.dataColumns);
       this.drawChartLines(chartData);
@@ -961,21 +964,14 @@ export class Chart {
          }
       }
 
-
-      let rects = this.svgGroup.selectAll("rect")
-         .data(range(refCumTimesSorted.length - 1));
-
-      rects.enter().append("rect");
-
-      rects = this.svgGroup.selectAll("rect")
-         .data(range(refCumTimesSorted.length - 1));
-      rects.attr("x", (i: number) => this.xScale(refCumTimesSorted[i]))
+      this.svgGroup.selectAll("rect.background-rect")
+         .data(range(refCumTimesSorted.length - 1))
+         .join("rect")
+         .attr("class", (i: number) => `background-rect ${(i % 2 === 0) ? "background1" : "background2"}`)
+         .attr("x", (i: number) => this.xScale(refCumTimesSorted[i]))
          .attr("y", 0)
          .attr("width", (i: number) => this.xScale(refCumTimesSorted[i + 1]) - this.xScale(refCumTimesSorted[i]))
-         .attr("height", this.contentHeight)
-         .attr("class", (i: number) => (i % 2 === 0) ? "background1" : "background2");
-
-      rects.exit().remove();
+         .attr("height", this.contentHeight);
    }
 
    /**
@@ -1040,8 +1036,6 @@ export class Chart {
 
       const lowerXAxis = axisBottom(scaleLinear())
          .scale(this.xScaleMinutes);
-
-      this.svgGroup.selectAll("g.axis").remove();
 
       this.svgGroup.append("g")
          .attr("class", "x axis")
