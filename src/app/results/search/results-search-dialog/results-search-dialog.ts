@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, computed, inject, linkedSignal, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -30,16 +30,15 @@ interface FilterPanelGroup {
    selector: 'app-results-search-dialog',
    changeDetection: ChangeDetectionStrategy.OnPush,
    imports: [
-      CommonModule,
-      ReactiveFormsModule,
-      MatOptionModule,
-      MatListModule,
-      MatIconModule,
-      MatFormFieldModule,
-      MatInputModule,
-      MatDialogModule,
-      MatButtonModule
-   ],
+    ReactiveFormsModule,
+    MatOptionModule,
+    MatListModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDialogModule,
+    MatButtonModule
+],
    templateUrl: './results-search-dialog.html',
    styleUrl: './results-search-dialog.scss'
 })

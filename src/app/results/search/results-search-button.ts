@@ -2,14 +2,14 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
+
 import { Competitor, Course, CourseClass } from 'app/results/model';
 import { ResultsSelectionService } from 'app/results/results-selection.service';
 import { ResultsSearchDialog, SearchSelectedItem } from './results-search-dialog/results-search-dialog';
 
 @Component({
   selector: 'app-results-search-button',
-  imports: [CommonModule, MatIconModule, MatButtonModule],
+  imports: [MatIconModule, MatButtonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <button mat-icon-button (click)="openSearchDialog()" aria-label="Open search dialog">

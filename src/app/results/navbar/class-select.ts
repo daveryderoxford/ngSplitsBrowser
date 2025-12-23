@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,7 +8,7 @@ import { CourseClass } from 'app/results/model';
 @Component({
   selector: 'app-class-select',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, MatSelectModule, MatFormFieldModule, FormsModule],
+  imports: [MatSelectModule, MatFormFieldModule, FormsModule],
   template: ` 
     <mat-form-field appearance="outline" subscriptSizing="dynamic" class="dense-form-field set-width">
       <mat-label>Class</mat-label>

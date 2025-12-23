@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,7 +15,7 @@ export type SearchButtonAppearance = 'list' | 'text' | 'icon';
 
 @Component({
    selector: 'app-user-result-button',
-   imports: [CommonModule, MatButtonModule, MatListModule],
+   imports: [MatButtonModule, MatListModule],
    changeDetection: ChangeDetectionStrategy.OnPush,
    template: `
    @if (appearance() === 'list') {
