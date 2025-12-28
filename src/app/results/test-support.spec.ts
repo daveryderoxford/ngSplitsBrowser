@@ -21,9 +21,8 @@
 
 /* eslint-disable max-len */
 
-import { } from "jasmine";
-import 'jasmine-expect';
 import $ from 'jquery';
+import { expect } from 'vitest';
 import { Competitor, sbTime } from "./model";
 import { isNaNStrict } from "./model/results_util";
 
@@ -43,9 +42,10 @@ export class TestSupport {
     static assertException(exceptionName: string, func: any, failureMessage?: string) {
         try {
             func();
-            expect(false).toBeTrue(failureMessage || "An exception with name '" + exceptionName + "' should have been thrown, but no exception was thrown");
-        } catch (e: any) {
-            expect(e.name).toEqual(exceptionName, "Exception with name '" + exceptionName + "' should have been thrown, message was " + e.message);
+            expect(false).toBe(true);
+        }
+        catch (e: any) {
+            expect(e.name, "Exception with name '" + exceptionName + "' should have been thrown, message was " + e.message).toEqual(exceptionName);
         }
     }
 
@@ -71,18 +71,17 @@ export class TestSupport {
     * @param {Array} expectedArray - The 'expected' array of numbers.
     */
     static assertStrictEqualArrays(actualArray: number[], expectedArray: number[]) {
-        expect($.isArray(actualArray)).toBeTrue("actualArray is not an array");
-        expect($.isArray(expectedArray)).toBeTrue("expectedArray is not an array");
-        expect(actualArray.length).toEqual(expectedArray.length,
-            "Lengths should be the same: expected " + expectedArray.length + ", actual " + actualArray.length);
+        expect($.isArray(actualArray)).toBe(true);
+        expect($.isArray(expectedArray)).toBe(true);
+        expect(actualArray.length, "Lengths should be the same: expected " + expectedArray.length + ", actual " + actualArray.length).toEqual(expectedArray.length);
 
         for (let index = 0; index < expectedArray.length; index += 1) {
             if (isNaNStrict(expectedArray[index])) {
-                expect(isNaNStrict(actualArray[index]))
-                    .toBeTrue("Expected array has NaN at index " + index + " so actual array should do too.  Actual value " + actualArray[index]);
-            } else {
-                expect(actualArray[index])
-                    .toEqual(expectedArray[index], "Array values at index " + index + " should be strict-equal");
+                expect(isNaNStrict(actualArray[index])).toBe(true);
+            }
+            else {
+                expect(actualArray[index], "Array values at index " + index + " should be strict-equal")
+                    .toEqual(expectedArray[index]);
             }
         }
     }
@@ -131,11 +130,7 @@ export class TestSupport {
     * @param {Array} splitTimes - Array of split times, as numbers, with nulls for missed controls.
     * @return {Competitor} Created competitor.
     */
-    static fromSplitTimes(order: number,
-        name: string,
-        club: string,
-        startTime: sbTime,
-        splitTimes: sbTime[]): Competitor {
+    static fromSplitTimes(order: number, name: string, club: string, startTime: sbTime, splitTimes: sbTime[]): Competitor {
 
         const cumTimes = TestSupport.cumTimesFromSplitTimes(splitTimes);
 

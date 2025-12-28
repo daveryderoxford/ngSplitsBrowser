@@ -4,9 +4,8 @@
     "outDir": "./out-tsc/spec",
     "baseUrl": "./src",
     "types": [
-      "jasmine",
+      "vitest/globals",
       "node",
-      "jasmine-expect"
     ]
   },
   "files": [
@@ -20,4 +19,3 @@
     "./src/**/*.node.ts"
   ]
 }
-

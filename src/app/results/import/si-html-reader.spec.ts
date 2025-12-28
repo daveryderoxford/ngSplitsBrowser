@@ -1,8 +1,9 @@
+import { describe, expect } from 'vitest';
 import { Results } from '../model';
-import { parseSIHTMLData } from './si-html-reader';
 import { Repairer } from '../model/repairer';
+import { parseSIHTMLData } from './si-html-reader';
 
-fdescribe('SIHTMLReader', () => {
+describe('SIHTMLReader', () => {
    let results: Results;
    let resultsCoursesOnly: Results;
 

@@ -23,11 +23,10 @@
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/quotes */
 
-import { } from "jasmine";
-
-import { parseIOFXMLEventData } from "./iof-xml-reader";
-import { TimeUtilities, Competitor, CourseClass } from "../model";
+import { describe, expect } from 'vitest';
+import { Competitor, CourseClass, TimeUtilities } from "../model";
 import { TestSupport } from "../test-support.spec";
+import { parseIOFXMLEventData } from "./iof-xml-reader";
 
 const formatTime = TimeUtilities.formatTime;
 const parseEventData = parseIOFXMLEventData;

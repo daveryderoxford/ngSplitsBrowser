@@ -1,9 +1,9 @@
-import { TestBed } from '@angular/core/testing';
-import { EllipsisPipe } from './ellipsis-pipe';
-import { } from "jasmine";
-import 'jasmine-expect';
 
-describe( 'LoggingService', () => {
+import { TestBed } from '@angular/core/testing';
+import { describe, expect } from 'vitest';
+import { EllipsisPipe } from './ellipsis-pipe';
+
+describe( 'EllipsisPipe', () => {
    beforeEach( () => TestBed.configureTestingModule( {} ) );
 
    it( 'should return string if max lenght is not eceeded', () => {

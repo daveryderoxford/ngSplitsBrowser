@@ -22,8 +22,7 @@
  */
 /* eslint-disable max-len */
 /* eslint-disable @typescript-eslint/quotes */
-
-import { } from "jasmine";
+import { describe, expect } from "vitest";
 import { Competitor, CourseClass } from "../model";
 import { parseHTMLEventData } from "./html-reader";
 

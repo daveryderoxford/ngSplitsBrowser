@@ -3,18 +3,18 @@
 /* eslint-disable @typescript-eslint/quotes */
 import { provideHttpClient } from '@angular/common/http';
 import { inject, TestBed } from '@angular/core/testing';
+import { describe, expect } from "vitest";
 
-import 'jasmine-expect';
-import { EventInfo } from 'app/events/model/oevent';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
-import { firebaseConfig } from 'app/app.firebase-config';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { firebaseConfig } from 'app/app.firebase-config';
+import { EventInfo } from 'app/events/model/oevent';
 import { EventAdminService } from './event-admin.service';
 
 const testEventInfo1: EventInfo = {
   name: 'test name 1',
-  date: new Date(2003,2,2), 
+  date: new Date(2003, 2, 2),
   nationality: 'SWE',
   club: 'TVOC',
   grade: 'Regional',
@@ -27,7 +27,7 @@ const testEventInfo1: EventInfo = {
 
 const testEventInfo2: EventInfo = {
   name: 'test name 2',
-  date: new Date(2007, 8,9),
+  date: new Date(2007, 8, 9),
   nationality: 'NOR',
   club: 'TVOC',
   grade: 'Local',
@@ -57,7 +57,7 @@ const resultsfile2 = [
 
 let eventAdmin: EventAdminService;
 
-xdescribe('EventAdminService', () => {
+describe.skip('EventAdminService', () => {
   beforeEach(() => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
@@ -85,7 +85,7 @@ xdescribe('EventAdminService', () => {
 
     expect(eventresult.key).toBeDefined();
     expect(eventresult.splits).toBeNull();
-    expect(eventresult).toEqual(jasmine.objectContaining(testEventInfo1));
+    expect(eventresult).toEqual(expect.objectContaining(testEventInfo1));
 
     await eventAdmin.delete(eventresult);
 
@@ -101,13 +101,13 @@ xdescribe('EventAdminService', () => {
     await eventAdmin.update(event.key, testEventInfo2);
 
     const eventresult = await eventAdmin.getEvent(event.key);
-    expect(eventresult).toEqual(jasmine.objectContaining(testEventInfo2));
+    expect(eventresult).toEqual(expect.objectContaining(testEventInfo2));
 
     done();
 
   }));
 
-  it('should save a results and update summary etc', async (done) => {
+  it('should save a results and update summary etc', async () => {
     const event = await eventAdmin.add(testEventInfo1);
     const eventresult = await eventAdmin.getEvent(event.key);
 
@@ -115,16 +115,15 @@ xdescribe('EventAdminService', () => {
     await eventAdmin.uploadResults(eventresult, file);
 
     const eventresult1 = await eventAdmin.getEvent(event.key);
-    expect(eventresult1.splits).toBeObject();
-    expect(eventresult1.summary.courses).toBeArrayOfSize(2);
+    expect(eventresult1.splits).toBeTypeOf('object');
+    expect(eventresult1.summary.courses).toHaveLength(2);
     expect(eventresult1.summary.numcompetitors).toEqual(6);
 
     // re-read the results and make sure they exist
 
     // Read competitor array
 
-    done();
-
+    ;
   });
 
   it('should update a results file that has already been downloaded once', async (done) => {
@@ -149,8 +148,8 @@ xdescribe('EventAdminService', () => {
 
   });
 
-  it('should rollback when db transaction fails', async (done) => {
-    done();
+  it('should rollback when db transaction fails', async () => {
+    ;
   });
 
 });

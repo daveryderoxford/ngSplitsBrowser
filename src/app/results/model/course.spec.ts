@@ -20,8 +20,7 @@
  */
 /* eslint-disable max-len */
 import { Competitor } from "app/results/model";
-import { } from "jasmine";
-import 'jasmine-expect';
+import { describe, expect } from "vitest";
 import { TestSupport } from "../test-support.spec";
 import { Course } from "./course";
 import { CourseClass } from "./course-class";
@@ -42,7 +41,7 @@ describe("Course", () => {
         const courseClass = new CourseClass("Test class", 3, []);
         const course = new Course("Test course", [courseClass], null, null, null);
 
-        expect(course.getOtherClasses(courseClass)).toEqual([],  "There should be no other classes");
+        expect(course.getOtherClasses(courseClass), "There should be no other classes").toEqual([]);
     });
 
     it("Course created with three classes has three classes", () => {
@@ -51,7 +50,7 @@ describe("Course", () => {
         const courseClass3 = new CourseClass("Test class 3", 3, []);
         const course = new Course("Test course", [courseClass1, courseClass2, courseClass3], null, null, null);
 
-        expect(course.getNumClasses()).toEqual(3,  "Course should have three classes");
+        expect(course.getNumClasses(), "Course should have three classes").toEqual(3);
     });
 
     it("Getting other classes of a course with three classes returns the other two when given one of the others", () => {
@@ -60,7 +59,7 @@ describe("Course", () => {
         const courseClass3 = new CourseClass("Test class 3", 3, []);
         const course = new Course("Test course", [courseClass1, courseClass2, courseClass3], null, null, null);
 
-        expect(course.getOtherClasses(courseClass2)).toEqual([courseClass1, courseClass3],  "There should be no other classes");
+        expect(course.getOtherClasses(courseClass2), "There should be no other classes").toEqual([courseClass1, courseClass3]);
     });
 
     it("Attempting to get other courses of a course with three classes when given some other class throws an exception", () => {
@@ -128,38 +127,38 @@ describe("Course", () => {
         const courseClass = new CourseClass("Test class", 3, []);
         const controls = ["235", "212", "189"];
         const course = new Course("Test course", [courseClass], 4.1, 115, controls);
-        expect(course.usesLeg(Course.START, "235")).toBe(true, "Course should use leg from start to control 1");
-        expect(course.usesLeg("235", "212")).toBe(true, "Course should use leg from control 1 to 2");
-        expect(course.usesLeg("212", "189")).toBe(true, "Course should use leg from control 2 to control 3");
-        expect(course.usesLeg("189", Course.FINISH)).toBe(true, "Course should use leg from control 3 to the finish");
+        expect(course.usesLeg(Course.START, "235"), "Course should use leg from start to control 1").toBe(true);
+        expect(course.usesLeg("235", "212"), "Course should use leg from control 1 to 2").toBe(true);
+        expect(course.usesLeg("212", "189"), "Course should use leg from control 2 to control 3").toBe(true);
+        expect(course.usesLeg("189", Course.FINISH), "Course should use leg from control 3 to the finish").toBe(true);
     });
 
     it("Course created with empty list of controls contains leg from start to finish", () => {
         const courseClass = new CourseClass("Test class", 0, []);
         const controls: string[] = [];
         const course = new Course("Test course", [courseClass], 4.1, 115, controls);
-        expect(course.usesLeg(Course.START, Course.FINISH)).toBe(true, "Course should use leg from start to finish");
+        expect(course.usesLeg(Course.START, Course.FINISH), "Course should use leg from start to finish").toBe(true);
     });
 
     it("Course created with empty list of controls does not contain legs with controls other than the start and finish", () => {
         const courseClass = new CourseClass("Test class", 0, []);
         const controls: string[] = [];
         const course = new Course("Test course", [courseClass], 4.1, 115, controls);
-        expect(!course.usesLeg(Course.START, "212")).toBe(true, "Course should use leg from start to some control");
-        expect(!course.usesLeg("212", Course.FINISH)).toBe(true, "Course should use leg from some control to the finish");
-        expect(!course.usesLeg("212", "189")).toBe(true,  "Course should use leg from some control to some other control");
+        expect(!course.usesLeg(Course.START, "212"), "Course should use leg from start to some control").toBe(true);
+        expect(!course.usesLeg("212", Course.FINISH), "Course should use leg from some control to the finish").toBe(true);
+        expect(!course.usesLeg("212", "189"), "Course should use leg from some control to some other control").toBe(true);
     });
 
     it("Course created with controls does not contain legs that are not part of it", () => {
         const courseClass = new CourseClass("Test class", 3, []);
         const controls = ["235", "212", "189"];
         const course = new Course("Test course", [courseClass], 4.1, 115, controls);
-        expect(!course.usesLeg("200", "189")).toBe(true,  "Course does not use leg from control not on the course");
-        expect(!course.usesLeg("212", "200")).toBe(true,  "Course does not use leg to control not on the course");
-        expect(!course.usesLeg(Course.START, Course.FINISH)).toBe(true,  "Course does not use leg from start to finish");
-        expect(!course.usesLeg(Course.START, "212")).toBe(true,  "Course does not use leg from the start to control 2");
-        expect(!course.usesLeg("212", Course.FINISH)).toBe(true,  "Course does not use leg from control 2 to the finish");
-        expect(!course.usesLeg("235", "189")).toBe(true,  "Course does not use leg from control 1 to control 3");
+        expect(!course.usesLeg("200", "189"), "Course does not use leg from control not on the course").toBe(true);
+        expect(!course.usesLeg("212", "200"), "Course does not use leg to control not on the course").toBe(true);
+        expect(!course.usesLeg(Course.START, Course.FINISH), "Course does not use leg from start to finish").toBe(true);
+        expect(!course.usesLeg(Course.START, "212"), "Course does not use leg from the start to control 2").toBe(true);
+        expect(!course.usesLeg("212", Course.FINISH), "Course does not use leg from control 2 to the finish").toBe(true);
+        expect(!course.usesLeg("235", "189"), "Course does not use leg from control 1 to control 3").toBe(true);
     });
 
     it("Course created with butterfly loops contains all legs despite central control being repeated", () => {
@@ -167,7 +166,7 @@ describe("Course", () => {
         const controls = ["235", "212", "189", "194", "212", "208", "214", "222"];
         const course = new Course("Test course", [courseClass], 4.1, 115, controls);
         for (let i = 1; i < controls.length; i += 1) {
-            expect(course.usesLeg(controls[i - 1], controls[i])).toBe(true,  "Course uses leg from control " + i + " to " + (i + 1));
+            expect(course.usesLeg(controls[i - 1], controls[i]), "Course uses leg from control " + i + " to " + (i + 1)).toBe(true);
         }
     });
 

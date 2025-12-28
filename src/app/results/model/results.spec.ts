@@ -19,8 +19,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 /* eslint-disable max-len */
-import { } from "jasmine";
-import 'jasmine-expect';
+import { describe, expect, it } from 'vitest';
 import { TestSupport } from "../test-support.spec";
 import { Competitor } from "./competitor";
 import { Course } from "./course";
@@ -182,7 +181,7 @@ describe("Results", () => {
         const course = new Course("Test course", [courseClass], null, null, ["235", "212", "189"]);
 
         const event = new Results([courseClass], [course]);
-        expect(!event.needsRepair()).toBe(true, "Event should not need repair");
+        expect(!event.needsRepair(), "Event should not need repair").toBe(true);
     });
 
     it("Event that does need repairing reports that it does", () => {
@@ -228,33 +227,33 @@ describe("Results", () => {
     it("Search by firstname", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("FreD");
-        expect(res[0].ecardId).toEqual("1", "match on first name");
-        expect(res.length).toBe(1, "One name fred matches");
+        expect(res[0].ecardId, "match on first name").toEqual("1");
+        expect(res.length, "One name fred matches").toBe(1);
     });
 
     it("Search by club with 2 characters", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("Sn");
-        expect(res[0].ecardId).toEqual("4", "match on first name");
-        expect(res.length).toBe(1, "Exact match on SN");
+        expect(res[0].ecardId, "match on first name").toEqual("4");
+        expect(res.length, "Exact match on SN").toBe(1);
     });
 
     it('Search for "" should not return any results', () => {
         const results = makeSearchData();
         const res = results.findCompetitors("");
-        expect(res.length).toBe(0, 'Expect search on "" not to return any results');
+        expect(res.length, 'Expect search on "" not to return any results').toBe(0);
     });
 
     it("Search by club with 2 characters - non excat match", () => {
         const results = makeSearchData();
         const res = results.findCompetitors("AB");
-        expect(res.length).toBe(1, "Non exact match on ABC");
+        expect(res.length, "Non exact match on ABC").toBe(1);
     });
 
     it("Search for course by name with 3 chracters with distances", () => {
         const results = makeSearchData();
         const res = results.findCourses("CoursE");
-        expect(res[0].name).toEqual("Course Y", "Course Y first as sorted by distance");
+        expect(res[0].name, "Course Y first as sorted by distance").toEqual("Course Y");
         expect(res[1].name).toEqual("Course X");
         expect(res.length).toBe(2);
     });

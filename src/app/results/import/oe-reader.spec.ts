@@ -21,7 +21,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 /* eslint-disable max-len */
-import { } from "jasmine";
+import { describe, expect } from "vitest";
 import { Course, CourseClass, Results, TimeUtilities } from "../model";
 import { parseOEEventData } from "./oe-reader";
 
@@ -1075,4 +1075,3 @@ describe("Input.OE", () => {
         });
     });
 });
-
