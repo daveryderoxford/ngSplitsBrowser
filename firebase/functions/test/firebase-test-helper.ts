@@ -80,3 +80,42 @@ export function v2Request<T>(data: T, uid = 'auth-user-id'): CallableRequest<T> 
 	} as CallableRequest<T>;
 	return request
 }
+
+/**
+ * Mocks an HTTP request and response for testing onRequest functions.
+ * @param method The HTTP method (e.g., 'POST', 'GET').
+ * @param body The request body.
+ * @returns A mock request and a mock response handler.
+ */
+export function mockHttpRequest(method: string, body: any, query: any = {}, headers: any = {}) {
+	const req = {
+		method,
+		body,
+		query,
+		headers,
+		get: (header: string) => headers[header] || headers[header.toLowerCase()],
+	};
+
+	let status = 200;
+	let sentBody: any;
+
+	const res = {
+		status: (s: number) => {
+			status = s;
+			return res;
+		},
+		send: (b: any) => {
+			sentBody = b;
+		},
+		json: (b: any) => {
+			sentBody = b;
+		},
+		set: (field: string, value: any) => { },
+		setHeader: (field: string, value: any) => { },
+		getHeader: (field: string) => { },
+		on: (event: string, cb: any) => { },
+		getSent: () => ({ status, body: sentBody }),
+	};
+
+	return { req, res };
+}

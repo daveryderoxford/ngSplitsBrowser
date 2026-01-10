@@ -6,7 +6,7 @@ import { describe, it } from 'mocha';
 import { eventConverter } from '../src/model/event-firebase-converters.js';
 import { EventInfo, OEvent, createEvent } from '../src/model/oevent.js';
 import { GetResultsFileData, SaveResultsFileData } from '../src/results/results.js';
-import { setupMochaHooks, testEnv, v2Request } from './firebase-test-helper.js';
+import { setupMochaHooks, testEnv, v2Request, mockHttpRequest } from './firebase-test-helper.js';
 
 /* UTILITY FUNCTIONS */
 
@@ -22,38 +22,6 @@ async function saveFile(bucket: Bucket, path: string, content: string): Promise<
 async function readFile(bucket: Bucket, path: string): Promise<string> {
   const [content] = await bucket.file(path).download();
   return content.toString('utf-8');
-}
-
-/**
- * Mocks an HTTP request and response for testing onRequest functions.
- * @param method The HTTP method (e.g., 'POST', 'GET').
- * @param body The request body.
- * @returns A mock request and a mock response handler.
- */
-function mockHttpRequest(method: string, body: any) {
-  const req = { method, body, headers: {} };
-
-  let status = 200;
-  let sentBody: any;
-
-  const res = {
-    status: (s: number) => {
-      status = s;
-      return res;
-    },
-    send: (b: any) => {
-      sentBody = b;
-    },
-    json: (b: any) => {
-      sentBody = b;
-    },
-    set: (field: string, value: any) => {
-      // No-op for most tests
-    },
-    getSent: () => ({ status, body: sentBody }),
-  };
-
-  return { req, res };
 }
 
 /** Event info containing all madatory fields  */
