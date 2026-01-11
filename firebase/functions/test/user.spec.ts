@@ -3,7 +3,7 @@ import { Firestore } from 'firebase-admin/firestore';
 import { describe, it, expect } from 'vitest';
 import { userConverter } from '../src/model/user-firebase-converters.js';
 import { UserData } from '../src/model/user.js';
-import { setupMochaHooks, testEnv } from './firebase-test-helper.js';
+import { initialiseFirebaseEmulator, testEnv } from './firebase-test-helper.js';
 
 /* UTILITY FUNCTIONS */
 
@@ -25,7 +25,7 @@ describe('User Cloud Functions', function () {
    // Set a default timeout of 5 seconds for all tests and hooks in this suite.
    // Vitest default timeout is 5000ms, can be configured in vitest.config.ts or per test
 
-   const context = setupMochaHooks();
+   const context = initialiseFirebaseEmulator();
 
    describe('createUser', () => {
       it('should create a new user data document when a user is created', async () => {

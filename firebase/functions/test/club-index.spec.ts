@@ -6,7 +6,7 @@ import { makeClubKey } from '../src/club/club-index.js';
 import { Club, createClub } from '../src/model/club.js';
 import { clubConverter, eventConverter } from '../src/model/event-firebase-converters.js';
 import { OEvent, createEvent } from '../src/model/oevent.js';
-import { setupMochaHooks, testEnv } from './firebase-test-helper.js';
+import { initialiseFirebaseEmulator, testEnv } from './firebase-test-helper.js';
 import { SUPER_USER_UID } from '../src/auth.js';
 
 /* UTILITY FUNCTIONS */
@@ -45,7 +45,7 @@ describe('Club Index Cloud Functions', function () {
    // Set a default timeout of 5 seconds for all tests and hooks in this suite.
    // Vitest default timeout is 5000ms
 
-   const context = setupMochaHooks();
+   const context = initialiseFirebaseEmulator();
 
    describe('clubsEventCreated', () => {
       it('should create a new club if one does not exist', async () => {

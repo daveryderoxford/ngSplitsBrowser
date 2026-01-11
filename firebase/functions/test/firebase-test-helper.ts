@@ -25,10 +25,9 @@ export interface TestContext {
 }
 
 /**
- * Sets up common Mocha hooks for Firebase Functions tests.
- * This handles app initialization, lazy-loading of functions, and cleanup.
+ * Initialises Firebase enulator, lazy-loading of functions.
  */
-export function setupMochaHooks(): TestContext {
+export function initialiseFirebaseEmulator(): TestContext {
 	const context: Partial<TestContext> = {};
 
 	beforeAll(async () => {
@@ -57,11 +56,7 @@ export function setupMochaHooks(): TestContext {
 		// TODO Maybe look into using this later
 		// testEnv.clearFirestore();
 		try {
-			const db = context.db!;
-			const collections = await db.listCollections();
-			for (const collection of collections) {
-				await db.recursiveDelete(collection);
-			}
+			await claenFirestoreDatabase(context);
 		} catch (error: any) {
 			console.log('\n ****** afterEach:  Error in aftereach\n', error.toString());
 		}
@@ -70,7 +65,22 @@ export function setupMochaHooks(): TestContext {
 	return context as TestContext;
 }
 
-export function v2Request<T>(data: T, uid = 'auth-user-id'): CallableRequest<T> {
+/** 
+Deletes all Firestore collections.
+The offical method to delete Firestore emulator collections 
+is testEnv.clearFirestore() but it has been found to casuse 
+intermittenmt failure of tests
+*/
+async function claenFirestoreDatabase(context: Partial<TestContext>) {
+	const db = context.db!;
+	const collections = await db.listCollections();
+	for (const collection of collections) {
+		await db.recursiveDelete(collection);
+	}
+}
+
+/** Creates a mock Cloud functionsV2 callable request */
+export function mockV2CallableRequest<T>(data: T, uid = 'auth-user-id'): CallableRequest<T> {
 	const request: CallableRequest<T> = {
 		data: data,
 		auth: { uid: uid, token: {} as DecodedIdToken },

@@ -6,7 +6,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { eventConverter } from '../src/model/event-firebase-converters.js';
 import { EventInfo, OEvent, createEvent } from '../src/model/oevent.js';
 import { GetResultsFileData, SaveResultsFileData } from '../src/results/results.js';
-import { setupMochaHooks, testEnv, v2Request, mockHttpRequest } from './firebase-test-helper.js';
+import { initialiseFirebaseEmulator, testEnv, mockV2CallableRequest, mockHttpRequest } from './firebase-test-helper.js';
 
 /* UTILITY FUNCTIONS */
 
@@ -39,7 +39,7 @@ function validEventInfo(): Partial<EventInfo> {
 describe('Results Cloud Functions', function () {
   // Set a default timeout of 5 seconds for all tests and hooks in this suite.
 
-  const context = setupMochaHooks();
+  const context = initialiseFirebaseEmulator();
 
   describe('getResultsFile', () => {
     it('should return file content for a valid eventKey', async () => {
@@ -51,7 +51,7 @@ describe('Results Cloud Functions', function () {
       await saveFile(context.storage.bucket(), filePath, fileContent);
 
       const wrapped = testEnv.wrap(context.myFunctions.getResultsFile);
-      const req = v2Request<GetResultsFileData>({ eventKey: 'evt-get-ok' });
+      const req = mockV2CallableRequest<GetResultsFileData>({ eventKey: 'evt-get-ok' });
       const result = await wrapped(req);
 
       expect(result).toBe(fileContent);
@@ -60,7 +60,7 @@ describe('Results Cloud Functions', function () {
     it('should throw "not-found" if the event does not exist', async () => {
       const wrapped = testEnv.wrap(context.myFunctions.getResultsFile);
       try {
-        await wrapped(v2Request({ eventKey: 'evt-not-found' }));
+        await wrapped(mockV2CallableRequest({ eventKey: 'evt-not-found' }));
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
         expect(e.code).toBe('not-found');
@@ -73,7 +73,7 @@ describe('Results Cloud Functions', function () {
 
       const wrapped = testEnv.wrap(context.myFunctions.getResultsFile);
       try {
-        await wrapped(v2Request({ eventKey: 'evt-no-file' }));
+        await wrapped(mockV2CallableRequest({ eventKey: 'evt-no-file' }));
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
         expect(e.code).toBe('not-found');
@@ -91,7 +91,7 @@ describe('Results Cloud Functions', function () {
       await saveEvent(context.db, eventData);
 
       const wrapped = testEnv.wrap(context.myFunctions.saveResultsFile);
-      const req = v2Request<SaveResultsFileData>({ eventKey: 'evt-save-ok', resultsData: fileContent }, 'auth-user-id');
+      const req = mockV2CallableRequest<SaveResultsFileData>({ eventKey: 'evt-save-ok', resultsData: fileContent }, 'auth-user-id');
       const result = await wrapped(req);
 
       expect(result.success).toBe(true);
@@ -106,7 +106,7 @@ describe('Results Cloud Functions', function () {
       console.log('*****Event saved');
 
       const wrapped = testEnv.wrap(context.myFunctions.saveResultsFile);
-      const req = v2Request<SaveResultsFileData>({ eventKey: 'evt-save-ok', resultsData: 'any-data' });
+      const req = mockV2CallableRequest<SaveResultsFileData>({ eventKey: 'evt-save-ok', resultsData: 'any-data' });
       delete req.auth;
       try {
         await wrapped(req);
@@ -121,7 +121,7 @@ describe('Results Cloud Functions', function () {
       await saveEvent(context.db, eventData);
 
       const wrapped = testEnv.wrap(context.myFunctions.saveResultsFile);
-      const req = v2Request<SaveResultsFileData>({ eventKey: 'evt-save-unauth', resultsData: 'any-data' }, 'not-the-owner-id');
+      const req = mockV2CallableRequest<SaveResultsFileData>({ eventKey: 'evt-save-unauth', resultsData: 'any-data' }, 'not-the-owner-id');
       try {
         await wrapped(req);
         expect.fail('Function should have thrown an error');
@@ -132,7 +132,7 @@ describe('Results Cloud Functions', function () {
 
     it('should throw "not-found" if the event does not exist', async () => {
       const wrapped = testEnv.wrap(context.myFunctions.saveResultsFile);
-      const req = v2Request<SaveResultsFileData>({ eventKey: 'evt-not-found', resultsData: 'any-data' }, 'any-user');
+      const req = mockV2CallableRequest<SaveResultsFileData>({ eventKey: 'evt-not-found', resultsData: 'any-data' }, 'any-user');
       try {
         await wrapped(req);
         expect.fail('Function should have thrown an error');
@@ -143,7 +143,7 @@ describe('Results Cloud Functions', function () {
 
     it('should throw "invalid-argument" if resultsData is missing', async () => {
       const wrapped = testEnv.wrap(context.myFunctions.saveResultsFile);
-      const req = v2Request<any>({ eventKey: 'any-event' }, 'any-user'); // 'resultsData' is missing
+      const req = mockV2CallableRequest<any>({ eventKey: 'any-event' }, 'any-user'); // 'resultsData' is missing
       try {
         await wrapped(req);
         expect.fail('Function should have thrown an error');
