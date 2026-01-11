@@ -2,7 +2,7 @@
 import test from 'firebase-functions-test';
 import { initializeApp, getApps, deleteApp } from 'firebase-admin/app';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
-import { before, after, afterEach } from 'mocha';
+import { beforeAll, afterAll, afterEach } from 'vitest';
 import { getStorage, Storage } from 'firebase-admin/storage';
 import { CallableRequest } from 'firebase-functions/v2/https';
 import { DecodedIdToken } from 'firebase-admin/auth';
@@ -31,10 +31,7 @@ export interface TestContext {
 export function setupMochaHooks(): TestContext {
 	const context: Partial<TestContext> = {};
 
-	gs://splitsbrowser-b5948.appspot.com
-
-
-	before(async () => {
+	beforeAll(async () => {
 		initializeApp({ 
 			projectId, 
 			storageBucket: `splitsbrowser-b5948.appspot.com`
@@ -46,7 +43,7 @@ export function setupMochaHooks(): TestContext {
 		context.myFunctions = await import('../src/index.js');
 	});
 
-	after(async () => {
+	afterAll(async () => {
 		testEnv.cleanup();
 		// Ensure the app is deleted to prevent state leakage between test files.
 		if (getApps().length) {

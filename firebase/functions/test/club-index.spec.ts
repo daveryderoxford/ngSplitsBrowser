@@ -1,8 +1,7 @@
 
 // Initialize the test environment. This must be done before importing the functions file.
-import { expect } from 'chai';
 import { Firestore, WriteResult } from 'firebase-admin/firestore';
-import { describe, it } from 'mocha';
+import { describe, it, expect } from 'vitest';
 import { makeClubKey } from '../src/club/club-index.js';
 import { Club, createClub } from '../src/model/club.js';
 import { clubConverter, eventConverter } from '../src/model/event-firebase-converters.js';
@@ -30,9 +29,9 @@ async function readClub(db: Firestore, oevent: OEvent): Promise<Club | undefined
 }
 
 function expectClub(club: Club | undefined, numEvents: number, expectedTime: Date | undefined, msg: string = '') {
-   expect(club, msg + '  Club undefined').to.not.be.undefined;
+   expect(club, msg + '  Club undefined').toBeDefined();
    if (club) {
-      expect(club.numEvents, msg + '  Numevents incorrect').to.equal(numEvents);
+      expect(club.numEvents, msg + '  Numevents incorrect').toBe(numEvents);
       if (expectedTime) {
          //   expect(isEqual(club.lastEvent, expectedTime), msg + 'end time incorrect').to.be.true;
       }
@@ -44,7 +43,7 @@ function expectClub(club: Club | undefined, numEvents: number, expectedTime: Dat
 describe('Club Index Cloud Functions', function () {
 
    // Set a default timeout of 5 seconds for all tests and hooks in this suite.
-   this.timeout(5000);
+   // Vitest default timeout is 5000ms
 
    const context = setupMochaHooks();
 
@@ -122,7 +121,7 @@ describe('Club Index Cloud Functions', function () {
 
          // Validate response
          const club = await readClub(context.db, eventData);
-         expect(club).to.be.undefined;
+         expect(club).toBeUndefined();
       });
    });
 
@@ -199,7 +198,7 @@ describe('Club Index Cloud Functions', function () {
 
          // Verify the stale club was deleted
          const allClubsSnap = await context.db.collection('clubs').withConverter(clubConverter).get();
-         expect(allClubsSnap.size).to.equal(2);
+         expect(allClubsSnap.size).toBe(2);
       });
 
       it('should throw an error if not authenticated', async () => {
@@ -210,7 +209,7 @@ describe('Club Index Cloud Functions', function () {
             await wrapped({ data: null, rawRequest: {} as any });
             expect.fail('Function should have thrown an error');
          } catch (e: any) {
-            expect(e.code).to.equal('permission-denied');
+            expect(e.code).toBe('permission-denied');
          }
       });
 

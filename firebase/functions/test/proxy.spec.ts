@@ -1,19 +1,18 @@
-import * as sinon from "sinon";
-import { expect } from "chai";
+import { describe, it, expect, afterEach, vi } from "vitest";
 import { resultsProxy } from "../src/proxy.js";
 import { mockHttpRequest } from "./firebase-test-helper.js";
 
 describe("resultsProxy", () => {
    afterEach(() => {
-      sinon.restore();
+      vi.unstubAllGlobals();
    });
 
    it("should return 400 if no URL is provided", async () => {
       const { req, res } = mockHttpRequest("GET", null, {}, {});
       await resultsProxy(req as any, res as any);
       const { status, body } = res.getSent();
-      expect(status).to.equal(400);
-      expect(body).to.equal("Please provide a URL in the query string.");
+      expect(status).toBe(400);
+      expect(body).toBe("Please provide a URL in the query string.");
    });
 
    it("should proxy the request and return the response", async () => {
@@ -27,25 +26,27 @@ describe("resultsProxy", () => {
          text: () => Promise.resolve(mockHtml),
          headers: { get: () => "text/html" },
       };
-      sinon.stub(global, "fetch").resolves(fetchResponse as any);
+      
+      const fetchSpy = vi.fn().mockResolvedValue(fetchResponse);
+      vi.stubGlobal("fetch", fetchSpy);
 
       const { req, res } = mockHttpRequest("GET", null, { url: targetUrl }, {});
       await resultsProxy(req as any, res as any);
       const { status, body } = res.getSent();
-      expect(status).to.equal(200);
-      expect(body).to.equal(mockHtml);
-      expect((global.fetch as any).getCall(0).args[0]).to.equal(targetUrl);
+      expect(status).toBe(200);
+      expect(body).toBe(mockHtml);
+      expect(fetchSpy).toHaveBeenCalledWith(targetUrl, expect.anything());
    });
 
    it("should handle fetch errors gracefully", async () => {
       const targetUrl = "http://example.com/nonexistent";
       const error = new Error("Network error");
-      sinon.stub(global, "fetch").rejects(error);
+      vi.stubGlobal("fetch", vi.fn().mockRejectedValue(error));
 
       const { req, res } = mockHttpRequest("GET", null, { url: targetUrl }, {});
       await resultsProxy(req as any, res as any);
       const { status, body } = res.getSent();
-      expect(status).to.equal(500);
-      expect(body).to.equal("Error fetching the URL.");
+      expect(status).toBe(500);
+      expect(body).toBe("Error fetching the URL.");
    });
 });

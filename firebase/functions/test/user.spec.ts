@@ -1,7 +1,6 @@
 // Initialize the test environment. This must be done before importing the functions file.
-import { expect } from 'chai';
 import { Firestore } from 'firebase-admin/firestore';
-import { describe, it } from 'mocha';
+import { describe, it, expect } from 'vitest';
 import { userConverter } from '../src/model/user-firebase-converters.js';
 import { UserData } from '../src/model/user.js';
 import { setupMochaHooks, testEnv } from './firebase-test-helper.js';
@@ -24,7 +23,7 @@ async function readUser(db: Firestore, uid: string): Promise<UserData | undefine
 describe('User Cloud Functions', function () {
 
    // Set a default timeout of 5 seconds for all tests and hooks in this suite.
-   this.timeout(30000);
+   // Vitest default timeout is 5000ms, can be configured in vitest.config.ts or per test
 
    const context = setupMochaHooks();
 
@@ -42,12 +41,12 @@ describe('User Cloud Functions', function () {
 
          const userData = await readUser(context.db, user.uid);
 
-         expect(userData).to.not.be.undefined;
+         expect(userData).toBeDefined();
          if (userData) {
-            expect(userData.key).to.equal(user.uid);
-            expect(userData.email).to.equal(user.email);
-            expect(userData.firstname).to.equal('');
-            expect(userData.surname).to.equal('');
+            expect(userData.key).toBe(user.uid);
+            expect(userData.email).toBe(user.email);
+            expect(userData.firstname).toBe('');
+            expect(userData.surname).toBe('');
          }
       });
    });
@@ -79,8 +78,8 @@ describe('User Cloud Functions', function () {
          // Verify updated user has archived set
          const userData = await readUser(context.db, user.uid);
 
-         expect(userData).to.not.be.undefined;
-         expect((userData as any).archived).to.be.true;
+         expect(userData).toBeDefined();
+         expect((userData as any).archived).toBe(true);
       });
    });
 });

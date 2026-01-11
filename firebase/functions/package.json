@@ -5,8 +5,7 @@
     "lint-fix": "eslint -fix .",
     "build": "tsc",
     "build-test": "tsc --build tsconfig.test.json",
-    "test": "NODE_OPTIONS='--loader ts-node/esm' mocha --project tsconfig.test.json test/**/*.spec.ts",
-    "test:emu": "firebase emulators:exec --only firestore,functions 'npm test'",
+    "test": "firebase emulators:exec --only firestore,functions,auth,storage 'vitest run'",
     "serve": "npm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
@@ -26,21 +25,13 @@
     "firebase-functions": "^5.0.1"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.11",
-    "@types/chai-spies": "^1.0.6",
-    "@types/mocha": "^10.0.10",
-    "@types/sinon": "^17.0.4",
     "@typescript-eslint/eslint-plugin": "^5.12.0",
     "@typescript-eslint/parser": "^5.12.0",
-    "chai": "^4.3.10",
-    "chai-spies": "^1.1.0",
     "eslint": "^8.9.0",
     "eslint-plugin-import": "^2.25.4",
     "firebase-functions-test": "^3.4.1",
-    "mocha": "^10.8.2",
-    "sinon": "^21.0.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0"
   },
   "private": true
 }

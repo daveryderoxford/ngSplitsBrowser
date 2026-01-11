@@ -1,8 +1,8 @@
 // Initialize the test environment. This must be done before importing the functions file.
+import { getAuth } from "firebase-admin/auth";
 import { Bucket } from "@google-cloud/storage";
-import { expect } from 'chai';
 import { Firestore } from 'firebase-admin/firestore';
-import { describe, it } from 'mocha';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { eventConverter } from '../src/model/event-firebase-converters.js';
 import { EventInfo, OEvent, createEvent } from '../src/model/oevent.js';
 import { GetResultsFileData, SaveResultsFileData } from '../src/results/results.js';
@@ -38,7 +38,6 @@ function validEventInfo(): Partial<EventInfo> {
 
 describe('Results Cloud Functions', function () {
   // Set a default timeout of 5 seconds for all tests and hooks in this suite.
-  this.timeout(60000);
 
   const context = setupMochaHooks();
 
@@ -55,7 +54,7 @@ describe('Results Cloud Functions', function () {
       const req = v2Request<GetResultsFileData>({ eventKey: 'evt-get-ok' });
       const result = await wrapped(req);
 
-      expect(result).to.equal(fileContent);
+      expect(result).toBe(fileContent);
     });
 
     it('should throw "not-found" if the event does not exist', async () => {
@@ -64,7 +63,7 @@ describe('Results Cloud Functions', function () {
         await wrapped(v2Request({ eventKey: 'evt-not-found' }));
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
-        expect(e.code).to.equal('not-found');
+        expect(e.code).toBe('not-found');
       }
     });
 
@@ -77,8 +76,8 @@ describe('Results Cloud Functions', function () {
         await wrapped(v2Request({ eventKey: 'evt-no-file' }));
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
-        expect(e.code).to.equal('not-found');
-        expect(e.message).to.contain('File not found at path');
+        expect(e.code).toBe('not-found');
+        expect(e.message).toContain('File not found at path');
       }
     });
   });
@@ -95,10 +94,10 @@ describe('Results Cloud Functions', function () {
       const req = v2Request<SaveResultsFileData>({ eventKey: 'evt-save-ok', resultsData: fileContent }, 'auth-user-id');
       const result = await wrapped(req);
 
-      expect(result.success).to.be.true;
+      expect(result.success).toBe(true);
 
       const savedContent = await readFile(context.storage.bucket(), filePath);
-      expect(savedContent).to.equal(fileContent);
+      expect(savedContent).toBe(fileContent);
     });
 
     it('should throw "unauthenticated" if user is not logged in', async () => {
@@ -113,7 +112,7 @@ describe('Results Cloud Functions', function () {
         await wrapped(req);
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
-        expect(e.code).to.equal('unauthenticated');
+        expect(e.code).toBe('unauthenticated');
       }
     });
 
@@ -127,7 +126,7 @@ describe('Results Cloud Functions', function () {
         await wrapped(req);
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
-        expect(e.code).to.equal('permission-denied');
+        expect(e.code).toBe('permission-denied');
       }
     });
 
@@ -138,7 +137,7 @@ describe('Results Cloud Functions', function () {
         await wrapped(req);
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
-        expect(e.code).to.equal('not-found');
+        expect(e.code).toBe('not-found');
       }
     });
 
@@ -149,7 +148,7 @@ describe('Results Cloud Functions', function () {
         await wrapped(req);
         expect.fail('Function should have thrown an error');
       } catch (e: any) {
-        expect(e.code).to.equal('invalid-argument');
+        expect(e.code).toBe('invalid-argument');
       }
     });
   });
@@ -158,11 +157,22 @@ describe('Results Cloud Functions', function () {
   describe('uploadResults', () => {
     const VALID_API_KEY = 'test-api-key';
 
-    before(() => {
+    beforeAll(async () => {
       process.env['UPLOAD_API_KEY'] = VALID_API_KEY;
+      // Create users in the emulator so that admin.auth().getUser() succeeds
+      try {
+        await getAuth().createUser({ uid: 'VALID_USER_ID' });
+      } catch (e: any) {
+        if (e.code !== 'auth/uid-already-exists') throw e;
+      }
+      try {
+        await getAuth().createUser({ uid: 'test-user' });
+      } catch (e: any) {
+        if (e.code !== 'auth/uid-already-exists') throw e;
+      }
     });
 
-    after(() => {
+    afterAll(() => {
       delete process.env['UPLOAD_API_KEY'];
     });
 
@@ -213,30 +223,30 @@ describe('Results Cloud Functions', function () {
       const { status, body } = res.getSent();
 
       // 1. Assert HTTP response
-      expect(status).to.equal(200);
-      expect(body.success).to.be.true;
-      expect(body.eventKey).to.be.a('string');
+      expect(status).toBe(200);
+      expect(body.success).toBe(true);
+      expect(body.eventKey).toBeTypeOf('string');
 
       const eventKey = body.eventKey;
 
       // 2. Assert Firestore document creation
       const eventDoc = await context.db.collection('events').doc(eventKey).withConverter(eventConverter).get();
       const savedEvent = eventDoc.data();
-      expect(savedEvent).to.exist;
-      expect(savedEvent!.name).to.equal(eventData.name);
-      expect(savedEvent!.club).to.equal(eventData.club);
-      expect(savedEvent!.userId).to.equal('VALID_USER_ID');
+      expect(savedEvent).toBeDefined();
+      expect(savedEvent!.name).toBe(eventData.name);
+      expect(savedEvent!.club).toBe(eventData.club);
+      expect(savedEvent!.userId).toBe('VALID_USER_ID');
 
-      expect(savedEvent!.summary).to.exist;
-      expect(savedEvent!.summary!.numcompetitors).to.equal(1);
-      expect(savedEvent!.summary!.courses).to.have.lengthOf(1);
-      expect(savedEvent!.summary!.courses[0].classes[0]).to.equal('M21');
-      expect(savedEvent!.summary!.courses[0].numcompetitors).to.equal(1);
+      expect(savedEvent!.summary).toBeDefined();
+      expect(savedEvent!.summary!.numcompetitors).toBe(1);
+      expect(savedEvent!.summary!.courses).toHaveLength(1);
+      expect(savedEvent!.summary!.courses[0].classes[0]).toBe('M21');
+      expect(savedEvent!.summary!.courses[0].numcompetitors).toBe(1);
 
       // 3. Assert Storage file creation
       const expectedPath = `results/VALID_USER_ID/${eventKey}-results`;
       const savedContent = await readFile(context.storage.bucket(), expectedPath);
-      expect(savedContent).to.equal(testResultsData);
+      expect(savedContent).toBe(testResultsData);
     });
 
     it('should return 401 Unauthorized for an invalid API key', async () => {
@@ -249,8 +259,8 @@ describe('Results Cloud Functions', function () {
       await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
-      expect(status).to.equal(401);
-      expect(body.error).to.contain('A valid API key is required');
+      expect(status).toBe(401);
+      expect(body.error).toContain('A valid API key is required');
     });
 
     it('should return 400 Bad Request if eventData is missing', async () => {
@@ -263,8 +273,8 @@ describe('Results Cloud Functions', function () {
       await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
-      expect(status).to.equal(400);
-      expect(body.error).to.contain('The function must be called with "eventData", "resultsData" and "userId".');
+      expect(status).toBe(400);
+      expect(body.error).toContain('The function must be called with "eventData", "resultsData" and "userId".');
     });
 
     it('should return 400 Bad Request if eventData.name is missing', async () => {
@@ -278,8 +288,8 @@ describe('Results Cloud Functions', function () {
       await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
-      expect(status).to.equal(400);
-      expect(body.error).to.equal('Missing required fields in eventData: name');
+      expect(status).toBe(400);
+      expect(body.error).toBe('Missing required fields in eventData: name');
     });
 
     it('should return 400 Bad Request if multiple required fields are missing', async () => {
@@ -293,8 +303,8 @@ describe('Results Cloud Functions', function () {
       await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
-      expect(status).to.equal(400);
-      expect(body.error).to.equal('Missing required fields in eventData: name, club, nationality');
+      expect(status).toBe(400);
+      expect(body.error).toBe('Missing required fields in eventData: name, club, nationality');
     });
 
     it('should return 500 Internal Server Error for invalid resultsData', async () => {
@@ -314,8 +324,8 @@ describe('Results Cloud Functions', function () {
       await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
-      expect(status).to.equal(500);
-      expect(body.error).to.equal('Error parsing results file');
+      expect(status).toBe(500);
+      expect(body.error).toBe('Error parsing results file');
     });
 
     it('should return 405 Method Not Allowed for non-POST requests', async () => {
@@ -324,8 +334,8 @@ describe('Results Cloud Functions', function () {
       await context.myFunctions.uploadResults(req as any, res as any);
 
       const { status, body } = res.getSent();
-      expect(status).to.equal(405);
-      expect(body).to.equal('Method Not Allowed');
+      expect(status).toBe(405);
+      expect(body).toBe('Method Not Allowed');
     });
 
     it('should handle OPTIONS preflight request', async () => {
@@ -333,7 +343,7 @@ describe('Results Cloud Functions', function () {
       // For onRequest functions, call the handler directly with mock req and res.
       await context.myFunctions.uploadResults(req as any, res as any);
       const { status} = res.getSent();
-      expect(status).to.equal(204);
+      expect(status).toBe(204);
     });
   });
 });

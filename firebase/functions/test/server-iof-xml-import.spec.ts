@@ -1,7 +1,6 @@
 import { parseIOFXMLEventData } from '../src/results/import/server-iof-xml-reader.js';
 import { WrongFileFormat } from '../src/results/model/exception.js';
-import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, expect } from 'vitest';
 
 
 const V3_HEADER = '<?xml version="1.0" encoding="UTF-8"?>\n<ResultList xmlns="http://www.orienteering.org/datastandard/3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" iofVersion="3.0">';
@@ -14,15 +13,15 @@ describe('IOF XML Reader (Server-Side)', () => {
 
    describe('Format Recognition', () => {
       it('should throw WrongFileFormat for empty string', () => {
-         expect(() => parseIOFXMLEventData("")).to.throw().instanceOf(WrongFileFormat);
+         expect(() => parseIOFXMLEventData("")).toThrowError(WrongFileFormat);
       });
 
       it('should throw WrongFileFormat for non-XML string', () => {
-         expect(() => parseIOFXMLEventData("this is not xml")).to.throw().instanceOf(WrongFileFormat);
+         expect(() => parseIOFXMLEventData("this is not xml")).toThrowError(WrongFileFormat);
       });
 
       it('should throw WrongFileFormat for XML that is not an IOF format', () => {
-         expect(() => parseIOFXMLEventData("<root><item>1</item></root>")).to.throw().instanceOf(WrongFileFormat);
+         expect(() => parseIOFXMLEventData("<root><item>1</item></root>")).toThrowError(WrongFileFormat);
       });
 
       it('should correctly identify and parse a valid v3.0 file', () => {
@@ -36,8 +35,8 @@ describe('IOF XML Reader (Server-Side)', () => {
         </ClassResult>
       ${V3_FOOTER}`;
          const results = parseIOFXMLEventData(xml);
-         expect(results.classes).to.have.lengthOf(1);
-         expect(results.classes[0].name).to.equal('M21E');
+         expect(results.classes).toHaveLength(1);
+         expect(results.classes[0].name).toBe('M21E');
       });
 
       it('should correctly identify and parse a valid v2.0.3 file', () => {
@@ -54,8 +53,8 @@ describe('IOF XML Reader (Server-Side)', () => {
         </ClassResult>
       ${V2_FOOTER}`;
          const results = parseIOFXMLEventData(xml);
-         expect(results.classes).to.have.lengthOf(1);
-         expect(results.classes[0].name).to.equal('M21E');
+         expect(results.classes).toHaveLength(1);
+         expect(results.classes[0].name).toBe('M21E');
       });
    });
 
@@ -101,33 +100,33 @@ describe('IOF XML Reader (Server-Side)', () => {
 
       it('should parse a class with multiple competitors', () => {
          const results = parseIOFXMLEventData(fullV3Xml);
-         expect(results.classes).to.have.lengthOf(1);
-         expect(results.classes[0].competitors).to.have.lengthOf(2);
+         expect(results.classes).toHaveLength(1);
+         expect(results.classes[0].competitors).toHaveLength(2);
       });
 
       it('should correctly parse competitor details', () => {
          const results = parseIOFXMLEventData(fullV3Xml);
          const competitor = results.classes[0].competitors[0];
-         expect(competitor.name).to.equal('John Smith');
-         expect(competitor.club).to.equal('CLUB');
-         expect(competitor.totalTime).to.equal(3723);
-         expect(competitor.completed).to.be.true;
+         expect(competitor.name).toBe('John Smith');
+         expect(competitor.club).toBe('CLUB');
+         expect(competitor.totalTime).toBe(3723);
+         expect(competitor.completed).toBe(true);
       });
 
       it('should correctly parse course details', () => {
          const results = parseIOFXMLEventData(fullV3Xml);
          const course = results.courses[0];
-         expect(course.name).to.equal('W21E Course');
-         expect(course.length).to.equal(5); // 5000m -> 5km
-         expect(course.climb).to.equal(150);
-         expect(course.controls).to.deep.equal(['101', '102']);
+         expect(course.name).toBe('W21E Course');
+         expect(course.length).toBe(5); // 5000m -> 5km
+         expect(course.climb).toBe(150);
+         expect(course.controls).toEqual(['101', '102']);
       });
 
       it('should correctly parse split times', () => {
          const results = parseIOFXMLEventData(fullV3Xml);
          const competitor = results.classes[0].competitors[0];
          // [0, 123, 345, 3723]
-         expect(competitor.allOriginalCumulativeTimes).to.deep.equal([0, 123, 345, 3723]);
+         expect(competitor.allOriginalCumulativeTimes).toEqual([0, 123, 345, 3723]);
       });
    });
 
@@ -155,34 +154,34 @@ describe('IOF XML Reader (Server-Side)', () => {
 
       it('should parse a class with one competitor', () => {
          const results = parseIOFXMLEventData(fullV2Xml);
-         expect(results.classes).to.have.lengthOf(1);
-         expect(results.classes[0].competitors).to.have.lengthOf(1);
-         expect(results.classes[0].name).to.equal('M40');
+         expect(results.classes).toHaveLength(1);
+         expect(results.classes[0].competitors).toHaveLength(1);
+         expect(results.classes[0].name).toBe('M40');
       });
 
       it('should correctly parse competitor details', () => {
          const results = parseIOFXMLEventData(fullV2Xml);
          const competitor = results.classes[0].competitors[0];
-         expect(competitor.name).to.equal('Test Runner');
-         expect(competitor.club).to.equal('V2CLUB');
-         expect(competitor.totalTime).to.equal(3330); // 55:30
-         expect(competitor.completed).to.be.true;
+         expect(competitor.name).toBe('Test Runner');
+         expect(competitor.club).toBe('V2CLUB');
+         expect(competitor.totalTime).toBe(3330); // 55:30
+         expect(competitor.completed).toBe(true);
       });
 
       it('should correctly parse course details', () => {
          const results = parseIOFXMLEventData(fullV2Xml);
          const course = results.courses[0];
-         expect(course.name).to.equal('M40');
-         expect(course.length).to.equal(4.5); // 4500m -> 4.5km
-         expect(course.climb).to.be.null;
-         expect(course.controls).to.deep.equal(['31', '32']);
+         expect(course.name).toBe('M40');
+         expect(course.length).toBe(4.5); // 4500m -> 4.5km
+         expect(course.climb).toBeNull();
+         expect(course.controls).toEqual(['31', '32']);
       });
 
       it('should correctly parse split times', () => {
          const results = parseIOFXMLEventData(fullV2Xml);
          const competitor = results.classes[0].competitors[0];
          // [0, 300, 900, 3330]
-         expect(competitor.allOriginalCumulativeTimes).to.deep.equal([0, 300, 900, 3330]);
+         expect(competitor.allOriginalCumulativeTimes).toEqual([0, 300, 900, 3330]);
       });
    });
 });
