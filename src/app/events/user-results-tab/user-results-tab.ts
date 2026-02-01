@@ -11,13 +11,13 @@ import { UserResultsTableComponent } from "app/user-results/user-results-table/u
 import { SelectedEventService } from '../selected-event.service';
 
 @Component({
-   selector: "app-my-events-tab",
-   templateUrl: "./my-events-tab.html",
-   styleUrls: ["./my-events-tab.scss"],
+   selector: 'app-user-results-tab',
+   templateUrl: './user-results-tab.html',
+   styleUrls: ['./user-results-tab.scss'],
    imports: [MatButtonModule, RouterLink, MatListModule, UserResultButton, UserResultsTableComponent],
    changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MyEventsTab {
+export class UserResultsTab {
    protected us = inject(UserDataService);
    protected ses = inject(SelectedEventService);
    protected auth = inject(AuthService);

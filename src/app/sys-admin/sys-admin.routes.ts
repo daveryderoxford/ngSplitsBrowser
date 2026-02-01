@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { getApp } from '@angular/fire/app';
 import { SysAdminSwitchboard } from './sys-admin-switchboard';
 import { getFunctions, provideFunctions } from '@angular/fire/functions';
 import { UserListComponent } from './user-list/user-list.component';
@@ -10,7 +11,7 @@ export const SYS_ADMIN_ROUTES: Routes = [
       component: SysAdminSwitchboard,
       title: 'System Administration',
       providers: [
-         provideFunctions(() => getFunctions()),
+         provideFunctions(() => getFunctions(getApp(), 'europe-west2')),
       ],
    }, 
    {

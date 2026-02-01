@@ -1,6 +1,7 @@
 /**
  * Splitsbrowser Google clould functions exports
  */
+import "./firebase-config.js";
 import { getApps, initializeApp } from "firebase-admin/app";  // Need to explicitly reference app for ESM 
 
 if (getApps().length === 0) {
@@ -32,3 +33,11 @@ export {
 export {
    uploadResults
 } from "./results/uploadResultsHttp.js";
+
+export {
+   importUsers
+} from './user/import_users.js'; 
+
+export {
+   exportUsers
+} from './user/export_users.js';

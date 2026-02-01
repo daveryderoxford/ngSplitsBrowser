@@ -8,7 +8,7 @@ import { Toolbar } from 'app/shared/components/toolbar';
 import { AllEventsTabComponent } from "../all-events-tab/all-events-tab.component";
 import { ClubEventsTabComponent } from "../club-events-tab/club-events-tab";
 import { EventService } from "../event.service";
-import { MyEventsTab } from "../my-events-tab/my-events-tab";
+import { UserResultsTab } from "../user-results-tab/user-results-tab";
 import { AppBreakpoints } from 'app/shared/services/breakpoints';
 import { SelectedEventService } from '../selected-event.service';
 
@@ -16,7 +16,7 @@ import { SelectedEventService } from '../selected-event.service';
    selector: "app-results",
    templateUrl: "./events-page.html",
    styleUrls: ["./events-page.scss"],
-   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, MyEventsTab, Toolbar, MatButtonModule, RouterLink],
+   imports: [MatTabsModule, AllEventsTabComponent, ClubEventsTabComponent, UserResultsTab, Toolbar, MatButtonModule, RouterLink],
    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EventsPage {

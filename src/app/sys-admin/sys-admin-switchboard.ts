@@ -22,6 +22,12 @@ import { RouterLink } from '@angular/router';
         <button matButton='tonal' (click)="rebuildClubIndex()" [disabled]="busy()">
           Rebuild club index
         </button>
+           <button matButton='tonal' (click)="exportUsers()" [disabled]="busy()">
+             Export
+        </button>
+           <button matButton='tonal' (click)="importUsers()" [disabled]="busy()">
+             Import
+        </button>
       </div>
       <span class="message">
          {{msgText()}}
@@ -61,7 +67,7 @@ import { RouterLink } from '@angular/router';
 })
 export class SysAdminSwitchboard {
   private eventsImport = inject(LegacyEventImport);
-  private functions = getFunctions(inject(FirebaseApp));
+  private functions = getFunctions(inject(FirebaseApp), 'europe-west2');
 
   busy = signal(false);
 
@@ -95,6 +101,39 @@ export class SysAdminSwitchboard {
       const message = error.message;
       const details = error.details;
       console.log(`Sys-admin: Rebuild indices: error code ${code}, message: ${message}, details: ${details}`);
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+  async exportUsers() {
+    try {
+      const exp = httpsCallable(this.functions, 'exportUsers');
+      const result = await exp({});
+      console.log('Sys-admin: Exported users', result);
+    } catch (error: any) {
+      // Getting the Error details.
+      const code = error.code;
+      const message = error.message;
+      const details = error.details;
+      console.log(`Sys-admin:Export Users: error code ${code}, message: ${message}, details: ${details}`);
+    } finally {
+      this.busy.set(false);
+    }
+  }
+
+
+  async importUsers() {
+    try {
+      const exp = httpsCallable(this.functions, 'importUsers');
+      const result = await exp({});
+      console.log('Sys-admin: Import users', result);
+    } catch (error: any) {
+      // Getting the Error details.
+      const code = error.code;
+      const message = error.message;
+      const details = error.details;
+      console.log(`Sys-admin:Import Users: error code ${code}, message: ${message}, details: ${details}`);
     } finally {
       this.busy.set(false);
     }

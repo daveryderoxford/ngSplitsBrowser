@@ -1,110 +1,167 @@
 {
   "indexes": [
     {
-      "collectionId": "events",
-      "state": "READY",
-      "fields": [
-        {
-          "fieldPath": "date",
-          "mode": "DESCENDING"
-        },
-        {
-          "fieldPath": "name",
-          "mode": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionId": "events",
-      "state": "READY",
-      "fields": [
-        {
-          "fieldPath": "club",
-          "mode": "ASCENDING"
-        },
-        {
-          "fieldPath": "date",
-          "mode": "DESCENDING"
-        }
-      ]
-    },
-    {
-      "collectionId": "clubs",
-      "state": "READY",
+      "collectionGroup": "clubs",
+      "queryScope": "COLLECTION",
       "fields": [
         {
           "fieldPath": "name",
-          "mode": "ASCENDING"
+          "order": "ASCENDING"
         },
         {
           "fieldPath": "nationality",
-          "mode": "ASCENDING"
+          "order": "ASCENDING"
         }
       ]
     },
     {
-      "collectionId": "events",
-      "state": "READY",
+      "collectionGroup": "entries",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "userId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "fixtureDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "club",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "club",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "splits.valid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "name",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "nationality",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "splits.valid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "splits.valid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "name",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
       "fields": [
         {
           "fieldPath": "user",
-          "mode": "ASCENDING"
+          "order": "ASCENDING"
         },
         {
           "fieldPath": "date",
-          "mode": "DESCENDING"
+          "order": "DESCENDING"
         }
       ]
     },
     {
-      "collectionId": "events",
-      "state": "READY",
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "club",
-          "mode": "ASCENDING"
-        },
-        {
-          "fieldPath": "splits.valid",
-          "mode": "ASCENDING"
+          "fieldPath": "userId",
+          "order": "ASCENDING"
         },
         {
           "fieldPath": "date",
-          "mode": "DESCENDING"
+          "order": "DESCENDING"
         }
       ]
     },
     {
-      "collectionId": "events",
-      "state": "READY",
+      "collectionGroup": "events",
+      "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "splits.valid",
-          "mode": "ASCENDING"
+          "fieldPath": "userId",
+          "order": "ASCENDING"
         },
         {
-          "fieldPath": "date",
-          "mode": "DESCENDING"
-        },
-        {
-          "fieldPath": "name",
-          "mode": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionId": "events",
-      "state": "READY",
-      "fields": [
-        {
-          "fieldPath": "nationality",
-          "mode": "ASCENDING"
-        },
-        {
-          "fieldPath": "date",
-          "mode": "DESCENDING"
+          "fieldPath": "dateSubmitted",
+          "order": "DESCENDING"
         }
       ]
     }
-  ]
+  ],
+  "fieldOverrides": []
 }

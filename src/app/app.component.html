@@ -1,50 +1,9 @@
 <mat-sidenav-container class="fullscreen">
 
-  <mat-sidenav>
-
-    <mat-action-list>
-
-      <button mat-list-item (click)='closeSidenav(["/events"])'>Events</button>
-      <button mat-list-item (click)='loadFromUrl()'>Load from URL</button>
-
-      @if (ses.selectedEvent()) {
-         <button mat-list-item (click)='navigateToEvent()'>Selected results</button>
-      
-          @if (auth.user()) {
-            @defer () {
-              <app-user-result-button />
-            } @placeholder {
-              <button mat-list-item>Add user result</button>
-            }
-        }
-      }
-      <mat-divider />
-
-      <!--  TODO Enable settings once effects implamented 
-      <button mat-list-item (click)='closeSidenav(["/settings"])'>Settings</button>
-      <mat-divider />
-      -->
-
-      @if (auth.user()) {
-        <button mat-list-item (click)='closeSidenav(["/admin/add-event"])'>Upload results</button>
-        <button mat-list-item (click)='closeSidenav(["/admin"])'>Administer results</button>
-        <mat-divider />
-        <button mat-list-item (click)='closeSidenav(["/user"])'>User details</button>
-        <button mat-list-item (click)='closeSidenav(["/auth/change-password"])'>Change password</button>
-        <button mat-list-item (click)="logout()">Logout</button>
-      } @else {
-        <button mat-list-item (click)='closeSidenav(["/auth/login"])'>Login</button>
-      }
-
-      <mat-divider />
-      <a mat-list-item href="https://ofixtures.co.uk/fixtures">OFixtures</a>
-
-      <mat-divider  />
-      <button mat-list-item (click)='closeSidenav(["/about"])'>About</button>
-      <button mat-list-item (click)='contact()'>Contact</button>
-
-    </mat-action-list>
-
+  <mat-sidenav #sidenav>
+    @defer (when sidenav.opened) {
+      <app-sidenav-menu />
+    }
   </mat-sidenav>
 
   <mat-sidenav-content class="fullscreen">

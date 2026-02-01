@@ -11,10 +11,10 @@
 
   <mat-tab #tabClub label="Club">
     <ng-template matTabContent>
-      @defer {
+      @defer (on immediate) {
         <app-club-events-tab (eventSelected)="eventClicked($event)" />
-      } @loading {
-        ...Loading
+      } @placeholder {
+        <p>...Loading</p>
       } @error {
         Error occured loading tab
       }
@@ -25,8 +25,8 @@
   <mat-tab #tabMyEvents label="My Results">
 
     <ng-template matTabContent>
-      @defer {
-        <app-my-events-tab (eventSelected)="eventClicked($event)" />
+      @defer (on immediate) {
+        <app-user-results-tab (eventSelected)="eventClicked($event)" />
       } @loading {
         ...Loading
       } @error {

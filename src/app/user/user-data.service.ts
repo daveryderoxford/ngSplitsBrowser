@@ -1,20 +1,19 @@
 import { Injectable, inject } from "@angular/core";
 import { rxResource } from "@angular/core/rxjs-interop";
 import { FirebaseApp } from '@angular/fire/app';
-import { Auth, User } from "@angular/fire/auth";
-import { DocumentReference, doc, docData, getFirestore, setDoc, updateDoc, arrayUnion, arrayRemove } from "@angular/fire/firestore";
+import { User } from "@angular/fire/auth";
+import { DocumentReference, arrayRemove, doc, docData, getFirestore, setDoc, updateDoc } from "@angular/fire/firestore";
 import { AuthService } from 'app/auth/auth.service';
 import { mappedCollectionRef } from 'app/shared/firebase/firestore-helper';
-import { of } from 'rxjs';
-import { UserData } from './user';
-import { UserResult } from '../user-results/user-result';
 import { isBefore } from 'date-fns';
+import { of } from 'rxjs';
+import { UserResult } from '../user-results/user-result';
+import { UserData } from './user';
 
 @Injectable({
   providedIn: "root"
 })
 export class UserDataService {
-  private auth = inject(Auth);
   private fs = getFirestore(inject(FirebaseApp));
   private as = inject(AuthService);
 
@@ -40,7 +39,7 @@ export class UserDataService {
     const key = currentUser.key;
     console.log('UserDataService: Saving user ' + key);
     details.key = key;
-    // Use setDoc with merge=true rahter than update as update does not support withConverter
+    // Use setDoc with merge=true rather than update as update does not support withConverter
     await setDoc(this._doc(key), details, { merge: true });
   }
 

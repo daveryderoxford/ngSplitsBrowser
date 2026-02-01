@@ -1,13 +1,14 @@
 {
   "projects": {
-    "default": "splitsbrowser-b5948",
-    "splitsbrowsertest": "splitsbrowsertest-94938"
+    "default": "splitsbrowser-eu",
+    "splitsbrowsertest": "splitsbrowsertest-94938",
+    "splitsbrowser-us": "splitsbrowser-b5948"
   },
   "targets": {
-    "splitsbrowser-b5948": {
+    "splitsbrowser-eu": {
       "hosting": {
         "splitsbrowser": [
-          "splitsbrowser-b5948"
+          "splitsbrowser-eu"
         ]
       }
     }

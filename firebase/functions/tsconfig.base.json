@@ -10,9 +10,7 @@
       "strictNullChecks": false,
       "target": "es2022",
       "types": [
-         "chai",
          "node",
-         "mocha"
       ]
    },
    "compileOnSave": true,

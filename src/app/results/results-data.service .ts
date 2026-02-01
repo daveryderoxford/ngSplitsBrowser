@@ -2,8 +2,7 @@
 
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { inject, Injectable, resource, signal } from "@angular/core";
-import { FirebaseApp } from '@angular/fire/app';
-import { getFunctions, httpsCallable } from '@angular/fire/functions';
+import { Functions, httpsCallable } from '@angular/fire/functions';
 import { getStorage } from '@angular/fire/storage';
 import { ascending as d3_ascending, range as d3_range } from "d3-array";
 import { firstValueFrom } from 'rxjs';
@@ -31,7 +30,7 @@ const colours = [
 })
 export class ResultsDataService {
 
-   private functions = getFunctions(inject(FirebaseApp));
+   private functions = inject(Functions);
 
    private http = inject(HttpClient);
    
